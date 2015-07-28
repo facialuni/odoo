@@ -630,9 +630,7 @@ form: module.record_id""" % (xml_id,)
         rec_model = rec.get("model").encode('ascii')
         model = self.pool[rec_model]
         rec_id = rec.get("id",'').encode('ascii')
-        rec_context = rec.get("context", {})
-        if rec_context:
-            rec_context = unsafe_eval(rec_context)
+        rec_context = self.get_context(data_node, rec, globals())
 
         if self.xml_filename and rec_id:
             rec_context['install_mode_data'] = dict(
@@ -706,7 +704,8 @@ form: module.record_id""" % (xml_id,)
                         f_val = int(f_val)
             res[f_name] = f_val
 
-        id = self.pool['ir.model.data']._update(cr, self.uid, rec_model, self.module, res, rec_id or False, not self.isnoupdate(data_node), noupdate=self.isnoupdate(data_node), mode=self.mode, context=rec_context )
+        uid = self.get_uid(cr, self.uid, data_node, rec)
+        id = self.pool['ir.model.data']._update(cr, uid, rec_model, self.module, res, rec_id or False, not self.isnoupdate(data_node), noupdate=self.isnoupdate(data_node), mode=self.mode, context=rec_context )
         if rec_id:
             self.idref[rec_id] = int(id)
         if config.get('import_partial'):

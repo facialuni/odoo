@@ -34,6 +34,7 @@ Ask questions, get answers, no distractions
     ],
     'demo': [
         'data/forum_demo.xml',
+        'data/forum_demo_largethread.xml',
     ],
     'installable': True,
     'application': True,

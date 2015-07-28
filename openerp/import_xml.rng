@@ -179,6 +179,7 @@
                 </rng:optional>
             </rng:optional>
             <rng:attribute name="model" />
+            <rng:optional><rng:attribute name="uid"/></rng:optional>
             <rng:optional><rng:attribute name="context"/></rng:optional>
             <rng:zeroOrMore>
                 <rng:ref name="field" />
