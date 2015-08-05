@@ -178,17 +178,18 @@ class QWeb(orm.AbstractModel):
         except ValueError:
             raise_qweb_exception(QWebTemplateNotFound, message="Loader could not find template %r" % name, template=origin_template)
 
-        if hasattr(document, 'documentElement'):
-            dom = document
-        elif document.startswith("<?xml"):
-            dom = etree.fromstring(document)
-        else:
-            dom = etree.parse(document).getroot()
+        if document is not None:
+            if hasattr(document, 'documentElement'):
+                dom = document
+            elif document.startswith("<?xml"):
+                dom = etree.fromstring(document)
+            else:
+                dom = etree.parse(document).getroot()
 
-        res_id = isinstance(name, (int, long)) and name or None
-        for node in dom:
-            if node.get('t-name') or (res_id and node.tag == "t"):
-                return node
+            res_id = isinstance(name, (int, long)) and name or None
+            for node in dom:
+                if node.get('t-name') or (res_id and node.tag == "t"):
+                    return node
 
         raise QWebTemplateNotFound("Template %r not found" % name, template=origin_template)
 
@@ -505,6 +506,7 @@ class QWeb(orm.AbstractModel):
 
         record, field_name = template_attributes["field"].rsplit('.', 1)
         record = self.eval_object(record, qwebcontext)
+        assert hasattr(record, '_fields'), template_attributes['field']
         field = record._fields[field_name]
         foptions = self.eval_format(template_attributes.get('field-options') or '{}', qwebcontext)
         options = json.loads(foptions)

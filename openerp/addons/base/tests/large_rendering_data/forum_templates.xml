@@ -1,0 +1,898 @@
+<data>
+    <t t-name="layout" name="Main layout">&lt;!DOCTYPE html&gt;
+        <html t-att-lang="lang and lang.replace('_', '-')"
+              t-att-data-website-id="website.id if editable and website else None"
+              t-att-data-editable="'1' if editable else None"
+              t-att-data-translatable="'1' if translatable else None"
+              t-att-data-edit_translations="'1' if edit_translations else None"
+              t-att-data-view-xmlid="xmlid if editable or translatable else None"
+              t-att-data-main-object="repr(main_object) if editable else None"
+              t-att-data-oe-company-name="res_company.name">
+            <head>
+                <meta charset="utf-8"/>
+                <t t-if="main_object and 'website_meta_title' in main_object and not title">
+                    <t t-set="title"
+                       t-value="main_object.website_meta_title"/>
+                </t>
+                <t t-if="main_object and 'name' in main_object and not title and not additional_title">
+                    <t t-set="additional_title"
+                       t-value="main_object.name"/>
+                </t>
+                <t t-if="not title">
+                    <t t-set="title">
+                        <t t-if="additional_title">
+                            <t t-raw="additional_title"/>
+                            |
+                        </t>
+                        <t t-esc="(website or res_company).name"/>
+                    </t>
+                </t>
+
+                <meta name="viewport" content="initial-scale=1"/>
+                <meta name="description" t-att-content="main_object and 'website_meta_description' in main_object
+            and main_object.website_meta_description or website_meta_description"/>
+                <meta name="keywords" t-att-content="main_object and 'website_meta_keywords' in main_object
+            and main_object.website_meta_keywords or website_meta_keywords"/>
+                <meta name="generator" content="Odoo"/>
+
+                <!-- OpenGraph tags for Facebook sharing -->
+                <meta property="og:title"
+                      t-att-content="additional_title"/>
+                <meta property="og:site_name"
+                      t-att-content="res_company.name"/>
+                <t t-if="main_object and 'plain_content' in main_object and main_object.plain_content">
+                    <t t-set="og_description"
+                       t-value="main_object.plain_content[0:500]"/>
+                    <meta property="og:description"
+                          t-att-content="og_description"/>
+                    <meta property='og:image'
+                          t-att-content="request.httprequest.url_root+'logo.png'"/>
+                    <meta property='og:url'
+                          t-att-content="request.httprequest.url_root+request.httprequest.path[1:end]"/>
+                </t>
+
+                <title>
+                    <t t-esc="title"/>
+                </title>
+
+                <t t-raw="head or ''" name='layout_head'/>
+            </head>
+            <body>
+                <div id="wrapwrap">
+                    <header>
+                        <div class="navbar navbar-default navbar-static-top">
+                            <div class="container">
+                                <div class="navbar-header">
+                                    <button type="button"
+                                            class="navbar-toggle"
+                                            data-toggle="collapse"
+                                            data-target=".navbar-top-collapse">
+                                        <span class="sr-only">Toggle
+                                            navigation
+                                        </span>
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                    </button>
+                                    <a class="navbar-brand" href="/"
+                                       t-if="website"
+                                       t-field="website.name">My Website
+                                    </a>
+                                </div>
+                                <div class="collapse navbar-collapse navbar-top-collapse">
+                                    <ul class="nav navbar-nav navbar-right"
+                                        id="top_menu">
+                                        <t t-foreach="website.menu_id.child_id"
+                                           t-as="submenu">
+                                            <t t-call="submenu"/>
+                                        </t>
+                                        <li class="divider"
+                                            t-ignore="true"
+                                            t-if="website.user_id != user_id"/>
+                                        <li class="dropdown"
+                                            t-ignore="true"
+                                            t-if="website.user_id != user_id">
+                                            <a href="#"
+                                               class="dropdown-toggle"
+                                               data-toggle="dropdown">
+                                                <b>
+                                                    <span t-esc="(len(user_id.name)&gt;25) and (user_id.name[:23]+'...') or user_id.name"/>
+                                                    <span class="caret"></span>
+                                                </b>
+                                            </a>
+                                            <ul class="dropdown-menu js_usermenu"
+                                                role="menu">
+                                                <li id="o_logout">
+                                                    <a t-attf-href="/web/session/logout?redirect=/"
+                                                       role="menuitem">
+                                                        Logout
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+                    <main>
+                        <t t-raw="0"/>
+                    </main>
+                    <footer>
+                        <div id="footer">
+                        </div>
+                    </footer>
+                </div>
+            </body>
+        </html>
+    </t>
+    <t t-name="header" name="Forum Index">
+        <t t-call="layout">
+            <div t-if="is_public_user and not forum_welcome_message"
+                 class="forum_intro">
+                <div t-field="forum.welcome_message"/>
+            </div>
+
+            <div class="container mt16 website_forum">
+                <div class="navbar navbar-default">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle"
+                                data-toggle="collapse"
+                                data-target="#oe-help-navbar-collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand"
+                           t-attf-href="/forum/#{slug(forum)}">
+                            <span t-field="forum.name"/>
+                        </a>
+                    </div>
+                    <div class="collapse navbar-collapse"
+                         id="oe-help-navbar-collapse">
+                        <ul class="nav navbar-nav">
+                            <li t-att-class="sorting == 'relevancy desc' and 'active' or '' ">
+                                <a t-attf-href="/forum/#{ slug(forum) }?{{ keep_query( 'search', 'post_type', 'filters', sorting='relevancy desc') }}">
+                                    Trending
+                                </a>
+                            </li>
+                            <li t-att-class="sorting == 'create_date desc' and 'active' or '' ">
+                                <a t-attf-href="/forum/#{ slug(forum) }?{{ keep_query( 'search', 'post_type', 'filters', sorting='create_date desc') }}">
+                                    Newest
+                                </a>
+                            </li>
+                            <li t-att-class="searches.get('users') and 'active' or '' ">
+                                <a t-attf-href="/forum/#{ slug(forum) }/users">
+                                    People
+                                </a>
+                            </li>
+                            <li t-att-class="searches.get('tags') and 'active' or '' ">
+                                <a t-attf-href="/forum/#{ slug(forum) }/tag">
+                                    Tags
+                                </a>
+                            </li>
+                            <li t-att-class="searches.get('badges') and 'active' or '' ">
+                                <a t-attf-href="/forum/#{ slug(forum) }/badge">
+                                    Badges
+                                </a>
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li t-if="not is_public_user"
+                                t-att-class="searches.get('my_profile') and 'active' or '' ">
+                                <a t-attf-href="/forum/#{ slug(forum) }/user/#{uid}">
+                                    <span t-field="user_id.name"/>
+                                    (k:<t t-esc="user_id.karma"/>)
+                                </a>
+                            </li>
+                            <li>
+                                <form class="navbar-form" role="search"
+                                      t-attf-action="/forum/#{ slug(forum) }"
+                                      method="get">
+                                    <t t-call="website_search_box"/>
+                                    <span class="dropdown"
+                                          groups="base.group_erp_manager">
+                                        <button class="btn btn-default dropdown-toggle"
+                                                type="button"
+                                                id="dropdownMenu1"
+                                                data-toggle="dropdown">
+                                            <i class="fa fa-cog"/>
+                                        </button>
+                                        <ul class="dropdown-menu"
+                                            role="menu"
+                                            aria-labelledby="dropdownMenu1">
+                                            <li role="presentation">
+                                                <a role="menuitem"
+                                                   tabindex="-1"
+                                                   t-attf-href="/forum/#{slug(forum)}/edit_welcome_message?enable_editor=1">
+                                                    Design Welcome Message
+                                                </a>
+                                            </li>
+                                            <li role="presentation">
+                                                <a role="menuitem"
+                                                   tabindex="-1"
+                                                   t-attf-href="/web#id=#{forum.id}&amp;view_type=form&amp;model=forum.forum">
+                                                    Forum Settings
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </span>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="wrap" class="container">
+                <div class="row mb16">
+                    <div class="col-sm-9">
+                        <div t-foreach="notifications or []"
+                             t-as="notification"
+                             class="alert alert-success alert-dismissable">
+                            <button type="button"
+                                    class="close notification_close"
+                                    t-att-id="notification.id"
+                                    data-dismiss="alert"
+                                    aria-hidden="true">&amp;times;
+                            </button>
+                            <div t-field="notification.body"/>
+                            <a t-attf-href="/forum/#{ slug(forum) }/user/#{ user.id }#badges"
+                               class="fa fa-arrow-right">View Your Badges
+                            </a>
+                        </div>
+                        <div t-if="not validation_email_sent and not is_public_user and user.karma == 0"
+                             class="alert alert-danger alert-dismissable">
+                            <button type="button"
+                                    class="close validation_email_close"
+                                    data-dismiss="alert"
+                                    aria-hidden="true">&amp;times;
+                            </button>
+                            <div>
+                                <p>
+                                    It appears your email has not been
+                                    verified.
+                                    <a class="send_validation_email"
+                                       href="#" t-att-forum-id="forum.id">
+                                        Click here to send a verification
+                                        email allowing you to participate
+                                        to the forum.
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                        <div t-if="validation_email_done"
+                             class="alert alert-success alert-dismissable">
+                            <button type="button"
+                                    class="close validated_email_close"
+                                    data-dismiss="alert"
+                                    aria-hidden="true">&amp;times;
+                            </button>
+                            <div>
+                                <p>Congratulations! Your email has just
+                                    been validated. You may now
+                                    participate to our forums.
+                                </p>
+                            </div>
+                        </div>
+                        <t t-raw="0"/>
+                    </div>
+                    <div class="col-sm-3" id="right-column">
+                        <div t-if="not header.get('ask_hide')"
+                             t-attf-class="btn-group btn-block mb16 #{(user.karma &lt; forum.karma_ask) and not is_public_user and 'karma_required' or ''}"
+                             t-attf-data-karma="#{forum.karma_ask}">
+                            <t t-set="multi_type"
+                               t-value="(forum.allow_link and forum.allow_question) or (forum.allow_link and forum.allow_discussion) or (forum.allow_question and forum.allow_discussion)"/>
+                            <a type="button"
+                               t-attf-class="btn btn-primary btn-lg #{'col-sm-10' if multi_type else 'col-sm-12'}"
+                               t-attf-href="/forum/#{slug(forum)}/ask?post_type=#{forum.default_post_type}">
+                                <t t-if="forum.default_post_type == 'question'">
+                                    Ask a Question
+                                </t>
+                                <t t-if="forum.default_post_type == 'link'">
+                                    Submit a Link
+                                </t>
+                                <t t-if="forum.default_post_type == 'discussion'">
+                                    New Discussion
+                                </t>
+                            </a>
+                            <t t-if="multi_type">
+                                <button type="button"
+                                        class="btn btn-primary btn-lg col-sm-2 dropdown-toggle"
+                                        data-toggle="dropdown">
+                                    <span class="caret"></span>
+                                    <span class="sr-only">Select Post
+                                    </span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li t-if="forum.allow_question">
+                                        <a t-attf-href="/forum/#{slug(forum)}/ask?post_type=question">
+                                            Ask a Question
+                                        </a>
+                                    </li>
+                                    <li t-if="forum.allow_link">
+                                        <a t-attf-href="/forum/#{slug(forum)}/ask?post_type=link">
+                                            Submit a Link
+                                        </a>
+                                    </li>
+                                    <li t-if="forum.allow_discussion">
+                                        <a t-attf-href="/forum/#{slug(forum)}/ask?post_type=discussion">
+                                            New Discussion
+                                        </a>
+                                    </li>
+                                </ul>
+                            </t>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Keep Informed</h3>
+                            </div>
+                            <div class="panel-body">
+                                <t t-call="follow">
+                                    <t t-set="email"
+                                       t-value="user.email"/>
+                                    <t t-set="object" t-value="forum"/>
+                                </t>
+                            </div>
+                        </div>
+                        <div class="panel panel-default" id="about_forum">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">About This
+                                    Community
+                                </h3>
+                            </div>
+                            <div class="panel-body">
+                                <span t-field="forum.description"/>
+                                <a t-if="not header.get('is_guidelines')"
+                                   t-attf-href="/forum/#{slug(forum)}/faq"
+                                   class="fa fa-arrow-right">Read
+                                    Guidelines
+                                </a>
+                                <a t-if="header.get('is_guidelines')"
+                                   t-attf-href="/forum/#{slug(forum)}"
+                                   class="fa fa-arrow-right">Back to
+                                    <span t-field="forum.name"/>
+                                </a>
+                            </div>
+                        </div>
+                        <div t-if="header.get('question_data')">
+                            <div class="panel panel-default">
+                                <div class="panel-heading text-center">
+                                    <h3 class="panel-title">Question
+                                        tools
+                                    </h3>
+                                </div>
+                                <div class="panel-body text-center">
+                                    <t t-call="follow">
+                                        <t t-set="object"
+                                           t-value="question"/>
+                                    </t>
+                                    <div class="mt8">
+                                        <strong>
+                                            <t t-raw="len(question.message_follower_ids)"/>
+                                        </strong>
+                                        follower(s)
+                                    </div>
+                                </div>
+                                <div class="panel-heading text-center">
+                                    <h3 class="panel-title ">Stats</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <td>Asked:
+                                                    <strong>
+                                                        <span t-field="question.create_date"
+                                                              t-field-options='{"format":"short"}'/>
+                                                    </strong>
+                                                </td>
+                                            </tr>
+                                        </thead>
+                                        <tr>
+                                            <td>Seen:
+                                                <strong>
+                                                    <t t-raw="question.views"/>
+                                                </strong>
+                                                <span t-if="question.views&gt;1">
+                                                    times
+                                                </span>
+                                                <span t-if="question.views&lt;=1">
+                                                    time
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Last updated:
+                                                <strong>
+                                                    <span t-field="question.write_date"
+                                                          t-field-options='{"format":"short"}'/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="oe_structure"/>
+        </t>
+    </t>
+    <t t-name="post_description_full" name="Question Navigation">
+        <t t-call="header">
+            <div t-attf-class="question #{can_bump and 'oe_js_bump' or ''}"
+                 t-att-data-type="question.post_type"
+                 t-att-data-last-update="question.write_date"
+                 t-att-data-id="question.id">
+                <div class="pull-left">
+                    <t t-call="vote">
+                        <t t-set="post" t-value="question"/>
+                        <div class="mt4">
+                            <a t-attf-data-href="/forum/#{slug(question.forum_id)}/question/#{slug(question)}/toggle_favourite"
+                               t-attf-class="favourite_question no-decoration fa fa-2x fa-star #{question.user_favourite and 'forum_favourite_question' or ''}"/>
+                        </div>
+                    </t>
+                </div>
+                <div t-attf-class="question-block #{not question.active and 'alert alert-danger' or ''}">
+                    <h1 class="mt0 mb0">
+                        <t t-if="question.post_type == 'link'">
+                            <a t-att-href="question.content_link">
+                                <t t-esc="question.name"/>
+                            </a>
+                        </t>
+                        <t t-if="question.post_type in ('question', 'discussion')">
+                            <a t-attf-href="/forum/#{ slug(forum) }/question/#{ slug(question) }">
+                                <t t-esc="question.name"/>
+                            </a>
+                        </t>
+                        <span t-if="not question.active">
+                            <b>[Deleted]</b>
+                        </span>
+                        <span t-if="question.state == 'close'">
+                            <b>[Closed]</b>
+                        </span>
+                    </h1>
+                    <div class="pull-right">
+                        <div class="text-right">
+                            <t t-foreach="question.tag_ids" t-as="tag">
+                                <a t-attf-href="/forum/#{ slug(forum) }/tag/#{ tag.id }/questions"
+                                   class="label label-default"
+                                   t-field="tag.name"/>
+                            </t>
+                        </div>
+                    </div>
+                    <div class="text-muted mb16">
+                        <i t-if="question.post_type == 'question'"
+                           t-attf-class="fa fa-question-circle"
+                           t-att-title="question.post_type.capitalize()"/>
+                        <i t-if="question.post_type == 'discussion'"
+                           t-attf-class="fa fa-comments-o"
+                           t-att-title="question.post_type.capitalize()"/>
+                        <i t-if="question.post_type == 'link'"
+                           t-attf-class="fa fa-link"
+                           t-att-title="question.post_type.capitalize()"/>
+                        <span>By</span>
+                        <a t-attf-href="/forum/#{ slug(forum) }/user/#{ question.create_uid.id }"
+                           t-field="question.create_uid"
+                           t-field-options='{"widget": "contact", "country_image": true, "fields": ["name", "country_id"]}'
+                           style="display: inline-block;"/>
+                        <span>on</span>
+                        <span t-field="question.create_date"
+                              t-field-options='{"format":"short"}'/>
+                        <span>•</span>
+                        <span t-field="question.views"/>
+                        views
+                    </div>
+
+                    <div class="alert alert-info text-center"
+                         t-if="question.state == 'close'">
+                        <p class="mt16">
+                            <b>The
+                                <i t-field="question.post_type"/>
+                                has been closed
+                                <t t-if="question.closed_reason_id">for
+                                    reason:
+                                    <i t-esc="question.closed_reason_id.name"/>
+                                </t>
+                            </b>
+                        </p>
+                        <t t-if="question.closed_uid">
+                            <b>by
+                                <a t-attf-href="/forum/#{ slug(forum) }/user/#{ question.closed_uid.id }"
+                                   t-field="question.closed_uid"
+                                   t-field-options='{"widget": "contact", "fields": ["name"]}'
+                                   style="display: inline-block;"/>
+                            </b>
+                        </t>
+                        <b>on
+                            <span t-field="question.closed_date"/>
+                        </b>
+                        <div class="mt16 mb24 text-center">
+                            <t t-call="link_button">
+                                <t t-set="url"
+                                   t-value="'/forum/' + slug(forum) + '/question/' + slug(question) + '/reopen'"/>
+                                <t t-set="label" t-value="'Reopen'"/>
+                                <t t-set="classes"
+                                   t-value="'fa-arrow-right'"/>
+                                <t t-set="karma"
+                                   t-value="not question.can_close and question.karma_close or 0"/>
+                            </t>
+                        </div>
+                    </div>
+                    <div t-if="question.post_type != 'link'">
+                        <span t-field="question.content"
+                              class="oe_no_empty"/>
+                    </div>
+
+                    <div class="clearfix">
+                        <ul class="pull-right list-inline mb0"
+                            id="options">
+                            <li t-if="question.state == 'close'">
+                                <t t-call="link_button">
+                                    <t t-set="url"
+                                       t-value="'/forum/' + slug(forum) +'/question/' + slug(question) + '/reopen'"/>
+                                    <t t-set="label" t-value="'Reopen'"/>
+                                    <t t-set="classes"
+                                       t-value="'fa-undo'"/>
+                                    <t t-set="karma"
+                                       t-value="not question.can_close and question.karma_close or 0"/>
+                                </t>
+                            </li>
+                            <li>
+                                <t t-call="link_button">
+                                    <t t-set="url"
+                                       t-value="'/forum/' + slug(forum) +'/post/' + slug(question) + '/edit'"/>
+                                    <t t-set="label" t-value="'Edit'"/>
+                                    <t t-set="classes"
+                                       t-value="'fa-pencil-square-o'"/>
+                                    <t t-set="karma"
+                                       t-value="not question.can_edit and question.karma_edit or 0"/>
+                                </t>
+                            </li>
+                            <li t-if="question.state != 'close'">
+                                <t t-call="link_button">
+                                    <t t-set="url"
+                                       t-value="'/forum/' + slug(forum) +'/question/' + slug(question) + '/ask_for_close'"/>
+                                    <t t-set="label" t-value="'Close'"/>
+                                    <t t-set="classes"
+                                       t-value="'fa-times'"/>
+                                    <t t-set="karma"
+                                       t-value="not question.can_close and question.karma_close or 0"/>
+                                </t>
+                            </li>
+                            <li t-if="question.active">
+                                <t t-call="link_button">
+                                    <t t-set="url"
+                                       t-value="'/forum/' + slug(forum) +'/question/' + slug(question) + '/delete'"/>
+                                    <t t-set="label" t-value="'Delete'"/>
+                                    <t t-set="classes"
+                                       t-value="'fa-trash-o'"/>
+                                    <t t-set="karma"
+                                       t-value="not question.can_unlink and question.karma_unlink or 0"/>
+                                </t>
+                            </li>
+                            <li t-if="not question.active">
+                                <t t-call="link_button">
+                                    <t t-set="url"
+                                       t-value="'/forum/' + slug(forum) +'/question/' + slug(question) + '/undelete'"/>
+                                    <t t-set="label"
+                                       t-value="'Reactivate'"/>
+                                    <t t-set="classes"
+                                       t-value="'fa-trash-o'"/>
+                                    <t t-set="karma"
+                                       t-value="not question.can_unlink and question.karma_unlink or 0"/>
+                                </t>
+                            </li>
+                        </ul>
+                        <ul class="list-inline mb0">
+                            <li t-if="(question.post_type != 'question' or question.post_type == 'question' and not question.uid_has_answered) and question.state != 'close' and question.active != False">
+                                <a t-attf-class="fa fa-reply"
+                                   href="#post_reply">Reply
+                                </a>
+                            </li>
+                            <li t-if="question.post_type == 'question'">
+                                <a style="cursor: pointer"
+                                   t-att-data-toggle="question.can_comment and 'collapse' or ''"
+                                   t-attf-class="fa fa-comment-o #{not question.can_comment and 'karma_required text-muted' or ''}"
+                                   t-attf-data-karma="#{not question.can_comment and question.karma_comment or 0}"
+                                   t-attf-data-target="#comment#{ question._name.replace('.','') + '-' + str(question.id) }">
+                                    Comment
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0)"
+                                   class="oe_social_share fa fa-share-square-o"
+                                   t-attf-data-hashtags="#{question.post_type}">
+                                    Share
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <t t-call="post_comment">
+                        <t t-set="object" t-value="question"/>
+                    </t>
+                </div>
+            </div>
+            <div t-foreach="question.child_ids" t-as="post_answer"
+                 class="mt16 mb32">
+                <hr class="mb4 mt4"/>
+                <t t-call="post_answers">
+                    <t t-set="answer" t-value="post_answer"/>
+                </t>
+            </div>
+            <div id="post_reply"
+                 t-if="(question.post_type != 'question' or question.post_type == 'question' and not question.uid_has_answered) and question.state != 'close' and question.active != False">
+                <t t-call="post_answer"/>
+            </div>
+            <div t-if="question.post_type == 'question' and question.uid_has_answered"
+                 class="mb16">
+                <a class="btn btn-primary"
+                   t-attf-href="/forum/#{slug(forum)}/question/#{slug(question)}/edit_answer">
+                    Edit Your Previous Answer
+                </a>
+                <span class="text-muted">(only one answer per question is
+                    allowed)
+                </span>
+            </div>
+        </t>
+    </t>
+    <t t-name="vote">
+        <t t-set="own_vote" t-value="post.user_vote"/>
+        <t t-set="forum" t-value="post.forum_id"/>
+        <t t-set="karma_up" t-value="forum.karma_upvote"/>
+        <t t-set="karma_down" t-value="forum.karma_downvote"/>
+        <t t-set="can_upvote" t-value="post.can_upvote"/>
+        <t t-set="can_downvote" t-value="post.can_downvote"/>
+        <div class="vote text-center">
+            <a t-attf-class="vote_up fa fa-caret-up no-decoration #{own_vote == 1 and 'text-success' or ''} #{((own_vote == 1 and not can_downvote) or not can_upvote) and 'karma_required' or ''}"
+               t-attf-data-karma="#{own_vote == 1 and karma_down or karma_up}"
+               t-attf-data-href="/forum/#{slug(forum)}/post/#{slug(post)}/upvote"/>
+            <div class="vote_count text-muted" t-esc="post.vote_count"/>
+            <a t-attf-class="vote_down fa fa-caret-down no-decoration #{own_vote == -1 and 'text-warning' or ''} #{((own_vote == -1 and not can_upvote) or not can_downvote) and 'karma_required' or ''}"
+               t-attf-data-karma="#{own_vote == -1 and karma_up or karma_down}"
+               t-attf-data-href="/forum/#{slug(forum)}/post/#{slug(post)}/downvote"/>
+            <t t-raw="0"/>
+        </div>
+    </t>
+    <t t-name="link_button">
+        <form method="POST" t-att-action="url">
+            <button t-attf-class="fa btn-link #{classes} #{karma and 'karma_required text-muted' or ''}"
+                    t-attf-data-karma="#{karma}">
+                <t t-esc="label"/>
+            </button>
+        </form>
+    </t>
+    <t t-name="post_comment">
+        <div class="row clearfix">
+            <div class="col-sm-10 col-sm-offset-2">
+                <div t-foreach="reversed(object.website_message_ids)"
+                     t-as="message" class="comment oe_comment_grey">
+                    <small class="text-muted">
+                        <t t-set="required_karma"
+                           t-value="message.author_id.id == user.partner_id.id and object.forum_id.karma_comment_unlink_own or object.forum_id.karma_comment_unlink_all"/>
+                        <t t-call="link_button">
+                            <t t-set="url"
+                               t-value="'/forum/' + slug(forum) + '/post/' + slug(object) + '/comment/' + slug(message) + '/delete'"/>
+                            <t t-set="label" t-value="' '"/>
+                            <t t-set="karma"
+                               t-value="user.karma&lt;required_karma and required_karma or 0"/>
+                            <t t-set="classes"
+                               t-value="'close comment_delete fa-times'"/>
+                        </t>
+
+                        <div>
+                            <span t-field="message.body" class="oe_no_empty"/>
+                        </div>
+                        <t t-set="required_karma"
+                           t-value="message.author_id.id == user.partner_id.id and object.forum_id.karma_comment_convert_own or object.forum_id.karma_comment_convert_all"/>
+                        <t t-if="(object.parent_id and object.parent_id.state != 'close' and object.parent_id.active != False) or (not object.parent_id and object.state != 'close' and object.active != False)">
+                            <t t-set="allow_post_comment" t-value="True"/>
+                        </t>
+                        <t t-if="allow_post_comment">
+                            <t t-call="link_button">
+                                <t t-set="url"
+                                   t-value="'/forum/' + slug(forum) + '/post/' + slug(object) + '/comment/' + slug(message) + '/convert_to_answer'"/>
+                                <t t-set="label"
+                                   t-value="'Convert as an answer'"/>
+                                <t t-set="karma"
+                                   t-value="user.karma&lt;required_karma and required_karma or 0"/>
+                                <t t-set="classes"
+                                   t-value="'fa-magic pull-right'"/>
+                            </t>
+                        </t>
+                        <a t-attf-href="/forum/#{slug(forum)}/partner/#{message.author_id.id}"
+                           t-field="message.author_id"
+                           t-field-options='{"widget": "contact", "country_image": true, "fields": ["name", "country_id"]}'
+                           style="display: inline-block;"/>
+                        on
+                        <span t-field="message.date"
+                              t-field-options='{"format":"short"}'/>
+                    </small>
+                </div>
+                <div class="css_editable_mode_hidden">
+                    <form t-attf-id="comment#{ object._name.replace('.','') + '-' + str(object.id) }"
+                          class="collapse oe_comment_grey js_website_submit_form"
+                          t-attf-action="/forum/#{slug(forum)}/post/#{slug(object)}/comment"
+                          method="POST">
+                        <input name="post_id" t-att-value="object.id"
+                               type="hidden" class="mt8"/>
+                        <textarea name="comment" class="form-control"
+                                  placeholder="Comment this post..."/>
+                        <button type="submit" class="btn btn-primary mt8">
+                            Post
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </t>
+    <t t-name="post_answer">
+        <h3 class="mt8" t-if="question.post_type == 'question'">Your Answer
+        </h3>
+        <h3 class="mt8" t-if="question.post_type != 'question'">Add a
+            Comment
+        </h3>
+        <p t-if="question.post_type == 'question'">
+            <b>Please try to give a substantial answer.</b>
+            If you wanted to comment on the question or answer, just
+            <b>use the commenting tool.</b>
+            Please remember that you can always
+            <b>revise your answers</b>
+            - no need to answer the same question twice. Also, please
+            <b>don't forget to vote</b>
+            - it really helps to select the best questions and answers!
+        </p>
+        <form t-attf-action="/forum/#{ slug(forum) }/#{slug(question)}/reply"
+              method="post" class="js_website_submit_form" role="form">
+            <input type="hidden" name="karma" t-attf-value="#{user.karma}"
+                   id="karma"/>
+            <textarea name="content" t-attf-id="content-#{str(question.id)}"
+                      class="form-control load_editor" required="True"
+                      t-att-data-karma="forum.karma_editor"/>
+            <button type="submit"
+                    t-attf-class="btn btn-primary #{forum.allow_share and 'oe_social_share_call' or ''} mt16 #{not question.can_answer and 'karma_required' or ''}"
+                    t-att-data-karma="question.forum_id.karma_answer"
+                    data-social-target-type="answer" data-hashtags="#answer">
+                Post Answer
+            </button>
+        </form>
+    </t>
+    <t t-name="post_answers">
+        <a t-attf-id="answer-#{str(answer.id)}"/>
+        <div t-attf-class="forum_answer" t-attf-id="answer_#{answer.id}">
+            <div class="pull-left">
+                <t t-call="vote">
+                    <t t-set="post" t-value="answer"/>
+                    <div t-if="question.post_type == 'question'" class="mt4">
+                        <a t-attf-class="accept_answer fa fa-2x fa-check-circle no-decoration #{answer.is_correct and 'oe_answer_true' or 'oe_answer_false'} #{not answer.can_accept and 'karma_required' or ''}"
+                           t-attf-data-karma="#{answer.karma_accept}"
+                           t-attf-data-href="/forum/#{slug(question.forum_id)}/post/#{slug(answer)}/toggle_correct"/>
+                    </div>
+                </t>
+            </div>
+            <div class="question-block">
+                <div class="pull-right author-box">
+                    <img class="pull-left img img-rounded img-avatar"
+                         t-attf-src="/forum/user/#{answer.create_uid.id}/avatar"/>
+                    <a t-attf-href="/forum/#{ slug(forum) }/user/#{ answer.create_uid.id }"
+                       t-field="answer.create_uid"
+                       t-field-options='{"widget": "contact", "country_image": true, "fields": ["name", "country_id"]}'
+                       style="display: inline-block;"/>
+                    <div class="text-muted">
+                        <a t-attf-href="/forum/#{slug(question.forum_id)}/question/#{slug(question)}#answer_#{answer.id}">
+                            On
+                        </a>
+                        <span t-field="answer.create_date"
+                              t-field-options='{"format":"short"}'/>
+                    </div>
+                </div>
+                <div class="clearfix">
+                    <span t-field="answer.content" class="oe_no_empty"/>
+                </div>
+                <div class="clearfix">
+                    <ul class="list-inline pull-right mb0">
+                        <li>
+                            <t t-call="link_button">
+                                <t t-set="url"
+                                   t-value="'/forum/' + slug(forum) + '/post/' + slug(answer) + '/edit'"/>
+                                <t t-set="label" t-value="'Edit'"/>
+                                <t t-set="classes"
+                                   t-value="'fa fa-pencil-square-o'"/>
+                                <t t-set="karma"
+                                   t-value="not answer.can_edit and answer.karma_edit or 0"/>
+                            </t>
+                        </li>
+                        <li>
+                            <t t-call="link_button">
+                                <t t-set="url"
+                                   t-value="'/forum/' + slug(forum) + '/post/' + slug(answer) + '/delete'"/>
+                                <t t-set="label" t-value="'Delete'"/>
+                                <t t-set="classes" t-value="'fa-trash-o'"/>
+                                <t t-set="karma"
+                                   t-value="not answer.can_unlink and answer.karma_unlink or 0"/>
+                            </t>
+                        </li>
+                        <li t-if="question.post_type == 'question'">
+                            <t t-call="link_button">
+                                <t t-set="url"
+                                   t-value="'/forum/' + slug(forum) + '/post/' + slug(answer) + '/convert_to_comment'"/>
+                                <t t-set="label"
+                                   t-value="'Convert as a comment'"/>
+                                <t t-set="classes" t-value="'fa-magic'"/>
+                                <t t-set="karma"
+                                   t-value="not answer.can_comment_convert and answer.karma_comment_convert or 0"/>
+                            </t>
+                        </li>
+                    </ul>
+                    <ul class="list-inline mb0">
+                        <li t-if="question.post_type == 'question'">
+                            <a t-attf-class="fa fa-comment-o #{not answer.can_comment and 'karma_required text-muted' or ''}"
+                               t-attf-data-karma="#{not answer.can_comment and answer.karma_comment or 0}"
+                               style="cursor: pointer"
+                               t-att-data-toggle="answer.can_comment and 'collapse' or ''"
+                               t-attf-data-target="#comment#{ answer._name.replace('.','') + '-' + str(answer.id) }">
+                                Comment
+                            </a>
+                        </li>
+                        <li t-if="question.post_type != 'question'">
+                            <a t-attf-class="fa fa-reply"
+                               style="cursor: pointer" data-toggle="collapse"
+                               t-attf-data-target="#reply#{ answer._name.replace('.','') + '-' + str(answer.id) }">
+                                Reply
+                            </a>
+                        </li>
+                    </ul>
+
+                </div>
+                <hr class="mt4 mb4"/>
+
+                <t t-if="answer.post_type == 'question'"
+                   t-call="post_comment">
+                    <t t-set="object" t-value="answer"/>
+                </t>
+                <div t-if="answer.post_type != 'question' and question.state != 'close' and question.active != False">
+                    <t t-call="post_reply">
+                        <t t-set="object" t-value="answer"/>
+                    </t>
+                </div>
+                <div t-foreach="answer.child_ids" t-as="child_answer"
+                     class="mt4 mb4">
+                    <t t-call="post_answers">
+                        <t t-set="answer" t-value="child_answer"/>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+    <t t-name="website_search_box" name="Website Searchbox">
+        <div class="input-group">
+            <div class="oe_search">
+                <input type="text" name="search" class="search-query form-control oe_search_box" placeholder="Search..." t-att-value="search" />
+                <span class="fa fa-remove fa-lg oe_search_clear"></span>
+            </div>
+            <span class="input-group-btn">
+               <button type="submit" class="btn btn-default oe_search_button"><i class="fa fa-search"/></button>
+            </span>
+        </div>
+    </t>
+    <t t-name="follow">
+        <div class="input-group js_follow" t-att-data-id="object.id"
+                  t-att-data-object="object._name"
+                  t-att-data-follow="object.id and object.message_is_follower and 'on' or 'off'"
+                  t-att-data-unsubscribe="'unsubscribe' if 'unsubscribe' in request.params else None">
+            <input
+                  type="email" name="email"
+                  class="js_follow_email form-control"
+                  placeholder="your email..."
+                  groups="base.group_public"/>
+            <span class="input-group-btn">
+                <button href="#" t-attf-class="btn btn-default js_unfollow_btn">Unsubscribe</button>
+                <button href="#" t-attf-class="btn btn-primary js_follow_btn">Subscribe</button>
+            </span>
+        </div>
+    </t>
+
+</data>
