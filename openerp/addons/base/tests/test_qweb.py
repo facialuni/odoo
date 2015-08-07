@@ -207,7 +207,8 @@ class TestLargeRendering(common.TransactionCase):
             want = etree.fromstring(f.read(), parser=etree.HTMLParser(encoding='utf-8', remove_blank_text=True))
 
         checker = LXMLOutputChecker()
-        assert checker.compare_docs(want, got), checker.collect_diff(want, got, html=True, indent=2)
+        assert checker.compare_docs(want, got), \
+            checker.collect_diff(want, got, html=True, indent=2)
 
 
 def load_tests(loader, suite, _):

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import ast
 import collections
 import copy
 import cStringIO
@@ -12,9 +13,12 @@ import os
 import re
 import sys
 import textwrap
+import time
 import uuid
 from subprocess import Popen, PIPE
 from urlparse import urlparse
+
+import __builtin__
 
 import babel
 import babel.dates
@@ -33,6 +37,8 @@ from openerp.osv import osv, orm, fields
 from openerp.tools import html_escape as escape
 from openerp.tools.misc import find_in_path
 from openerp.tools.translate import _
+
+from . import _astgen
 
 _logger = logging.getLogger(__name__)
 
@@ -92,8 +98,37 @@ class FileSystemLoader(object):
                 arch = etree.tostring(root, encoding='utf-8', xml_declaration=True)
                 return arch
 
+class EvalDict(collections.Mapping):
+    """ Mapping proxying on an evaluation context, also builtins
+
+    * prevents access to cr and loader
+    * acts as a defaultdict(lambda: None) so code can try to access unset
+      variables and will just get None
+    """
+    def __init__(self, ctx):
+        self._ctx = ctx
+
+    def __iter__(self):
+        return (k for k in self._ctx if k not in ('cr', 'loader'))
+
+    def __len__(self):
+        l = len(self._ctx)
+        if 'cr' in self._ctx:
+            l -= 1
+        if 'loader' in self._ctx:
+            l -= 1
+        return l
+
+    def __getitem__(self, key):
+        if key in ('cr', 'loader'):
+            return None
+        try:
+            return self._ctx[key]
+        except KeyError:
+            return getattr(__builtin__, key, None)
+
 class QWebContext(dict):
-    def __init__(self, cr, uid, data, loader=None, context=None):
+    def __init__(self, cr, uid, data, loader=None, context=None, templates=None):
         self.cr = cr
         self.uid = uid
         self.loader = loader
@@ -101,6 +136,8 @@ class QWebContext(dict):
         dic = dict(data)
         super(QWebContext, self).__init__(dic)
         self['defined'] = lambda key: key in self
+        self.templates = templates or {}
+        self.eval_dict = EvalDict(self)
 
     def safe_eval(self, expr):
         locals_dict = collections.defaultdict(lambda: None)
@@ -115,11 +152,13 @@ class QWebContext(dict):
         """
         return QWebContext(self.cr, self.uid, dict.copy(self),
                            loader=self.loader,
-                           context=self.context)
+                           context=self.context,
+                           templates=self.templates)
 
     def __copy__(self):
         return self.copy()
 
+_set_seq = iter(itertools.count())
 class QWeb(orm.AbstractModel):
     """ Base QWeb rendering engine
 
@@ -231,6 +270,256 @@ class QWeb(orm.AbstractModel):
     def eval_bool(self, expr, qwebcontext):
         return int(bool(self.eval(expr, qwebcontext)))
 
+    def _compile(self, element, ctx):
+        mod = _astgen.base_module()
+
+        fn = _astgen.base_fn_def(self._compile_document(
+            element, ctx=ctx))
+
+        mod.body.append(fn)
+        ast.fix_missing_locations(mod)
+        ns = {}
+        __builtin__.eval(compile(mod, '<template>', 'exec'), ns)
+        return ns[fn.name]
+
+    def _directives_eval_order(self):
+        """ Should list all supported directives in the order in which they
+        should evaluate when set on the same element. E.g. if a node bearing
+        both ``foreach`` and ``if`` should see ``foreach`` executed before
+        ``if`` aka
+
+        .. code-block:: xml
+
+            <el t-foreach="foo" t-as="bar" t-if="bar">
+
+        should be equivalent to
+
+        .. code-block:: xml
+
+            <t t-foreach="foo" t-as="bar">
+                <t t-if="bar">
+                    <el>
+
+        then this method should return ``['foreach', 'if']``
+        """
+        return ['foreach', 'if', 'call', 'set', 'esc', 'raw', 'debug']
+
+    def _compile_element(self, el, body, ctx):
+        # doesn't generate any content itself
+        if el.text is not None:
+            body.insert(0, _astgen.append(ast.Str(unicode(el.text))))
+
+        opening = []
+        closing = []
+        if el.tag != 't':
+            directive_names = {'t-' + n for n in self._directives_eval_order()}
+            # build opening tag
+            opening = [_astgen.append(ast.Str(u'<' + el.tag + u''.join(
+                u' {}="{}"'.format(name, escape(value))
+                for name, value in el.attrib.iteritems()
+                if not name.startswith('t-att')
+                if name not in directive_names
+            )))]
+            # dynamic attributes codegen
+            for name, value in el.attrib.iteritems():
+                if name.startswith('t-attf-'):
+                    opening.append(ast.Assign(
+                        targets=[ast.Name(id='result', ctx=ast.Store())],
+                        value=_astgen.compile_format(value)
+                    ))
+                    opening.extend(ast.parse(textwrap.dedent("""
+                    if result:
+                        output.append(u' {}="{{}}"'.format(escape(result)))
+                    """.format(name[7:]))).body)
+                elif name.startswith('t-att-'):
+                    opening.append(ast.Assign(
+                        targets=[ast.Name(id='result', ctx=ast.Store())],
+                        value=_astgen.compile_strexpr(value)
+                    ))
+                    opening.extend(ast.parse(textwrap.dedent("""
+                    if result:
+                        output.append(u' {}="{{}}"'.format(escape(result)))
+                    """.format(name[6:]))).body)
+                elif name == 't-att':
+                    opening.append(ast.Assign(
+                        targets=[ast.Name(id='result', ctx=ast.Store())],
+                        value=_astgen.compile_expr(value)
+                    ))
+                    opening.extend(ast.parse(textwrap.dedent("""
+                        output.extend(
+                            u' {}="{}"'.format(name, escape(value))
+                            for name, value in (
+                                result.iteritems() if isinstance(result, collections.Mapping)
+                                else [result]
+                            ) if value
+                        )
+                    """)).body)
+            opening.append(_astgen.append(ast.Str(u'>')))
+
+            if el.tag not in self._void_elements:
+                closing = [_astgen.append(ast.Str(u'</%s>' % el.tag))]
+
+        return opening + body + closing
+
+    def _compile_directive_esc(self, el, body, ctx):
+        # TODO: widgets
+        return [_astgen.append(ast.Call(
+            func=ast.Name(id='escape', ctx=ast.Load()),
+            args=[_astgen.compile_strexpr(el.get('t-esc'))],
+            keywords=[],
+        ))] + body
+
+    def _compile_directive_raw(self, el, body, ctx):
+        return [_astgen.append(_astgen.compile_strexpr(el.get('t-raw')))] + body
+
+    def _compile_directive_set(self, el, body, ctx):
+        if 't-value' in el.attrib:
+            value = _astgen.compile_expr(el.get('t-value'))
+            body = []
+        elif 't-valuef' in el.attrib:
+            value = _astgen.compile_format(el.get('t-valuef'))
+            body = []
+        else:
+            # FIXME: that's going to wrap around eventually...
+            fn_name = '_set_%d' % next(_set_seq)
+            # FIXME: should be defined at template start or in template module (loops)
+            body = [_astgen.base_fn_def(body, name=fn_name)]
+            render = ast.Call(
+                func=ast.Name(id=fn_name, ctx=ast.Load()),
+                args=[ast.Name(id='qwebcontext', ctx=ast.Load())],
+                keywords=[]
+            )
+            # concat body render to string
+            value = ast.Call(
+                func=ast.Attribute(value=ast.Str(u''), attr='join', ctx=ast.Load()),
+                args=[render], keywords=[]
+            )
+
+        return body + [ast.Assign(
+            [ast.Subscript(
+                value=ast.Name(id='qwebcontext', ctx=ast.Load()),
+                slice=ast.Index(ast.Str(el.get('t-set'))),
+                ctx=ast.Store()
+            )],
+            value
+        )]
+
+    def _compile_directive_call(self, el, body, ctx):
+        """
+        :param etree._Element el:
+        :param list body:
+        :param _astgen.CompileContext ctx:
+        :return: new body
+        :rtype: list(ast.AST)
+        """
+        # TODO: add support for t-lang
+        # TODO: template name as format string?
+        # TODO: integer template name?
+        tmpl = el.get('t-call')
+        ctx.register_template(tmpl)
+
+        # body evaluator
+        fn_name = '_call_%d' % next(_set_seq)
+        body = [_astgen.base_fn_def(body, name=fn_name)]
+
+        return body + ast.parse(textwrap.dedent("""
+        qwebcontext_copy = qwebcontext.copy()
+        # concat body render to string
+        qwebcontext_copy[0] = u''.join(%s(qwebcontext_copy))
+        output.extend(qwebcontext.templates[%s](qwebcontext_copy))
+        """ % (fn_name, repr(tmpl)))).body
+
+    def _compile_directive_if(self, el, body, ctx):
+        return [
+            ast.If(
+                test=_astgen.compile_expr(el.get('t-if')),
+                body=body,
+                orelse=[]
+            )
+        ]
+    def _compile_directive_foreach(self, el, body, ctx):
+        expr = _astgen.compile_expr(el.get('t-foreach'))
+        varname = el.get('t-as').replace('.', '_')
+        # FIXME: randomize function name and store it at the module level (?)
+        body_fn = _astgen.base_fn_def(body, name='_foreach_callback')
+
+        # foreach_iterator(qwebcontext, <expr>, varname)
+        it = ast.Call(
+            func=ast.Name(id='foreach_iterator', ctx=ast.Load()),
+            args=[ast.Name(id='qwebcontext', ctx=ast.Load()), expr, ast.Str(varname)],
+            keywords=[]
+        )
+        callback = ast.Name(id='_foreach_callback', ctx=ast.Load())
+        # itertools.imap(_foreach_callback, previous)
+        it = ast.Call(
+            func=ast.Attribute(
+                value=ast.Name(id='itertools', ctx=ast.Load()),
+                attr='imap',
+                ctx=ast.Load()
+            ), args=[callback, it], keywords=[]
+        )
+        # itertools.chain.from_iterable(previous)
+        it = ast.Call(
+            func=ast.Attribute(
+                value=ast.Attribute(
+                    value=ast.Name(id='itertools', ctx=ast.Load()),
+                    attr='chain',
+                    ctx=ast.Load()
+                ),
+                attr='from_iterable',
+                ctx=ast.Load()
+            ), args=[it], keywords=[]
+        )
+        return [
+            body_fn,
+            _astgen.extend(it)
+        ]
+
+    def _compile_document(self, element, ctx):
+        """
+        Compiles a document rooted in ``element`` to a Python AST. The
+        resulting ast statements should be returned or yielded.
+
+        ``register_call`` is a function used to record templates seen during
+        compilation which may need to be compiled themselves.
+
+        Calls the following hooks:
+
+        * ``_compile_element`` compiles the non-directive parts (static &
+          attribute generation & any other) of the element to AST
+        * :samp:`_compile_directive_{name}` compiles the directive of the
+          specified name to AST
+
+        In either case, the current etree._Element is received as first
+        parameter and the current body as second. The body *must* be returned,
+        it can either be the original body (possibly modified in place) or a
+        brand new list of AST nodes (containing the original body or not).
+        """
+        # stack of body items collected by subtrees
+        bodies = [[]]
+        for event, el in etree.iterwalk(element, events=('start', 'end'),
+                                        # ignore comments & processing instructions
+                                        tag=etree.Element):
+            if event == 'start':
+                bodies.append([])
+            if event != 'end':
+                continue
+
+            body = bodies.pop()
+            body = self._compile_element(el, body, ctx)
+            for name in reversed(self._directives_eval_order()):
+                # skip directives not present on the element
+                if ('t-' + name) not in el.attrib: continue
+
+                body = getattr(self, '_compile_directive_%s' % name)(
+                    el, body, ctx)
+
+            if el.tail is not None:
+                body.append(_astgen.append(ast.Str(unicode(el.tail))))
+            bodies[-1].extend(body)
+
+        return bodies.pop()
+
     def render(self, cr, uid, id_or_xml_id, qwebcontext=None, loader=None, context=None):
         """ render(cr, uid, id_or_xml_id, qwebcontext=None, loader=None, context=None)
 
@@ -255,9 +544,18 @@ class QWeb(orm.AbstractModel):
         qwebcontext['__stack__'] = stack
         qwebcontext['xmlid'] = str(stack[0]) # Temporary fix
 
-        element = self.get_template(id_or_xml_id, qwebcontext)
-        element.attrib.pop("name", False)
-        return self.render_node(element, qwebcontext, generated_attributes=qwebcontext.pop('generated_attributes', ''))
+        ctx = _astgen.CompileContext()
+        if id_or_xml_id not in qwebcontext.templates:
+            ctx.register_template(id_or_xml_id)
+            while ctx.to_compile:
+                tmpl = ctx.to_compile.pop()
+                if tmpl in qwebcontext.templates:
+                    continue
+                element = self.get_template(tmpl, qwebcontext)
+                element.attrib.pop("name", False)
+                qwebcontext.templates[tmpl] = self._compile(element, ctx)
+        template_function = qwebcontext.templates[id_or_xml_id]
+        return u''.join(template_function(qwebcontext))
 
     def render_node(self, element, qwebcontext, generated_attributes=''):
         t_render = None
@@ -349,97 +647,11 @@ class QWeb(orm.AbstractModel):
         else:
             return "<%s%s/>" % (name, generated_attributes)
 
-    def render_attribute(self, element, name, value, qwebcontext):
-        return _build_attribute(name, value)
-
     def render_text(self, text, element, qwebcontext):
         return text.encode('utf-8')
 
     def render_tail(self, tail, element, qwebcontext):
         return tail.encode('utf-8')
-
-    # Attributes
-    def render_att_att(self, element, attribute_name, attribute_value, qwebcontext):
-        if attribute_name.startswith("t-attf-"):
-            return [(attribute_name[7:], self.eval_format(attribute_value, qwebcontext))]
-
-        if attribute_name.startswith("t-att-"):
-            return [(attribute_name[6:], self.eval(attribute_value, qwebcontext))]
-
-        result = self.eval_object(attribute_value, qwebcontext)
-        if isinstance(result, collections.Mapping):
-            return result.iteritems()
-        # assume tuple
-        return [result]
-
-    # Tags
-    def render_tag_raw(self, element, template_attributes, generated_attributes, qwebcontext):
-        inner = self.eval_str(template_attributes["raw"], qwebcontext)
-        return self.render_element(element, template_attributes, generated_attributes, qwebcontext, inner)
-
-    def render_tag_esc(self, element, template_attributes, generated_attributes, qwebcontext):
-        options = json.loads(template_attributes.get('esc-options') or '{}')
-        widget = self.get_widget_for(options.get('widget'))
-        inner = widget.format(template_attributes['esc'], options, qwebcontext)
-        return self.render_element(element, template_attributes, generated_attributes, qwebcontext, inner)
-
-    def _iterate(self, iterable):
-        if isinstance (iterable, collections.Mapping):
-            return iterable.iteritems()
-
-        return itertools.izip(*itertools.tee(iterable))
-
-    def render_tag_foreach(self, element, template_attributes, generated_attributes, qwebcontext):
-        expr = template_attributes["foreach"]
-        enum = self.eval_object(expr, qwebcontext)
-        if enum is None:
-            template = qwebcontext.get('__template__')
-            raise QWebException("foreach enumerator %r is not defined while rendering template %r" % (expr, template), template=template)
-        if isinstance(enum, int):
-            enum = range(enum)
-
-        varname = template_attributes['as'].replace('.', '_')
-        copy_qwebcontext = qwebcontext.copy()
-
-        size = None
-        if isinstance(enum, collections.Sized):
-            size = len(enum)
-            copy_qwebcontext["%s_size" % varname] = size
-
-        copy_qwebcontext["%s_all" % varname] = enum
-        ru = []
-        for index, (item, value) in enumerate(self._iterate(enum)):
-            copy_qwebcontext.update({
-                varname: item,
-                '%s_value' % varname: value,
-                '%s_index' % varname: index,
-                '%s_first' % varname: index == 0,
-            })
-            if size is not None:
-                copy_qwebcontext['%s_last' % varname] = index + 1 == size
-            if index % 2:
-                copy_qwebcontext.update({
-                    '%s_parity' % varname: 'odd',
-                    '%s_even' % varname: False,
-                    '%s_odd' % varname: True,
-                })
-            else:
-                copy_qwebcontext.update({
-                    '%s_parity' % varname: 'even',
-                    '%s_even' % varname: True,
-                    '%s_odd' % varname: False,
-                })
-            ru.append(self.render_element(element, template_attributes, generated_attributes, copy_qwebcontext))
-
-        for k in qwebcontext.keys():
-            qwebcontext[k] = copy_qwebcontext[k]
-
-        return "".join(ru)
-
-    def render_tag_if(self, element, template_attributes, generated_attributes, qwebcontext):
-        if self.eval_bool(template_attributes["if"], qwebcontext):
-            return self.render_element(element, template_attributes, generated_attributes, qwebcontext)
-        return ""
 
     def render_tag_call(self, element, template_attributes, generated_attributes, qwebcontext):
         d = qwebcontext.copy()
@@ -485,15 +697,6 @@ class QWeb(orm.AbstractModel):
         js = self.get_attr_bool(template_attributes.get('js'), default=True)
         async = self.get_attr_bool(template_attributes.get('async'), default=False)
         return bundle.to_html(css=css, js=js, debug=bool(qwebcontext.get('debug')), async=async)
-
-    def render_tag_set(self, element, template_attributes, generated_attributes, qwebcontext):
-        if "value" in template_attributes:
-            qwebcontext[template_attributes["set"]] = self.eval_object(template_attributes["value"], qwebcontext)
-        elif "valuef" in template_attributes:
-            qwebcontext[template_attributes["set"]] = self.eval_format(template_attributes["valuef"], qwebcontext)
-        else:
-            qwebcontext[template_attributes["set"]] = self.render_element(element, template_attributes, generated_attributes, qwebcontext)
-        return ""
 
     def render_tag_field(self, element, template_attributes, generated_attributes, qwebcontext):
         """ eg: <span t-record="browse_record(res.partner, 1)" t-field="phone">+1 555 555 8069</span>"""
