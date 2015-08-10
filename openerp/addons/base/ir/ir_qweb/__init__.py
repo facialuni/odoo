@@ -127,6 +127,7 @@ class EvalDict(collections.Mapping):
         except KeyError:
             return getattr(__builtin__, key, None)
 
+# FIXME: raise_qweb_exception on errors
 class QWebContext(dict):
     def __init__(self, cr, uid, data, loader=None, context=None, templates=None):
         self.cr = cr
@@ -186,91 +187,31 @@ class QWeb(orm.AbstractModel):
             '\{\{(.+?)\}\}'
         ')')
 
-    def __init__(self, pool, cr):
-        super(QWeb, self).__init__(pool, cr)
-
-        self._render_tag = self.prefixed_methods('render_tag_')
-        self._render_att = self.prefixed_methods('render_att_')
-
-    def prefixed_methods(self, prefix):
-        """ Extracts all methods prefixed by ``prefix``, and returns a mapping
-        of (t-name, method) where the t-name is the method name with prefix
-        removed and underscore converted to dashes
-
-        :param str prefix:
-        :return: dict
-        """
-        n_prefix = len(prefix)
-        return dict(
-            (name[n_prefix:].replace('_', '-'), getattr(type(self), name))
-            for name in dir(self)
-            if name.startswith(prefix)
-        )
-
-    def register_tag(self, tag, func):
-        self._render_tag[tag] = func
-
     def get_template(self, name, qwebcontext):
         origin_template = qwebcontext.get('__caller__') or qwebcontext['__stack__'][0]
         try:
             document = qwebcontext.loader(name)
         except ValueError:
             raise_qweb_exception(QWebTemplateNotFound, message="Loader could not find template %r" % name, template=origin_template)
+        else:
+            if document is not None:
+                if hasattr(document, 'documentElement'):
+                    dom = document
+                elif document.startswith("<?xml"):
+                    dom = etree.fromstring(document)
+                else:
+                    dom = etree.parse(document).getroot()
 
-        if document is not None:
-            if hasattr(document, 'documentElement'):
-                dom = document
-            elif document.startswith("<?xml"):
-                dom = etree.fromstring(document)
-            else:
-                dom = etree.parse(document).getroot()
-
-            res_id = isinstance(name, (int, long)) and name or None
-            for node in dom:
-                if node.get('t-name') or (res_id and node.tag == "t"):
-                    return node
+                res_id = isinstance(name, (int, long)) and name or None
+                for node in dom:
+                    if node.get('t-name') or (res_id and node.tag == "t"):
+                        return node
 
         raise QWebTemplateNotFound("Template %r not found" % name, template=origin_template)
 
-    def eval(self, expr, qwebcontext):
-        try:
-            return qwebcontext.safe_eval(expr)
-        except Exception:
-            template = qwebcontext.get('__template__')
-            raise_qweb_exception(message="Could not evaluate expression %r" % expr, expression=expr, template=template)
-
-    def eval_object(self, expr, qwebcontext):
-        return self.eval(expr, qwebcontext)
-
-    def eval_str(self, expr, qwebcontext):
-        if expr == "0":
-            return qwebcontext.get(0, '')
-        val = self.eval(expr, qwebcontext)
-        if isinstance(val, unicode):
-            return val.encode("utf8")
-        if val is False or val is None:
-            return ''
-        return str(val)
-
-    def eval_format(self, expr, qwebcontext):
-        expr, replacements = self._format_regex.subn(
-            lambda m: self.eval_str(m.group(1) or m.group(2), qwebcontext),
-            expr
-        )
-
-        if replacements:
-            return expr
-
-        try:
-            return str(expr % qwebcontext)
-        except Exception:
-            template = qwebcontext.get('__template__')
-            raise_qweb_exception(message="Format error for expression %r" % expr, expression=expr, template=template)
-
-    def eval_bool(self, expr, qwebcontext):
-        return int(bool(self.eval(expr, qwebcontext)))
-
     def _compile(self, element, ctx):
+        # TODO: load all templates in same module (no indirection via ctx.templates) or lazy load templates (!!!)
+        # TODO: make locations work based on source element (?)
         mod = _astgen.base_module()
 
         fn = _astgen.base_fn_def(self._compile_document(
@@ -312,15 +253,14 @@ class QWeb(orm.AbstractModel):
         opening = []
         closing = []
         if el.tag != 't':
-            directive_names = {'t-' + n for n in self._directives_eval_order()}
             # build opening tag
             opening = [_astgen.append(ast.Str(u'<' + el.tag + u''.join(
                 u' {}="{}"'.format(name, escape(value))
                 for name, value in el.attrib.iteritems()
-                if not name.startswith('t-att')
-                if name not in directive_names
+                if not name.startswith('t-')
             )))]
             # dynamic attributes codegen
+            # TODO: should be able to generate a single expression/append
             for name, value in el.attrib.iteritems():
                 if name.startswith('t-attf-'):
                     opening.append(ast.Assign(
@@ -413,12 +353,19 @@ class QWeb(orm.AbstractModel):
         :rtype: list(ast.AST)
         """
         # TODO: add support for t-lang
-        # TODO: template name as format string?
-        # TODO: integer template name?
+        # if t-lang
+        # * store old lang
+        # * verify lang exists in res.lang
+        # * set lang in context
+        # * run with lang
+        # * reset/don't copy back lang
+        # TODO: template name as format string
+        # TODO: integer template name
         tmpl = el.get('t-call')
         ctx.register_template(tmpl)
 
-        # body evaluator
+        # FIXME: wraparound + should be defined in template module
+        # FIXME: skip if no body
         fn_name = '_call_%d' % next(_set_seq)
         body = [_astgen.base_fn_def(body, name=fn_name)]
 
@@ -497,22 +444,60 @@ class QWeb(orm.AbstractModel):
         """
         # stack of body items collected by subtrees
         bodies = [[]]
+        skipto = None
         for event, el in etree.iterwalk(element, events=('start', 'end'),
                                         # ignore comments & processing instructions
                                         tag=etree.Element):
+            # skip subtree to specified element
+            if skipto is not None:
+                if el is skipto:
+                    skipto = None
+                continue
+
             if event == 'start':
+                if el.get("groups") and not self.user_has_groups(groups=el.get('groups')):
+                    skipto = el
+                    continue
                 bodies.append([])
+
             if event != 'end':
                 continue
 
             body = bodies.pop()
+            # TODO: trim
+            # trim = el.get("t-trim", 0)
+            # if trim == 0:
+            #     pass
+            # elif trim == 'left':
+            #     inner = inner.lstrip()
+            # elif trim == 'right':
+            #     inner = inner.rstrip()
+            # elif trim == 'both':
+            #     inner = inner.strip()
+            # TODO: render_text/render_tail/render_attribute overload
             body = self._compile_element(el, body, ctx)
+            directives = {
+                att[2:]
+                for att in el.attrib
+                if att.startswith('t-')
+                if not att.startswith('t-att')
+                if att not in (
+                    't-name', 't-field-options', 't-esc-options', 't-as',
+                    't-value', 't-valuef'
+                )
+            }
             for name in reversed(self._directives_eval_order()):
                 # skip directives not present on the element
-                if ('t-' + name) not in el.attrib: continue
+                if name not in directives: continue
 
+                directives.remove(name)
                 body = getattr(self, '_compile_directive_%s' % name)(
                     el, body, ctx)
+            # TODO: non-compiled directives support for field, snippet
+            assert not directives, "unhandled directives %s on %s" % (
+                directives,
+                etree.tostring(el)
+            )
 
             if el.tail is not None:
                 body.append(_astgen.append(ast.Str(unicode(el.tail))))
@@ -553,134 +538,9 @@ class QWeb(orm.AbstractModel):
                     continue
                 element = self.get_template(tmpl, qwebcontext)
                 element.attrib.pop("name", False)
-                qwebcontext.templates[tmpl] = self._compile(element, ctx)
+                qwebcontext.templates[tmpl] = self.browse()._compile(element, ctx)
         template_function = qwebcontext.templates[id_or_xml_id]
         return u''.join(template_function(qwebcontext))
-
-    def render_node(self, element, qwebcontext, generated_attributes=''):
-        t_render = None
-        template_attributes = {}
-
-        debugger = element.get('t-debug')
-        if debugger is not None:
-            if openerp.tools.config['dev_mode']:
-                __import__(debugger).set_trace()  # pdb, ipdb, pudb, ...
-            else:
-                _logger.warning("@t-debug in template '%s' is only available in --dev mode" % qwebcontext['__template__'])
-
-        for (attribute_name, attribute_value) in element.attrib.iteritems():
-            attribute_name = str(attribute_name)
-            if attribute_name == "groups":
-                cr = qwebcontext.get('request') and qwebcontext['request'].cr or None
-                uid = qwebcontext.get('request') and qwebcontext['request'].uid or None
-                can_see = self.user_has_groups(cr, uid, groups=attribute_value) if cr and uid else False
-                if not can_see:
-                    return ''
-
-            attribute_value = attribute_value.encode("utf8")
-
-            if attribute_name.startswith("t-"):
-                for attribute in self._render_att:
-                    if attribute_name[2:].startswith(attribute):
-                        attrs = self._render_att[attribute](
-                            self, element, attribute_name, attribute_value, qwebcontext)
-                        for att, val in attrs:
-                            if not val: continue
-                            generated_attributes += self.render_attribute(element, att, val, qwebcontext)
-                        break
-                else:
-                    if attribute_name[2:] in self._render_tag:
-                        t_render = attribute_name[2:]
-                    template_attributes[attribute_name[2:]] = attribute_value
-            else:
-                generated_attributes += self.render_attribute(element, attribute_name, attribute_value, qwebcontext)
-
-        if t_render:
-            result = self._render_tag[t_render](self, element, template_attributes, generated_attributes, qwebcontext)
-        else:
-            result = self.render_element(element, template_attributes, generated_attributes, qwebcontext)
-
-        if element.tail:
-            result += self.render_tail(element.tail, element, qwebcontext)
-
-        if isinstance(result, unicode):
-            return result.encode('utf-8')
-        return result
-
-    def render_element(self, element, template_attributes, generated_attributes, qwebcontext, inner=None):
-        # element: element
-        # template_attributes: t-* attributes
-        # generated_attributes: generated attributes
-        # qwebcontext: values
-        # inner: optional innerXml
-        name = str(element.tag)
-        if inner:
-            g_inner = inner.encode('utf-8') if isinstance(inner, unicode) else inner
-        else:
-            g_inner = [] if element.text is None else [self.render_text(element.text, element, qwebcontext)]
-            for current_node in element.iterchildren(tag=etree.Element):
-                try:
-                    g_inner.append(self.render_node(current_node, qwebcontext,
-                        generated_attributes= name == "t" and generated_attributes or ''))
-                except QWebException:
-                    raise
-                except Exception:
-                    template = qwebcontext.get('__template__')
-                    raise_qweb_exception(message="Could not render element %r" % element.tag, node=element, template=template)
-        inner = "".join(g_inner)
-        trim = template_attributes.get("trim", 0)
-        if trim == 0:
-            pass
-        elif trim == 'left':
-            inner = inner.lstrip()
-        elif trim == 'right':
-            inner = inner.rstrip()
-        elif trim == 'both':
-            inner = inner.strip()
-        if name == "t":
-            return inner
-        elif len(inner) or name not in self._void_elements:
-            return "<%s%s>%s</%s>" % tuple(
-                qwebcontext if isinstance(qwebcontext, str) else qwebcontext.encode('utf-8')
-                for qwebcontext in (name, generated_attributes, inner, name)
-            )
-        else:
-            return "<%s%s/>" % (name, generated_attributes)
-
-    def render_text(self, text, element, qwebcontext):
-        return text.encode('utf-8')
-
-    def render_tail(self, tail, element, qwebcontext):
-        return tail.encode('utf-8')
-
-    def render_tag_call(self, element, template_attributes, generated_attributes, qwebcontext):
-        d = qwebcontext.copy()
-
-        if 'lang' in template_attributes:
-            init_lang = d.context.get('lang', 'en_US')
-            lang = template_attributes['lang']
-            d.context['lang'] = self.eval(lang, d) or lang
-            if not self.pool['res.lang'].search(d.cr, d.uid, [('code', '=', lang)], count=True, context=d.context):
-                _logger.info("'%s' is not a valid language code, is an empty field or is not installed, falling back to en_US", lang)
-
-        d[0] = self.render_element(element, template_attributes, generated_attributes, d)
-        cr = d.get('request') and d['request'].cr or None
-        uid = d.get('request') and d['request'].uid or None
-
-        template = self.eval_format(template_attributes["call"], d)
-        try:
-            template = int(template)
-        except ValueError:
-            pass
-
-        d['generated_attributes'] = generated_attributes
-        res = self.render(cr, uid, template, d)
-
-        # we need to reset the lang after the rendering
-        if 'lang' in template_attributes:
-            d.context['lang'] = init_lang
-
-        return res
 
     def render_tag_call_assets(self, element, template_attributes, generated_attributes, qwebcontext):
         """ This special 't-call' tag can be used in order to aggregate/minify javascript and css assets"""
