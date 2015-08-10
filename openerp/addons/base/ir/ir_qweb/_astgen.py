@@ -5,6 +5,7 @@ Functions and helpers for AST generation from QWeb XML data
 import ast
 import re
 import __builtin__
+import itertools
 
 from openerp.tools import safe_eval
 
@@ -203,9 +204,30 @@ def compile_format(f):
 
 class CompileContext(object):
     def __init__(self):
+        self._name_gen = itertools.count()
         self.to_compile = set()
+        self._functions = []
     def register_template(self, name):
         self.to_compile.add(name)
+
+    def call_body(self, body, args=('qwebcontext',), prefix='fn'):
+        """
+        If ``body`` is non-empty, generates (and globally store) the
+        corresponding function definition and returns the relevant ast.Call
+        node.
+
+        If ``body`` is empty, doesn't do anything and returns ``None``.
+        """
+        if not body:
+            return None
+        name = "%s_%s" % (prefix, next(self._name_gen))
+        self._functions.append(base_fn_def(body, name=name))
+        return ast.Call(
+            func=ast.Name(id=name, ctx=ast.Load()),
+            args=[ast.Name(id=arg, ctx=ast.Load()) for arg in args],
+            keywords=[]
+        )
+
 
 def pp(node):
     PrettyPrinter().visit(node)

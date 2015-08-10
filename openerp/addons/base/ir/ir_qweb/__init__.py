@@ -214,14 +214,15 @@ class QWeb(orm.AbstractModel):
         # TODO: make locations work based on source element (?)
         mod = _astgen.base_module()
 
-        fn = _astgen.base_fn_def(self._compile_document(
-            element, ctx=ctx))
+        doc_body = self._compile_document(element, ctx=ctx)
+        call = ctx.call_body(doc_body)
 
-        mod.body.append(fn)
+        mod.body.extend(ctx._functions)
+        ctx._functions = []
         ast.fix_missing_locations(mod)
         ns = {}
         __builtin__.eval(compile(mod, '<template>', 'exec'), ns)
-        return ns[fn.name]
+        return ns[call.func.id]
 
     def _directives_eval_order(self):
         """ Should list all supported directives in the order in which they
@@ -315,27 +316,20 @@ class QWeb(orm.AbstractModel):
     def _compile_directive_set(self, el, body, ctx):
         if 't-value' in el.attrib:
             value = _astgen.compile_expr(el.get('t-value'))
-            body = []
         elif 't-valuef' in el.attrib:
             value = _astgen.compile_format(el.get('t-valuef'))
-            body = []
         else:
-            # FIXME: that's going to wrap around eventually...
-            fn_name = '_set_%d' % next(_set_seq)
-            # FIXME: should be defined at template start or in template module (loops)
-            body = [_astgen.base_fn_def(body, name=fn_name)]
-            render = ast.Call(
-                func=ast.Name(id=fn_name, ctx=ast.Load()),
-                args=[ast.Name(id='qwebcontext', ctx=ast.Load())],
-                keywords=[]
-            )
-            # concat body render to string
-            value = ast.Call(
-                func=ast.Attribute(value=ast.Str(u''), attr='join', ctx=ast.Load()),
-                args=[render], keywords=[]
-            )
+            render = ctx.call_body(body, prefix='set')
+            if render is None:
+                value = ast.Str(u'')
+            else:
+                # concat body render to string
+                value = ast.Call(
+                    func=ast.Attribute(value=ast.Str(u''), attr='join', ctx=ast.Load()),
+                    args=[render], keywords=[]
+                )
 
-        return body + [ast.Assign(
+        return [ast.Assign(
             [ast.Subscript(
                 value=ast.Name(id='qwebcontext', ctx=ast.Load()),
                 slice=ast.Index(ast.Str(el.get('t-set'))),
@@ -364,17 +358,59 @@ class QWeb(orm.AbstractModel):
         tmpl = el.get('t-call')
         ctx.register_template(tmpl)
 
-        # FIXME: wraparound + should be defined in template module
-        # FIXME: skip if no body
-        fn_name = '_call_%d' % next(_set_seq)
-        body = [_astgen.base_fn_def(body, name=fn_name)]
+        qw = 'qwebcontext_copy'
+        call = ctx.call_body(body, [qw], prefix='prepare_call')
 
-        return body + ast.parse(textwrap.dedent("""
-        qwebcontext_copy = qwebcontext.copy()
-        # concat body render to string
-        qwebcontext_copy[0] = u''.join(%s(qwebcontext_copy))
-        output.extend(qwebcontext.templates[%s](qwebcontext_copy))
-        """ % (fn_name, repr(tmpl)))).body
+        if call is None:
+            val = ast.Str(u'')
+        else:
+            val = ast.Call(
+                func=ast.Attribute(value=ast.Str(u''), attr='join', ctx=ast.Load()),
+                args=[call], keywords=[]
+            )
+        body = [
+            # qwebcontext_copy = qwebcontext.copy()
+            ast.Assign(
+                [ast.Name(id=qw, ctx=ast.Store())],
+                ast.Call(
+                    func=ast.Attribute(
+                        value=ast.Name(id='qwebcontext', ctx=ast.Load()),
+                        attr='copy',
+                        ctx=ast.Load()
+                    ),
+                    args=[], keywords=[]
+                )
+            ),
+            # qwebcontext_copy[0] = $value
+            ast.Assign(
+                [ast.Subscript(
+                    value=ast.Name(id=qw, ctx=ast.Load()),
+                    slice=ast.Index(ast.Num(0)),
+                    ctx=ast.Store()
+                )],
+                val
+            ),
+            # output.extend
+            _astgen.extend(
+                # (qwebcontext_copy)
+                ast.Call(
+                    # [$tmpl]
+                    func=ast.Subscript(
+                        # qwebcontext.templates
+                        value=ast.Attribute(
+                            value=ast.Name(id='qwebcontext', ctx=ast.Load()),
+                            attr='templates',
+                            ctx=ast.Load()
+                        ),
+                        slice=ast.Index(ast.Str(str(tmpl))),
+                        ctx=ast.Load()
+                    ),
+                    args=[ast.Name(id=qw, ctx=ast.Load())],
+                    keywords=[]
+                )
+            )
+        ]
+        return body
 
     def _compile_directive_if(self, el, body, ctx):
         return [
@@ -387,8 +423,6 @@ class QWeb(orm.AbstractModel):
     def _compile_directive_foreach(self, el, body, ctx):
         expr = _astgen.compile_expr(el.get('t-foreach'))
         varname = el.get('t-as').replace('.', '_')
-        # FIXME: randomize function name and store it at the module level (?)
-        body_fn = _astgen.base_fn_def(body, name='_foreach_callback')
 
         # foreach_iterator(qwebcontext, <expr>, varname)
         it = ast.Call(
@@ -396,14 +430,14 @@ class QWeb(orm.AbstractModel):
             args=[ast.Name(id='qwebcontext', ctx=ast.Load()), expr, ast.Str(varname)],
             keywords=[]
         )
-        callback = ast.Name(id='_foreach_callback', ctx=ast.Load())
-        # itertools.imap(_foreach_callback, previous)
+        # itertools.imap($call, previous)
+        call = ctx.call_body(body, prefix='foreach')
         it = ast.Call(
             func=ast.Attribute(
                 value=ast.Name(id='itertools', ctx=ast.Load()),
                 attr='imap',
                 ctx=ast.Load()
-            ), args=[callback, it], keywords=[]
+            ), args=[call.func, it], keywords=[]
         )
         # itertools.chain.from_iterable(previous)
         it = ast.Call(
@@ -417,10 +451,7 @@ class QWeb(orm.AbstractModel):
                 ctx=ast.Load()
             ), args=[it], keywords=[]
         )
-        return [
-            body_fn,
-            _astgen.extend(it)
-        ]
+        return [_astgen.extend(it)]
 
     def _compile_document(self, element, ctx):
         """
@@ -515,6 +546,8 @@ class QWeb(orm.AbstractModel):
         :param loader: if ``qwebcontext`` is a dict, loader set into the
                        context instantiated for rendering
         """
+        # noinspection PyMethodFirstArgAssignment
+        self = self.browse(cr, uid, [], context=context)
         if qwebcontext is None:
             qwebcontext = {}
 
@@ -538,7 +571,7 @@ class QWeb(orm.AbstractModel):
                     continue
                 element = self.get_template(tmpl, qwebcontext)
                 element.attrib.pop("name", False)
-                qwebcontext.templates[tmpl] = self.browse()._compile(element, ctx)
+                qwebcontext.templates[tmpl] = self._compile(element, ctx)
         template_function = qwebcontext.templates[id_or_xml_id]
         return u''.join(template_function(qwebcontext))
 
