@@ -254,7 +254,28 @@ class PrettyPrinter(ast.NodeVisitor):
             self.visit(stmt)
         self.level -= 1
 
+    def visit_Module(self, node):
+        for stmt in node.body:
+            self.visit(stmt)
+
     ## statements
+    def visit_Import(self, node):
+        # Import(alias* names)
+        self._indent()
+        p('import ')
+        self.visit_params(node.names)
+        p('\n')
+
+    def visit_ImportFrom(self, node):
+        # ImportFrom(identifier? module, alias* names, int? level)
+        self._indent()
+        p('from ')
+        p('.'*(node.level or 0))
+        p(node.module)
+        p(' import ')
+        self.visit_params(node.names)
+        p('\n')
+
     def visit_FunctionDef(self, node):
         # FunctionDef(identifier name, arguments args, stmt* body, expr* decorator_list)
         self._indent()
@@ -288,6 +309,22 @@ class PrettyPrinter(ast.NodeVisitor):
         p(':\n')
         self.visit_body(node.body)
         if node.orelse:
+            self._indent()
+            p('else:\n')
+            self.visit_body(node.orelse)
+        p('\n')
+
+    def visit_For(self, node):
+        # For(expr target, expr iter, stmt* body, stmt* orelse)
+        self._indent()
+        p('for ')
+        self.visit(node.target)
+        p(' in ')
+        self.visit(node.iter)
+        p(':\n')
+        self.visit_body(node.body)
+        if node.orelse:
+            self._indent()
             p('else:\n')
             self.visit_body(node.orelse)
         p('\n')
@@ -388,6 +425,11 @@ class PrettyPrinter(ast.NodeVisitor):
         p(':')
         if node.step:
             self.visit(node.step)
+    def visit_Yield(self, node):
+        # Yield(expr? value)
+        p('yield ')
+        if node.value:
+            self.visit(node.value)
 
     # literals
     def visit_List(self, node):
@@ -409,6 +451,12 @@ class PrettyPrinter(ast.NodeVisitor):
         p(node.arg)
         p('=')
         self.visit(node.value)
+
+    def visit_alias(self, node):
+        p(node.name)
+        if node.asname:
+            p(' as ')
+            p(node.asname)
 
     def visit_int(self, node):
         p("[[INT {}]]".format(node))
