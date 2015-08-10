@@ -5,11 +5,12 @@ import datetime
 import json
 import os.path
 import re
+import sys
 import time
+import unittest
 from lxml.doctestcompare import LXMLOutputChecker
 
 import simplejson
-import sys
 import werkzeug
 
 from dateutil import relativedelta
@@ -22,6 +23,7 @@ import openerp.modules
 from openerp.tests import common
 
 
+@unittest.skip("no more qweb.render_node for now")
 class TestQWebTField(common.TransactionCase):
     def setUp(self):
         super(TestQWebTField, self).setUp()

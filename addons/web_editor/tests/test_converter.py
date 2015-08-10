@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import textwrap
+import unittest
 import unittest2
 
 from lxml import etree, html
@@ -113,6 +114,7 @@ class TestHTMLToText(unittest2.TestCase):
                 "baz")))
 
 
+@unittest.skip("removed ir.qweb.eval_object")
 class TestConvertBack(common.TransactionCase):
     def setUp(self):
         super(TestConvertBack, self).setUp()
