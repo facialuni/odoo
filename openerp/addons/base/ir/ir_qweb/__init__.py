@@ -13,7 +13,6 @@ import os
 import re
 import sys
 import textwrap
-import time
 import uuid
 from subprocess import Popen, PIPE
 from urlparse import urlparse
@@ -29,13 +28,11 @@ import psycopg2
 
 import openerp.http
 import openerp.tools
-from openerp.tools.func import lazy_property
 import openerp.tools.lru
+
 from openerp.http import request
-from openerp.tools.safe_eval import safe_eval as eval
 from openerp.osv import osv, orm, fields
-from openerp.tools import html_escape as escape
-from openerp.tools.misc import find_in_path
+from openerp.tools import func, misc, safe_eval, html_escape as escape
 from openerp.tools.translate import _
 
 from . import _astgen
@@ -145,7 +142,7 @@ class QWebContext(dict):
         locals_dict.update(self)
         locals_dict.pop('cr', None)
         locals_dict.pop('loader', None)
-        return eval(expr, None, locals_dict, nocopy=True, locals_builtins=True)
+        return safe_eval.safe_eval(expr, None, locals_dict, nocopy=True, locals_builtins=True)
 
     def copy(self):
         """ Clones the current context, conserving all data and metadata
@@ -192,7 +189,7 @@ class QWeb(orm.AbstractModel):
         try:
             document = qwebcontext.loader(name)
         except ValueError:
-            raise_qweb_exception(QWebTemplateNotFound, message="Loader could not find template %r" % name, template=origin_template)
+            raise_qweb_exception(message="Loader could not find template %r" % name, template=origin_template)
         else:
             if document is not None:
                 if hasattr(document, 'documentElement'):
@@ -207,9 +204,10 @@ class QWeb(orm.AbstractModel):
                     if node.get('t-name') or (res_id and node.tag == "t"):
                         return node
 
-        raise QWebTemplateNotFound("Template %r not found" % name, template=origin_template)
+        raise raise_qweb_exception(message="Template %r not found" % name, template=origin_template)
 
-    def _compile(self, element, ctx):
+    def _compile(self, element):
+        ctx = _astgen.CompileContext()
         # TODO: load all templates in same module (no indirection via ctx.templates) or lazy load templates (!!!)
         # TODO: make locations work based on source element (?)
         mod = _astgen.base_module()
@@ -218,10 +216,9 @@ class QWeb(orm.AbstractModel):
         call = ctx.call_body(doc_body)
 
         mod.body.extend(ctx._functions)
-        ctx._functions = []
         ast.fix_missing_locations(mod)
-        ns = {}
-        __builtin__.eval(compile(mod, '<template>', 'exec'), ns)
+        ns = {'nodes': ctx._nodes}
+        eval(compile(mod, '<template>', 'exec'), ns)
         return ns[call.func.id]
 
     def _directives_eval_order(self):
@@ -244,12 +241,29 @@ class QWeb(orm.AbstractModel):
 
         then this method should return ``['foreach', 'if']``
         """
-        return ['foreach', 'if', 'call', 'set', 'esc', 'raw', 'debug']
+        return [
+            'call-assets',
+            'foreach', 'if', 'call',
+            'set', 'field', 'debug'
+        ]
+
+    def _nondirectives_ignore(self):
+        """
+        t-* attributes existing as support for actual directives, should just
+        be ignored
+
+        :returns: set
+        """
+        return {
+            't-name', 't-field-options', 't-esc-options', 't-as',
+            't-value', 't-valuef', 't-ignore',
+            # they are directives but not handled via directive handlers so...
+            't-esc', 't-raw'
+        }
 
     def _compile_element(self, el, body, ctx):
         # doesn't generate any content itself
-        if el.text is not None:
-            body.insert(0, _astgen.append(ast.Str(unicode(el.text))))
+        body = self._compile_body(el, body, ctx)
 
         opening = []
         closing = []
@@ -302,16 +316,18 @@ class QWeb(orm.AbstractModel):
 
         return opening + body + closing
 
-    def _compile_directive_esc(self, el, body, ctx):
-        # TODO: widgets
-        return [_astgen.append(ast.Call(
-            func=ast.Name(id='escape', ctx=ast.Load()),
-            args=[_astgen.compile_strexpr(el.get('t-esc'))],
-            keywords=[],
-        ))] + body
+    def _compile_body(self, el, body, ctx):
+        if el.get('t-esc'):
+            # TODO: widgets
+            return [_astgen.append(ast.Call(
+                func=ast.Name(id='escape', ctx=ast.Load()),
+                args=[_astgen.compile_strexpr(el.get('t-esc'))],
+                keywords=[],
+            ))] + body
+        elif el.get('t-raw'):
+            return [_astgen.append(_astgen.compile_strexpr(el.get('t-raw')))] + body
 
-    def _compile_directive_raw(self, el, body, ctx):
-        return [_astgen.append(_astgen.compile_strexpr(el.get('t-raw')))] + body
+        return self._compile_text(el, body, ctx)
 
     def _compile_directive_set(self, el, body, ctx):
         if 't-value' in el.attrib:
@@ -346,7 +362,7 @@ class QWeb(orm.AbstractModel):
         :return: new body
         :rtype: list(ast.AST)
         """
-        # TODO: add support for t-lang
+        # TODO: add support for t-lang="<expr>"
         # if t-lang
         # * store old lang
         # * verify lang exists in res.lang
@@ -356,10 +372,9 @@ class QWeb(orm.AbstractModel):
         # TODO: template name as format string
         # TODO: integer template name
         tmpl = el.get('t-call')
-        ctx.register_template(tmpl)
 
         qw = 'qwebcontext_copy'
-        call = ctx.call_body(body, [qw], prefix='prepare_call')
+        call = ctx.call_body(body, ['self', qw], prefix='prepare_call')
 
         if call is None:
             val = ast.Str(u'')
@@ -394,18 +409,24 @@ class QWeb(orm.AbstractModel):
             _astgen.extend(
                 # (qwebcontext_copy)
                 ast.Call(
-                    # [$tmpl]
-                    func=ast.Subscript(
-                        # qwebcontext.templates
-                        value=ast.Attribute(
-                            value=ast.Name(id='qwebcontext', ctx=ast.Load()),
-                            attr='templates',
+                    # ($tmpl, qwebcontext)
+                    func=ast.Call(
+                        # self._get_template
+                        func=ast.Attribute(
+                            value=ast.Name(id='self', ctx=ast.Load()),
+                            attr='_get_template',
                             ctx=ast.Load()
                         ),
-                        slice=ast.Index(ast.Str(str(tmpl))),
-                        ctx=ast.Load()
+                        args=[
+                            ast.Str(str(tmpl)),
+                            ast.Name(id='qwebcontext', ctx=ast.Load()),
+                        ],
+                        keywords=[]
                     ),
-                    args=[ast.Name(id=qw, ctx=ast.Load())],
+                    args=[
+                        ast.Name(id='self', ctx=ast.Load()),
+                        ast.Name(id=qw, ctx=ast.Load()),
+                    ],
                     keywords=[]
                 )
             )
@@ -430,14 +451,22 @@ class QWeb(orm.AbstractModel):
             args=[ast.Name(id='qwebcontext', ctx=ast.Load()), expr, ast.Str(varname)],
             keywords=[]
         )
-        # itertools.imap($call, previous)
+        # itertools.repeat(self)
+        selfs = ast.Call(
+            func=ast.Attribute(
+                value=ast.Name(id='itertools', ctx=ast.Load()),
+                attr='repeat',
+                ctx=ast.Load()
+            ), args=[ast.Name(id='self', ctx=ast.Load())], keywords=[]
+        )
+        # itertools.imap($call, repeat(self), it)
         call = ctx.call_body(body, prefix='foreach')
         it = ast.Call(
             func=ast.Attribute(
                 value=ast.Name(id='itertools', ctx=ast.Load()),
                 attr='imap',
                 ctx=ast.Load()
-            ), args=[call.func, it], keywords=[]
+            ), args=[call.func, selfs, it], keywords=[]
         )
         # itertools.chain.from_iterable(previous)
         it = ast.Call(
@@ -476,6 +505,8 @@ class QWeb(orm.AbstractModel):
         # stack of body items collected by subtrees
         bodies = [[]]
         skipto = None
+        ignored = self._nondirectives_ignore()
+
         for event, el in etree.iterwalk(element, events=('start', 'end'),
                                         # ignore comments & processing instructions
                                         tag=etree.Element):
@@ -495,16 +526,6 @@ class QWeb(orm.AbstractModel):
                 continue
 
             body = bodies.pop()
-            # TODO: trim
-            # trim = el.get("t-trim", 0)
-            # if trim == 0:
-            #     pass
-            # elif trim == 'left':
-            #     inner = inner.lstrip()
-            # elif trim == 'right':
-            #     inner = inner.rstrip()
-            # elif trim == 'both':
-            #     inner = inner.strip()
             # TODO: render_text/render_tail/render_attribute overload
             body = self._compile_element(el, body, ctx)
             directives = {
@@ -512,29 +533,65 @@ class QWeb(orm.AbstractModel):
                 for att in el.attrib
                 if att.startswith('t-')
                 if not att.startswith('t-att')
-                if att not in (
-                    't-name', 't-field-options', 't-esc-options', 't-as',
-                    't-value', 't-valuef'
-                )
+                if att not in ignored
             }
             for name in reversed(self._directives_eval_order()):
                 # skip directives not present on the element
                 if name not in directives: continue
 
                 directives.remove(name)
-                body = getattr(self, '_compile_directive_%s' % name)(
-                    el, body, ctx)
-            # TODO: non-compiled directives support for field, snippet
-            assert not directives, "unhandled directives %s on %s" % (
-                directives,
-                etree.tostring(el)
-            )
+                mname = name.replace('-', '_')
+                compile_handler = getattr(self, '_compile_directive_%s' % mname, None)
+                interpret_handler = 'render_tag_%s' % mname
+                if compile_handler:
+                    if hasattr(self, interpret_handler):
+                        _logger.warning(
+                            "Directive '%s' is AOT-compiled. Dynamic "
+                            "interpreter %s will ignored",
+                            name, interpret_handler
+                        )
+                    body = compile_handler(el, body, ctx)
+                elif hasattr(self, interpret_handler):
+                    # output.append(self._runtime_trampoline(store(el), qwebcontext))
+                    body = [_astgen.append(ast.Call(
+                        func=ast.Attribute(
+                            value=ast.Name(id='self', ctx=ast.Load()),
+                            attr='_runtime_trampoline',
+                            ctx=ast.Load()
+                        ),
+                        args=[
+                            ctx.store_node(el),
+                            ast.Name(id='qwebcontext', ctx=ast.Load()),
+                            ast.Str(interpret_handler)
+                        ],
+                        keywords=[]
+                    ))]
+                else:
+                    raise_qweb_exception(message="Unknown directive %s on %s" % (name, etree.tostring(el)))
 
-            if el.tail is not None:
-                body.append(_astgen.append(ast.Str(unicode(el.tail))))
+            body = self._compile_tail(el, body, ctx)
             bodies[-1].extend(body)
 
         return bodies.pop()
+
+    def _compile_text(self, el, body, ctx):
+        if el.text is not None:
+            body.insert(0, _astgen.append(ast.Str(unicode(el.text))))
+        return body
+
+    def _compile_tail(self, el, body, ctx):
+        if el.tail is not None:
+            body.append(_astgen.append(ast.Str(unicode(el.tail))))
+        return body
+
+    # assume cache will be invalidated by third party on write to ir.ui.view
+    # or groups access rights changes, maybe could use declarative "clear
+    # cache" spec so they can be duplicated without risking extra work?
+    @openerp.tools.ormcache('self.env.uid', 'tmpl')
+    def _get_template(self, tmpl, qwebcontext):
+        element = self.get_template(tmpl, qwebcontext)
+        element.attrib.pop("name", False)
+        return self._compile(element)
 
     def render(self, cr, uid, id_or_xml_id, qwebcontext=None, loader=None, context=None):
         """ render(cr, uid, id_or_xml_id, qwebcontext=None, loader=None, context=None)
@@ -562,18 +619,56 @@ class QWeb(orm.AbstractModel):
         qwebcontext['__stack__'] = stack
         qwebcontext['xmlid'] = str(stack[0]) # Temporary fix
 
-        ctx = _astgen.CompileContext()
-        if id_or_xml_id not in qwebcontext.templates:
-            ctx.register_template(id_or_xml_id)
-            while ctx.to_compile:
-                tmpl = ctx.to_compile.pop()
-                if tmpl in qwebcontext.templates:
-                    continue
-                element = self.get_template(tmpl, qwebcontext)
-                element.attrib.pop("name", False)
-                qwebcontext.templates[tmpl] = self._compile(element, ctx)
-        template_function = qwebcontext.templates[id_or_xml_id]
-        return u''.join(template_function(qwebcontext))
+        template_function = self._get_template(id_or_xml_id, qwebcontext)
+        result = template_function(self, qwebcontext)
+        # is the encoding necessary?
+        return u''.join(result).encode('utf-8')
+
+    def _runtime_trampoline(self, element, qwebcontext, handler_name):
+        """ Trampoline between AOT-compiled QWeb and runtime-implemented qweb
+        directives. Reimplements part of render_node (and kinda duplicates
+        _compile_element) to extract the g_att and t_att from the node.
+        """
+        template_attributes = {}
+        generated_attributes = []
+        for name, value in element.attrib.iteritems():
+            name = str(name)
+            if name == "groups":
+                can_see = self.user_has_groups(groups=value)
+                if not can_see:
+                    return ''
+            value = value.encode("utf8")
+            if name.startswith("t-"):
+                if name.startswith('t-att'):
+                    if name.startswith("t-attf-"):
+                        attrs = (name[7:], self.eval_format(value, qwebcontext))
+                    elif name.startswith("t-att-"):
+                        attrs = (name[6:], self.eval(value, qwebcontext))
+                    else: # t-att=
+                        attrs = self.eval_object(value, qwebcontext)
+
+                    if isinstance(attrs, collections.Mapping):
+                        attrs = attrs.iteritems()
+                    else:
+                        # assume tuple
+                        attrs = [attrs]
+
+                    for att, val in attrs:
+                        if not val: continue
+                        generated_attributes.append(_build_attribute(att, val))
+                else:
+                    template_attributes[name[2:]] = value
+            else:
+                generated_attributes.append(_build_attribute(name, value))
+        res = getattr(self, handler_name)(
+            element,
+            template_attributes,
+            ''.join(generated_attributes),
+            qwebcontext
+        )
+        if isinstance(res, str):
+            return res.decode('utf-8')
+        return res
 
     def render_tag_call_assets(self, element, template_attributes, generated_attributes, qwebcontext):
         """ This special 't-call' tag can be used in order to aggregate/minify javascript and css assets"""
@@ -590,6 +685,65 @@ class QWeb(orm.AbstractModel):
         js = self.get_attr_bool(template_attributes.get('js'), default=True)
         async = self.get_attr_bool(template_attributes.get('async'), default=False)
         return bundle.to_html(css=css, js=js, debug=bool(qwebcontext.get('debug')), async=async)
+
+    def eval(self, expr, qwebcontext):
+        try:
+            return qwebcontext.safe_eval(expr)
+        except Exception:
+            template = qwebcontext.get('__template__')
+            raise_qweb_exception(message="Could not evaluate expression %r" % expr, expression=expr, template=template)
+    def eval_object(self, expr, qwebcontext):
+        return self.eval(expr, qwebcontext)
+    def eval_str(self, expr, qwebcontext):
+        if expr == "0":
+            return qwebcontext.get(0, '')
+        val = self.eval(expr, qwebcontext)
+        if isinstance(val, unicode):
+            return val.encode("utf8")
+        if val is False or val is None:
+            return ''
+        return str(val)
+    def eval_format(self, expr, qwebcontext):
+        expr, replacements = self._format_regex.subn(
+            lambda m: self.eval_str(m.group(1) or m.group(2), qwebcontext),
+            expr
+        )
+        if replacements:
+            return expr
+        try:
+            return str(expr % qwebcontext)
+        except Exception:
+            template = qwebcontext.get('__template__')
+            raise_qweb_exception(message="Format error for expression %r" % expr, expression=expr, template=template)
+
+    def render_element(self, element, template_attributes, generated_attributes, qwebcontext, inner=None):
+        # element: element
+        # template_attributes: t-* attributes
+        # generated_attributes: generated attributes
+        # qwebcontext: values
+        # inner: optional innerXml
+        name = str(element.tag)
+        if inner:
+            g_inner = inner.encode('utf-8') if isinstance(inner, unicode) else inner
+        else:
+            g_inner = [] if element.text is None else [element.text.encode('utf-8')]
+
+            if len(element):
+                raise_qweb_exception(
+                    message="Children nodes not supported anymore on "
+                            "dynamically rendered directives",
+                    node=element, template=qwebcontext.get('template')
+                )
+        inner = "".join(g_inner)
+        if name == "t":
+            return inner
+        elif len(inner) or name not in self._void_elements:
+            return "<%s%s>%s</%s>" % tuple(
+                it if isinstance(it, str) else it.encode('utf-8')
+                for it in (name, generated_attributes, inner, name)
+            )
+        else:
+            return "<%s%s/>" % (name, generated_attributes)
 
     def render_tag_field(self, element, template_attributes, generated_attributes, qwebcontext):
         """ eg: <span t-record="browse_record(res.partner, 1)" t-field="phone">+1 555 555 8069</span>"""
@@ -1297,7 +1451,7 @@ class AssetsBundle(object):
         response.extend(self.remains)
         return sep + sep.join(response)
 
-    @lazy_property
+    @func.lazy_property
     def last_modified(self):
         """Returns last modified date of linked files"""
         return max(itertools.chain(
@@ -1305,11 +1459,11 @@ class AssetsBundle(object):
             (asset.last_modified for asset in self.stylesheets),
         ))
 
-    @lazy_property
+    @func.lazy_property
     def version(self):
         return self.checksum[0:7]
 
-    @lazy_property
+    @func.lazy_property
     def checksum(self):
         """
         Not really a full checksum.
@@ -1530,7 +1684,7 @@ class WebAsset(object):
     def to_html(self):
         raise NotImplementedError()
 
-    @lazy_property
+    @func.lazy_property
     def last_modified(self):
         try:
             self.stat()
@@ -1719,7 +1873,7 @@ class SassStylesheetAsset(PreprocessedCSS):
 
     def get_command(self):
         try:
-            sass = find_in_path('sass')
+            sass = misc.find_in_path('sass')
         except IOError:
             sass = 'sass'
         return [sass, '--stdin', '-t', 'compressed', '--unix-newlines', '--compass',
@@ -1729,9 +1883,9 @@ class LessStylesheetAsset(PreprocessedCSS):
     def get_command(self):
         try:
             if os.name == 'nt':
-                lessc = find_in_path('lessc.cmd')
+                lessc = misc.find_in_path('lessc.cmd')
             else:
-                lessc = find_in_path('lessc')
+                lessc = misc.find_in_path('lessc')
         except IOError:
             lessc = 'lessc'
         webpath = openerp.http.addons_manifest['web']['addons_path']

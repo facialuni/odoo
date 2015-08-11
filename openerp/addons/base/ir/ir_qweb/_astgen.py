@@ -98,7 +98,10 @@ def base_fn_def(body, name='fn'):
     """
     return ast.FunctionDef(
         name=name,
-        args=ast.arguments(args=[ast.Name('qwebcontext', ast.Param())], defaults=[]),
+        args=ast.arguments(args=[
+            ast.Name('self', ast.Param()),
+            ast.Name('qwebcontext', ast.Param())
+        ], defaults=[]),
         body=[ast.Assign([ast.Name(id='output', ctx=ast.Store())],
                          ast.List(elts=[], ctx=ast.Load()))]
             + body
@@ -205,12 +208,10 @@ def compile_format(f):
 class CompileContext(object):
     def __init__(self):
         self._name_gen = itertools.count()
-        self.to_compile = set()
         self._functions = []
-    def register_template(self, name):
-        self.to_compile.add(name)
+        self._nodes = []
 
-    def call_body(self, body, args=('qwebcontext',), prefix='fn'):
+    def call_body(self, body, args=('self', 'qwebcontext',), prefix='fn'):
         """
         If ``body`` is non-empty, generates (and globally store) the
         corresponding function definition and returns the relevant ast.Call
@@ -228,6 +229,21 @@ class CompileContext(object):
             keywords=[]
         )
 
+    def store_node(self, node):
+        """ Memoizes an elementtree node for use at runtime. The node will be
+        available via a module-global ``nodes`` list
+
+        :param etree._Element node:
+        :returns: AST expression fetching the relevant node
+        :rtype: ast.expr
+        """
+        idx = len(self._nodes)
+        self._nodes.append(node)
+        return ast.Subscript(
+            value=ast.Name(id='nodes', ctx=ast.Load()),
+            slice=ast.Index(ast.Num(idx)),
+            ctx=ast.Load()
+        )
 
 def pp(node):
     PrettyPrinter().visit(node)
