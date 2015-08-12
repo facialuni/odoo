@@ -317,9 +317,10 @@ class QWeb(orm.AbstractModel):
                             ) if value
                         )
                     """)).body)
-            opening.append(_astgen.append(ast.Str(u'>')))
-
-            if el.tag not in self._void_elements:
+            if el.tag in self._void_elements:
+                opening.append(_astgen.append(ast.Str(u'/>')))
+            else:
+                opening.append(_astgen.append(ast.Str(u'>')))
                 closing = [_astgen.append(ast.Str(u'</%s>' % el.tag))]
 
         return opening + body + closing
@@ -747,8 +748,10 @@ class QWeb(orm.AbstractModel):
             if len(element):
                 raise_qweb_exception(
                     message="Children nodes not supported anymore on "
-                            "dynamically rendered directives",
-                    node=element, template=qwebcontext.get('template')
+                            "dynamically rendered directives (%s)" %
+                            etree.tostring(element),
+                    node=element,
+                    template=qwebcontext.get('__template__')
                 )
         inner = "".join(g_inner)
         if name == "t":

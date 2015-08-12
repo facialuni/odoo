@@ -7,7 +7,7 @@
     <t t-name="static-void">
         <img src="/test.jpg"/>
     </t>
-    <result id="static-void"><![CDATA[<img src="/test.jpg">]]></result>
+    <result id="static-void"><![CDATA[<img src="/test.jpg"/>]]></result>
 
     <t t-name="fixed-literal">
         <div t-att-foo="'bar'"/>
