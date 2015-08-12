@@ -208,17 +208,25 @@ class QWeb(orm.AbstractModel):
 
     def _compile(self, element):
         ctx = _astgen.CompileContext()
-        # TODO: load all templates in same module (no indirection via ctx.templates) or lazy load templates (!!!)
-        # TODO: make locations work based on source element (?)
+
         mod = _astgen.base_module()
 
         doc_body = self._compile_document(element, ctx=ctx)
-        call = ctx.call_body(doc_body)
+        call = ctx.call_body(
+            doc_body, prefix='template_%s' %
+                element.get('t-name', 'unknown').replace('.', '_')
+        )
 
         mod.body.extend(ctx._functions)
         ast.fix_missing_locations(mod)
         ns = {'nodes': ctx._nodes}
-        eval(compile(mod, '<template>', 'exec'), ns)
+        # noinspection PyBroadException
+        try:
+            eval(compile(mod, '<template>', 'exec'), ns)
+        except Exception, e:
+            raise QWebException(
+                "%s\nError when compiling AST\n\n%s" % (
+                    e, _astgen.pformat(mod)))
         return ns[call.func.id]
 
     def _directives_eval_order(self):
@@ -322,7 +330,7 @@ class QWeb(orm.AbstractModel):
             return [_astgen.append(ast.Call(
                 func=ast.Name(id='escape', ctx=ast.Load()),
                 args=[_astgen.compile_strexpr(el.get('t-esc'))],
-                keywords=[],
+                keywords=[], starargs=None, kwargs=None
             ))] + body
         elif el.get('t-raw'):
             return [_astgen.append(_astgen.compile_strexpr(el.get('t-raw')))] + body
@@ -335,14 +343,15 @@ class QWeb(orm.AbstractModel):
         elif 't-valuef' in el.attrib:
             value = _astgen.compile_format(el.get('t-valuef'))
         else:
-            render = ctx.call_body(body, prefix='set')
+            render = ctx.call_body(body, prefix='set', lineno=el.sourceline)
             if render is None:
                 value = ast.Str(u'')
             else:
                 # concat body render to string
                 value = ast.Call(
                     func=ast.Attribute(value=ast.Str(u''), attr='join', ctx=ast.Load()),
-                    args=[render], keywords=[]
+                    args=[render], keywords=[],
+                    starargs=None, kwargs=None
                 )
 
         return [ast.Assign(
@@ -374,14 +383,15 @@ class QWeb(orm.AbstractModel):
         tmpl = el.get('t-call')
 
         qw = 'qwebcontext_copy'
-        call = ctx.call_body(body, ['self', qw], prefix='prepare_call')
+        call = ctx.call_body(body, ['self', qw], prefix='prepare_call', lineno=el.sourceline)
 
         if call is None:
             val = ast.Str(u'')
         else:
             val = ast.Call(
                 func=ast.Attribute(value=ast.Str(u''), attr='join', ctx=ast.Load()),
-                args=[call], keywords=[]
+                args=[call], keywords=[],
+                starargs=None, kwargs=None
             )
         body = [
             # qwebcontext_copy = qwebcontext.copy()
@@ -393,7 +403,8 @@ class QWeb(orm.AbstractModel):
                         attr='copy',
                         ctx=ast.Load()
                     ),
-                    args=[], keywords=[]
+                    args=[], keywords=[],
+                    starargs=None, kwargs=None
                 )
             ),
             # qwebcontext_copy[0] = $value
@@ -421,13 +432,13 @@ class QWeb(orm.AbstractModel):
                             ast.Str(str(tmpl)),
                             ast.Name(id='qwebcontext', ctx=ast.Load()),
                         ],
-                        keywords=[]
+                        keywords=[], starargs=None, kwargs=None
                     ),
                     args=[
                         ast.Name(id='self', ctx=ast.Load()),
                         ast.Name(id=qw, ctx=ast.Load()),
                     ],
-                    keywords=[]
+                    keywords=[], starargs=None, kwargs=None
                 )
             )
         ]
@@ -449,7 +460,7 @@ class QWeb(orm.AbstractModel):
         it = ast.Call(
             func=ast.Name(id='foreach_iterator', ctx=ast.Load()),
             args=[ast.Name(id='qwebcontext', ctx=ast.Load()), expr, ast.Str(varname)],
-            keywords=[]
+            keywords=[], starargs=None, kwargs=None
         )
         # itertools.repeat(self)
         selfs = ast.Call(
@@ -457,16 +468,18 @@ class QWeb(orm.AbstractModel):
                 value=ast.Name(id='itertools', ctx=ast.Load()),
                 attr='repeat',
                 ctx=ast.Load()
-            ), args=[ast.Name(id='self', ctx=ast.Load())], keywords=[]
+            ), args=[ast.Name(id='self', ctx=ast.Load())], keywords=[],
+            starargs=None, kwargs=None
         )
         # itertools.imap($call, repeat(self), it)
-        call = ctx.call_body(body, prefix='foreach')
+        call = ctx.call_body(body, prefix='foreach', lineno=el.sourceline)
         it = ast.Call(
             func=ast.Attribute(
                 value=ast.Name(id='itertools', ctx=ast.Load()),
                 attr='imap',
                 ctx=ast.Load()
-            ), args=[call.func, selfs, it], keywords=[]
+            ), args=[call.func, selfs, it], keywords=[],
+            starargs=None, kwargs=None
         )
         # itertools.chain.from_iterable(previous)
         it = ast.Call(
@@ -478,7 +491,8 @@ class QWeb(orm.AbstractModel):
                 ),
                 attr='from_iterable',
                 ctx=ast.Load()
-            ), args=[it], keywords=[]
+            ), args=[it], keywords=[],
+            starargs=None, kwargs=None
         )
         return [_astgen.extend(it)]
 
@@ -564,12 +578,14 @@ class QWeb(orm.AbstractModel):
                             ast.Name(id='qwebcontext', ctx=ast.Load()),
                             ast.Str(interpret_handler)
                         ],
-                        keywords=[]
+                        keywords=[], starargs=None, kwargs=None
                     ))]
                 else:
                     raise_qweb_exception(message="Unknown directive %s on %s" % (name, etree.tostring(el)))
 
             body = self._compile_tail(el, body, ctx)
+            for node in body:
+                node.lineno = el.sourceline
             bodies[-1].extend(body)
 
         return bodies.pop()
