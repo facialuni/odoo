@@ -746,7 +746,7 @@ class QWeb(orm.AbstractModel):
             g_inner = [] if element.text is None else [element.text.encode('utf-8')]
 
             if len(element):
-                raise_qweb_exception(
+                raise QWebException(
                     message="Children nodes not supported anymore on "
                             "dynamically rendered directives (%s)" %
                             etree.tostring(element),
