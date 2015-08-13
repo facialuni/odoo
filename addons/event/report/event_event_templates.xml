@@ -64,9 +64,7 @@
                             <div class="row" t-ignore="true">
                                 <div class="col-xs-12">
                                     <span t-if="event.organizer_id.is_company and event.organizer_id.company_id.logo_web">
-                                        <div t-field="event.event_logo">
-                                            <img t-att-src="'data:image/png;base64,%s' % event.organizer_id.company_id.logo_web" style="max-height:1cm; max-width:4cm;"/>
-                                        </div>
+                                        <div t-field="event.event_logo"/>
                                     </span>
                                     <h4 t-field="event.name"/>
                                     <h5>( <i class="fa fa-clock-o"></i> <span itemprop="startDate" t-field="event.date_begin" t-field-options='{"hide_seconds":"True"}'> </span> <i>to</i> <span itemprop="endDate" t-field="event.date_end" t-field-options='{"hide_seconds":"True"}'> </span> )</h5>
