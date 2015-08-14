@@ -264,7 +264,7 @@ class QWeb(orm.AbstractModel):
         """
         return {
             't-name', 't-field-options', 't-esc-options', 't-as',
-            't-value', 't-valuef', 't-ignore',
+            't-value', 't-valuef', 't-ignore', 't-js', 't-css', 't-async',
             # they are directives but not handled via directive handlers so...
             't-esc', 't-raw'
         }
@@ -553,7 +553,6 @@ class QWeb(orm.AbstractModel):
             for name in reversed(self._directives_eval_order()):
                 # skip directives not present on the element
                 if name not in directives: continue
-
                 directives.remove(name)
                 mname = name.replace('-', '_')
                 compile_handler = getattr(self, '_compile_directive_%s' % mname, None)
@@ -581,8 +580,8 @@ class QWeb(orm.AbstractModel):
                         ],
                         keywords=[], starargs=None, kwargs=None
                     ))]
-                else:
-                    raise_qweb_exception(message="Unknown directive %s on %s" % (name, etree.tostring(el)))
+            if directives:
+                raise QWebException(message="Unknown directive %s on %s" % (name, etree.tostring(el)))
 
             body = self._compile_tail(el, body, ctx)
             for node in body:

@@ -42,6 +42,7 @@ class QWeb(orm.AbstractModel):
     re_remove_spaces = re.compile('\s+')
 
     def render_tag_snippet(self, element, template_attributes, generated_attributes, qwebcontext):
+        print "render_tag_snippet"
         cr = qwebcontext['request'].cr
         uid = qwebcontext['request'].uid
         view_reg = self.pool['ir.ui.view']
@@ -58,6 +59,10 @@ class QWeb(orm.AbstractModel):
     def get_converter_for(self, field_type):
         return self.pool.get('ir.qweb.field.' + field_type, self.pool['ir.qweb.field'])
 
+    def _directives_eval_order(self):
+        return ['snippet'] + super(QWeb, self)._directives_eval_order()
+    def _nondirectives_ignore(self):
+        return {'t-thumbnail'} | super(QWeb, self)._nondirectives_ignore()
 
 #------------------------------------------------------
 # QWeb fields
