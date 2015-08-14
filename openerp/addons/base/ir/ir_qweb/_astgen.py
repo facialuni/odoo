@@ -286,13 +286,16 @@ class CompileContext(object):
         """
         if not body:
             return None
-        name = "%s_%s" % (prefix, next(self._name_gen))
+        name = self.make_name(prefix)
         self._functions.append(base_fn_def(body, name=name, lineno=lineno))
         return ast.Call(
             func=ast.Name(id=name, ctx=ast.Load()),
             args=[ast.Name(id=arg, ctx=ast.Load()) for arg in args],
             keywords=[], starargs=None, kwargs=None
         )
+
+    def make_name(self, prefix='var'):
+        return "%s_%s" % (prefix, next(self._name_gen))
 
     def store_node(self, node):
         """ Memoizes an elementtree node for use at runtime. The node will be

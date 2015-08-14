@@ -43,4 +43,29 @@
 [1: b 2 - odd]
 [2: c 3 - even]
     </result>
+
+    <!-- old pyqweb behaviour wrt inherited attributes & foreach, not sure
+         whether that should be kept or changed
+    <t t-name="iter-noinherit">
+        <t t-foreach="3" t-as="item" t-att-foo="item_value">
+<span/></t>
+    </t>
+    <result id="iter-noinherit"><![CDATA[
+<span></span>
+<span></span>
+<span></span>
+    ]]></result>
+    <t t-name="iter-attrs">
+        <span t-foreach="3" t-as="item" t-att-foo="item_value"/>
+    </t>
+    <result id="iter-attrs"><![CDATA[
+        <span></span><span></span><span></span>
+    ]]></result>
+    <t t-name="iter-inherit">
+        <t foo="0"><span t-foreach="3" t-as="item"/></t>
+    </t>
+    <result id="iter-inherit"><![CDATA[
+        <span foo="0"></span><span foo="0"></span><span foo="0"></span>
+    ]]></result>
+    -->
 </templates>

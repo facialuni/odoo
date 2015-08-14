@@ -14,6 +14,29 @@
     </t>
     <result id="fixed-literal"><![CDATA[<div foo="bar"></div>]]></result>
 
+    <t t-name="inherit-literal">
+        <t a="3" t-att-b="5">
+            <span/>
+        </t>
+    </t>
+    <result id="inherit-literal"><![CDATA[<span a="3" b="5"></span>]]></result>
+
+    <t t-name="inherit-multiple">
+        <t t-att-foo="bar"><i/><b/><u/></t>
+    </t>
+    <params id="inherit-multiple">{"bar": 1}</params>
+    <result id="inherit-multiple"><![CDATA[<i foo="1"></i><b foo="1"></b><u foo="1"></u>]]></result>
+
+    <t t-name="inherit-nesting">
+        <t t-att-foo="1"><i><b><u/></b></i></t>
+    </t>
+    <result id="inherit-nesting"><![CDATA[<i foo="1"><b><u></u></b></i>]]></result>
+
+    <t t-name="inherit-multinest">
+        <t a="1"><t b="2"><i/></t></t>
+    </t>
+    <result id="inherit-multinest"><![CDATA[<i a="1" b="2"></i>]]></result>
+
     <t t-name="fixed-variable">
         <div t-att-foo="value"/>
     </t>

@@ -277,53 +277,119 @@ class QWeb(orm.AbstractModel):
         closing = []
         if el.tag != 't':
             # build opening tag
-            opening = [_astgen.append(ast.Str(u'<' + el.tag + u''.join(
-                u' {}="{}"'.format(name, escape(value))
-                for name, value in el.attrib.iteritems()
-                if not name.startswith('t-')
-            )))]
+            opening = [_astgen.append(ast.Str(u'<{}{}'.format(
+                el.tag,
+                self._serialize_static_attributes(el, ctx))
+            ))]
             # dynamic attributes codegen
-            # TODO: should be able to generate a single expression/append
-            for name, value in el.attrib.iteritems():
-                if name.startswith('t-attf-'):
-                    opening.append(ast.Assign(
-                        targets=[ast.Name(id='result', ctx=ast.Store())],
-                        value=_astgen.compile_format(value)
-                    ))
-                    opening.extend(ast.parse(textwrap.dedent("""
-                    if result:
-                        output.append(u' {}="{{}}"'.format(escape(result)))
-                    """.format(name[7:]))).body)
-                elif name.startswith('t-att-'):
-                    opening.append(ast.Assign(
-                        targets=[ast.Name(id='result', ctx=ast.Store())],
-                        value=_astgen.compile_strexpr(value)
-                    ))
-                    opening.extend(ast.parse(textwrap.dedent("""
-                    if result:
-                        output.append(u' {}="{{}}"'.format(escape(result)))
-                    """.format(name[6:]))).body)
-                elif name == 't-att':
-                    opening.append(ast.Assign(
-                        targets=[ast.Name(id='result', ctx=ast.Store())],
-                        value=_astgen.compile_expr(value)
-                    ))
-                    opening.extend(ast.parse(textwrap.dedent("""
-                        output.extend(
-                            u' {}="{}"'.format(name, escape(value))
-                            for name, value in (
-                                result.iteritems() if isinstance(result, collections.Mapping)
-                                else [result]
-                            ) if value
-                        )
-                    """)).body)
+            opening.extend(self._compile_dynamic_attributes(el, ctx))
             if el.tag in self._void_elements:
                 opening.append(_astgen.append(ast.Str(u'/>')))
             else:
                 opening.append(_astgen.append(ast.Str(u'>')))
                 closing = [_astgen.append(ast.Str(u'</%s>' % el.tag))]
+        elif el.attrib and body:
+            n = ctx.make_name('t_attrs')
+            # render attributes to <n>
+            newbody = [
+                ast.Assign(
+                    [ast.Name(id=n, ctx=ast.Store())],
+                    ast.List(elts=[], ctx=ast.Load())
+                ),
+                _astgen.append(ast.Str(
+                    self._serialize_static_attributes(el, ctx)), to=n)
+            ]
+            newbody.extend(self._compile_dynamic_attributes(el, ctx, to=n))
+            # $n = u''.join($n)
+            newbody.append(ast.Assign(
+                [ast.Name(id=n, ctx=ast.Store())],
+                ast.Call(
+                    func=ast.Attribute(
+                        value=ast.Str(u''),
+                        attr='join',
+                        ctx=ast.Load()
+                    ),
+                    args=[ast.Name(id=n, ctx=ast.Load())], keywords=[],
+                    starargs=None, kwargs=None
+                )
+            ))
+
+            level = 0
+            for node in body:
+                # start by keeping the current node
+                newbody.append(node)
+                # output.append(u'<{letter} -> start of an element, increment level and if level is 0 append new attributes
+                # output.append(u'/>') or output.append(u'</ -> end of an element, decrement level
+                if not isinstance(node, ast.Expr): continue
+                call = node.value
+                if not isinstance(call, ast.Call): continue
+                fn = call.func
+                if not (isinstance(fn, ast.Attribute)
+                        and fn.attr == 'append'
+                        and isinstance(fn.value, ast.Name)
+                        and fn.value.id == 'output'):
+                    continue
+                if not (len(call.args) == 1 and isinstance(call.args[0], ast.Str)):
+                    continue
+                s = call.args[0]
+                if s.s == u'/>' or s.s.startswith(u'</'):
+                    level -= 1
+                elif re.match(ur'<[a-zA-Z]', s.s):
+                    if level == 0:
+                        newbody.append(_astgen.append(ast.Name(id=n, ctx=ast.Load())))
+                    level += 1
+                assert level >= 0, \
+                    "levels went negative while distributing <t> attributes"
+            assert level == 0, \
+                "found unbalanced levels while distributing <t> attributes: " \
+                "ended distribution at level %d" % level
+            body = newbody
 
         return opening + body + closing
+
+    def _serialize_static_attributes(self, el, ctx):
+        return u''.join(
+            u' {}="{}"'.format(name, escape(value))
+            for name, value in el.attrib.iteritems()
+            if not name.startswith('t-')
+        )
+
+    def _compile_dynamic_attributes(self, el, ctx, to='output'):
+        nodes = []
+        for name, value in el.attrib.iteritems():
+            if name.startswith('t-attf-'):
+                nodes.append(ast.Assign(
+                    targets=[ast.Name(id='result', ctx=ast.Store())],
+                    value=_astgen.compile_format(value)
+                ))
+                nodes.extend(ast.parse(textwrap.dedent("""
+                    if result:
+                        {}.append(u' {}="{{}}"'.format(escape(result)))
+                    """.format(to, name[7:]))).body)
+            elif name.startswith('t-att-'):
+                nodes.append(ast.Assign(
+                    targets=[ast.Name(id='result', ctx=ast.Store())],
+                    value=_astgen.compile_strexpr(value)
+                ))
+                nodes.extend(ast.parse(textwrap.dedent("""
+                    if result:
+                        {}.append(u' {}="{{}}"'.format(escape(result)))
+                    """.format(to, name[6:]))).body)
+            elif name == 't-att':
+                nodes.append(ast.Assign(
+                    targets=[ast.Name(id='result', ctx=ast.Store())],
+                    value=_astgen.compile_expr(value)
+                ))
+                nodes.extend(ast.parse(textwrap.dedent("""
+                        {}.extend(
+                            u' {{}}="{{}}"'.format(name, escape(value))
+                            for name, value in (
+                                result.iteritems() if isinstance(result, collections.Mapping)
+                                else [result]
+                            ) if value
+                        )
+                    """.format(to))).body)
+        return nodes
 
     def _compile_body(self, el, body, ctx):
         if el.get('t-esc'):
