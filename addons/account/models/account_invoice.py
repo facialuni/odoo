@@ -315,11 +315,11 @@ class AccountInvoice(models.Model):
 
     @api.model
     def fields_view_get(self, view_id=None, view_type=False, toolbar=False, submenu=False):
-        def get_view_id(xid, name):
+        def get_view_id(xid, name, views=self.env['ir.ui.view'].sudo()):
             try:
                 return self.env.ref('account.' + xid)
             except ValueError:
-                view = self.env['ir.ui.view'].search([('name', '=', name)], limit=1)
+                view = views.search([('name', '=', name)], limit=1)
                 if not view:
                     return False
                 return view.id

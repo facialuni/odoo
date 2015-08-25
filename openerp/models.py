@@ -1476,6 +1476,8 @@ class BaseModel(object):
                             * if some tag other than 'position' is found in parent view
         :raise Invalid ArchitectureError: if there is view type other than form, tree, calendar, search etc defined on the structure
         """
+        self.check_access_rights(cr, uid, 'read')
+
         if context is None:
             context = {}
         View = self.pool['ir.ui.view']

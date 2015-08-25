@@ -397,10 +397,10 @@ class website(osv.osv):
         if not isinstance(template, (int, long)) and '.' not in template:
             template = 'website.%s' % template
         View = self.pool['ir.ui.view']
-        view_id = View.get_view_id(cr, uid, template, context=context)
+        view_id = View.get_view_id(cr, openerp.SUPERUSER_ID, template, context=context)
         if not view_id:
             raise NotFound
-        return View.browse(cr, uid, view_id, context=context)
+        return View.browse(cr, openerp.SUPERUSER_ID, view_id, context=context)
 
     def _render(self, cr, uid, ids, template, values=None, context=None):
         # TODO: remove this. (just kept for backward api compatibility for saas-3)

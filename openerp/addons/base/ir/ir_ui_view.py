@@ -392,7 +392,7 @@ class view(osv.osv):
             ['type', '=', view_type],
             ['mode', '=', 'primary'],
         ]
-        ids = self.search(cr, uid, domain, limit=1, context=context)
+        ids = self.search(cr, openerp.SUPERUSER_ID, domain, limit=1, context=context)
         if not ids:
             return False
         return ids[0]
@@ -416,7 +416,8 @@ class view(osv.osv):
         if not context:
             context = {}
 
-        user = self.pool['res.users'].browse(cr, 1, uid, context=context)
+        su = openerp.SUPERUSER_ID
+        user = self.pool['res.users'].browse(cr, su, uid, context=context)
         user_groups = frozenset(user.groups_id or ())
 
         conditions = [
@@ -433,14 +434,14 @@ class view(osv.osv):
                 ['model_ids.module', 'in', tuple(self.pool._init_modules)],
                 ['id', 'in', context.get('check_view_ids') or (0,)],
             ])
-        view_ids = self.search(cr, uid, conditions, context=context)
+        view_ids = self.search(cr, su, conditions, context=context)
 
         return [(view.arch, view.id)
-                for view in self.browse(cr, 1, view_ids, context)
+                for view in self.browse(cr, su, view_ids, context)
                 if not (view.groups_id and user_groups.isdisjoint(view.groups_id))]
 
     def raise_view_error(self, cr, uid, message, view_id, context=None):
-        view = self.browse(cr, uid, view_id, context)
+        view = self.browse(cr, openerp.SUPERUSER_ID, view_id, context)
         not_avail = _('n/a')
         message = ("%(msg)s\n\n" +
                    _("Error context:\nView `%(view_name)s`") + 
@@ -608,17 +609,12 @@ class view(osv.osv):
         if context is None: context = {}
 
         # if view_id is not a root view, climb back to the top.
-        base = v = self.browse(cr, uid, view_id, context=context)
+        base = v = self.browse(cr, openerp.SUPERUSER_ID, [view_id], context=context)
         while v.mode != 'primary':
             v = v.inherit_id
-        root_id = v.id
 
-        # arch and model fields are always returned
-        if fields:
-            fields = list({'arch', 'model'}.union(fields))
-
-        # read the view arch
-        [view] = self.read(cr, uid, [root_id], fields=fields, context=context)
+        # read the view arch, arch and model fields are always returned
+        [view] = v.read(fields=fields and {'arch', 'model'}.union(fields))
         view_arch = etree.fromstring(view['arch'].encode('utf-8'))
         if not v.inherit_id:
             arch_tree = view_arch
@@ -632,13 +628,13 @@ class view(osv.osv):
         if context.get('inherit_branding'):
             arch_tree.attrib.update({
                 'data-oe-model': 'ir.ui.view',
-                'data-oe-id': str(root_id),
+                'data-oe-id': str(v.id),
                 'data-oe-field': 'arch',
             })
 
         # and apply inheritance
         arch = self.apply_view_inheritance(
-            cr, uid, arch_tree, root_id, base.model, context=context)
+            cr, uid, arch_tree, v.id, base.model, context=context)
 
         return dict(view, arch=etree.tostring(arch, encoding='utf-8'))
 
@@ -908,11 +904,14 @@ class view(osv.osv):
         tools.ormcache_context('uid', 'view_id',
             keys=('lang', 'inherit_branding', 'editable', 'translatable', 'edit_translations')))
     def _read_template(self, cr, uid, view_id, context=None):
-        arch = self.read_combined(cr, uid, view_id, fields=['arch'], context=context)['arch']
-        arch_tree = etree.fromstring(arch)
+        v = self.read_combined(cr, uid, view_id, fields=['arch', 'type'], context=context)
+        assert v['type'] == 'qweb',\
+            _("Only qweb views can be interpreted as templates, got {type}").format(**v)
+        arch_tree = etree.fromstring(v['arch'])
 
         if 'lang' in context:
-            arch_tree = self.translate_qweb(cr, uid, view_id, arch_tree, context['lang'], context)
+            arch_tree = self.translate_qweb(
+                cr, openerp.SUPERUSER_ID, view_id, arch_tree, context['lang'], context=context)
 
         self.distribute_branding(arch_tree)
         root = etree.Element('templates')
@@ -926,7 +925,7 @@ class view(osv.osv):
         else:
             if '.' not in xml_id:
                 raise ValueError('Invalid template id: %r' % (xml_id,))
-            view_id = self.get_view_id(cr, uid, xml_id, context=context)
+            view_id = self.get_view_id(cr, openerp.SUPERUSER_ID, xml_id, context=context)
         return self._read_template(cr, uid, view_id, context=context)
 
     def get_view_id(self, cr, uid, xml_id, context=None):
