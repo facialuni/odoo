@@ -102,7 +102,7 @@ class WebsiteMembership(http.Controller):
         page_partner_ids = set(m.partner.id for m in membership_lines)
 
         google_map_partner_ids = []
-        if request.env.ref('website_membership.opt_index_google_map').customize_show:
+        if request.env(user=SUPERUSER_ID).ref('website_membership.opt_index_google_map').customize_show:
             membership_lines_ids = membership_line_obj.search(cr, uid, line_domain, context=context)
             google_map_partner_ids = membership_line_obj.get_published_companies(cr, uid, membership_line_ids, limit=2000, context=context)
 

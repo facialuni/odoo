@@ -9,6 +9,7 @@ from functools import partial
 from operator import attrgetter
 from types import NoneType
 import logging
+import collections
 import pytz
 import xmlrpclib
 
@@ -1770,7 +1771,6 @@ class _RelationalMulti(_Relational):
             other, field = self.traverse_related(record)
             record[self.name] = other[field.name]
 
-
 class One2many(_RelationalMulti):
     """ One2many field; the value of such a field is the recordset of all the
         records in ``comodel_name`` such that the field ``inverse_name`` is equal to
@@ -1829,6 +1829,7 @@ class One2many(_RelationalMulti):
     _column_fields_id = property(attrgetter('inverse_name'))
     _column_auto_join = property(attrgetter('auto_join'))
     _column_limit = property(attrgetter('limit'))
+collections.Iterable.register(One2many)
 
 
 class Many2many(_RelationalMulti):
@@ -1909,6 +1910,7 @@ class Many2many(_RelationalMulti):
     _column_id1 = property(attrgetter('column1'))
     _column_id2 = property(attrgetter('column2'))
     _column_limit = property(attrgetter('limit'))
+collections.Iterable.register(Many2many)
 
 
 class Serialized(Field):

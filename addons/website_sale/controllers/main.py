@@ -624,9 +624,7 @@ class website_sale(http.Controller):
 
     @http.route(['/shop/confirm_order'], type='http', auth="public", website=True)
     def confirm_order(self, **post):
-        cr, uid, context, registry = request.cr, request.uid, request.context, request.registry
-
-        order = request.website.sale_get_order(context=context)
+        order = request.website.sale_get_order(context=request.context)
         if not order:
             return request.redirect("/shop")
 
@@ -644,10 +642,9 @@ class website_sale(http.Controller):
 
         request.session['sale_last_order_id'] = order.id
 
-        request.website.sale_get_order(update_pricelist=True, context=context)
+        request.website.sale_get_order(update_pricelist=True, context=request.context)
 
-        extra_step = registry['ir.model.data'].xmlid_to_object(cr, uid, 'website_sale.extra_info_option', raise_if_not_found=True)
-        if extra_step.active:
+        if request.env.ref('website_sale.extra_info_option').sudo().active:
             return request.redirect("/shop/extra_info")
 
         return request.redirect("/shop/payment")
