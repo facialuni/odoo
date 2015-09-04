@@ -7,7 +7,7 @@
     'version': '1.0',
     'category': 'Hardware Drivers',
     'sequence': 6,
-    'website': 'https://www.odoo.com/page/point-of-sale',
+    'website': 'https://www.odoo.com/point-of-sale',
     'summary': 'A homepage for the PosBox',
     'description': """
 PosBox Homepage

@@ -68,29 +68,25 @@ class Website(openerp.addons.web.controllers.main.Home):
         redirect.set_cookie('website_lang', lang)
         return redirect
 
-    @http.route('/page/<page:page>', type='http', auth="public", website=True, cache=300)
-    def page(self, page, **opt):
+    @http.route(['/<page:view>'], type='http', auth="public", website=True, cache=300)
+    def page(self, view, **opt):
+        key = view.key
         values = {
-            'path': page,
+            'path': key,
             'deletable': True, # used to add 'delete this page' in content menu
         }
-        # /page/website.XXX --> /page/XXX
-        if page.startswith('website.'):
-            return request.redirect('/page/' + page[8:], code=301)
-        elif '.' not in page:
-            page = 'website.%s' % page
 
         try:
-            request.website.get_template(page)
+            request.website.get_template(key)
         except ValueError, e:
             # page not found
             if request.website.is_publisher():
                 values.pop('deletable')
-                page = 'website.page_404'
+                key = 'website.page_404'
             else:
                 return request.registry['ir.http']._handle_exception(e, 404)
 
-        return request.render(page, values)
+        return request.render(key, values)
 
     @http.route(['/robots.txt'], type='http', auth="public")
     def robots(self):
@@ -186,12 +182,12 @@ class Website(openerp.addons.web.controllers.main.Home):
             request.registry['website.menu'].create(
                 request.cr, request.uid, {
                     'name': path,
-                    'url': "/page/" + xml_id[8:],
+                    'url': "/" + xml_id[8:],
                     'parent_id': request.website.menu_id.id,
                     'website_id': request.website.id,
                 }, context=request.context)
-        # Reverse action in order to allow shortcut for /page/<website_xml_id>
-        url = "/page/" + re.sub(r"^website\.", '', xml_id)
+        # Reverse action in order to allow shortcut for /<website_xml_id>
+        url = "/" + re.sub(r"^website\.", '', xml_id)
 
         if noredirect:
             return werkzeug.wrappers.Response(url, mimetype='text/plain')

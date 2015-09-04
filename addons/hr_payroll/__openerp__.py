@@ -19,7 +19,7 @@ Generic Payroll system.
     * Monthly Payroll Register
     * Integrated with Holiday Management
     """,
-    'website': 'https://www.odoo.com/page/employees',
+    'website': 'https://www.odoo.com/employees',
     'depends': [
         'hr',
         'hr_contract',

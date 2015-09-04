@@ -9,7 +9,7 @@
     'version': '1.0',
     'author': 'Odoo S.A.',
     'category': 'Accounting & Finance',
-    'website': 'https://www.odoo.com/page/accounting',
+    'website': 'https://www.odoo.com/accounting',
     'description': """
 Asserts on accounting.
 ======================

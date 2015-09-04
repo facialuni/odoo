@@ -5,7 +5,7 @@
 {
     'name': 'MRP',
     'version': '1.1',
-    'website': 'https://www.odoo.com/page/manufacturing',
+    'website': 'https://www.odoo.com/manufacturing',
     'category': 'Manufacturing',
     'sequence': 14,
     'summary': 'Manufacturing Orders, Bill of Materials, Work Order Operations',

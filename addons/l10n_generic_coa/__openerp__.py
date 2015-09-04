@@ -25,5 +25,5 @@ Install some generic chart of accounts.
         '../account/test/account_invoice_state.yml',
     ],
     'installable': True,
-    'website': 'https://www.odoo.com/page/accounting',
+    'website': 'https://www.odoo.com/accounting',
 }

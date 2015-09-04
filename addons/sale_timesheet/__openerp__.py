@@ -15,7 +15,7 @@ according to the order/contract you work on. This allows to
 have real delivered quantities in sales orders.
 """,
     'author': 'OpenERP SA',
-    'website': 'https://www.odoo.com/page/warehouse',
+    'website': 'https://www.odoo.com/warehouse',
     'depends': ['sale', 'hr_timesheet'],
     'data': ['views/sale_timesheet_view.xml'],
     'demo': ['data/sale_timesheet_demo.xml'],

@@ -423,7 +423,7 @@ default db to serve on localhost:8069
 .. _PostgreSQL for windows:
     http://www.enterprisedb.com/products-services-training/pgdownload
 .. _Quilt: http://en.wikipedia.org/wiki/Quilt_(software)
-.. _saas: https://www.odoo.com/page/start
+.. _saas: https://www.odoo.com/start
 .. _the wkhtmltopdf download page: http://wkhtmltopdf.org/downloads.html
 .. _UAC: http://en.wikipedia.org/wiki/User_Account_Control
 .. _wkhtmltopdf: http://wkhtmltopdf.org

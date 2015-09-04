@@ -57,7 +57,7 @@
     <tbody><tr>
         <td style="width: 600px; font-size:12px; text-align:center; padding-top:10px; color:#a24689; padding-bottom:5px">
             <a href="${object.website_url}" style="color:#a24689">View in browser</a> |
-            <a href="/page/contactus" style="color:#a24689">Contact</a>
+            <a href="/contactus" style="color:#a24689">Contact</a>
         </td>
     </tr></tbody>
 </table>
@@ -109,7 +109,7 @@
     <tbody><tr>
         <td style="width: 600px; font-size:12px; text-align:center; padding-top:10px; color:#a24689; padding-bottom:5px">
             <a href="${object.website_url}" style="color:#a24689">View in browser</a> |
-            <a href="/page/contactus" style="color:#a24689">Contact</a>
+            <a href="/contactus" style="color:#a24689">Contact</a>
         </td>
     </tr></tbody>
 </table>

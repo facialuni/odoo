@@ -11,7 +11,7 @@ This module adds the Timesheet support for the Issues/Bugs Management in Project
 
 Worklogs can be maintained to signify number of hours spent by users to handle an issue.
                 """,
-    'website': 'https://www.odoo.com/page/project-management',
+    'website': 'https://www.odoo.com/project-management',
     'depends': [
         'project_issue',
         'hr_timesheet_sheet',

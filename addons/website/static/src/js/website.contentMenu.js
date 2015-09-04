@@ -107,7 +107,7 @@ var TopBarContent = Widget.extend({
                             context: context
                         },
                     }).then(function (new_name) {
-                        window.location = "/page/" + encodeURIComponent(new_name);
+                        window.location = "/" + encodeURIComponent(new_name);
                     });
                 });
             });

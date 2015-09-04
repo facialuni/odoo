@@ -22,7 +22,7 @@ The following topics should be covered by this module:
     * Notes for the technician and for the final customer
 """,
     'depends': ['stock', 'sale', 'account'],
-    'website': 'https://www.odoo.com/page/manufacturing',
+    'website': 'https://www.odoo.com/manufacturing',
     'data': [
         'security/ir.model.access.csv',
         'security/mrp_repair_security.xml',

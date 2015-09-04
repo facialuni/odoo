@@ -31,7 +31,7 @@ Dashboard / Reports for Inventory Management will include:
 * Last Product Inventories
 * Moves Analysis
     """,
-    'website': 'https://www.odoo.com/page/warehouse',
+    'website': 'https://www.odoo.com/warehouse',
     'depends': ['product', 'procurement', 'barcodes', 'web_planner'],
     'category': 'Inventory Management',
     'sequence': 13,

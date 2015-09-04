@@ -423,7 +423,7 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
     this.imageLayer = imageLayer;
     this.groupStack = [];
     this.processingType3 = null;
-    // Patterns are painted relative to the initial page/form transform, see pdf
+    // Patterns are painted relative to the initial form transform, see pdf
     // spec 8.7.2 NOTE 1.
     this.baseTransform = null;
     this.baseTransformStack = [];

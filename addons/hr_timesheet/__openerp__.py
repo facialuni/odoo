@@ -20,7 +20,7 @@ Lots of reporting on time and employee tracking are provided.
 It is completely integrated with the cost accounting module. It allows you to set
 up a management by affair.
     """,
-    'website': 'https://www.odoo.com/page/employees',
+    'website': 'https://www.odoo.com/employees',
     'depends': ['account', 'hr', 'base', 'hr_attendance'],
     'data': [
         'security/ir.model.access.csv',

@@ -3,7 +3,7 @@
     'category': 'Website',
     'sequence': 55,
     'summary': 'Sell Your Products Online',
-    'website': 'https://www.odoo.com/page/e-commerce',
+    'website': 'https://www.odoo.com/e-commerce',
     'version': '1.0',
     'description': """
 OpenERP E-Commerce

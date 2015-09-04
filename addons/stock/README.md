@@ -1,7 +1,7 @@
 Odoo Inventory Management
 -------------------------
 
-The Odoo <a href="https://www.odoo.com/page/warehouse">Open Source Inventory Management</a>
+The Odoo <a href="https://www.odoo.com/warehouse">Open Source Inventory Management</a>
 is a double entry warehouse management system.
 
 Decrease your process times, automate transactions, reduce your stock levels

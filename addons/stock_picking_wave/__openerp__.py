@@ -9,7 +9,7 @@
 This module adds the picking wave option in warehouse management.
 =================================================================
     """,
-    'website': 'https://www.odoo.com/page/warehouse',
+    'website': 'https://www.odoo.com/warehouse',
     'depends': ['stock'],
     'data': ['security/ir.model.access.csv',
             'stock_picking_wave_view.xml',

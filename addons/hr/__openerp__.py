@@ -20,7 +20,7 @@ You can manage:
 * HR Departments
 * HR Jobs
     """,
-    'website': 'https://www.odoo.com/page/employees',
+    'website': 'https://www.odoo.com/employees',
     'images': [
         'images/hr_department.jpeg',
         'images/hr_employee.jpeg',

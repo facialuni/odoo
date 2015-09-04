@@ -930,7 +930,7 @@ equivalent shortcut through the :func:`~openerp.Widget.$` method::
     The global jQuery function ``$()`` should *never* be used unless it is
     absolutely necessary: selection on a widget's root are scoped to the
     widget and local to it, but selections with ``$()`` are global to the
-    page/application and may match parts of other widgets and views, leading
+    application and may match parts of other widgets and views, leading
     to odd or dangerous side-effects. Since a widget should generally act
     only on the DOM section it owns, there is no cause for global selection.
 

@@ -6,7 +6,7 @@
     'name': 'PosBox Software Upgrader',
     'version': '1.0',
     'category': 'Hardware Drivers',
-    'website': 'https://www.odoo.com/page/point-of-sale',
+    'website': 'https://www.odoo.com/point-of-sale',
     'sequence': 6,
     'summary': 'Allows to remotely upgrade the PosBox software',
     'description': """

@@ -12,7 +12,7 @@ base.ready().done(function () {
     Tour.register({
         id:   'banner',
         name: _t("Build a page"),
-        path: '/page/homepage',
+        path: '/homepage',
         steps: [
             {
                 title:     _t("Welcome to your website!"),

@@ -5,7 +5,7 @@
 {
     'name' : 'Procurements',
     'version' : '1.0',
-    'website': 'https://www.odoo.com/page/manufacturing',
+    'website': 'https://www.odoo.com/manufacturing',
     'category' : 'Hidden/Dependency',
     'depends' : ['base', 'product'],
     'description': """

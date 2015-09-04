@@ -7,7 +7,7 @@
     'name': 'Belgium - Structured Communication',
     'version': '1.2',
     'author': 'Noviat',
-    'website': 'https://www.odoo.com/page/accounting',
+    'website': 'https://www.odoo.com/accounting',
     'category' : 'Localization',
     'description': """
     

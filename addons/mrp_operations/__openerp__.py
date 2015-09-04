@@ -34,7 +34,7 @@ must become done.
 The field 'Working Hours' is the delay(stop date - start date).
 So, that we can compare the theoretic delay and real delay. 
     """,
-    'website': 'https://www.odoo.com/page/manufacturing',
+    'website': 'https://www.odoo.com/manufacturing',
     'depends': ['mrp'],
     'data': [
         'data/report_paperformat.xml',

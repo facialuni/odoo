@@ -8,7 +8,7 @@
     'category': 'Human Resources',
     'sequence': 85,
     'summary': 'Holidays, Allocation and Leave Requests',
-    'website': 'https://www.odoo.com/page/employees',
+    'website': 'https://www.odoo.com/employees',
     'description': """
 Manage leaves and allocation requests
 =====================================

@@ -25,7 +25,7 @@ The validation can be configured in the company:
 * Period size (Day, Week, Month)
 * Maximal difference between timesheet and attendances
     """,
-    'website': 'https://www.odoo.com/page/employees',
+    'website': 'https://www.odoo.com/employees',
     'depends': ['hr_timesheet'],
     'data': [
         'security/ir.model.access.csv',

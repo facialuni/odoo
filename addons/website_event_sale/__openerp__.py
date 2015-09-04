@@ -4,7 +4,7 @@
     'name': "Online Event's Tickets",
     'category': 'Website',
     'summary': "Sell Your Event's Tickets",
-    'website': 'https://www.odoo.com/page/events',
+    'website': 'https://www.odoo.com/events',
     'version': '1.0',
     'description': """
 Online Event's Tickets

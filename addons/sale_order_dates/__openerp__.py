@@ -16,7 +16,7 @@ You can add the following additional dates to a sales order:
     * Commitment Date
     * Effective Date
 """,
-    'website': 'https://www.odoo.com/page/crm',
+    'website': 'https://www.odoo.com/crm',
     'depends': ['sale_stock'],
     'data': ['sale_order_dates_view.xml'],
     'demo': [],

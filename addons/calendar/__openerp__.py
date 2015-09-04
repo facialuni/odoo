@@ -19,7 +19,7 @@ It supports:
 If you need to manage your meetings, you should install the CRM module.
     """,
     'category': 'Hidden/Dependency',
-    'website': 'https://www.odoo.com/page/crm',
+    'website': 'https://www.odoo.com/crm',
     'demo': ['calendar_demo.xml'],
     'data': [
         'calendar_cron.xml',

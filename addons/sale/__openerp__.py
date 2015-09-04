@@ -38,7 +38,7 @@ The Dashboard for the Sales Manager will include
 * My Quotations
 * Monthly Turnover (Graph)
     """,
-    'website': 'https://www.odoo.com/page/crm',
+    'website': 'https://www.odoo.com/crm',
     'depends': ['sales_team','account', 'procurement', 'report'],
     'data': [
         'wizard/sale_make_invoice_advance.xml',

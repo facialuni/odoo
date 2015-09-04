@@ -13,7 +13,7 @@ Generic Payroll system Integrated with Accounting.
     * Company Contribution Management
     """,
     'author':'OpenERP SA',
-    'website': 'https://www.odoo.com/page/employees',
+    'website': 'https://www.odoo.com/employees',
     'depends': [
         'hr_payroll',
         'account',

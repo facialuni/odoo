@@ -443,7 +443,7 @@
                         <tr>
                             <td style="font-size:12px;text-align:center;padding:10px">
                                 &amp;nbsp;
-                                <a style="color:inherit" href="/unsubscribe_from_list">Unsubscribe</a> | <a style="color:inherit" href="/page/contactus">Contact</a>
+                                <a style="color:inherit" href="/unsubscribe_from_list">Unsubscribe</a> | <a style="color:inherit" href="/contactus">Contact</a>
                                 &amp;nbsp;
                             </td>
                         </tr>
@@ -460,7 +460,7 @@
                             <td style="font-size:12px;text-align:center;padding:10px">
                                 &amp;nbsp;
                                 <a style="color:inherit" href="/unsubscribe_from_list">Unsubscribe</a>
-                                <t t-if="website"> | <a style="color:inherit" href="/page/contactus">Contact</a> </t>
+                                <t t-if="website"> | <a style="color:inherit" href="/contactus">Contact</a> </t>
                                 &amp;nbsp;
                             </td>
                         </tr>
@@ -483,7 +483,7 @@
                                 <td valign="middle" align="right" style="font-size:12px;padding:20px;text-align:center">
                                     &amp;nbsp;
                                     <t t-if="website">
-                                        <a style="color:inherit" href="/page/contactus">Contact Us</a> | 
+                                        <a style="color:inherit" href="/contactus">Contact Us</a> | 
                                         <a style="color:inherit" t-att-href="(website.social_facebook) or '#'">Facebook</a> | 
                                         <a style="color:inherit" t-att-href="(website.social_twitter) or '#'">Twitter</a> | 
                                         <a style="color:inherit" href="#">Support</a> | 

@@ -637,7 +637,7 @@
                             <tr>
                                 <td style="font-size:12px;text-align:center;padding-top:10px">
                                     &amp;nbsp;
-                                    <a style="color:#fff" href="/unsubscribe_from_list">Unsubscribe</a> | <a style="color:#fff" href="/page/contactus">Contact</a>
+                                    <a style="color:#fff" href="/unsubscribe_from_list">Unsubscribe</a> | <a style="color:#fff" href="/contactus">Contact</a>
                                     &amp;nbsp;
                                 </td>
                             </tr>
@@ -655,7 +655,7 @@
                             <td style="font-size:12px;text-align:center;padding-top:10px;padding-bottom:5px;color:#fff">
                                 &amp;nbsp;
                                 <a href="/unsubscribe_from_list" style="color:#fff">Unsubscribe</a>
-                                <t t-if="website"> | <a href="/page/contactus" style="color:#fff">Contact</a> </t>
+                                <t t-if="website"> | <a href="/contactus" style="color:#fff">Contact</a> </t>
                                 &amp;nbsp;
                             </td>
                         </tr>
@@ -678,7 +678,7 @@
                                 <td valign="middle" align="right" style="font-size:12px;padding:20px;text-align:center">
                                     &amp;nbsp;
                                     <t t-if="website">
-                                        <a href="/page/contactus" style="color:#fff">Contact Us</a> | 
+                                        <a href="/contactus" style="color:#fff">Contact Us</a> | 
                                         <t t-if="website.social_facebook">
                                             <a t-att-href="website.social_facebook" style="color:#fff">Facebook</a> | 
                                         </t>

@@ -5,7 +5,7 @@
     'category': 'Website',
     'sequence': 135,
     'summary': 'Schedule, Promote and Sell Events',
-    'website': 'https://www.odoo.com/page/website-builder',
+    'website': 'https://www.odoo.com/website-builder',
     'version': '1.0',
     'description': """
 Online Events

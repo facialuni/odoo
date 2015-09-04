@@ -15,7 +15,7 @@ This module does not add any feature, despite a few demo data to
 test the features easily.
 """,
     'author': 'OpenERP SA',
-    'website': 'https://www.odoo.com/page/warehouse',
+    'website': 'https://www.odoo.com/warehouse',
     'depends': ['sale', 'hr_expense'],
     'data': [
         'views/product_view.xml',

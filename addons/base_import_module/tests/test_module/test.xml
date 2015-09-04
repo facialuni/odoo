@@ -29,7 +29,7 @@
             <div id="wrap" class="oe_structure oe_empty">
                 This homepage has been overwritten by an imported module !
                 <p>
-                    <a href="/page/test_module.test_page">Link to page added by imported module</a>
+                    <a href="/test_module.test_page">Link to page added by imported module</a>
                 </p>
             </div>
         </t>

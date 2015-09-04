@@ -16,7 +16,7 @@ answers of question and according to that survey is done. Partners are also
 sent mails with personal token for the invitation of the survey.
     """,
     'summary': 'Create surveys, collect answers and print statistics',
-    'website': 'https://www.odoo.com/page/survey',
+    'website': 'https://www.odoo.com/survey',
     'depends': ['mail', 'website', 'marketing'],
     'data': [
         'security/survey_security.xml',

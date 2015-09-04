@@ -475,7 +475,7 @@ Update your theme
 
 .. image:: theme_tutorial_assets/img/restart.png
 
-Great, our Services page is ready and you’ll be able to access it by navigating to ``/yourwebsite/page/services``.
+Great, our Services page is ready and you’ll be able to access it by navigating to ``/yourwebsite/services``.
 
 You will notice that it's possible to drag/drop snippets underneath the
 *Our Services* list.
@@ -490,7 +490,7 @@ copy/paste the following code.
 
   <record id="services_page_link" model="website.menu">
     <field name="name">Services</field>
-    <field name="url">/page/services</field>
+    <field name="url">/services</field>
     <field name="parent_id" ref="website.main_menu" />
     <field name="sequence" type="int">99</field>
   </record>

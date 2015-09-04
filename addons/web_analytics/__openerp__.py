@@ -11,7 +11,7 @@ Google Analytics.
 
 Collects web application usage with Google Analytics.
     """,
-    'website': 'https://www.odoo.com/page/website-builder',
+    'website': 'https://www.odoo.com/website-builder',
     'depends': ['web'],
     'data': [
         'views/web_analytics.xml',

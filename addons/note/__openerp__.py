@@ -17,7 +17,7 @@ meeting minutes.
 
 Notes can be found in the 'Home' menu.
 """,
-    'website': 'https://www.odoo.com/page/notes',
+    'website': 'https://www.odoo.com/notes',
     'summary': 'Sticky notes, Collaborative, Memos',
     'sequence': 45,
     'depends': [

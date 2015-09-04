@@ -1,7 +1,7 @@
 {
     'name': 'Resellers',
     'category': 'Website',
-    'website': 'https://www.odoo.com/page/website-builder',
+    'website': 'https://www.odoo.com/website-builder',
     'summary': 'Publish Your Channel of Resellers',
     'version': '1.0',
     'description': """

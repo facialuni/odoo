@@ -60,5 +60,5 @@ Wizards provided by this module:
     'test': [
     ],
     'installable': True,
-    'website': 'https://www.odoo.com/page/accounting',
+    'website': 'https://www.odoo.com/accounting',
 }

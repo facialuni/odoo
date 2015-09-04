@@ -322,6 +322,16 @@ class ModelConverter(ir.ir_http.ModelConverter):
                 yield {'loc': (record['id'], record[obj._rec_name])}
 
 class PageConverter(werkzeug.routing.PathConverter):
+    def to_python(self, value):
+        domain = [('page', '=', True), '|', ('key', '=', value), ('key', '=', 'website.%s' % value)]
+        rec = request.env['ir.ui.view'].search(domain, context=request.context)
+        if not rec:
+            raise werkzeug.routing.ValidationError()
+        return rec
+
+    def to_url(self, value):
+        return value.key
+
     """ Only point of this converter is to bundle pages enumeration logic """
     def generate(self, cr, uid, query=None, args={}, context=None):
         View = request.registry['ir.ui.view']
@@ -333,8 +343,8 @@ class PageConverter(werkzeug.routing.PathConverter):
         views = View.search_read(cr, uid, domain, fields=['key', 'priority', 'write_date'], order='name', context=context)
         for view in views:
             xid = view['key'].startswith('website.') and view['key'][8:] or view['key']
-            # the 'page/homepage' url is indexed as '/', avoid aving the same page referenced twice
-            # when we will have an url mapping mechanism, replace this by a rule: page/homepage --> /
+            # the 'homepage' url is indexed as '/', avoid aving the same page referenced twice
+            # when we will have an url mapping mechanism, replace this by a rule: homepage --> /
             if xid=='homepage': continue
             record = {'loc': xid}
             if view['priority'] <> 16:

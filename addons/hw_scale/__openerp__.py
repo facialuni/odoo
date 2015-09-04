@@ -8,7 +8,7 @@
     'category': 'Hardware Drivers',
     'sequence': 6,
     'summary': 'Hardware Driver for Weighting Scales',
-    'website': 'https://www.odoo.com/page/point-of-sale',
+    'website': 'https://www.odoo.com/point-of-sale',
     'description': """
 Weighting Scale Hardware Driver
 ================================

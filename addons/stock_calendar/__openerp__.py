@@ -36,7 +36,7 @@
         The calendars we use are on weekly basis.  It is possible however to have a start date and end date for e.g. the Tuesday delivery.
         It is also possible to put exceptions for days when there is none.
     """,
-    'website': 'https://www.odoo.com/page/warehouse',
+    'website': 'https://www.odoo.com/warehouse',
     'images': [],
     'depends': ['purchase', 'resource'],
     'category': 'Warehouse Management',

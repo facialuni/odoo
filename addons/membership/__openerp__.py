@@ -32,7 +32,7 @@ invoice and send propositions for membership renewal.
         'membership_demo.xml',
         'membership_demo.yml',
     ],
-    'website': 'https://www.odoo.com/page/community-builder',
+    'website': 'https://www.odoo.com/community-builder',
     'test': [
         '../account/test/account_minimal_test.xml',
         'test/test_membership.yml'

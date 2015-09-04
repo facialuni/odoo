@@ -20,7 +20,7 @@ going through the retailer's warehouse. In this case no
 internal transfer document is needed.
 
 """,
-    'website': 'https://www.odoo.com/page/warehouse',
+    'website': 'https://www.odoo.com/warehouse',
     'depends': ['purchase', 'sale_stock'],
     'data': ['stock_dropshipping.xml'],
     'test': [

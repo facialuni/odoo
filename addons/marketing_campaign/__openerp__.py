@@ -35,7 +35,7 @@ input segments, workflow.
       module, but this will also install the CRM application as it depends on
       CRM Leads.
     """,
-    'website': 'https://www.odoo.com/page/lead-automation',
+    'website': 'https://www.odoo.com/lead-automation',
     'data': [
         'marketing_campaign_view.xml',
         'marketing_campaign_data.xml',

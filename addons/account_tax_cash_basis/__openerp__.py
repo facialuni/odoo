@@ -11,7 +11,7 @@
     cash basis involved, a new journal entry will be create containing those taxes value.
     """,
     'category' : 'Accounting & Finance',
-    'website': 'https://www.odoo.com/page/accounting',
+    'website': 'https://www.odoo.com/accounting',
     'depends' : ['account'],
     'data': [
         'views/tax_cash_basis_view.xml',

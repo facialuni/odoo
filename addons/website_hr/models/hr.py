@@ -13,5 +13,5 @@ class hr_employee(osv.osv):
 
     def _website_url(self, cr, uid, ids, field_name, arg, context=None):
         res = super(hr_employee, self)._website_url(cr, uid, ids, field_name, arg, context=context)
-        res.update({(employee_id, '/page/website.aboutus#team') for employee_id in ids})
+        res.update({(employee_id, '/website.aboutus#team') for employee_id in ids})
         return res

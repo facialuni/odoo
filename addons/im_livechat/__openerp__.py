@@ -6,7 +6,7 @@
     'summary': 'Live Chat with Visitors/Customers',
     'category': 'Tools',
     'complexity': 'easy',
-    'website': 'https://www.odoo.com/page/live-chat',
+    'website': 'https://www.odoo.com/live-chat',
     'description':
         """
 Live Chat Support

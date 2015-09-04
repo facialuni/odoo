@@ -11,7 +11,7 @@ odoo.define('website_crm.tour', function(require) {
         Tour.register({
             id:   'website_crm_tour',
             name: "Test the contact us form",
-            path: '/page/contactus',
+            path: '/contactus',
             mode: 'test',
             steps: [
                 {

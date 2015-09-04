@@ -4,7 +4,7 @@
 {
     'name': 'Project Management',
     'version': '1.1',
-    'website': 'https://www.odoo.com/page/project-management',
+    'website': 'https://www.odoo.com/project-management',
     'category': 'Project Management',
     'sequence': 10,
     'summary': 'Projects, Tasks',
