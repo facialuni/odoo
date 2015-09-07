@@ -279,7 +279,7 @@ class website(osv.osv):
             # search for page with link
             page_search_dom = [
                 '|', ('website_id', '=', website_id), ('website_id', '=', False),
-                '|', ('arch_db', 'ilike', '/page/%s' % name), ('arch_db', 'ilike', '/page/%s' % fullname)
+                '|', ('arch_db', 'ilike', '/%s' % name), ('arch_db', 'ilike', '/%s' % fullname)
             ]
             pages = View.search(cr, uid, page_search_dom, context=context)
             if pages:
@@ -289,7 +289,7 @@ class website(osv.osv):
                 if page.page:
                     dep[page_key].append({
                         'text': _('Page <b>%s</b> seems to have a link to this page !' % page.key),
-                        'link': '/page/%s' % page.key
+                        'link': '/%s' % page.key
                     })
                 else:
                     dep[page_key].append({
@@ -300,7 +300,7 @@ class website(osv.osv):
             # search for menu with link
             menu_search_dom = [
                 '|', ('website_id', '=', website_id), ('website_id', '=', False),
-                '|', ('url', 'ilike', '/page/%s' % name), ('url', 'ilike', '/page/%s' % fullname)
+                '|', ('url', 'ilike', '/%s' % name), ('url', 'ilike', '/%s' % fullname)
             ]
 
             menus = Menu.search(cr, uid, menu_search_dom, context=context)
@@ -321,10 +321,12 @@ class website(osv.osv):
 
     def page_exists(self, cr, uid, ids, name, module='website', context=None):
         try:
-            name = (name or "").replace("/page/website.", "").replace("/page/", "")
+            name = (name or "").replace("/website.", "")
+            if name.startswith("/"):
+                name = name[1:]
             if not name:
                 return False
-            return self.pool["ir.model.data"].get_object_reference(cr, uid, module, name)
+            return self.pool['ir.ui.view'].search(cr, uid, [('key', '=', '%s.%s' % (module, name))], context=context)
         except:
             return False
 
@@ -424,7 +426,7 @@ class website(osv.osv):
             pmin = pmax - scope if pmax - scope > 0 else 1
 
         def get_url(page):
-            _url = "%s/page/%s" % (url, page) if page > 1 else url
+            _url = "%s/%s" % (url, page) if page > 1 else url
             if url_args:
                 _url = "%s?%s" % (_url, werkzeug.url_encode(url_args))
             return _url

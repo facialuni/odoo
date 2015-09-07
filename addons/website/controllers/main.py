@@ -37,11 +37,10 @@ class Website(openerp.addons.web.controllers.main.Home):
             pass
         else:
             first_menu = main_menu.child_id and main_menu.child_id[0]
-            if first_menu:
-                if not (first_menu.url.startswith(('/page/', '/?', '/#')) or (first_menu.url=='/')):
+            if first_menu and first_menu.url != '/':
+                if not first_menu.url.startswith(('/?', '/#')):
                     return request.redirect(first_menu.url)
-                if first_menu.url.startswith('/page/'):
-                    return request.registry['ir.http'].reroute(first_menu.url)
+                return request.registry['ir.http'].reroute(first_menu.url)
         return self.page(page)
 
     #------------------------------------------------------
