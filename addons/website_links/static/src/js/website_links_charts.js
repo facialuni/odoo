@@ -56,7 +56,7 @@ openerp.website.if_dom_contains('div.o_website_links_chart', function() {
                     .x(function(d) { return getDate(d); })
                     .y(function(d) { return getNbClicks(d); })
                     .tooltips(true)
-                    .transitionDuration(0)
+                    .transition(0)
                     .showYAxis(true)
                     .showXAxis(true);
 
