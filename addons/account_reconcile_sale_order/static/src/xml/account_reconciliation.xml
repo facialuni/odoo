@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates xml:space="preserve">
+
+    <t t-extend="bank_statement_reconciliation_line">
+        <t t-jquery=".match_controls" t-operation="append">
+            <div t-if="init_data &amp;&amp; init_data.sale_orders" class="dropdown so-selection">
+                <a data-toggle="dropdown" href="javascript:void(0)">
+                    <i class="fa fa-bookmark"></i> Select a Sale Order
+                </a>
+                <ul class="dropdown-menu" role="menu">
+                    <t t-foreach="init_data.sale_orders" t-as="so">
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0)" class="create_counter_part_so" t-att-data-sale_order_id="so[0]">
+                            <t t-esc="so[1]"/> : <t t-esc="so[2]"/>
+                        </a></li>
+                    </t>
+                </ul>
+            </div>
+        </t>
+    </t>
+
+    <t t-name="bank_statement_reconciliation_line_link_to_so">
+        <a href="javascript:void(0)" class="go_to_so" t-att-data-so_id="so_id">
+            View SO
+        </a>
+    </t>
+
+</templates>
