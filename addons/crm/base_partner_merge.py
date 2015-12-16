@@ -160,8 +160,8 @@ class MergePartnerAutomatic(osv.TransientModel):
                 continue
             partner_ids = tuple(map(int, src_partners))
 
-            query = "SELECT column_name FROM information_schema.columns WHERE table_name LIKE '%s'" % (table)
-            cr.execute(query, ())
+            query = "SELECT column_name FROM information_schema.columns WHERE table_name = %s"
+            cr.execute(query, [table])
             columns = []
             for data in cr.fetchall():
                 if data[0] != column:
