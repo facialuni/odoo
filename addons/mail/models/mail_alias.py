@@ -165,13 +165,12 @@ class Alias(models.Model):
         name = re.sub(r'[^\w+.]+', '-', name)
         return self._find_unique(name, alias_ids=alias_ids)
 
-    def migrate_to_alias(self, cr, child_model_name, child_table_name, child_model_auto_init_fct,
-        alias_model_name, alias_id_column, alias_key, alias_prefix='', alias_force_key='', alias_defaults={},
-        alias_generate_name=False, context=None):
+    def _migrate_to_alias(self, cr, child_model, child_model_auto_init_fct,
+                          alias_model_name, alias_id_column, alias_key, alias_prefix='', alias_force_key=None, alias_defaults={},
+                          alias_generate_name=False, context=None):
         """ Installation hook to create aliases for all users and avoid constraint errors.
 
-            :param child_model_name: model name of the child class (i.e. res.users)
-            :param child_table_name: table name of the child class (i.e. res_users)
+            :param child_model: child model object
             :param child_model_auto_init_fct: pointer to the _auto_init function
                 (i.e. super(res_users,self)._auto_init(cr, context=context))
             :param alias_model_name: name of the aliased model
@@ -195,32 +194,39 @@ class Alias(models.Model):
         # call _auto_init
         res = child_model_auto_init_fct(cr, context=context)
 
-        registry = RegistryManager.get(cr.dbname)
-        mail_alias = registry.get('mail.alias')
-        child_class_model = registry[child_model_name]
-        no_alias_ids = child_class_model.search(cr, SUPERUSER_ID, [('alias_id', '=', False)], context={'active_test': False})
+        MailAlias = self.pool['mail.alias']
+        children_without_alias = child_model.search(cr, SUPERUSER_ID, [('alias_id', '=', False)], context={'active_test': False})
+
+        child_fields = [alias_key]
+        # ensure all the requested/used fields are being read
+        child_fields.extend(alias_defaults.values())
+        if alias_force_key: child_fields.append(alias_force_key)
+
         # Use read() not browse(), to avoid prefetching uninitialized inherited fields
-        for obj_data in child_class_model.read(cr, SUPERUSER_ID, no_alias_ids, [alias_key]):
-            alias_vals = {'alias_name': False}
+        for obj_data in child_model.read(cr, SUPERUSER_ID, children_without_alias, child_fields):
+            alias_vals = {
+                'alias_name': False,
+                'alias_defaults': {k: obj_data[v] for k, v in alias_defaults.iteritems()},
+                'alias_parent_thread_id': obj_data['id'],
+            }
             if alias_generate_name:
                 alias_vals['alias_name'] = '%s%s' % (alias_prefix, obj_data[alias_key])
             if alias_force_key:
                 alias_vals['alias_force_thread_id'] = obj_data[alias_force_key]
-            alias_vals['alias_defaults'] = dict((k, obj_data[v]) for k, v in alias_defaults.iteritems())
-            alias_vals['alias_parent_thread_id'] = obj_data['id']
-            alias_create_ctx = dict(context, alias_model_name=alias_model_name, alias_parent_model_name=child_model_name)
-            alias_id = mail_alias.create(cr, SUPERUSER_ID, alias_vals, context=alias_create_ctx)
-            child_class_model.write(cr, SUPERUSER_ID, obj_data['id'], {'alias_id': alias_id}, context={'mail_notrack': True})
-            _logger.info('Mail alias created for %s %s (id %s)', child_model_name, obj_data[alias_key], obj_data['id'])
+            alias_create_ctx = dict(context, alias_model_name=alias_model_name, alias_parent_model_name=child_model._name)
+
+            alias_id = MailAlias.create(cr, SUPERUSER_ID, alias_vals, context=alias_create_ctx)
+            child_model.write(cr, SUPERUSER_ID, obj_data['id'], {'alias_id': alias_id}, context={'mail_notrack': True})
+            _logger.info('Mail alias created for %s %s (id %s)', child_model._name, obj_data[alias_key], obj_data['id'])
 
         # Finally attempt to reinstate the missing constraint
         try:
-            cr.execute('ALTER TABLE %s ALTER COLUMN alias_id SET NOT NULL' % (child_table_name))
+            cr.execute('ALTER TABLE %s ALTER COLUMN alias_id SET NOT NULL' % child_model._table)
         except Exception:
             _logger.warning("Table '%s': unable to set a NOT NULL constraint on column '%s' !\n"\
                             "If you want to have it, you should update the records and execute manually:\n"\
                             "ALTER TABLE %s ALTER COLUMN %s SET NOT NULL",
-                            child_table_name, 'alias_id', child_table_name, 'alias_id')
+                            child_model._table, 'alias_id', child_model._table, 'alias_id')
 
         # set back the unique alias_id constraint
         alias_id_column.required = True

@@ -37,7 +37,7 @@ class Users(models.Model):
 
     def _auto_init(self, cr, context=None):
         """ Installation hook: aliases """
-        return self.pool.get('mail.alias').migrate_to_alias(cr, self._name, self._table, super(Users, self)._auto_init, self._name, self._columns['alias_id'], 'login', alias_force_key='id', context=context)
+        return self.pool.get('mail.alias')._migrate_to_alias(cr, self, super(Users, self)._auto_init, self._name, self._columns['alias_id'], 'login', alias_force_key='id', context=context)
 
     @api.model
     def create(self, values):

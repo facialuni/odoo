@@ -65,7 +65,7 @@ class project(osv.osv):
         """ Installation hook: aliases, project.project """
         # create aliases for all projects and avoid constraint errors
         alias_context = dict(context, alias_model_name='project.task')
-        return self.pool.get('mail.alias').migrate_to_alias(cr, self._name, self._table, super(project, self)._auto_init,
+        return self.pool.get('mail.alias')._migrate_to_alias(cr, self, super(project, self)._auto_init,
             'project.task', self._columns['alias_id'], 'id', alias_prefix='project+', alias_defaults={'project_id':'id'}, context=alias_context)
 
     def onchange_partner_id(self, cr, uid, ids, part=False, context=None):

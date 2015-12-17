@@ -19,7 +19,7 @@ class crm_team(osv.Model):
 
     def _auto_init(self, cr, context=None):
         """Installation hook to create aliases for all lead and avoid constraint errors."""
-        return self.pool.get('mail.alias').migrate_to_alias(cr, self._name, self._table, super(crm_team, self)._auto_init,
+        return self.pool.get('mail.alias')._migrate_to_alias(cr, self, super(crm_team, self)._auto_init,
             'crm.lead', self._columns['alias_id'], 'name', alias_prefix='Lead+', alias_defaults={}, context=context)
 
     _defaults = {
