@@ -138,8 +138,12 @@ class product_template(osv.Model):
 
     def set_sequence_up(self, cr, uid, ids, context=None):
         product = self.browse(cr, uid, ids[0], context=context)
-        cr.execute("""  SELECT id, website_sequence FROM product_template
-                        WHERE website_sequence > %s AND website_published = %s ORDER BY website_sequence ASC LIMIT 1""" % (product.website_sequence, product.website_published))
+        cr.execute("""SELECT id, website_sequence
+                      FROM product_template
+                      WHERE website_sequence > %s
+                        AND website_published = %s
+                      ORDER BY website_sequence ASC LIMIT 1""",
+                   (product.website_sequence, product.website_published))
         prev = cr.fetchone()
         if prev:
             self.write(cr, uid, [prev[0]], {'website_sequence': product.website_sequence}, context=context)
@@ -149,8 +153,12 @@ class product_template(osv.Model):
 
     def set_sequence_down(self, cr, uid, ids, context=None):
         product = self.browse(cr, uid, ids[0], context=context)
-        cr.execute("""  SELECT id, website_sequence FROM product_template
-                        WHERE website_sequence < %s AND website_published = %s ORDER BY website_sequence DESC LIMIT 1""" % (product.website_sequence, product.website_published))
+        cr.execute("""SELECT id, website_sequence
+                      FROM product_template
+                      WHERE website_sequence < %s
+                        AND website_published = %s
+                      ORDER BY website_sequence DESC LIMIT 1""",
+                   (product.website_sequence, product.website_published))
         next = cr.fetchone()
         if next:
             self.write(cr, uid, [next[0]], {'website_sequence': product.website_sequence}, context=context)
