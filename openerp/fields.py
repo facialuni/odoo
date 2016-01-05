@@ -1819,6 +1819,7 @@ class _RelationalMulti(_Relational):
             if not record.id:
                 result.append((0, 0, vals))
             elif vals:
+                result.append((4, record.id))
                 result.append((1, record.id, vals))
             else:
                 result.append((4, record.id))
