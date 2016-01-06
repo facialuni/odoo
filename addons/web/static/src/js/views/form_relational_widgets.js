@@ -456,10 +456,21 @@ function compute_commands(mutex, dataset, command_list, options) {
                         if (dataset.ids.indexOf(id) === -1) {
                             return dataset.alter_ids(dataset.ids.concat([id]), options);
                         }
+                        if (data.BufferedDataSet.virtual_id_regex.test(id)) {
+                            throw new Error("send_commands to '"+dataset.x2m.name+"' receive corrupted values." +
+                                "\n" + JSON.stringify(command_list));
+                        }
                         return;
                     case COMMANDS.DELETE_ALL:
                         return dataset.reset_ids([], {keep_read_data: true});
                     case COMMANDS.REPLACE_WITH:
+                        dataset.ids = [];
+                        _.each(command[2], function (id) {
+                            if (data.BufferedDataSet.virtual_id_regex.test(id)) {
+                                throw new Error("send_commands to '"+dataset.x2m.name+"' receive corrupted values." +
+                                "\n" + JSON.stringify(command_list));
+                            }
+                        });
                         return dataset.alter_ids(command[2], options);
                 }
             }
@@ -679,6 +690,8 @@ var AbstractManyField = common.AbstractField.extend({
                     command_list.push(COMMANDS.update(record.id, values));
                 }
                 return;
+            } else if (data.BufferedDataSet.virtual_id_regex.test(id)) {
+                throw new Error("get_value of '"+self.name+"' can't create a command, the widget have corrupted values.", id);
             }
             if (!is_one2many || not_delete || self.dataset.delete_all) {
                 replace_with_ids.push(id);
