@@ -143,6 +143,11 @@ class Discussion(models.Model):
         self.message_concat = "\n".join(["%s:%s" % (m.name, m.body) for m in self.messages])
 
 
+class Tags(models.Model):
+    _name = 'test_new_api.message.tag'
+
+    name = fields.Char(string='Name', required=True)
+
 class Message(models.Model):
     _name = 'test_new_api.message'
 
@@ -158,6 +163,7 @@ class Message(models.Model):
         'res.partner', compute='_compute_author_partner',
         search='_search_author_partner')
     important = fields.Boolean()
+    tags = fields.Many2many('test_new_api.message.tag')
 
     @api.one
     @api.constrains('author', 'discussion')
@@ -202,6 +208,10 @@ class Message(models.Model):
         self.double_size = 0
         size = self.size
         self.double_size = self.double_size + size
+
+    @api.onchange('author')
+    def _onchange_author(self):
+        self.tags += self.tags.new({'name': 'test %s' % datetime.datetime.now()})
 
     @api.one
     @api.depends('author', 'author.partner_id')
