@@ -59,7 +59,12 @@
             <field name="subject">${object.subject or (object.record_name and 'Re: %s' % object.record_name) or (object.parent_id and object.parent_id.subject and 'Re: %s' % object.parent_id.subject) or (object.parent_id and object.parent_id.record_name and 'Re: %s' % object.parent_id.record_name)}</field>
             <field name="model_id" ref="mail.model_mail_message"/>
             <field name="auto_delete" eval="True"/>
-            <field name="body_html"><![CDATA[
+            <field name="body_html"><![CDATA[<style>
+/* Media query for displaying content in mobile email clients */
+@media only screen and (max-device-width: 600px) { 
+   div[style*="600px"], table[style*="600px"], td[style*="600px"] { width: auto !important; margin: 0 !important; }
+}
+</style>
 <div itemscope itemtype="http://schema.org/EmailMessage">
     <div itemprop="potentialAction" itemscope itemtype="http://schema.org/ViewAction">
         % if ctx.get('button_access'):
