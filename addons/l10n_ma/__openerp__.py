@@ -5,7 +5,7 @@
 
 {
     'name': 'Maroc - Accounting',
-    'version': '1.0',
+    'version': '2.0',
     'author': 'kazacube',
     'category': 'Localization/Account Charts',
     'description': """
