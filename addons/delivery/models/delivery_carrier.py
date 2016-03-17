@@ -62,19 +62,6 @@ class DeliveryCarrier(models.Model):
         self.prod_environment = not self.prod_environment
 
     @api.multi
-    def install_more_provider(self):
-        return {
-            'name': 'New Providers',
-            'view_mode': 'kanban',
-            'res_model': 'ir.module.module',
-            'domain': [['name', 'ilike', 'delivery_']],
-            'type': 'ir.actions.act_window',
-            'help': _('''<p class="oe_view_nocontent">
-                    Buy Odoo Enterprise now to get more providers.
-                </p>'''),
-        }
-
-    @api.multi
     def name_get(self):
         display_delivery = self.env.context.get('display_delivery', False)
         order_id = self.env.context.get('order_id', False)

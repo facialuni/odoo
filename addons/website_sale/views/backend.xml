@@ -72,6 +72,13 @@
         <field name="search_view_id" ref="account.view_account_invoice_filter"/>
     </record>
 
+    <record id="action_install_payment_acquirer" model="ir.actions.act_window">
+        <field name="name">New Payment Acquirers</field>
+        <field name="res_model">ir.module.module</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[('name', 'ilike', 'payment_')]</field>
+    </record>
+
     <menuitem id="menu_orders" name="Orders" parent="website.menu_website_configuration" sequence="2"/>
     <menuitem id="menu_catalog" name="Catalog" parent="website.menu_website_configuration" sequence="3"/>
 
@@ -88,7 +95,8 @@
 
     <!-- Configuration sub-menus -->
     <menuitem id="menu_ecommerce_settings" parent="website.menu_website_global_configuration" name="eCommerce"/>
-    <menuitem id="menu_ecommerce_payment_acquirers" parent="menu_ecommerce_settings" name="Payment Acquirers" action="payment.action_payment_acquirer"/>
+    <menuitem id="menu_ecommerce_payment_acquirers" parent="menu_ecommerce_settings" name="Payment Acquirers" action="payment.action_payment_acquirer" sequence="21"/>
+    <menuitem id="menu_ecommerce_new_payment_acquirers" parent="menu_ecommerce_settings" name="Install New Payment Acquirers" action="action_install_payment_acquirer" sequence="22"/>
 
 
 </odoo>

@@ -18,6 +18,17 @@
         </field>
     </record>
 
-    <menuitem id="menu_ecommerce_delivery" parent="website_sale.menu_ecommerce_settings" name="Delivery Methods" action="delivery.action_delivery_carrier_form"/>
+    <record id="action_new_delivery_carrier" model="ir.actions.act_window">
+        <field name="name">New Delivery Methods</field>
+        <field name="res_model">ir.module.module</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[('name', 'ilike', 'delivery_')]</field>
+        <field name="help">Buy Odoo Enterprise now to get more providers.</field>
+    </record>
+
+
+
+    <menuitem id="menu_ecommerce_delivery" parent="website_sale.menu_ecommerce_settings" name="Delivery Methods" action="delivery.action_delivery_carrier_form" sequence="31"/>
+    <menuitem id="menu_ecommerce_new_delivery" parent="website_sale.menu_ecommerce_settings" name="Install New Delivery Methods" action="action_new_delivery_carrier" sequence="32"/>
 
  </odoo>
