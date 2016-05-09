@@ -56,6 +56,54 @@ class MassMailingList(models.Model):
         for mailing_list in self:
             mailing_list.contact_nbr = data.get(mailing_list.id, 0)
 
+    @api.multi
+    def copy(self, default=None):
+        recipients = self.env['mail.mass_mailing.contact'].search([('list_ids', 'in', self.ids), ('opt_out', '!=', True)])
+        mailing_list = super(MassMailingList, self).copy(default=default)
+        recipients.write({'list_ids': [(4, mailing_list.ids)]})
+        return mailing_list
+
+    @api.multi
+    def merge_massmail_list(self, src_mailing_lists, dst_mailing_lists):
+        self.env.cr.execute("""
+            SELECT DISTINCT contact.email, contact.id
+            FROM
+                mail_mass_mailing_contact contact,
+                mail_mass_mailing_contact_list_rel contact_list_rel,
+                mail_mass_mailing_list mass_mailing
+            WHERE contact.id=contact_list_rel.contact_id
+            AND contact.opt_out <> TRUE
+            AND mass_mailing.id=contact_list_rel.list_id
+            AND mass_mailing.id IN %s""",
+            (tuple(src_mailing_lists.ids), ))
+
+        contact_ids = [ x['id'] for x in  self.env.cr.dictfetchall()]
+        self.env['mail.mass_mailing.contact'].browse(contact_ids).write({'list_ids': [(4, self.ids)]})
+
+        mailing_lists = src_mailing_lists - dst_mailing_lists
+        mailing_lists.write({'active': False})
+
+    def delete_duplicate_contact(self):
+        self.env.cr.execute("""
+            DELETE FROM mail_mass_mailing_contact_list_rel WHERE contact_id IN(
+                SELECT id FROM mail_mass_mailing_contact WHERE EXISTS(
+                    SELECT contact_rel.contact_id
+                        FROM
+                            mail_mass_mailing_contact_list_rel contact_rel,
+                            mail_mass_mailing_contact contact,
+                            mail_mass_mailing_list massmail
+                        WHERE
+                            contact.email = mail_mass_mailing_contact.email
+                        AND
+                            contact.ctid > mail_mass_mailing_contact.ctid
+                        AND
+                            contact.id = contact_rel.contact_id
+                        AND
+                            contact_rel.list_id IN %s))
+            AND list_id IN (%s)
+        """,(tuple(self.ids), tuple(self.ids)))
+
+
 class MassMailingContact(models.Model):
     """Model of a contact. This model is different from the partner model
     because it holds only some basic information: name, email. The purpose is to
