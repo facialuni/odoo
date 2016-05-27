@@ -258,10 +258,7 @@
                             <div class="oe_kanban_content">
                                 <h4 class="oe_center"><field name="title" /></h4>
                                 <div><ul>
-                                    <li>
-                                        <a name="action_test_survey" type="object">Design</a>
-                                    </li>
-                                    <li>
+                                    <li id="survey_test">
                                         <t t-if="record.designed.raw_value"><a type="object" name="action_test_survey">Test</a></t>
                                         <t t-if="! record.designed.raw_value"><a style="color: #aaaaaa;">Test</a></t>
                                     </li>
