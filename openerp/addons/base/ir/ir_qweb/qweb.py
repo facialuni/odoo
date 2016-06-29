@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 import ast
+import os
+import py_compile
+import time
+import marshal
 from collections import OrderedDict, Sized, Mapping, defaultdict
 from lxml import etree, html
 import re
@@ -241,6 +245,7 @@ class QWeb(object):
             * ``load`` (function) overrides the load method
             * ``profile`` (float) profile the rendering (use astor lib) (filter
               profile line with time ms >= profile)
+            * ``save_compiled_filename`` string: save/load compiled inside file
         """
         body = []
         self.compile(template, options)(self, body.append, values or {})
@@ -260,46 +265,76 @@ class QWeb(object):
         _options = dict(options)
         options = frozendict(options)
 
-        element, document = self.get_template(template, options)
-        name = element.get('t-name', 'unknown')
+        # load compiled from file
+        codeobject = None
+        if _options.get('save_compiled_filename'):
+            if os.path.isfile(_options['save_compiled_filename']):
+                with open(_options['save_compiled_filename'], 'rb') as f:
+                    codeobject = marshal.load(f)
+                    f.close()
+        # /load
 
-        _options['template'] = template
-        _options['ast_calls'] = []
-        _options['root'] = element.getroottree()
-        _options['last_path_node'] = None
+        name = 'unknown'
+        element = None
+        if not codeobject:
+            element, document = self.get_template(template, options)
+            name = element.get('t-name', 'unknown')
 
-        # generate ast
+            _options['template'] = template
+            _options['ast_calls'] = []
+            _options['root'] = element.getroottree()
+            _options['last_path_node'] = None
 
-        astmod = self._base_module()
+            # generate ast
+
+            astmod = self._base_module()
+            try:
+                body = self._compile_node(element, _options)
+                def_name = self._create_def(_options, body, prefix='template_%s' % name.replace('.', '_'))
+            except QWebException, e:
+                raise e
+            except Exception, e:
+                path = _options['last_path_node']
+                node = element.getroottree().xpath(path)
+                raise QWebException("Error when compiling AST", e, path, etree.tostring(node[0]), name)
+            astmod.body.extend(_options['ast_calls'])
+
+            if 'profile' in options:
+                self._profiling(astmod, _options)
+
+            ast.fix_missing_locations(astmod)
+
+            # compile ast
+
+            try:
+                codeobject = compile(astmod, '<template>', 'exec')
+            except QWebException, e:
+                raise e
+            except Exception, e:
+                path = _options['last_path_node']
+                node = element.getroottree().xpath(path)
+                raise QWebException("Error when compiling AST", e, path, node and etree.tostring(node[0]), name)
+
+            # save compiled as file
+            if _options.get('save_compiled_filename'):
+                with open(_options['save_compiled_filename'], 'wb') as f:
+                    marshal.dump(codeobject, f)
+                    f.close()
+            # /save
+
         try:
-            body = self._compile_node(element, _options)
-            def_name = self._create_def(_options, body, prefix='template_%s' % name.replace('.', '_'))
-        except QWebException, e:
-            raise e
-        except Exception, e:
-            path = _options['last_path_node']
-            node = element.getroottree().xpath(path)
-            raise QWebException("Error when compiling AST", e, path, etree.tostring(node[0]), name)
-        astmod.body.extend(_options['ast_calls'])
-
-        if 'profile' in options:
-            self._profiling(astmod, _options)
-
-        ast.fix_missing_locations(astmod)
-
-        # compile ast
-
-        try:
-            # noinspection PyBroadException
             ns = {}
-            eval(compile(astmod, '<template>', 'exec'), ns)
-            compiled = ns[def_name]
+            eval(codeobject, ns)
+            def_name = any(item.startswith('template_') for item in ns.keys())
+            compiled = next(v for k, v in ns.iteritems() if k.startswith('template_'))
         except QWebException, e:
             raise e
         except Exception, e:
-            path = _options['last_path_node']
-            node = element.getroottree().xpath(path)
-            raise QWebException("Error when compiling AST", e, path, node and etree.tostring(node[0]), name)
+            if element:
+                path = _options['last_path_node']
+                node = element.getroottree().xpath(path)
+                raise QWebException("Error when compiling AST", e, path, node and etree.tostring(node[0]), name)
+            raise QWebException("Error when compiling AST", e, name)
 
         # return the wrapped function
 

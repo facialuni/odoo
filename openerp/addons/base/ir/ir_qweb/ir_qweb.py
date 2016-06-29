@@ -62,7 +62,7 @@ class IrQWeb(models.AbstractModel, QWeb):
     # assume cache will be invalidated by third party on write to ir.ui.view
     def _get_template_cache_keys(self):
         """ Return the list of context keys to use for caching ``_get_template``. """
-        return ['lang', 'inherit_branding', 'editable', 'translatable', 'edit_translations']
+        return ['profile', 'lang', 'inherit_branding', 'editable', 'translatable', 'edit_translations']
 
     # apply ormcache_context decorator unless in dev mode...
     @tools.conditional(
@@ -70,6 +70,11 @@ class IrQWeb(models.AbstractModel, QWeb):
         tools.ormcache('id_or_xml_id', 'tuple(map(options.get, self._get_template_cache_keys()))'),
     )
     def compile(self, id_or_xml_id, options):
+        if isinstance(id_or_xml_id, (int, long)) or (isinstance(id_or_xml_id, str) and '.' in id_or_xml_id):
+            template = self.env['ir.ui.view'].read_template(id_or_xml_id)
+            key = hash(tuple([template] + map(options.get, self._get_template_cache_keys())))
+            directory = os.path.dirname(os.path.realpath(__file__))
+            options = dict(options, save_compiled_filename="%s/tmp/%s" % (directory, key))
         return super(IrQWeb, self).compile(id_or_xml_id, options=options)
 
     def load(self, name, options):
