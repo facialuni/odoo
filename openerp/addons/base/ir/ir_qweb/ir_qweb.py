@@ -71,10 +71,33 @@ class IrQWeb(models.AbstractModel, QWeb):
     )
     def compile(self, id_or_xml_id, options):
         if isinstance(id_or_xml_id, (int, long)) or (isinstance(id_or_xml_id, str) and '.' in id_or_xml_id):
-            template = self.env['ir.ui.view'].read_template(id_or_xml_id)
-            key = hash(tuple([template] + map(options.get, self._get_template_cache_keys())))
+            ir_view = self.env['ir.ui.view']
+            translation = self.env['ir.translation']
+            view = ir_view.browse(ir_view.get_view_id(id_or_xml_id))
+
+            root = view
+            while root.mode != 'primary':
+                root = root.inherit_id
+
+            query = """SELECT v.id, v.write_date, string_agg(t.value, ';')
+                        FROM ir_ui_view v
+                        LEFT JOIN ir_translation t
+                        ON t.res_id = v.id
+                            AND t.name = 'ir.ui.view,arch_db'
+                            AND t.lang = %s
+                        WHERE (v.inherit_id = %s
+                            AND v.mode = 'extension'
+                            AND v.active = true)
+                            OR v.id = %s
+                        GROUP BY v.id
+                    """
+            self._cr.execute(query, [options.get('lang', 'en_US'), root.id, root.id])
+            datas = [(view.id, view.write_date)] + self._cr.fetchall()
+
+            key = hash(tuple(datas + map(options.get, self._get_template_cache_keys())))
             directory = os.path.dirname(os.path.realpath(__file__))
             options = dict(options, save_compiled_filename="%s/tmp/%s" % (directory, key))
+
         return super(IrQWeb, self).compile(id_or_xml_id, options=options)
 
     def load(self, name, options):
