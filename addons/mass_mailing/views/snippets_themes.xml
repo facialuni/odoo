@@ -19,16 +19,16 @@
                     </div>
 
                     <!-- Odoo Template -->
-                    <t t-call="mass_mailing.odoo_email_template"></t>
+                    <!-- <t t-call="mass_mailing.odoo_email_template"></t> -->
                     
                     <!-- Lemon Template -->
-                    <t t-call="mass_mailing.lemon_email_template"></t>
+                    <!-- <t t-call="mass_mailing.lemon_email_template"></t> -->
 
                     <!-- Tech Template -->
-                    <t t-call="mass_mailing.tech_email_template"></t>                    
+                    <!-- <t t-call="mass_mailing.tech_email_template"></t> -->              
 
                     <!-- Airmail Template -->
-                    <t t-call="mass_mailing.airmail_email_template"></t>
+                    <!-- <t t-call="mass_mailing.airmail_email_template"></t> -->
 
                 </div>
             </div>
@@ -45,27 +45,7 @@
                 </div>
                 <div class="o_panel_body">
 
-                    <div name="Left Logo" class="o_mail_block_header_left_logo">
-                        <div class="snippet_row">
-                            <div class="snippet-general">
-                                <table align="center" cellspacing="0" cellpadding="0" border="0" class="table-styles" width="600">
-                                    <tbody>
-                                      <tr>
-                                          <td width="100%" valign="top" class="horizontal-padding vertical-padding">
-                                                &amp;nbsp;
-                                                <a t-att-href="(company_id.website) or '#'">
-                                                    <img border="0" src="http://www.odoocdn.com/openerp_website/static/src/img/2016/logos/odoo_logo_small.png" style="height:auto;max-width:600px;width:100px;margin-left:-6px;" alt="Your Logo" />
-                                                </a>
-                                                &amp;nbsp;
-                                          </td>
-                                      </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div name="Logo - Social" class="o_mail_block_header_social">
+                    <div name="Left Logo" class="o_mail_block_header_social">
                         <div class="snippet_row">
                             <div class="snippet-general">
 
@@ -118,27 +98,7 @@
                         </div>
                     </div>
 
-                    <div name="Text Left" class="o_mail_block_header_left_text">
-                        <div class="snippet_row">
-                            <div class="snippet-general">
-                                <table align="center" cellspacing="0" cellpadding="0" border="0" class="table-styles" width="600">
-                                    <tbody>
-                                        <tr>
-                                            <td width="100%" class="horizontal-padding vertical-padding">
-                                                &amp;nbsp;
-                                                <a t-att-href="(company_id.website) or '#'" class="display-1" style="margin-left:-6px;">
-                                                    My Company
-                                                </a>
-                                                &amp;nbsp;
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div name="Text - Social" class="o_mail_block_header_text_social">
+                    <div name="Left Text" class="o_mail_block_header_text_social">
                         <div class="snippet_row">
                             <div class="snippet-general">
                                 <table align="center" width="600" cellspacing="0" cellpadding="0" border="0" class="table-styles">
@@ -216,22 +176,6 @@
                     </div>
                 <div class="o_panel_body">
 
-                    <div name="Button" class="o_mail_block_button">
-                        <div class="snippet_row">
-                            <div class="snippet-general">
-                                <table align="center" style="text-align:center;" class="table-styles" width="600">
-                                    <tr>
-                                        <td class="horizontal-padding vertical-padding" style="padding:10px;">
-                                            &amp;nbsp;
-                                            <a href="#" class="newsletter-btn" style="padding:10px;">My Account</a>
-                                            &amp;nbsp;
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
                     <div name="Title Content" class="o_mail_block_title_text">
                         <div class="snippet_row">
                             <div class="snippet-general">
@@ -239,12 +183,15 @@
                                     <tbody>
                                         <tr>
                                             <td width="100%" class="horizontal-padding vertical-padding">
-                                                <p class="display-1">Your order has been shipped!</p>
+                                                <p class="display-1">Don't miss our weekly sales!</p>
                                                 <div>
-                                                    <p>Hello Bob,</p>
-                                                    <p>We would like you to know that your order has shipped! To view your order or make any changes please click the "my order" button below.</p>
+                                                    <p><strong>Dear ${object.name}</strong></p>
+                                                    <p class="no-margin">Great stories have personality. Consider telling a great story that provides personality. Writing a story with personality for potential clients will assist with making a relationship connection. This shows up in small quirks like word choices or phrases. Write from your point of view, not from someone else's experience.<br/></p>
+                                                    <p>Great stories are for everyone even when only written for just one person. If you try to write with a wide general audience in mind, your story will ring false and be bland. No one will be interested. Write for one person. If it’s genuine for the one, it’s genuine for the rest.</p>
+                                                    <p>Kind Regards,</p>
+                                                    <p class="no-margin">Michael Fletcher</p>
                                                     <div class="vertical-padding">
-                                                        <a href="#" class="newsletter-btn">Track shipping</a>
+                                                        <a href="#" class="newsletter-btn">See Our Deals!</a>
                                                         &amp;nbsp;
                                                     </div>
                                                 </div>
@@ -268,159 +215,6 @@
                                             </td>
                                         </tr>
                                     </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div name="Discount Coupon" class="o_mail_block_discount2">
-                        <div class="snippet_row">
-                            <div class="snippet-general">
-                                <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
-                                    <tbody>
-                                        <tr>
-                                            <td class="horizontal-padding vertical-padding">
-                                                <p class="display-1 no-margin">
-                                                    Upgrade to Premium Account!
-                                                </p>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <p class="horizontal-padding vertical-padding no-margin" style="margin:10px 0;"> Code: <strong>45A9E77DGW8455</strong></p>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div name="Discount Offer" class="o_mail_block_discount1">
-                        <div class="snippet_row">
-                            <div class="snippet-general">
-                                <table align="center" cellpadding="0" cellspacing="0" width="600" class="table-styles">
-                                    <tbody>
-                                        <tr>
-                                            <td class="horizontal-padding vertical-padding">
-                                                <p class="display-1 no-margin">20% off for EVERY PRODUCT today!</p>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="horizontal-padding text-center">
-                                                <p class="display-2 no-margin">Hurry Up!</p>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="horizontal-padding vertical-padding"><br/>
-                                                <p class="no-margin">We are continuing to grow and we miss seeing you be a part of it! We've increased store hours and have lot's of new brands available. To welcome you back please accept this 20% discount on you next purchase by clicking the button below.</p>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="horizontal-padding vertical-padding text-center">
-                                                &amp;nbsp;
-                                                <a href="#" class="newsletter-btn">Redeem Discount!</a>
-                                                &amp;nbsp;
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div name="Event" class="o_mail_block_event">
-                        <div class="snippet_row">
-                            <div class="snippet-general">
-                                <table align="center" cellpadding="0" cellspacing="0" width="600" class="table-styles">
-                                    <tr>
-                                        <td style="width:25%;height: 150px;vertical-align:middle;" class="horizontal-padding vertical-padding bg-beta text-center">
-                                            <span class="display-1">21</span>
-                                            <span class="display-1">Jul</span>
-                                            <span style="display: block;font-weight: 600" class="display-3">
-                                                ALL DAY
-                                            </span>
-                                        </td>
-                                        <td style="width:25%;height: 150px;" class="horizontal-padding vertical-padding text-center bg-delta">
-                                            <div style="margin:27px auto">
-                                                &amp;nbsp;
-                                                <span class="fa fa-calendar fa-5x"></span>
-                                                &amp;nbsp;
-                                            </div>
-                                        </td>
-                                        <td style="vertical-align:top;width:50%;height:150px;min-width:255px" class="col_mv">
-                                            <table style="width:100%;border-collapse:separate;">
-                                                <tr style="padding-right:5px;">
-                                                    <td style="padding-top:20px;padding-left:20px;float:left" width="90%">
-                                                        <div style="min-height:100px;text-align:left">
-                                                            <p class="no-margin display-3">Your Event Name</p>
-                                                            <p class="no-margin">Description</p>
-                                                        </div>
-                                                        <div style="padding-left:0">
-                                                            <p style="display: table-cell;cursor: pointer;font-size: 11px;font-weight: 300;padding: 3px 30px;">
-                                                                <a href="#" class="link-color">Link </a>
-                                                            </p>
-                                                            <p style="display: table-cell;cursor: pointer;font-size: 11px;font-weight: 300;padding: 3px 30px;">
-                                                                <a href="#" class="link-color">Info</a>
-                                                            </p>
-                                                        </div>
-                                                    </td>
-                                                    <td style="vertical-align:middle;">
-                                                        <div t-if="website" style="padding-left:16px">
-                                                            <t t-if="website.social_facebook">
-                                                                <div style="width:33%;margin-left:0">
-                                                                    <a t-att-href="website.social_facebook">
-                                                                      <span class="fa fa-facebook-square fa-2x"></span>
-                                                                    </a>
-                                                                </div>
-                                                            </t>
-                                                            <t t-if="website.social_twitter">
-                                                                <div style="width:34%;margin-left:0">
-                                                                    <a t-att-href="website.social_twitter">
-                                                                      <span class="fa fa-twitter-square fa-2x"></span>
-                                                                    </a>
-                                                                </div>
-                                                            </t>
-                                                            <t t-if="website.social_googleplus">
-                                                                <div style="width:33%;margin-left:0">
-                                                                    <a t-att-href="website.social_googleplus">
-                                                                      <span class="fa fa-google-plus-square fa-2x"></span>
-                                                                    </a>
-                                                                </div>
-                                                            </t>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div name="User Profile" class="o_mail_block_profile">
-                        <div class="snippet_row">
-                            <div class="snippet-general">
-                                <table align="center" cellpadding="0" cellspacing="0" width="600" class="table-styles">
-                                    <tr>
-                                        <td class="horizontal-padding vertical-padding" style="text-align:center;width:30%">
-                                            &amp;nbsp;
-                                            <span class="fa fa-user fa-5x" style="margin: 5px 20px;"></span>
-                                            &amp;nbsp;
-                                            <p>User: John Doe</p>
-                                        </td>
-                                        <td class="horizontal-padding vertical-padding">
-                                            <p class="no-margin">Hey Bob,</p>
-                                            <p class="no-margin">I set up an Odoo profile where I can do tons of really awesome stuff. I want you to follow me so we can keep in touch!</p>
-                                            <p class="no-margin">See you soon!</p>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="horizontal-padding vertical-padding" colspan="2">
-                                            <p class="no-margin">Because I've invited you, you can also use the below coupon code to receive a 50% discount on you first months subscription!</p>
-                                        </td>
-                                    </tr>
                                 </table>
                             </div>
                         </div>
@@ -639,24 +433,185 @@
                         </div>
                     </div>
 
-                    <div name="Text Block" class="o_mail_block_simple_text">
+                    <div name="Separator" class="o_mail_block_footer_seprator">
                         <div class="snippet_row">
                             <div class="snippet-general">
-                                <tbody>
-                                    <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
-                                        <tbody>
-                                            <tr>
-                                                <td class="horizontal-padding vertical-padding">
-                                                    <p><strong>Dear ${object.name}</strong></p>
-                                                    <p class="no-margin">Great stories have personality. Consider telling a great story that provides personality. Writing a story with personality for potential clients will assist with making a relationship connection. This shows up in small quirks like word choices or phrases. Write from your point of view, not from someone else's experience.<br/></p>
-                                                    <p>Great stories are for everyone even when only written for just one person. If you try to write with a wide general audience in mind, your story will ring false and be bland. No one will be interested. Write for one person. If it’s genuine for the one, it’s genuine for the rest.</p>
-                                                    <p>Kind Regards,</p>
-                                                    <p class="no-margin">Michael Fletcher</p>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </tbody>
+                                <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
+                                    <tbody>
+                                        <tr>
+                                            <td valign="top" style="width:600px;" class="vertical-padding">
+                                                <div style="width:600px;" class="separator"></div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div name="Tag Line" class="o_mail_block_footer_tag_line">
+                        <div class="snippet_row">
+                            <div class="snippet-general" bgcolor="#875a7b" style="background-color:#875a7b;width:600px;">
+                                <table class="table-styles" width="600" align="center" cellpadding="0" cellspacing="0">
+                                    <tbody>
+                                        <tr>
+                                            <td width="600" class="text-center horizontal-padding vertical-padding bg-beta">
+                                                <p class="display-2" style="margin:10px 0;">Apps That Help You Grow Your Business</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="horizontal-padding vertical-padding bg-beta" style="padding:10px;">
+                                                &amp;nbsp;
+                                                <a href="#" class="newsletter-btn">My Account</a>
+                                                &amp;nbsp;
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="bg-beta">
+                                                    &amp;nbsp;
+
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div id="email_designer_default_extra" class="o_panel">
+                <div class="o_panel_header">
+                    <span class="fa-stack">
+                        <i class="fa fa-plus fa-stack-1x"></i>
+                    </span> Marketing Content
+                </div>
+                <div class="o_panel_body">
+
+                    <div name="Discount Coupon" class="o_mail_block_discount2">
+                        <div class="snippet_row">
+                            <div class="snippet-general">
+                                <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
+                                    <tbody>
+                                        <tr>
+                                            <td class="horizontal-padding vertical-padding">
+                                                <p class="display-1 no-margin">
+                                                    Upgrade to Premium Account!
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <p class="horizontal-padding vertical-padding no-margin" style="margin:10px 0;"> Code: <strong>45A9E77DGW8455</strong></p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div name="Discount Offer" class="o_mail_block_discount1">
+                        <div class="snippet_row">
+                            <div class="snippet-general">
+                                <table align="center" cellpadding="0" cellspacing="0" width="600" class="table-styles">
+                                    <tbody>
+                                        <tr>
+                                            <td class="horizontal-padding vertical-padding">
+                                                <p class="display-1 no-margin">20% off for EVERY PRODUCT today!</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="horizontal-padding text-center">
+                                                <p class="display-2 no-margin">Hurry Up!</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="horizontal-padding vertical-padding"><br/>
+                                                <p class="no-margin">We are continuing to grow and we miss seeing you be a part of it! We've increased store hours and have lot's of new brands available. To welcome you back please accept this 20% discount on you next purchase by clicking the button below.</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="horizontal-padding vertical-padding text-center">
+                                                &amp;nbsp;
+                                                <a href="#" class="newsletter-btn">Redeem Discount!</a>
+                                                &amp;nbsp;
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div name="Event" class="o_mail_block_event">
+                        <div class="snippet_row">
+                            <div class="snippet-general">
+                                <table align="center" cellpadding="0" cellspacing="0" width="600" class="table-styles">
+                                    <tr>
+                                        <td style="width:25%;height: 150px;vertical-align:middle;" class="horizontal-padding vertical-padding bg-beta text-center">
+                                            <span class="display-1">21</span>
+                                            <span class="display-1">Jul</span>
+                                            <span style="display: block;font-weight: 600" class="display-3">
+                                                ALL DAY
+                                            </span>
+                                        </td>
+                                        <td style="width:25%;height: 150px;" class="horizontal-padding vertical-padding text-center bg-delta">
+                                            <div style="margin:27px auto">
+                                                &amp;nbsp;
+                                                <span class="fa fa-calendar fa-5x"></span>
+                                                &amp;nbsp;
+                                            </div>
+                                        </td>
+                                        <td style="vertical-align:top;width:50%;height:150px;min-width:255px" class="col_mv">
+                                            <table style="width:100%;border-collapse:separate;">
+                                                <tr style="padding-right:5px;">
+                                                    <td style="padding-top:20px;padding-left:20px;float:left" width="90%">
+                                                        <div style="min-height:100px;text-align:left">
+                                                            <p class="no-margin display-3">Your Event Name</p>
+                                                            <p class="no-margin">Description</p>
+                                                        </div>
+                                                        <div style="padding-left:0">
+                                                            <p style="display: table-cell;cursor: pointer;font-size: 11px;font-weight: 300;padding: 3px 30px;">
+                                                                <a href="#" class="link-color">Link </a>
+                                                            </p>
+                                                            <p style="display: table-cell;cursor: pointer;font-size: 11px;font-weight: 300;padding: 3px 30px;">
+                                                                <a href="#" class="link-color">Info</a>
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                    <td style="vertical-align:middle;">
+                                                        <div t-if="website" style="padding-left:16px">
+                                                            <t t-if="website.social_facebook">
+                                                                <div style="width:33%;margin-left:0">
+                                                                    <a t-att-href="website.social_facebook">
+                                                                      <span class="fa fa-facebook-square fa-2x"></span>
+                                                                    </a>
+                                                                </div>
+                                                            </t>
+                                                            <t t-if="website.social_twitter">
+                                                                <div style="width:34%;margin-left:0">
+                                                                    <a t-att-href="website.social_twitter">
+                                                                      <span class="fa fa-twitter-square fa-2x"></span>
+                                                                    </a>
+                                                                </div>
+                                                            </t>
+                                                            <t t-if="website.social_googleplus">
+                                                                <div style="width:33%;margin-left:0">
+                                                                    <a t-att-href="website.social_googleplus">
+                                                                      <span class="fa fa-google-plus-square fa-2x"></span>
+                                                                    </a>
+                                                                </div>
+                                                            </t>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -721,64 +676,7 @@
 
                 </div>
             </div>
-            <div id="email_designer_default_extra" class="o_panel">
-                <div class="o_panel_header">
-                    <span class="fa-stack">
-                        <i class="fa fa-plus fa-stack-1x"></i>
-                    </span> Extra
-                </div>
-                <div class="o_panel_body">
-
-                    <div name="Separator" class="o_mail_block_footer_seprator">
-                        <div class="snippet_row">
-                            <div class="snippet-general">
-                                <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
-                                    <tbody>
-                                        <tr>
-                                            <td valign="top" style="width:600px;" class="separator">
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                
-                            </div>
-                        </div>
-                    </div>
-
-                    <div name="Tag Line" class="o_mail_block_footer_tag_line">
-                        <div class="snippet_row">
-                            <div class="snippet-general" bgcolor="#875a7b" style="background-color:#875a7b;width:600px;">
-                                <table class="table-styles" width="600" align="center" cellpadding="0" cellspacing="0">
-                                    <tbody>
-                                        <tr>
-                                            <td width="600" class="text-center horizontal-padding vertical-padding bg-beta">
-                                                <p class="display-2" style="margin:10px 0;">Apps That Help You Grow Your Business</p>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="horizontal-padding vertical-padding bg-beta" style="padding:10px;">
-                                                &amp;nbsp;
-                                                <a href="#" class="newsletter-btn">My Account</a>
-                                                &amp;nbsp;
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="bg-beta">
-                                                    &amp;nbsp;
-
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-            <div id="email_designer_default_footer" class="o_panel">
+            <div t-if="website" id="email_designer_default_footer" class="o_panel">
                 <div class="o_panel_header">
                     <span class="fa-stack">
                         <i class="fa fa-angle-double-down fa-stack-1x"></i>
