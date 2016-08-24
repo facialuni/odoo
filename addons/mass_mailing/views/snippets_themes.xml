@@ -4,19 +4,19 @@
     <xpath expr="//div[@id='o_scroll']" position="replace">
         <div id="o_scroll">
             <div id="email_designer_layout" class="o_panel">
-                <div class="o_panel_header o_snippet_section">
+                <!-- <div class="o_panel_header o_snippet_section">
                     <span class="fa-stack">
                         <i class="fa fa-paint-brush fa-stack-1x"></i>
                     </span> Choose Template
-                </div>
+                </div> -->
 
                 <!-- Templates -->
 
                 <div class="o_panel_body">
                     <!-- Default Template -->
-                    <div name="Default" class="o_mail_block_default_template">
+                    <!-- <div name="Default" class="o_mail_block_default_template">
                         <div class="o_layout"></div>
-                    </div>
+                    </div> -->
 
                     <!-- Odoo Template -->
                     <!-- <t t-call="mass_mailing.odoo_email_template"></t> -->
@@ -226,57 +226,121 @@
                                 <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
                                     <tbody>
                                         <tr>
-                                            <td class="horizontal-padding vertical-padding">
-                                                <table width="560" cellspacing="0" cellpadding="0" class="table-styles vertical-padding" style="margin-bottom:10px;">
-                                                    <tbody>
+                                            <td class="horizontal-padding vertical-padding col_mv">
+                                                <table cellspacing="0" cellpadding="0" class="table-styles">
+                                                    <thead>
                                                         <tr>
-                                                            <td valign="top" width="300">
-                                                                <p class="no-margin"><strong>Bob Erlicious</strong></p>
-                                                                <p class="no-margin">
-                                                                    123 Flower Drive<br/>
-                                                                    Victoria, BC<br/>
-                                                                    V9P 2E8<br/>
-                                                                    1(250)222-2232
-                                                                </p>
+                                                            <th class="bg-beta">
+                                                                <h2 class="display-1 text-center">REGISTERED</h2>
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="bg-gray-lighter">
+                                                        <tr>
+                                                            <td class="text-center col_mv">
+                                                                <p class="display-coupon text-center" style="font-weight:800;">$40</p>
+                                                                <small>user / month (billed annually)</small>
                                                             </td>
-                                                            <td valign="top" width="300">
-                                                                <p class="no-margin"><strong>Invoice: 00234</strong></p>
-                                                                <p class="no-margin">April 3, 2014</p>
+                                                        </tr>
+                                                        <tr>
+                                                            <td valign="top" class="vertical-padding col_mv">
+                                                                <div class="separator"></div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="col_mv">
+                                                                <p style="margin: 0 15px 15px;">Basic sales and marketing for up to 2 users</p>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="col_mv">
+                                                                <p style="margin: 0 15px 15px;">Account and sales management</p>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="col_mv">
+                                                                <p style="margin: 0 15px 15px;">No customization</p>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="col_mv">
+                                                                <p style="margin: 0 15px 15px;">No support</p>
                                                             </td>
                                                         </tr>
                                                     </tbody>
-                                                </table>
-                                                <table width="560" cellspacing="0" cellpadding="0" class="table-styles">
-                                                    <tbody>
+                                                    <tfoot class="bg-gray-lighter">
                                                         <tr>
-                                                            <td>
-                                                                <table width="560" cellspacing="0" cellpadding="0" class="table-styles" data-max-width="560px">
-                                                                    <thead>
-                                                                        <tr style="background-color:#875a7b;" bgcolor="#875a7b" class="row col">
-                                                                            <th style="padding: 10px 0px 10px 10px;color: #ffffff;color: #ffffff;" class="mv">Plan</th>
-                                                                            <th style="padding: 10px 0px;color: #ffffff;" class="mv">Period</th>
-                                                                            <th style="padding: 10px 10px 10px 0;color: #ffffff;text-align:right;" class="mv">Amount</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        <tr style="color:#464646" class="row">
-                                                                            <td style="padding: 10px 0px 10px 10px;">Silver Plan</td>
-                                                                            <td style="padding:10px 0px;">August</td>
-                                                                            <td style="padding:10px 10px 10px 0;text-align:right;">$50.00</td>
-                                                                        </tr>
-                                                                    </tbody>
-                                                                </table>
+                                                            <td valign="top">
+                                                                <div class="separator"></div>
                                                             </td>
                                                         </tr>
-                                                    </tbody>
+                                                        <tr>
+                                                            <td class="text-center" style="padding:15px 0;">
+                                                                &amp;nbsp;
+                                                                <a href="#" class="newsletter-btn">More</a>
+                                                                &amp;nbsp;
+                                                            </td>
+                                                        </tr>
+                                                    </tfoot>
                                                 </table>
                                             </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="horizontal-padding vertical-padding">
-                                                <p>
-                                                    The amount of $50.00 CAD has been charged on the credit card ending with 0123.
-                                                </p>
+                                            <td class="horizontal-padding vertical-padding col_mv">
+                                                <table cellspacing="0" cellpadding="0" class="table-styles">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="bg-beta">
+                                                                <h2 class="display-1 text-center">REGISTERED</h2>
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="bg-gray-lighter">
+                                                        <tr>
+                                                            <td class="text-center col_mv">
+                                                                <p class="display-coupon text-center" style="font-weight:800;">$40</p>
+                                                                <small>user / month (billed annually)</small>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td valign="top" class="vertical-padding col_mv">
+                                                                <div class="separator"></div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="col_mv">
+                                                                <p style="margin: 0 15px 15px;">Basic sales and marketing for up to 2 users</p>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="col_mv">
+                                                                <p style="margin: 0 15px 15px;">Account and sales management</p>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="col_mv">
+                                                                <p style="margin: 0 15px 15px;">No customization</p>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="col_mv">
+                                                                <p style="margin: 0 15px 15px;">No support</p>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                    <tfoot class="bg-gray-lighter">
+                                                        <tr>
+                                                            <td valign="top">
+                                                                <div class="separator"></div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-center" style="padding:15px 0;">
+                                                                &amp;nbsp;
+                                                                <a href="#" class="newsletter-btn">More</a>
+                                                                &amp;nbsp;
+                                                            </td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -286,13 +350,13 @@
                     </div>
 
                     <div name="Two Columns" class="o_mail_block_two_cols">
-                        <div class="snippet_row">
+                        <div class="snippet_row mv">
                             <div class="snippet-general">
                                 <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
                                     <tbody>
                                         <tr>
                                             <td style="vertical-align:top;width:270px;padding:20px 10px 20px 20px;" class="col_mv">
-                                                <img src="http://www.odoocdn.com/openerp_website/static/src/img/2016/project/case_study_inspiral.jpg" style="height:auto;max-width:270px;width:270px;" alt="Your Logo" />
+                                                <img src="http://www.odoocdn.com/openerp_website/static/src/img/2016/project/case_study_inspiral.jpg" style="height:auto;max-width:100%;" alt="Your Logo" />
                                                 <p class="display-2 text-center" style="margin-top:20px;">Step 1</p>
                                                 <p class="text-center no-margin">
                                                     We need you to update your account information. If there is ever a problem with your account, this information will make it easier for you to log back in.
@@ -303,7 +367,7 @@
                                             </td>
 
                                             <td style="vertical-align:top;width:270px;padding:20px 20px 20px 10px;" class="col_mv">
-                                                <img src="http://www.odoocdn.com/openerp_website/static/src/img/2016/project/case_study_universem.jpg" style="height:auto;max-width:270px;width:270px;" alt="Your Logo" />
+                                                <img src="http://www.odoocdn.com/openerp_website/static/src/img/2016/project/case_study_universem.jpg" style="height:auto;max-width:100%;" alt="Your Logo" />
                                                 <p class="display-2 text-center" style="margin-top:20px;">Step 2</p>
                                                 <p class="text-center no-margin">
                                                     We need you to update your account information. If there is ever a problem with your account, this information will make it easier for you to log back in.
@@ -326,7 +390,7 @@
                                     <tbody>
                                         <tr>
                                             <td style="vertical-align:top;width:180px;padding:20px 5px 20px 20px;" class="col_mv">
-                                                <img src="http://www.odoocdn.com/openerp_website/static/src/img/2016/project/case_study_inspiral.jpg" style="height:auto;max-width:180px;width:180px;" alt="Your Logo" />
+                                                <img src="http://www.odoocdn.com/openerp_website/static/src/img/2016/project/case_study_inspiral.jpg" style="height:auto;max-width:100%;" alt="Your Logo" />
                                                 <p class="display-2 text-center" style="margin-top:20px;">Step 1</p>
                                                 <p class="text-center no-margin">
                                                     We need you to update your account information. If there is ever a problem with your account, this information will make it easier for you to log back in.
@@ -337,7 +401,7 @@
                                             </td>
 
                                             <td style="vertical-align:top;width:180px;padding:20px 5px 20px 5px;" class="col_mv">
-                                                <img src="http://www.odoocdn.com/openerp_website/static/src/img/2016/project/case_study_universem.jpg" style="height:auto;max-width:180px;width:180px;" alt="Your Logo" />
+                                                <img src="http://www.odoocdn.com/openerp_website/static/src/img/2016/project/case_study_universem.jpg" style="height:auto;max-width:100%;" alt="Your Logo" />
                                                 <p class="display-2 text-center" style="margin-top:20px;">Step 2</p>
                                                 <p class="text-center no-margin">
                                                     We need you to update your account information. If there is ever a problem with your account, this information will make it easier for you to log back in.
@@ -348,7 +412,7 @@
                                             </td>
 
                                             <td style="vertical-align:top;width:180px;padding:20px 20px 20px 5px;" class="col_mv">
-                                                <img src="http://www.odoocdn.com/openerp_website/static/src/img/2016/project/case_study_universem.jpg" style="height:auto;max-width:180px;width:180px;" alt="Your Logo" />
+                                                <img src="http://www.odoocdn.com/openerp_website/static/src/img/2016/project/case_study_universem.jpg" style="height:auto;max-width:100%;" alt="Your Logo" />
                                                 <p class="display-2 text-center" style="margin-top:20px;">Step 3</p>
                                                 <p class="text-center no-margin">
                                                     We need you to update your account information. If there is ever a problem with your account, this information will make it easier for you to log back in.
@@ -497,14 +561,35 @@
                                     <tbody>
                                         <tr>
                                             <td class="horizontal-padding vertical-padding">
-                                                <p class="display-1 no-margin">
-                                                    Upgrade to Premium Account!
-                                                </p>
+                                                <div class="text-center center-block">
+                                                    <p class="display-coupon no-margin text-center text-beta" style="font-weight:800;">
+                                                        $20
+                                                    </p>
+                                                    <span class="display-2">FROM YOUR NEXT ORDER!</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" style="width:600px;" class="vertical-padding">
+                                                <div style="width:600px;" class="separator"></div>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>
-                                                <p class="horizontal-padding vertical-padding no-margin" style="margin:10px 0;"> Code: <strong>45A9E77DGW8455</strong></p>
+                                                <p class="text-center" style="margin-top:10px;">
+                                                    Use This Promo Code BEFORE 1st of August
+                                                </p>
+                                                <p class="horizontal-padding vertical-padding display-2 text-center">
+                                                    Code: <strong>45A9E77DGW8455</strong>
+                                                </p>
+                                                <p class="text-center">
+                                                    to receive $20 from your next purchase!
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" style="width:600px;" class="vertical-padding">
+                                                <div style="width:600px;" class="separator"></div>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -519,25 +604,30 @@
                                 <table align="center" cellpadding="0" cellspacing="0" width="600" class="table-styles">
                                     <tbody>
                                         <tr>
-                                            <td class="horizontal-padding vertical-padding">
-                                                <p class="display-1 no-margin">20% off for EVERY PRODUCT today!</p>
+                                            <td class="horizontal-padding vertical-padding text-center col_mv" width="250">
+                                                <table>
+                                                    <tr>
+                                                        <td>
+                                                            <p class="display-coupon text-beta text-center no-margin" style="font-weight:800;">20%</p>
+                                                            <p class="display-3 text-beta text-center" style="font-weight:800;">OFF</p>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <p class="display-3 text-center">FROM YOUR NEXT ORDER! <br/> &amp;nbsp;</p>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-center">
+                                                            &amp;nbsp;
+                                                            <a href="#" class="newsletter-btn" style="margin-top:15px;">Redeem Discount!</a>
+                                                            &amp;nbsp;
+                                                        </td>
+                                                    </tr>
+                                                </table>
                                             </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="horizontal-padding text-center">
-                                                <p class="display-2 no-margin">Hurry Up!</p>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="horizontal-padding vertical-padding"><br/>
-                                                <p class="no-margin">We are continuing to grow and we miss seeing you be a part of it! We've increased store hours and have lot's of new brands available. To welcome you back please accept this 20% discount on you next purchase by clicking the button below.</p>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="horizontal-padding vertical-padding text-center">
-                                                &amp;nbsp;
-                                                <a href="#" class="newsletter-btn">Redeem Discount!</a>
-                                                &amp;nbsp;
+                                            <td class="horizontal-padding vertical-padding col_mv" width="350">
+                                                <p class="no-margin">We are continuing to grow and we miss seeing you be a part of it! We've increased store hours and have lot's of new brands available. To welcome you back please accept this 20% discount on you next purchase by clicking the button.</p>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -622,17 +712,17 @@
                                 <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
                                     <tbody>
                                         <tr>
-                                            <td class="col_mv horizontal-padding vertical-padding bg-delta">
+                                            <td class="col_mv horizontal-padding vertical-padding bg-beta">
                                                 <table class="table-styles">
                                                     <tr>
                                                         <td rowspan="2">
                                                             &amp;nbsp;
-                                                            <span class="fa fa-check fa-3x"></span>
+                                                            <span class="fa fa-hand-pointer-o fa-3x"></span>
                                                             &amp;nbsp;
                                                         </td>
                                                         <td style="padding-left:10px;">
                                                             <p style="font-weight:bold;margin:0 0 3px 0;" class="display-3">Step 1:</p>
-                                                            <p class="no-margin">Place Order</p>
+                                                            <p class="no-margin">Register</p>
                                                         </td>
                                                     </tr>
                                                 </table>
@@ -642,12 +732,12 @@
                                                     <tr>
                                                         <td rowspan="2">
                                                             &amp;nbsp;
-                                                            <span class="fa fa-truck fa-3x"></span>
+                                                            <span class="fa fa-map-marker fa-3x"></span>
                                                             &amp;nbsp;
                                                         </td>
                                                         <td style="padding-left:10px;">
                                                             <p style="font-weight:bold;margin:0 0 3px 0" class="display-3">Step 2:</p>
-                                                            <p class="no-margin">Shipping</p>
+                                                            <p class="no-margin">Attend</p>
                                                         </td>
                                                     </tr>
                                                 </table>
@@ -657,12 +747,12 @@
                                                     <tr>
                                                         <td rowspan="2">
                                                             &amp;nbsp;
-                                                            <span class="fa fa-usd fa-3x"></span>
+                                                            <span class="fa fa-money fa-3x"></span>
                                                             &amp;nbsp;
                                                         </td>
                                                         <td style="padding-left:10px;">
                                                             <p style="font-weight:bold;margin:0 0 3px 0" class="display-3">Step 3:</p>
-                                                            <p class="no-margin">Payment</p>
+                                                            <p class="no-margin">Win</p>
                                                         </td>
                                                     </tr>
                                                 </table>
@@ -684,7 +774,7 @@
                 </div>
                 <div class="o_panel_body">
 
-                    <div name="Text + Social" class="o_mail_block_footer_social">
+                    <div name="Footer" class="o_mail_block_footer_social">
                         <div class="snippet_row">
                             <div class="snippet-general">
                                 <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
@@ -722,13 +812,18 @@
                                                 &amp;nbsp;
                                             </td>
                                         </tr>
+                                        <tr>
+                                            <td class="horizontal-padding vertical-padding">
+                                                <p style="font-size:12px;text-align:center;" class="no-margin">© 2014 All Rights Reserved</p>
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
 
-                    <div name="Text + Copyright" class="o_mail_block_footer_copyright">
+                    <!-- <div name="Text + Copyright" class="o_mail_block_footer_copyright">
                         <div class="snippet_row">
                             <div class="snippet-general">
                                 <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
@@ -741,18 +836,13 @@
                                                 &amp;nbsp;
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td class="horizontal-padding vertical-padding">
-                                                <p style="font-size:12px;text-align:center;" class="no-margin">© 2014 All Rights Reserved</p>
-                                            </td>
-                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
-                    <div name="Text Only" class="o_mail_block_footer_text">
+                    <!-- <div name="Text Only" class="o_mail_block_footer_text">
                         <div class="snippet_row">
                             <div class="snippet-general">
                                 <table class="table-styles" width="600" align="center" cellpadding="0" cellspacing="0">
@@ -777,7 +867,7 @@
                                 </table>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                 </div>
             </div>

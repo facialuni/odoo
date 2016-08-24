@@ -10,8 +10,8 @@
     </div>
 
     <div data-js='table_row'
-        data-selector=".row"
-        data-drop-near=".row">
+        data-selector="tr:has(>.row), tr:has(>.col_mv)"
+        data-drop-near="tr:has(>.row), tr:has(>.col_mv)">
     </div>
 
     <div data-js='table_column'

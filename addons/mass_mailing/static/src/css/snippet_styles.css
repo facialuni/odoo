@@ -12,10 +12,13 @@
 
 /* ======================== TYPO ====================== */
 
-.display-1, .display-2, .display-3, p, th, td, a, .table-styles {
+.display-coupon, .display-1, .display-2, .display-3, p, th, td, a, .table-styles {
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-weight:300;
     text-decoration: none !important;
+}
+.display-coupon {
+    font-size:60px;
 }
 .display-1 {
     font-size: 30px;
@@ -55,7 +58,7 @@ a, a:hover {
 }
 .snippet-general {
     width:600px;
-    margin:10px auto;
+    margin:0 auto;
     color:#464646;
 }
 .newsletter-btn {
