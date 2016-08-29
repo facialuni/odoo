@@ -133,6 +133,34 @@ snippets_editor.Class.include({
     _get_snippet_url: function () {
         return snippets_url;
     },
+    compute_snippet_templates: function (html) {
+        this._super(html);
+        var self = this;
+        var $layouts = this.$('#email_designer_layout .o_panel_body > *');
+        $layouts.removeClass("oe_snippet_body");
+        $layouts.find('*').add($layouts).off();
+        $layouts.on('click', function (event) {
+            event.preventDefault();
+            var $editable = $('#editable_area');
+            var $o_layout = $editable.find('.o_layout');
+            var $html = ($o_layout.length ? $o_layout.find('.oe_structure').first() : $editable).contents();
+            var $layout = $(".o_layout", this).clone();
+
+            if ($o_layout.length) {
+                $('body').removeClass($o_layout.attr('class'));
+            }
+            $('body').addClass($layout.attr('class')).removeClass('odoo o_layout oe_snippet_body');
+
+            var $structure = $layout.find('.oe_structure');
+            if ($structure.length) {
+                $structure.html($html);
+                $('#editable_area').html($layout);
+            } else {
+                $('#editable_area').html($html);
+            }
+        });
+    },
+
 });
 
 var odoo_top = window.top.odoo;
