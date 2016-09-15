@@ -4,10 +4,10 @@
 from odoo import api, fields, models
 
 
-class HrExpenseRefuseWizard(models.TransientModel):
+class HrExpenseSheetRefuseWizard(models.TransientModel):
 
-    _name = "hr.expense.refuse.wizard"
-    _description = "Hr Expense refuse Reason wizard"
+    _name = "hr.expense.sheet.refuse.wizard"
+    _description = "Hr Expense Sheet refuse Reason wizard"
 
     description = fields.Char(string='Reason', required=True)
 
