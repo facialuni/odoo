@@ -4413,7 +4413,10 @@ class BaseModel(object):
         for name in name_seq.split('.'):
             field = recs._fields[name]
             null = field.convert_to_cache(False, self, validate=False)
-            recs = recs.mapped(lambda rec: field.convert_to_record(rec._cache.get(field, null), rec))
+            if recs:
+                recs = recs.mapped(lambda rec: field.convert_to_record(rec._cache.get(field, null), rec))
+            else:
+                recs = field.convert_to_record(null, recs)
         return recs
 
     def filtered(self, func):
