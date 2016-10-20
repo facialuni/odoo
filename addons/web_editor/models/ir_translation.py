@@ -4,7 +4,7 @@
 from lxml import etree
 
 from odoo import models, api
-from odoo.tools.translate import encode, xml_translate, html_translate
+from odoo.tools.translate import encode
 
 
 def edit_translation_mapping(data):

@@ -3,7 +3,7 @@
 
 import unittest
 
-from odoo.tools.translate import quote, unquote, xml_translate, html_translate
+from odoo.tools.translate import quote, unquote, XMLTranslator
 from odoo.tests.common import TransactionCase
 
 
@@ -32,62 +32,65 @@ class TranslationToolsTestCase(unittest.TestCase):
          """)
 
     def test_translate_xml_base(self):
-        """ Test xml_translate() without formatting elements. """
-        terms = []
+        """ Test XMLTranslator(method='xml') without formatting elements. """
         source = """<form string="Form stuff">
                         <h1>Blah blah blah</h1>
                         Put some more text here
                         <field name="foo"/>
                     </form>"""
-        result = xml_translate(lambda term, id=0: terms.append(term), source)
+        result, terms = XMLTranslator(source, method='xml')
         self.assertEquals(result, source)
-        self.assertItemsEqual(terms,
+        self.assertItemsEqual([t[1] for t in terms],
             ['Form stuff', 'Blah blah blah', 'Put some more text here'])
 
     def test_translate_xml_text(self):
-        """ Test xml_translate() on plain text. """
-        terms = []
+        """ Test XMLTranslator(method='xml') on plain text. """
         source = "Blah blah blah"
-        result = xml_translate(lambda term, id=0: terms.append(term), source)
+        result, terms = XMLTranslator(source, method='xml')
         self.assertEquals(result, source)
+        print "------"
+        print "------"
+        print "------"
+        print "------"
+        print terms, [source]
         self.assertItemsEqual(terms, [source])
 
     def test_translate_xml_text_entity(self):
-        """ Test xml_translate() on plain text with HTML escaped entities. """
+        """ Test XMLTranslator(method='xml') on plain text with HTML escaped entities. """
         terms = []
         source = "Blah&amp;nbsp;blah&amp;nbsp;blah"
-        result = xml_translate(lambda term, id=0: terms.append(term), source)
+        result, terms = XMLTranslator(source, method='xml')
         self.assertEquals(result, source)
         self.assertItemsEqual(terms, [source])
 
     def test_translate_xml_inline1(self):
-        """ Test xml_translate() with formatting elements. """
+        """ Test XMLTranslator(method='xml') with formatting elements. """
         terms = []
         source = """<form string="Form stuff">
                         <h1>Blah <i>blah</i> blah</h1>
                         Put some <b>more text</b> here
                         <field name="foo"/>
                     </form>"""
-        result = xml_translate(lambda term, id=0: terms.append(term), source)
+        result, terms = XMLTranslator(source, method='xml')
         self.assertEquals(result, source)
         self.assertItemsEqual(terms,
             ['Form stuff', 'Blah <i>blah</i> blah', 'Put some <b>more text</b> here'])
 
     def test_translate_xml_inline2(self):
-        """ Test xml_translate() with formatting elements embedding other elements. """
+        """ Test XMLTranslator(method='xml') with formatting elements embedding other elements. """
         terms = []
         source = """<form string="Form stuff">
                         <b><h1>Blah <i>blah</i> blah</h1></b>
                         Put <em>some <b>more text</b></em> here
                         <field name="foo"/>
                     </form>"""
-        result = xml_translate(lambda term, id=0: terms.append(term), source)
+        result, terms = XMLTranslator(source, method='xml')
         self.assertEquals(result, source)
         self.assertItemsEqual(terms,
             ['Form stuff', 'Blah <i>blah</i> blah', 'Put <em>some <b>more text</b></em> here'])
 
     def test_translate_xml_inline3(self):
-        """ Test xml_translate() with formatting elements without actual text. """
+        """ Test XMLTranslator(method='xml') with formatting elements without actual text. """
         terms = []
         source = """<form string="Form stuff">
                         <div>
@@ -98,51 +101,51 @@ class TranslationToolsTestCase(unittest.TestCase):
                             </span>
                         </div>
                     </form>"""
-        result = xml_translate(lambda term, id=0: terms.append(term), source)
+        result, terms = XMLTranslator(source, method='xml')
         self.assertEquals(result, source)
         self.assertItemsEqual(terms,
             ['Form stuff', 'Blah blah blah'])
 
     def test_translate_xml_t(self):
-        """ Test xml_translate() with t-* attributes. """
+        """ Test XMLTranslator(method='xml') with t-* attributes. """
         terms = []
         source = """<t t-name="stuff">
                         stuff before
                         <span t-field="o.name"/>
                         stuff after
                     </t>"""
-        result = xml_translate(lambda term, id=0: terms.append(term), source)
+        result, terms = XMLTranslator(source, method='xml')
         self.assertEquals(result, source)
         self.assertItemsEqual(terms,
             ['stuff before', 'stuff after'])
 
     def test_translate_xml_off(self):
-        """ Test xml_translate() with attribute translate="off". """
+        """ Test XMLTranslator(method='xml') with attribute translate="off". """
         terms = []
         source = """<div>
                         stuff before
                         <div t-translation="off">Do not translate this</div>
                         stuff after
                     </div>"""
-        result = xml_translate(lambda term, id=0: terms.append(term), source)
+        result, terms = XMLTranslator(source, method='xml')
         self.assertEquals(result, source)
         self.assertItemsEqual(terms,
             ['stuff before', 'stuff after'])
 
     def test_translate_xml_attribute(self):
-        """ Test xml_translate() with <attribute> elements. """
+        """ Test XMLTranslator(method='xml') with <attribute> elements. """
         terms = []
         source = """<field name="foo" position="attributes">
                         <attribute name="string">Translate this</attribute>
                         <attribute name="option">Do not translate this</attribute>
                     </field>"""
-        result = xml_translate(lambda term, id=0: terms.append(term), source)
+        result, terms = XMLTranslator(source, method='xml')
         self.assertEquals(result, source)
         self.assertItemsEqual(terms,
             ['Translate this'])
 
     def test_translate_xml_a(self):
-        """ Test xml_translate() with <a> elements. """
+        """ Test XMLTranslator(method='xml') with <a> elements. """
         terms = []
         source = """<t t-name="stuff">
                         <ul class="nav navbar-nav">
@@ -157,17 +160,17 @@ class TranslationToolsTestCase(unittest.TestCase):
                             </li>
                         </ul>
                     </t>"""
-        result = xml_translate(lambda term, id=0: terms.append(term), source)
+        result, terms = XMLTranslator(source, method='xml')
         self.assertEquals(result, source)
         self.assertItemsEqual(terms,
             ['<span class="oe_menu_text">Blah</span>', 'More <b class="caret"/>'])
 
     def test_translate_html(self):
-        """ Test xml_translate() and html_translate() with <i> elements. """
+        """ Test XMLTranslator(method='html') and XMLTranslator(method='xml') with <i> elements. """
         source = """<i class="fa-check"></i>"""
-        result = xml_translate(lambda term, seq=None: term, source)
+        result = XMLTranslator(lambda term, seq=None: term, source, method='xml')
         self.assertEquals(result, """<i class="fa-check"/>""")
-        result = html_translate(lambda term, seq=None: term, source)
+        result = XMLTranslator(lambda term, seq=None: term, source, method='html')
         self.assertEquals(result, source)
 
 

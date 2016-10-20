@@ -13,7 +13,7 @@ import logging
 import pytz
 import xmlrpclib
 import re
-import itertools
+from lxml import etree
 
 import psycopg2
 
@@ -22,7 +22,7 @@ from odoo.tools import float_precision, float_repr, float_round, frozendict, \
                        html_sanitize, human_size, pg_varchar, ustr, OrderedSet
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT as DATE_FORMAT
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT as DATETIME_FORMAT
-from odoo.tools.translate import xml_translate, html_translate, _
+from odoo.tools.translate import XMLTranslator, _
 
 
 DATE_LENGTH = len(date.today().strftime(DATE_FORMAT))
@@ -1340,21 +1340,25 @@ class Xml(Text):
     def get_trans_terms(self, value):
         return [value] if value else []
 
-    def _convert_to_translate_callback(self, value):
-        ids = map(int, RE_TRANSLATION_SEQ.findall(value))
-        id_max = itertools.count(max(ids) + 1 if ids else 0)
+    def convert_to_translate(self, value, record):
+        trans = []
+        try:
+            root = etree.fromstring(value)
+            value, trans = XMLTranslator(root, method=self.type)
+        except etree.ParseError:
+            try:
+                # fallback for translated terms: use an HTML parser and wrap the term
+                wrapped = u"<div>%s</div>" % (value)
+                root = etree.fromstring(wrapped, etree.HTMLParser(encoding='utf-8'))
+                value, trans = XMLTranslator(root[0][0], method=self.type) # html > body > div
+                value = value[5:-6] # remove tags <div> and </div>
+            except ValueError:
+                _logger.exception("Cannot translate malformed HTML, using source value instead")
 
         translation = []
-        def callback(term, id=0):
-            id = id or next(id_max)
-            translation.append((id, self.name, term))
-            return "[o-translation=%s]" % id
+        for t in trans:
+            translation.append((t[0], self.name, t[1]))
 
-        return (callback, translation)
-
-    def convert_to_translate(self, value, record):
-        callback, translation = self._convert_to_translate_callback(value)
-        value = xml_translate(callback, value)
         return (value, translation)
 
     def get_trans_func(self, records):
@@ -1362,14 +1366,7 @@ class Xml(Text):
 
         def translate(record_id, value):
             src_trans = rec_src_trans[record_id]
-            text = []
-            init = 0
-            for m in RE_TRANSLATION_SEQ.finditer(value):
-                text.append(value[init:m.start()])
-                init = m.end()
-                text.append(src_trans.get(m.group(1), ''))
-            text.append(value[init:])
-            return u"".join(text)
+            return value % defaultdict(str, src_trans)
 
         return translate
 
@@ -1384,17 +1381,6 @@ class Html(Xml):
         'strip_style': False,           # whether to strip style attributes (removed and therefore not sanitized)
         'strip_classes': False,         # whether to strip classes attributes
     }
-
-    def convert_to_translate(self, value, record):
-        callback, translation = self._convert_to_translate_callback(value)
-        value = html_translate(callback, value)
-        return (value, translation)
-
-    def _setup_attrs(self, model, name):
-        super(Html, self)._setup_attrs(model, name)
-        # Translated sanitized html fields must use html_translate or a callable.
-        if self.translate is True and self.sanitize:
-            self.translate = html_translate
 
     _related_sanitize = property(attrgetter('sanitize'))
     _related_sanitize_tags = property(attrgetter('sanitize_tags'))

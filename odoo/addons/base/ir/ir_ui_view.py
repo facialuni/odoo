@@ -27,7 +27,7 @@ from odoo.tools.convert import _fix_multiple_roots
 from odoo.tools.parse_version import parse_version
 from odoo.tools.safe_eval import safe_eval
 from odoo.tools.view_validation import valid_view
-from odoo.tools.translate import encode, xml_translate, TRANSLATED_ATTRS
+from odoo.tools.translate import encode, TRANSLATED_ATTRS
 
 _logger = logging.getLogger(__name__)
 

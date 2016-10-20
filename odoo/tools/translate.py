@@ -9,6 +9,7 @@ import locale
 import logging
 import os
 import re
+import itertools
 import tarfile
 import tempfile
 import threading
@@ -149,173 +150,114 @@ TRANSLATED_ATTRS = {
     'string', 'help', 'sum', 'avg', 'confirm', 'placeholder', 'alt', 'title',
 }
 
-avoid_pattern = re.compile(r"[\s\n]*<!DOCTYPE", re.IGNORECASE)
+# avoid_pattern = re.compile(r"[\s\n]*<!DOCTYPE", re.IGNORECASE)
+RE_STRIP = re.compile(r"^([\s\r\n]*)([\s\S]*?)([\s\r\n]*)$", re.IGNORECASE)
+RE_TRANSLATION_SEQ = re.compile(r'\[o-translation=([0-9]+)\]')
 
-class XMLTranslator(object):
-    """ A sequence of serialized XML/HTML items, with some of them to translate
-        (todo) and others already translated (done). The purpose of this object
-        is to simplify the handling of phrasing elements (like <b>) that must be
-        translated together with their surrounding text.
 
-        For instance, the content of the "div" element below will be translated
-        as a whole (without surrounding spaces):
+def is_translatable(node):
+    return node.tag in TRANSLATED_ELEMENTS and not any(attr.startswith("t-") for attr in node.attrib)
 
-            <div>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                <b>sed</b> do eiusmod tempor incididunt ut labore et dolore
-                magna aliqua. <span class="more">Ut enim ad minim veniam,
-                <em>quis nostrud exercitation</em> ullamco laboris nisi ut
-                aliquip ex ea commodo consequat.</span>
-            </div>
 
-    """
-    def __init__(self, callback, method, parser=None, seq=None):
-        self.callback = callback        # callback function to translate terms
-        self.method = method            # serialization method ('xml' or 'html')
-        self.parser = parser            # parser for validating translations
-        self._done = []                 # translated strings
-        self._todo = []                 # todo strings that come after _done
-        self.needs_trans = False        # whether todo needs translation
-        self.seq = seq
+def XMLTranslator(arch, method='xml'):
+    todo = [arch]
+    translate = []
 
-    def todo(self, text, needs_trans=True):
-        self._todo.append(text)
-        if needs_trans and text.strip():
-            self.needs_trans = True
+    def add_trans_to_replace(child_content, id=None, index=None):
+        trans = u''.join(child_content)
 
-    def all_todo(self):
-        return not self._done
+        node_trans = etree.Element('translation')
+        if index is None:
+            node.append(node_trans)
+        else:
+            node.insert(index, node_trans)
 
-    def get_todo(self):
-        return "".join(self._todo)
+        translate.append({
+            'id': id,
+            'content': trans,
+            'node': node_trans,
+            'type': 'replace'
+        })
 
-    def flush(self):
-        if self._todo:
-            todo = "".join(self._todo)
-            done = self.process_text(todo) if self.needs_trans else todo
-            self._done.append(done)
-            del self._todo[:]
-            self.needs_trans = False
+    while todo:
+        node = todo.pop()
 
-    def done(self, text):
-        self.flush()
-        self._done.append(text)
-
-    def get_done(self):
-        """ Complete the translations and return the result. """
-        self.flush()
-        return "".join(self._done)
-
-    def process_text(self, text):
-        """ Translate text.strip(), but keep the surrounding spaces from text. """
-        term = text.strip()
-        trans = term and self.callback(term, self.seq)
-        if trans:
-            try:
-                # parse the translation to validate it
-                etree.fromstring("<div>%s</div>" % encode(trans), parser=self.parser)
-            except etree.ParseError:
-                # fallback: escape the translation
-                trans = escape(trans)
-            text = text.replace(term, trans)
-        return text
-
-    def process_attr(self, attr, id=None):
-        """ Translate the given node attribute value. """
-        term = attr.strip()
-        trans = term and self.callback(term, id)
-        return attr.replace(term, trans) if trans else attr
-
-    def process(self, node):
-        """ Process the given xml `node`: collect `todo` and `done` items. """
         if (
             isinstance(node, SKIPPED_ELEMENT_TYPES) or
             node.tag in SKIPPED_ELEMENTS or
             node.get("t-translation", "").strip() == "off" or
             node.tag == "attribute" and node.get("name") not in TRANSLATED_ATTRS or
-            node.getparent() is None and node.text and '<!DOCTYPE' in node.text
-        ):
+            node.getparent() is None and node.text and '<!DOCTYPE' in node.text):
             # do not translate the contents of the node
-            tail, node.tail = node.tail, None
-            self.done(etree.tostring(node, method=self.method))
-            self.todo(escape(tail or ""))
-            return
+            continue
 
-        # process children nodes locally in child_trans
-        child_trans = XMLTranslator(self.callback, self.method, parser=self.parser, seq=int(node.get('data-translation-seq', 0)))
+        for attr in TRANSLATED_ATTRS:
+            if node.get(attr):
+                translate.append({
+                    'id': node.attrib.pop('data-translation-%s-seq' % attr, None),
+                    'content': node.get(attr),
+                    'node': node,
+                    'type': 'attribute',
+                    'attr': attr
+                })
+
+        id = node.attrib.pop('data-translation-seq', None)
+        all_content = True
+        child_content = []
         if node.text:
-            if avoid_pattern.match(node.text):
-                child_trans.done(escape(node.text)) # do not translate <!DOCTYPE...
+            child_content.append(node.text)
+            node.text = None
+
+        for child in node.getchildren():
+            if not is_translatable(child):
+                all_content = False
+                if child_content:
+                    add_trans_to_replace(child_content, id=None if id is None else int(id), index=node.index(child))
+                    id = None
+                    child_content = []
+                todo.append(child)
+                if child.tail:
+                    child_content.append(child.tail)
+                    child.tail = None
+                continue
+            node.remove(child)
+            child_content.append(etree.tostring(child, method=method))
+
+        add_trans_to_replace(child_content, id=id)
+
+        if node.tail:
+            add_trans_to_replace([node.tail])
+
+    max_id = max([-1] + [t['id'] for t in translate if t['id'] is not None])
+    id_max = itertools.count(max_id + 1)
+
+    translation = []
+    for t in translate:
+        stripped = RE_STRIP.match(t['content'])
+
+        if t['id'] is None and stripped.group(2):
+            t['id'] = next(id_max)
+            translation.append((t['id'], stripped.group(2)))
+            value = '%s[o-translation=%s]%s' % (stripped.group(1), t['id'], stripped.group(3))
+        else:
+            value = t['content'] or None
+
+        if t['type'] == 'content':
+            t['node'].text = value
+        elif t['type'] == 'replace':
+            parent = t['node'].getparent()
+            if parent.index(t['node']) == 0:
+                parent.text = value
             else:
-                child_trans.todo(escape(node.text))
-        for child in node:
-            child_trans.process(child)
+                t['node'].getprevious().tail = value
+            parent.remove(t['node'])
+        elif t['type'] == 'attribute':
+            t['node'].set(t['attr'], value)
 
-        if (child_trans.all_todo() and
-                node.tag in TRANSLATED_ELEMENTS and
-                not any(attr.startswith("t-") for attr in node.attrib)):
-            # serialize the node element as todo
-            text = self.serialize(node.tag, node.attrib, child_trans.get_todo())
-            self.todo(text,
-                      child_trans.needs_trans)
-        else:
-            # complete translations and serialize result as done
-            for attr in TRANSLATED_ATTRS:
-                if node.get(attr):
-                    node.set(attr, self.process_attr(node.get(attr), int(node.get('data-translation-%s-seq' % attr, 0))))
-            self.done(self.serialize(node.tag, node.attrib, child_trans.get_done()))
+    xml = etree.tostring(arch, method=method)
+    xml = RE_TRANSLATION_SEQ.sub(r'%(\1)s', xml.replace('%', '%%'))
 
-        # add node tail as todo
-        self.todo(escape(node.tail or ""))
-
-    def serialize(self, tag, attrib, content):
-        """ Return a serialized element with the given `tag`, attributes
-            `attrib`, and already-serialized `content`.
-        """
-        if content:
-            elem = etree.tostring(etree.Element(tag, attrib), method='xml')
-            assert elem.endswith("/>")
-            return "%s>%s</%s>" % (elem[:-2], content, tag)
-        else:
-            return etree.tostring(etree.Element(tag, attrib), method=self.method)
-
-
-def xml_translate(callback, value):
-    """ Translate an XML value (string), using `callback` for translating text
-        appearing in `value`.
-    """
-    if not value:
-        return value
-
-    trans = XMLTranslator(callback, 'xml')
-    try:
-        root = etree.fromstring(encode(value))
-        trans.process(root)
-        return trans.get_done()
-    except etree.ParseError:
-        # fallback for translated terms: use an HTML parser and wrap the term
-        wrapped = "<div>%s</div>" % encode(value)
-        root = etree.fromstring(wrapped, etree.HTMLParser(encoding='utf-8'))
-        trans.process(root[0][0])               # html > body > div
-        return trans.get_done()[5:-6]           # remove tags <div> and </div>
-
-def html_translate(callback, value):
-    """ Translate an HTML value (string), using `callback` for translating text
-        appearing in `value`.
-    """
-    if not value:
-        return value
-
-    try:
-        parser = etree.HTMLParser(encoding='utf-8')
-        trans = XMLTranslator(callback, 'html', parser)
-        wrapped = "<div>%s</div>" % encode(value)
-        root = etree.fromstring(wrapped, parser)
-        trans.process(root[0][0])               # html > body > div
-        value = trans.get_done()[5:-6]           # remove tags <div> and </div>
-    except ValueError:
-        _logger.exception("Cannot translate malformed HTML, using source value instead")
-    return value
+    return xml, translation
 
 
 #

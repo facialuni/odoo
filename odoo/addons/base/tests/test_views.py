@@ -402,6 +402,7 @@ class TestNoModel(ViewCase):
         Test if translations work correctly without a model
         """
         self.env['res.lang'].load_lang('fr_FR')
+
         ARCH = '<template name="foo">%s<hr/>    %s</template>'
         TEXT_EN = ("Copyright copyrighter", "hi <b>b</b> c")
         TEXT_FR = (u"Copyrighter, tous droits réservés", "bonjour <b>b</b> c")
@@ -411,9 +412,6 @@ class TestNoModel(ViewCase):
             'inherit_id': False,
             'type': 'qweb',
         })
-
-        view = view.with_context(lang='unknown')
-        print view.arch
 
         data = {
             'type': 'model',
@@ -427,9 +425,12 @@ class TestNoModel(ViewCase):
         data['src'] = '1'
         data['value'] = TEXT_FR[1]
         self.env['ir.translation'].create(data)
-        view = view.with_context(lang='fr_FR')
 
-        self.assertEqual(view.arch, ARCH % TEXT_FR)
+        view = view.with_context(lang='fr_FR')
+        self.assertEqual(view.arch, ARCH % TEXT_FR, "Wrong view translation")
+
+        view = view.with_context(lang='unknown')
+        self.assertEqual(view.arch, ARCH % TEXT_EN, "Wrong fallback view translation")
 
 
 class TestTemplating(ViewCase):
