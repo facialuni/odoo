@@ -734,7 +734,7 @@ class Environment(Mapping):
         self.registry = Registry(cr.dbname)
         self.cache = defaultdict(dict)              # {field: {id: value, ...}, ...}
         self._protected = defaultdict(frozenset)    # {field: ids, ...}
-        self.dirty = defaultdict(set)               # {record: set(field_name), ...}
+        self._dirty = defaultdict(set)              # {record: set(field_name), ...}
         self.all = envs
         envs.add(self)
         return self
@@ -804,7 +804,7 @@ class Environment(Mapping):
                 yield
             finally:
                 self.all.mode = False
-                self.dirty.clear()
+                self._dirty.clear()
 
     def do_in_draft(self):
         """ Context-switch to draft mode, where all field updates are done in
@@ -854,7 +854,7 @@ class Environment(Mapping):
         for env in list(self.all):
             env.cache.clear()
             env._protected.clear()
-            env.dirty.clear()
+            env._dirty.clear()
 
     def clear(self):
         """ Clear all record caches, and discard all fields to recompute.
