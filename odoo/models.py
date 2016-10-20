@@ -2567,8 +2567,8 @@ class BaseModel(object):
                 record = self.browse(values.pop('id'), self._prefetch)
                 record._cache.update(record._convert_to_cache(values, validate=False))
             if not self._cache.contains(field):
-                e = AccessError("No value found for %s.%s" % (self, field.name))
-                self._cache[field] = FailedValue(e)
+                exc = AccessError("No value found for %s.%s" % (self, field.name))
+                self._cache.set_failed([field], exc)
 
     @api.multi
     def _read_from_database(self, field_names, inherited_field_names=[]):
@@ -2671,15 +2671,16 @@ class BaseModel(object):
             # mark non-existing records in missing
             forbidden = missing.exists()
             if forbidden:
+                _logger.info(
+                    _('The requested operation cannot be completed due to record rules: Document type: %s, Operation: %s, Records: %s, User: %s') % \
+                    (self._name, 'read', ','.join([str(r.id) for r in self][:6]), self._uid))
                 # store an access error exception in existing records
                 exc = AccessError(
                     _('The requested operation cannot be completed due to security restrictions. Please contact your system administrator.\n\n(Document type: %s, Operation: %s)') % \
                     (self._name, 'read')
                 )
-                _logger.info(
-                    _('The requested operation cannot be completed due to record rules: Document type: %s, Operation: %s, Records: %s, User: %s') % \
-                    (self._name, 'read', ','.join([str(r.id) for r in self][:6]), self._uid))
-                forbidden._cache.update(FailedValue(exc))
+                for record in forbidden:
+                    record._cache.set_failed(record._fields.itervalues(), exc)
 
     @api.multi
     def get_metadata(self):
@@ -3850,7 +3851,8 @@ class BaseModel(object):
         if len(existing) < len(self):
             # mark missing records in cache with a failed value
             exc = MissingError(_("Record does not exist or has been deleted."))
-            (self - existing)._cache.update(FailedValue(exc))
+            for record in (self - existing):
+                record._cache.set_failed(record._fields.itervalues(), exc)
         return existing
 
     @api.multi
@@ -4998,18 +5000,6 @@ class RecordCache(MutableMapping):
         values = dict.fromkeys(self._recs._ids, value)
         self._recs.env.cache[field].update(values)
 
-    def update(self, *args, **kwargs):
-        """ Update the cache of all records in ``records``. If the argument is a
-            ``SpecialValue``, update all fields (except "magic" columns).
-        """
-        if args and isinstance(args[0], SpecialValue):
-            values = dict.fromkeys(self._recs._ids, args[0])
-            for name, field in self._recs._fields.iteritems():
-                if name != 'id':
-                    self._recs.env.cache[field].update(values)
-        else:
-            return super(RecordCache, self).update(*args, **kwargs)
-
     def __delitem__(self, field):
         """ Remove the cached value of ``field`` for all ``records``. """
         if isinstance(field, basestring):
@@ -5029,6 +5019,14 @@ class RecordCache(MutableMapping):
     def __len__(self):
         """ Return the number of fields with a regular value in cache. """
         return sum(1 for name in self)
+
+    def set_failed(self, fields, exception):
+        """ Mark the given fields with the given exception. """
+        cache, id = self._recs.env.cache, self._recs.id
+        value = FailedValue(exception)
+        for field in fields:
+            if field.name != 'id':
+                cache[field][id] = value
 
 
 AbstractModel = BaseModel
