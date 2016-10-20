@@ -412,7 +412,7 @@ class TestNoModel(ViewCase):
             'type': 'qweb',
         })
 
-        view = view.with_context(lang=None)
+        view = view.with_context(lang='unknown')
         print view.arch
 
         data = {

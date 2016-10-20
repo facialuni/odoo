@@ -128,8 +128,6 @@ class UNIX_LINE_TERMINATOR(csv.excel):
 
 csv.register_dialect("UNIX", UNIX_LINE_TERMINATOR)
 
-DEFAULT_LANGUAGE = 'en_US'
-
 #
 # Helper functions for translating fields
 #

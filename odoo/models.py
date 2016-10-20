@@ -51,7 +51,7 @@ from .tools.config import config
 from .tools.func import frame_codeinfo
 from .tools.misc import CountingStream, DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 from .tools.safe_eval import safe_eval
-from .tools.translate import _, DEFAULT_LANGUAGE
+from .tools.translate import _
 
 _logger = logging.getLogger(__name__)
 _schema = logging.getLogger(__name__ + '.schema')
@@ -1827,6 +1827,8 @@ class BaseModel(object):
         :param domain: original domain for read_group
         """
 
+        default_lng = self.env['res.lang'].get_installed()[0][0]
+
         sections = []
         for gb in annotated_groupbys:
             ftype = gb['type']
@@ -1838,7 +1840,7 @@ class BaseModel(object):
                 if ftype == 'many2one':
                     value = value[0]
                 elif ftype in ('date', 'datetime'):
-                    locale = self._context.get('lang', DEFAULT_LANGUAGE)
+                    locale = self._context.get('lang', default_lng)
                     fmt = DEFAULT_SERVER_DATETIME_FORMAT if ftype == 'datetime' else DEFAULT_SERVER_DATE_FORMAT
                     tzinfo = None
                     range_start = value
@@ -3588,7 +3590,10 @@ class BaseModel(object):
         updend = []             # list of possibly inherited field names
         direct = []             # list of direcly updated columns
         translation = []
-        single_lang = len(self.env['res.lang'].get_installed()) <= 1
+        lang = self.env['res.lang'].get_installed()
+        default_lng = lang[0][0]
+        single_lang = len(lang) <= 1
+
         for name, val in vals.iteritems():
             field = self._fields[name]
             if field and field.deprecated:
@@ -3600,10 +3605,9 @@ class BaseModel(object):
                     if field.translate:
                         val, trans = field.convert_to_translate(val, self)
                         translation += trans
-                    if single_lang or not (self.env.lang and field.translate):
-                        # val is not a translation: update the table
-                        val = field.convert_to_column(val, self)
-                        updates.append((name, field.column_format, val))
+                    # val is not a translation: update the table
+                    val = field.convert_to_column(val, self)
+                    updates.append((name, field.column_format, val))
                     direct.append(name)
                 else:
                     upd_todo.append(name)
@@ -3629,7 +3633,7 @@ class BaseModel(object):
 
             for id, name, trans in translation:
                 tname = "%s,%s" % (self._name, name)
-                self.env['ir.translation']._set_ids(tname, 'model', self.env.lang or DEFAULT_LANGUAGE, self.ids, trans, src=id, seq=id)
+                self.env['ir.translation']._set_ids(tname, 'model', self.env.lang or default_lng, self.ids, trans, src=id, seq=id)
 
         # invalidate and mark new-style fields to recompute; do this before
         # setting other fields, because it can require the value of computed
@@ -3854,12 +3858,13 @@ class BaseModel(object):
                 vals[name] = False
 
         # determine SQL values
+
         for name, val in vals.iteritems():
             field = self._fields[name]
-            if field.translate:
-                val, trans = field.convert_to_translate(val, self)
-                translation += trans
             if field.store and field.column_type:
+                if field.translate:
+                    val, trans = field.convert_to_translate(val, self)
+                    translation += trans
                 updates.append((name, field.column_format, field.convert_to_column(val, self)))
             else:
                 upd_todo.append(name)
@@ -3886,9 +3891,11 @@ class BaseModel(object):
         id_new, = cr.fetchone()
         self = self.browse(id_new)
 
-        for id, name, trans in translation:
-            tname = "%s,%s" % (self._name, name)
-            self.env['ir.translation']._set_ids(tname, 'model', self.env.lang or DEFAULT_LANGUAGE, self.ids, trans, src=id, seq=id)
+        if translation:
+            default_lng = self.env['res.lang'].get_installed()[0][0]
+            for id, name, trans in translation:
+                tname = "%s,%s" % (self._name, name)
+                self.env['ir.translation']._set_ids(tname, 'model', self.env.lang or default_lng, self.ids, trans, src=id, seq=id)
 
         if self._parent_store and not self._context.get('defer_parent_store_computation'):
             if self.pool._init:
