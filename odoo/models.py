@@ -2562,11 +2562,11 @@ class BaseModel(object):
             result = self.read([f.name for f in fs], load='_classic_write')
 
         # check the cache, and update it if necessary
-        if field not in self._cache:
+        if not self._cache.has_value(field):
             for values in result:
                 record = self.browse(values.pop('id'), self._prefetch)
                 record._cache.update(record._convert_to_cache(values, validate=False))
-            if not self._cache.contains(field):
+            if field not in self._cache:
                 exc = AccessError("No value found for %s.%s" % (self, field.name))
                 self._cache.set_failed([field], exc)
 
@@ -4414,7 +4414,7 @@ class BaseModel(object):
             field = recs._fields[name]
             null = field.convert_to_cache(False, self, validate=False)
             if recs:
-                recs = recs.mapped(lambda rec: field.convert_to_record(rec._cache.get(field, null), rec))
+                recs = recs.mapped(lambda rec: field.convert_to_record(rec._cache.get_value(field, null), rec))
             else:
                 recs = field.convert_to_record(null, recs)
         return recs
@@ -4968,58 +4968,57 @@ class RecordCache(MutableMapping):
         assert len(record) == 1, "Unexpected RecordCache(%s)" % record
         self._record = record
 
-    def contains(self, field):
-        """ Return whether `record` has a value for ``field`` in cache. """
+    def __contains__(self, field):
+        """ Return whether the record has a cached value for ``field``. """
         if isinstance(field, basestring):
             field = self._record._fields[field]
         return self._record.id in self._record.env.cache[field]
 
-    def __contains__(self, field):
-        """ Return whether `record` has a regular value for ``field`` in cache. """
-        if isinstance(field, basestring):
-            field = self._record._fields[field]
-        dummy = SpecialValue(None)
-        value = self._record.env.cache[field].get(self._record.id, dummy)
-        return not isinstance(value, SpecialValue)
-
-    def get(self, field, default=None):
-        """ Return the cached, regular value of ``field`` for `record`, or ``default``. """
-        if isinstance(field, basestring):
-            field = self._record._fields[field]
-        dummy = SpecialValue(None)
-        value = self._record.env.cache[field].get(self._record.id, dummy)
-        return default if isinstance(value, SpecialValue) else value
-
     def __getitem__(self, field):
-        """ Return the cached value of ``field`` for `record`. """
+        """ Return the cached value of ``field`` for the record. """
         if isinstance(field, basestring):
             field = self._record._fields[field]
         value = self._record.env.cache[field][self._record.id]
         return value.get() if isinstance(value, SpecialValue) else value
 
     def __setitem__(self, field, value):
-        """ Assign the cached value of ``field`` for ``record``. """
+        """ Assign the cached value of ``field`` for the record. """
         if isinstance(field, basestring):
             field = self._record._fields[field]
         self._record.env.cache[field][self._record.id] = value
 
     def __delitem__(self, field):
-        """ Remove the cached value of ``field`` for ``record``. """
+        """ Remove the cached value of ``field`` for the record. """
         if isinstance(field, basestring):
             field = self._record._fields[field]
         del self._record.env.cache[field][self._record.id]
 
     def __iter__(self):
-        """ Iterate over the field names with a regular value in cache. """
+        """ Iterate over the field names with a cached value. """
         cache, id = self._record.env.cache, self._record.id
-        dummy = SpecialValue(None)
         for name, field in self._record._fields.iteritems():
-            if name != 'id' and not isinstance(cache[field].get(id, dummy), SpecialValue):
+            if name != 'id' and id in cache[field]:
                 yield name
 
     def __len__(self):
-        """ Return the number of fields with a regular value in cache. """
+        """ Return the number of fields with a cached value. """
         return sum(1 for name in self)
+
+    def has_value(self, field):
+        """ Return whether the record has a regular value for ``field`` in cache. """
+        if isinstance(field, basestring):
+            field = self._record._fields[field]
+        dummy = SpecialValue(None)
+        value = self._record.env.cache[field].get(self._record.id, dummy)
+        return not isinstance(value, SpecialValue)
+
+    def get_value(self, field, default=None):
+        """ Return the cached, regular value of ``field``, or ``default``. """
+        if isinstance(field, basestring):
+            field = self._record._fields[field]
+        dummy = SpecialValue(None)
+        value = self._record.env.cache[field].get(self._record.id, dummy)
+        return default if isinstance(value, SpecialValue) else value
 
     def set_failed(self, fields, exception):
         """ Mark the given fields with the given exception. """
