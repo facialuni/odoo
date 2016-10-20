@@ -2562,13 +2562,13 @@ class BaseModel(object):
             result = self.read([f.name for f in fs], load='_classic_write')
 
         # check the cache, and update it if necessary
-        if not self._cache.has_value(field):
+        if not self._cache.has_value(field.name):
             for values in result:
                 record = self.browse(values.pop('id'), self._prefetch)
                 record._cache.update(record._convert_to_cache(values, validate=False))
-            if field not in self._cache:
+            if field.name not in self._cache:
                 exc = AccessError("No value found for %s.%s" % (self, field.name))
-                self._cache.set_failed([field], exc)
+                self._cache.set_failed([field.name], exc)
 
     @api.multi
     def _read_from_database(self, field_names, inherited_field_names=[]):
@@ -2680,7 +2680,7 @@ class BaseModel(object):
                     (self._name, 'read')
                 )
                 for record in forbidden:
-                    record._cache.set_failed(record._fields.itervalues(), exc)
+                    record._cache.set_failed(record._fields, exc)
 
     @api.multi
     def get_metadata(self):
@@ -3852,7 +3852,7 @@ class BaseModel(object):
             # mark missing records in cache with a failed value
             exc = MissingError(_("Record does not exist or has been deleted."))
             for record in (self - existing):
-                record._cache.set_failed(record._fields.itervalues(), exc)
+                record._cache.set_failed(record._fields, exc)
         return existing
 
     @api.multi
@@ -4414,7 +4414,7 @@ class BaseModel(object):
             field = recs._fields[name]
             null = field.convert_to_cache(False, self, validate=False)
             if recs:
-                recs = recs.mapped(lambda rec: field.convert_to_record(rec._cache.get_value(field, null), rec))
+                recs = recs.mapped(lambda rec: field.convert_to_record(rec._cache.get_value(name, null), rec))
             else:
                 recs = field.convert_to_record(null, recs)
         return recs
@@ -4968,29 +4968,25 @@ class RecordCache(MutableMapping):
         assert len(record) == 1, "Unexpected RecordCache(%s)" % record
         self._record = record
 
-    def __contains__(self, field):
-        """ Return whether the record has a cached value for ``field``. """
-        if isinstance(field, basestring):
-            field = self._record._fields[field]
+    def __contains__(self, name):
+        """ Return whether the record has a cached value for field ``name``. """
+        field = self._record._fields[name]
         return self._record.id in self._record.env.cache[field]
 
-    def __getitem__(self, field):
-        """ Return the cached value of ``field`` for the record. """
-        if isinstance(field, basestring):
-            field = self._record._fields[field]
+    def __getitem__(self, name):
+        """ Return the cached value of field ``name`` for the record. """
+        field = self._record._fields[name]
         value = self._record.env.cache[field][self._record.id]
         return value.get() if isinstance(value, SpecialValue) else value
 
-    def __setitem__(self, field, value):
-        """ Assign the cached value of ``field`` for the record. """
-        if isinstance(field, basestring):
-            field = self._record._fields[field]
+    def __setitem__(self, name, value):
+        """ Assign the cached value of field ``name`` for the record. """
+        field = self._record._fields[name]
         self._record.env.cache[field][self._record.id] = value
 
-    def __delitem__(self, field):
-        """ Remove the cached value of ``field`` for the record. """
-        if isinstance(field, basestring):
-            field = self._record._fields[field]
+    def __delitem__(self, name):
+        """ Remove the cached value of field ``name`` for the record. """
+        field = self._record._fields[name]
         del self._record.env.cache[field][self._record.id]
 
     def __iter__(self):
@@ -5004,34 +5000,31 @@ class RecordCache(MutableMapping):
         """ Return the number of fields with a cached value. """
         return sum(1 for name in self)
 
-    def has_value(self, field):
-        """ Return whether the record has a regular value for ``field`` in cache. """
-        if isinstance(field, basestring):
-            field = self._record._fields[field]
+    def has_value(self, name):
+        """ Return whether the record has a regular value for field ``name`` in cache. """
+        field = self._record._fields[name]
         dummy = SpecialValue(None)
         value = self._record.env.cache[field].get(self._record.id, dummy)
         return not isinstance(value, SpecialValue)
 
-    def get_value(self, field, default=None):
-        """ Return the cached, regular value of ``field``, or ``default``. """
-        if isinstance(field, basestring):
-            field = self._record._fields[field]
+    def get_value(self, name, default=None):
+        """ Return the cached, regular value of field ``name``, or ``default``. """
+        field = self._record._fields[name]
         dummy = SpecialValue(None)
         value = self._record.env.cache[field].get(self._record.id, dummy)
         return default if isinstance(value, SpecialValue) else value
 
-    def set_special(self, field, getter):
-        """ Set the given ``getter`` as the cached value of ``field``. """
-        if isinstance(field, basestring):
-            field = self._record._fields[field]
+    def set_special(self, name, getter):
+        """ Set the given ``getter`` as the cached value of field ``name``. """
+        field = self._record._fields[name]
         self._record.env.cache[field][self._record.id] = SpecialValue(getter)
 
-    def set_failed(self, fields, exception):
+    def set_failed(self, names, exception):
         """ Mark the given fields with the given exception. """
         def getter():
             raise exception
-        for field in fields:
-            self.set_special(field, getter)
+        for name in names:
+            self.set_special(name, getter)
 
 
 class SpecialValue(object):

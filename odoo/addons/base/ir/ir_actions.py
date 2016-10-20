@@ -351,7 +351,7 @@ class IrActionsActWindow(models.Model):
             # mark missing records in cache with a failed value
             exc = MissingError(_("Record does not exist or has been deleted."))
             for record in (self - existing):
-                record._cache.set_failed(record._fields.itervalues(), exc)
+                record._cache.set_failed(record._fields, exc)
         return existing
 
     @api.model
