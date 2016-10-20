@@ -839,15 +839,15 @@ class Environment(Mapping):
         if not spec:
             return
         for env in list(self.all):
-            c = env.cache
+            cache = env.cache
             for field, ids in spec:
-                if ids is None:
-                    if field in c:
-                        del c[field]
-                else:
-                    field_cache = c[field]
-                    for id in ids:
-                        field_cache.pop(id, None)
+                if field in cache:
+                    if ids is None:
+                        del cache[field]
+                    else:
+                        field_cache = cache[field]
+                        for id in ids:
+                            field_cache.pop(id, None)
 
     def invalidate_all(self):
         """ Clear the cache of all environments. """
