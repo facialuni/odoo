@@ -894,7 +894,7 @@ class expression(object):
                     if len(path) > 1:
                         right = comodel.search([('.'.join(path[1:]), operator, right)]).ids
                         operator = 'in'
-                    domain = field.determine_domain(model, operator, right)
+                    domain = field.search_domain(model, operator, right)
 
                 if not domain:
                     leaf.leaf = TRUE_LEAF

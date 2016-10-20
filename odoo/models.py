@@ -3014,7 +3014,7 @@ class BaseModel(object):
                 for record in self:
                     record._cache.update(record._convert_to_cache(new_vals, update=True))
                 for key in new_vals:
-                    self._fields[key].determine_inverse(self)
+                    self._fields[key].set_inverse(self)
                 # check Python constraints for inversed fields
                 self._validate_fields(set(new_vals) - set(old_vals))
 
@@ -3274,7 +3274,7 @@ class BaseModel(object):
         protected_fields = map(self._fields.get, new_vals)
         with self.env.protecting(protected_fields, record):
             for key in new_vals:
-                self._fields[key].determine_inverse(record)
+                self._fields[key].set_inverse(record)
             # check Python constraints for inversed fields
             record._validate_fields(set(new_vals) - set(old_vals))
 

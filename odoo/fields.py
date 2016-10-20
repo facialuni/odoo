@@ -908,10 +908,9 @@ class Field(object):
             except KeyError:
                 # cache miss, determine value and retrieve it
                 if record.id:
-                    self.determine_value(record)
+                    value = self.get_value(record)
                 else:
-                    self.determine_draft_value(record)
-                value = record._cache[self]
+                    value = self.get_draft_value(record)
         else:
             # null record -> return the null value for this field
             value = self.convert_to_cache(False, record, validate=False)
@@ -983,8 +982,8 @@ class Field(object):
                     except Exception as exc:
                         record._cache.set_failed([self], exc)
 
-    def determine_value(self, record):
-        """ Determine the value of ``self`` for ``record``. """
+    def get_value(self, record):
+        """ Return the value of ``self`` for ``record``. """
         env = record.env
 
         if self.store and not (self.compute and env.in_onchange):
@@ -1005,7 +1004,7 @@ class Field(object):
                             except MissingError as exc:
                                 target._cache.set_failed(target._fields.itervalues(), exc)
                     # the result is saved to database by BaseModel.recompute()
-                    return
+                    return record._cache[self]
 
             # read the field from database
             record._prefetch_field(self)
@@ -1023,24 +1022,26 @@ class Field(object):
             # this is a non-stored non-computed field
             record._cache[self] = self.convert_to_cache(False, record, validate=False)
 
-    def determine_draft_value(self, record):
-        """ Determine the value of ``self`` for the given draft ``record``. """
+        return record._cache[self]
+
+    def get_draft_value(self, record):
+        """ Return the value of ``self`` for the given draft ``record``. """
         if self.compute:
             fields = record._field_computed[self]
             with record.env.protecting(fields, record):
                 self._compute_value(record)
+                return record._cache[self]
         else:
-            null = self.convert_to_cache(False, record, validate=False)
-            record._cache[self] = SpecialValue(null)
+            return self.convert_to_cache(False, record, validate=False)
 
-    def determine_inverse(self, records):
+    def set_inverse(self, records):
         """ Given the value of ``self`` on ``records``, inverse the computation. """
         if isinstance(self.inverse, basestring):
             getattr(records, self.inverse)()
         else:
             self.inverse(records)
 
-    def determine_domain(self, records, operator, value):
+    def search_domain(self, records, operator, value):
         """ Return a domain representing a condition on ``self``. """
         if isinstance(self.search, basestring):
             return getattr(records, self.search)(operator, value)
