@@ -152,7 +152,7 @@ class View(models.Model):
                              ('qweb', 'QWeb')], string='View Type')
     arch = fields.Text(compute='_compute_arch', inverse='_inverse_arch', string='View Architecture', nodrop=True)
     arch_base = fields.Text(compute='_compute_arch_base', inverse='_inverse_arch_base', string='View Architecture')
-    arch_db = fields.Text(string='Arch Blob', translate=xml_translate, oldname='arch')
+    arch_db = fields.Xml(string='Arch Blob', translate=True, oldname='arch')
     arch_fs = fields.Char(string='Arch Filename')
     inherit_id = fields.Many2one('ir.ui.view', string='Inherited View', ondelete='restrict', index=True)
     inherit_children_ids = fields.One2many('ir.ui.view', 'inherit_id', string='Views which inherit from this one')

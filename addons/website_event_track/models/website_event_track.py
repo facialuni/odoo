@@ -2,7 +2,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models
-from odoo.tools.translate import _, html_translate
 from odoo.addons.website.models.website import slug
 
 
@@ -49,7 +48,7 @@ class Track(models.Model):
     state = fields.Selection([
         ('draft', 'Proposal'), ('confirmed', 'Confirmed'), ('announced', 'Announced'), ('published', 'Published'), ('refused', 'Refused'), ('cancel', 'Cancelled')],
         'Status', default='draft', required=True, copy=False, track_visibility='onchange')
-    description = fields.Html('Track Description', translate=html_translate, sanitize_attributes=False)
+    description = fields.Html('Track Description', translate=True, sanitize_attributes=False)
     date = fields.Datetime('Track Date')
     duration = fields.Float('Duration', default=1.5)
     location_id = fields.Many2one('event.track.location', 'Room')

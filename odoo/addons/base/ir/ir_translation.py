@@ -171,6 +171,7 @@ class IrTranslation(models.Model):
     name = fields.Char(string='Translated field', required=True)
     res_id = fields.Integer(string='Record ID', index=True)
     lang = fields.Selection(selection='_get_languages', string='Language')
+    seq = fields.Integer(string='Translation part id', index=True)
     type = fields.Selection(TRANSLATION_TYPE, string='Type', index=True)
     src = fields.Text(string='Internal Source')  # stored in database, kept for backward compatibility
     source = fields.Text(string='Source term', compute='_compute_source',
@@ -310,7 +311,7 @@ class IrTranslation(models.Model):
                 break
 
     @api.model
-    def _set_ids(self, name, tt, lang, ids, value, src=None):
+    def _set_ids(self, name, tt, lang, ids, value, src=None, seq=0):
         """ Update the translations of records.
 
         :param name: a string defined as "<model_name>,<field_name>"
@@ -325,9 +326,9 @@ class IrTranslation(models.Model):
         # update existing translations
         self._cr.execute("""UPDATE ir_translation
                             SET value=%s, src=%s, state=%s
-                            WHERE lang=%s AND type=%s AND name=%s AND res_id IN %s
+                            WHERE lang=%s AND type=%s AND name=%s AND seq=%s AND res_id IN %s
                             RETURNING res_id""",
-                         (value, src, 'translated', lang, tt, name, tuple(ids)))
+                         (value, str(src), 'translated', lang, tt, name, seq, tuple(ids)))
         existing_ids = [row[0] for row in self._cr.fetchall()]
 
         # create missing translations
@@ -338,7 +339,8 @@ class IrTranslation(models.Model):
                 'name': name,
                 'res_id': res_id,
                 'value': value,
-                'src': src,
+                'src': str(src),
+                'seq': seq,
                 'state': 'translated',
             })
         return len(ids)
@@ -436,51 +438,6 @@ class IrTranslation(models.Model):
         return result
 
     @api.model
-    def _sync_terms_translations(self, field, records):
-        """ Synchronize the translations to the terms to translate, after the
-        English value of a field is modified. The algorithm tries to match
-        existing translations to the terms to translate, provided the distance
-        between modified strings is not too large. It allows to not retranslate
-        data where a typo has been fixed in the English value.
-        """
-        if not callable(field.translate):
-            return
-
-        trans = self.env['ir.translation']
-        outdated = trans
-        discarded = trans
-
-        for record in records:
-            # get field value and terms to translate
-            value = record[field.name]
-            terms = set(field.get_trans_terms(value))
-            record_trans = trans.search([
-                ('type', '=', 'model'),
-                ('name', '=', "%s,%s" % (field.model_name, field.name)),
-                ('res_id', '=', record.id),
-            ])
-
-            if not terms:
-                # discard all translations for that field
-                discarded += record_trans
-                continue
-
-            # remap existing translations on terms when possible
-            for trans in record_trans:
-                if trans.src == trans.value:
-                    discarded += trans
-                elif trans.src not in terms:
-                    matches = get_close_matches(trans.src, terms, 1, 0.9)
-                    if matches:
-                        trans.write({'src': matches[0], 'state': trans.state})
-                    else:
-                        outdated += trans
-
-        # process outdated and discarded translations
-        outdated.write({'state': 'to_translate'})
-        discarded.unlink()
-
-    @api.model
     @tools.ormcache_context('model_name', keys=('lang',))
     def get_field_string(self, model_name):
         """ Return the translation of fields strings in the context's language.
@@ -548,7 +505,7 @@ class IrTranslation(models.Model):
                 if callable(field.translate):
                     # check whether applying (trans.src -> trans.value) then
                     # (trans.value -> trans.src) gives the original value back
-                    value0 = field.translate(lambda term: None, record[fname])
+                    value0 = field.translate(lambda term, seq=None: None, record[fname])
                     value1 = field.translate({trans.src: trans.value}.get, value0)
                     value2 = field.translate({trans.value: trans.src}.get, value1)
                     if value2 != value0:

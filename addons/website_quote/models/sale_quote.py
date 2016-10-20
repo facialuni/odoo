@@ -2,7 +2,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models
-from odoo.tools.translate import html_translate
 import odoo.addons.decimal_precision as dp
 
 
@@ -11,7 +10,7 @@ class SaleQuoteTemplate(models.Model):
     _description = "Sale Quotation Template"
 
     name = fields.Char('Quotation Template', required=True)
-    website_description = fields.Html('Description', translate=html_translate, sanitize_attributes=False)
+    website_description = fields.Html('Description', translate=True, sanitize_attributes=False)
     quote_line = fields.One2many('sale.quote.line', 'quote_id', 'Quotation Template Lines', copy=True)
     note = fields.Text('Terms and conditions')
     options = fields.One2many('sale.quote.option', 'template_id', 'Optional Products Lines', copy=True)
@@ -48,7 +47,7 @@ class SaleQuoteLine(models.Model):
     product_id = fields.Many2one('product.product', 'Product', domain=[('sale_ok', '=', True)], required=True)
     layout_category_id = fields.Many2one('sale.layout_category', string='Section')
     website_description = fields.Html('Line Description', related='product_id.product_tmpl_id.quote_description',
-        translate=html_translate)
+        translate=True)
     price_unit = fields.Float('Unit Price', required=True, digits=dp.get_precision('Product Price'))
     discount = fields.Float('Discount (%)', digits=dp.get_precision('Discount'), default=0.0)
     product_uom_qty = fields.Float('Quantity', required=True, digits=dp.get_precision('Product UoS'), default=1)
@@ -100,7 +99,7 @@ class SaleQuoteOption(models.Model):
     name = fields.Text('Description', required=True, translate=True)
     product_id = fields.Many2one('product.product', 'Product', domain=[('sale_ok', '=', True)], required=True)
     layout_category_id = fields.Many2one('sale.layout_category', string='Section')
-    website_description = fields.Html('Option Description', translate=html_translate, sanitize_attributes=False)
+    website_description = fields.Html('Option Description', translate=True, sanitize_attributes=False)
     price_unit = fields.Float('Unit Price', required=True, digits=dp.get_precision('Product Price'))
     discount = fields.Float('Discount (%)', digits=dp.get_precision('Discount'))
     uom_id = fields.Many2one('product.uom', 'Unit of Measure ', required=True)

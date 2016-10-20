@@ -12,6 +12,8 @@ import json
 import logging
 import pytz
 import xmlrpclib
+import re
+import itertools
 
 import psycopg2
 
@@ -20,7 +22,8 @@ from odoo.tools import float_precision, float_repr, float_round, frozendict, \
                        html_sanitize, human_size, pg_varchar, ustr, OrderedSet
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT as DATE_FORMAT
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT as DATETIME_FORMAT
-from odoo.tools.translate import html_translate, _
+from odoo.tools.translate import xml_translate, html_translate, _
+
 
 DATE_LENGTH = len(date.today().strftime(DATE_FORMAT))
 DATETIME_LENGTH = len(datetime.now().strftime(DATETIME_FORMAT))
@@ -1233,60 +1236,37 @@ class Monetary(Field):
         return float(value or 0.0)
 
 
+RE_TRANSLATION_SEQ = re.compile(r'\[o-translation=([0-9]+)\]')
+
+
 class _String(Field):
     """ Abstract class for string fields. """
     _slots = {
         'translate': False,             # whether the field is translated
     }
 
-    def __init__(self, string=Default, **kwargs):
-        # translate is either True, False, or a callable
-        if 'translate' in kwargs and not callable(kwargs['translate']):
-            kwargs['translate'] = bool(kwargs['translate'])
-        super(_String, self).__init__(string=string, **kwargs)
-
-    _related_translate = property(attrgetter('translate'))
-
     def _description_translate(self, env):
         return bool(self.translate)
 
     def get_trans_terms(self, value):
         """ Return the sequence of terms to translate found in `value`. """
-        if not callable(self.translate):
-            return [value] if value else []
-        terms = []
-        self.translate(terms.append, value)
-        return terms
+        return [value] if value else []
+
+    def convert_to_translate(self, value, record):
+        return (value, [])
 
     def get_trans_func(self, records):
         """ Return a translation function `translate` for `self` on the given
         records; the function call `translate(record_id, value)` translates the
         field value to the language given by the environment of `records`.
         """
-        if callable(self.translate):
-            rec_src_trans = records.env['ir.translation']._get_terms_translations(self, records)
+        rec_trans = records.env['ir.translation']._get_ids(
+            '%s,%s' % (self.model_name, self.name), 'model', records.env.lang, records.ids)
 
-            def translate(record_id, value):
-                src_trans = rec_src_trans[record_id]
-                return self.translate(src_trans.get, value)
-
-        else:
-            rec_trans = records.env['ir.translation']._get_ids(
-                '%s,%s' % (self.model_name, self.name), 'model', records.env.lang, records.ids)
-
-            def translate(record_id, value):
-                return rec_trans.get(record_id) or value
+        def translate(record_id, value):
+            return rec_trans.get(record_id) or value
 
         return translate
-
-    def check_trans_value(self, value):
-        """ Check and possibly sanitize the translated term `value`. """
-        if callable(self.translate):
-            # do a "no-translation" to sanitize the value
-            callback = lambda term: None
-            return self.translate(callback, value)
-        else:
-            return value
 
 
 class Char(_String):
@@ -1354,9 +1334,48 @@ class Text(_String):
         return ustr(value)
 
 
-class Html(_String):
+class Xml(Text):
+    type = 'xml'
+
+    def get_trans_terms(self, value):
+        return [value] if value else []
+
+    def _convert_to_translate_callback(self, value):
+        ids = map(int, RE_TRANSLATION_SEQ.findall(value))
+        id_max = itertools.count(max(ids) + 1 if ids else 0)
+
+        translation = []
+        def callback(term, id=0):
+            id = id or next(id_max)
+            translation.append((id, self.name, term))
+            return "[o-translation=%s]" % id
+
+        return (callback, translation)
+
+    def convert_to_translate(self, value, record):
+        callback, translation = self._convert_to_translate_callback(value)
+        value = xml_translate(callback, value)
+        return (value, translation)
+
+    def get_trans_func(self, records):
+        rec_src_trans = records.env['ir.translation']._get_terms_translations(self, records)
+
+        def translate(record_id, value):
+            src_trans = rec_src_trans[record_id]
+            text = []
+            init = 0
+            for m in RE_TRANSLATION_SEQ.finditer(value):
+                text.append(value[init:m.start()])
+                init = m.end()
+                text.append(src_trans.get(m.group(1), ''))
+            text.append(value[init:])
+            return u"".join(text)
+
+        return translate
+
+
+class Html(Xml):
     type = 'html'
-    column_type = ('text', 'text')
     _slots = {
         'sanitize': True,               # whether value must be sanitized
         'sanitize_tags': True,          # whether to sanitize tags (only a white list of attributes is accepted)
@@ -1365,6 +1384,11 @@ class Html(_String):
         'strip_style': False,           # whether to strip style attributes (removed and therefore not sanitized)
         'strip_classes': False,         # whether to strip classes attributes
     }
+
+    def convert_to_translate(self, value, record):
+        callback, translation = self._convert_to_translate_callback(value)
+        value = html_translate(callback, value)
+        return (value, translation)
 
     def _setup_attrs(self, model, name):
         super(Html, self)._setup_attrs(model, name)

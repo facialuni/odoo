@@ -6,7 +6,6 @@ import random
 
 from odoo import api, models, fields, _
 from odoo.addons.website.models.website import slug
-from odoo.tools.translate import html_translate
 from odoo.tools import html2plaintext
 
 
@@ -116,7 +115,7 @@ class BlogPost(models.Model):
         default='{"background-image": "none", "background-color": "oe_black", "opacity": "0.2", "resize_class": ""}')
     blog_id = fields.Many2one('blog.blog', 'Blog', required=True, ondelete='cascade')
     tag_ids = fields.Many2many('blog.tag', string='Tags')
-    content = fields.Html('Content', default=_default_content, translate=html_translate, sanitize_attributes=False)
+    content = fields.Html('Content', default=_default_content, translate=True, sanitize_attributes=False)
     teaser = fields.Text('Teaser', compute='_compute_teaser', inverse='_set_teaser')
     teaser_manual = fields.Text(string='Teaser Content')
 

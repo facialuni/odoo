@@ -16,7 +16,7 @@ class ViewCase(common.TransactionCase):
     def setUp(self):
         super(ViewCase, self).setUp()
         self.addTypeEqualityFunc(etree._Element, self.assertTreesEqual)
-        self.View = self.env['ir.ui.view']
+        self.View = self.env['ir.ui.view'].with_context(lang="en_US")
 
     def assertTreesEqual(self, n1, n2, msg=None):
         self.assertEqual(n1.tag, n2.tag, msg)
@@ -397,41 +397,38 @@ class TestNoModel(ViewCase):
             'model': False,
         })
 
-    text_para = E.p("", {'class': 'legalese'})
-    arch = E.body(
-        E.div(
-            E.h1("Title"),
-            id="header"),
-        E.p("Welcome!"),
-        E.div(
-            E.hr(),
-            text_para,
-            id="footer"),
-        {'class': "index"},)
-
     def test_qweb_translation(self):
         """
         Test if translations work correctly without a model
         """
         self.env['res.lang'].load_lang('fr_FR')
-        ARCH = '<template name="foo">%s</template>'
-        TEXT_EN = "Copyright copyrighter"
-        TEXT_FR = u"Copyrighter, tous droits réservés"
+        ARCH = '<template name="foo">%s<hr/>    %s</template>'
+        TEXT_EN = ("Copyright copyrighter", "hi <b>b</b> c")
+        TEXT_FR = (u"Copyrighter, tous droits réservés", "bonjour <b>b</b> c")
         view = self.View.create({
             'name': 'dummy',
             'arch': ARCH % TEXT_EN,
             'inherit_id': False,
             'type': 'qweb',
         })
-        self.env['ir.translation'].create({
+
+        view = view.with_context(lang=None)
+        print view.arch
+
+        data = {
             'type': 'model',
             'name': 'ir.ui.view,arch_db',
             'res_id': view.id,
             'lang': 'fr_FR',
-            'src': TEXT_EN,
-            'value': TEXT_FR,
-        })
+            'src': '0',
+            'value': TEXT_FR[0],
+        }
+        self.env['ir.translation'].create(data)
+        data['src'] = '1'
+        data['value'] = TEXT_FR[1]
+        self.env['ir.translation'].create(data)
         view = view.with_context(lang='fr_FR')
+
         self.assertEqual(view.arch, ARCH % TEXT_FR)
 
 
@@ -539,7 +536,7 @@ class TestTemplating(ViewCase):
             </root>""",
         })
 
-        arch_string = view.with_context(inherit_branding=True).read_combined(['arch'])['arch']
+        arch_string = view.with_context(inherit_branding=True, lang=None).read_combined(['arch'])['arch']
         arch = etree.fromstring(arch_string)
         self.View.distribute_branding(arch)
 

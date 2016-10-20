@@ -51,7 +51,7 @@ from .tools.config import config
 from .tools.func import frame_codeinfo
 from .tools.misc import CountingStream, DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 from .tools.safe_eval import safe_eval
-from .tools.translate import _
+from .tools.translate import _, DEFAULT_LANGUAGE
 
 _logger = logging.getLogger(__name__)
 _schema = logging.getLogger(__name__ + '.schema')
@@ -1838,7 +1838,7 @@ class BaseModel(object):
                 if ftype == 'many2one':
                     value = value[0]
                 elif ftype in ('date', 'datetime'):
-                    locale = self._context.get('lang', 'en_US')
+                    locale = self._context.get('lang', DEFAULT_LANGUAGE)
                     fmt = DEFAULT_SERVER_DATETIME_FORMAT if ftype == 'datetime' else DEFAULT_SERVER_DATE_FORMAT
                     tzinfo = None
                     range_start = value
@@ -3084,7 +3084,7 @@ class BaseModel(object):
             field
             for field in fields
             if field.base_field.store and field.base_field.column_type
-            if not (field.inherited and callable(field.base_field.translate))
+            if not (field.inherited and field.base_field.translate and field.type in ('xml', 'html'))
         ]
 
         # the query may involve several tables: we need fully-qualified names
@@ -3123,11 +3123,12 @@ class BaseModel(object):
             # translate the fields if necessary
             if context.get('lang'):
                 for field in fields_pre:
-                    if not field.inherited and callable(field.translate):
+                    if not field.inherited and field.translate and field.type in ('xml', 'html'):
                         f = field.name
                         translate = field.get_trans_func(fetched)
                         for vals in result:
-                            vals[f] = translate(vals['id'], vals[f])
+                            if vals[f]:
+                                vals[f] = translate(vals['id'], vals[f])
 
             # store result in cache for POST fields
             for vals in result:
@@ -3586,7 +3587,7 @@ class BaseModel(object):
         upd_todo = []           # list of column names to set explicitly
         updend = []             # list of possibly inherited field names
         direct = []             # list of direcly updated columns
-        has_trans = self.env.lang and self.env.lang != 'en_US'
+        translation = []
         single_lang = len(self.env['res.lang'].get_installed()) <= 1
         for name, val in vals.iteritems():
             field = self._fields[name]
@@ -3596,7 +3597,10 @@ class BaseModel(object):
                 if hasattr(field, 'selection') and val:
                     self._check_selection_field_value(name, val)
                 if field.column_type:
-                    if single_lang or not (has_trans and field.translate is True):
+                    if field.translate:
+                        val, trans = field.convert_to_translate(val, self)
+                        translation += trans
+                    if single_lang or not (self.env.lang and field.translate):
                         # val is not a translation: update the table
                         val = field.convert_to_column(val, self)
                         updates.append((name, field.column_format, val))
@@ -3623,25 +3627,9 @@ class BaseModel(object):
                 if cr.rowcount != len(sub_ids):
                     raise MissingError(_('One of the records you are trying to modify has already been deleted (Document type: %s).') % self._description)
 
-            # TODO: optimize
-            for name in direct:
-                field = self._fields[name]
-                if callable(field.translate):
-                    # The source value of a field has been modified,
-                    # synchronize translated terms when possible.
-                    self.env['ir.translation']._sync_terms_translations(self._fields[name], self)
-
-                elif has_trans and field.translate:
-                    # The translated value of a field has been modified.
-                    src_trans = self.read([name])[0][name]
-                    if not src_trans:
-                        # Insert value to DB
-                        src_trans = vals[name]
-                        self.with_context(lang=None).write({name: src_trans})
-                    val = field.convert_to_column(vals[name], self)
-                    tname = "%s,%s" % (self._name, name)
-                    self.env['ir.translation']._set_ids(
-                        tname, 'model', self.env.lang, self.ids, val, src_trans)
+            for id, name, trans in translation:
+                tname = "%s,%s" % (self._name, name)
+                self.env['ir.translation']._set_ids(tname, 'model', self.env.lang or DEFAULT_LANGUAGE, self.ids, trans, src=id, seq=id)
 
         # invalidate and mark new-style fields to recompute; do this before
         # setting other fields, because it can require the value of computed
@@ -3834,6 +3822,8 @@ class BaseModel(object):
         upd_todo = []
         unknown_fields = []
         protected_fields = []
+        translation = []
+
         for name, val in vals.items():
             field = self._fields.get(name)
             if not field:
@@ -3866,6 +3856,9 @@ class BaseModel(object):
         # determine SQL values
         for name, val in vals.iteritems():
             field = self._fields[name]
+            if field.translate:
+                val, trans = field.convert_to_translate(val, self)
+                translation += trans
             if field.store and field.column_type:
                 updates.append((name, field.column_format, field.convert_to_column(val, self)))
             else:
@@ -3893,13 +3886,9 @@ class BaseModel(object):
         id_new, = cr.fetchone()
         self = self.browse(id_new)
 
-        if self.env.lang and self.env.lang != 'en_US':
-            # add translations for self.env.lang
-            for name, val in vals.iteritems():
-                field = self._fields[name]
-                if field.store and field.column_type and field.translate is True:
-                    tname = "%s,%s" % (self._name, name)
-                    self.env['ir.translation']._set_ids(tname, 'model', self.env.lang, self.ids, val, val)
+        for id, name, trans in translation:
+            tname = "%s,%s" % (self._name, name)
+            self.env['ir.translation']._set_ids(tname, 'model', self.env.lang or DEFAULT_LANGUAGE, self.ids, trans, src=id, seq=id)
 
         if self._parent_store and not self._context.get('defer_parent_store_computation'):
             if self.pool._init:
@@ -4053,7 +4042,7 @@ class BaseModel(object):
 
         :return: the qualified field name (or expression) to use for ``field``
         """
-        if self.env.lang:
+        if self.env.lang and self._fields[field].type not in ('xml', 'html'):
             # Sub-select to return at most one translation per record.
             # Even if it shoud probably not be the case,
             # this is possible to have multiple translations for a same record in the same language.

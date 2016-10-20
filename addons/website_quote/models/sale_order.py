@@ -5,7 +5,6 @@ import uuid
 from datetime import datetime, timedelta
 
 from odoo import api, fields, models, _
-from odoo.tools.translate import html_translate
 import odoo.addons.decimal_precision as dp
 
 
@@ -13,7 +12,7 @@ class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
     _description = "Sales Order Line"
 
-    website_description = fields.Html('Line Description', sanitize=False, translate=html_translate)
+    website_description = fields.Html('Line Description', sanitize=False, translate=True)
     option_line_id = fields.One2many('sale.order.option', 'line_id', 'Optional Products Lines')
 
     # Take the description on the order template if the product is present in it
@@ -56,7 +55,7 @@ class SaleOrder(models.Model):
         'sale.quote.template', 'Quotation Template',
         default=_get_default_template_id, readonly=True,
         states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
-    website_description = fields.Html('Description', sanitize_attributes=False, translate=html_translate)
+    website_description = fields.Html('Description', sanitize_attributes=False, translate=True)
     options = fields.One2many(
         'sale.order.option', 'order_id', 'Optional Products Lines',
         copy=True, readonly=True,
@@ -198,7 +197,7 @@ class SaleOrderOption(models.Model):
     name = fields.Text('Description', required=True)
     product_id = fields.Many2one('product.product', 'Product', domain=[('sale_ok', '=', True)])
     layout_category_id = fields.Many2one('sale.layout_category', string='Section')
-    website_description = fields.Html('Line Description', sanitize_attributes=False, translate=html_translate)
+    website_description = fields.Html('Line Description', sanitize_attributes=False, translate=True)
     price_unit = fields.Float('Unit Price', required=True, digits=dp.get_precision('Product Price'))
     discount = fields.Float('Discount (%)', digits=dp.get_precision('Discount'))
     uom_id = fields.Many2one('product.uom', 'Unit of Measure ', required=True)

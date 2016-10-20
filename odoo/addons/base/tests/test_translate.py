@@ -39,7 +39,7 @@ class TranslationToolsTestCase(unittest.TestCase):
                         Put some more text here
                         <field name="foo"/>
                     </form>"""
-        result = xml_translate(terms.append, source)
+        result = xml_translate(lambda term, id=0: terms.append(term), source)
         self.assertEquals(result, source)
         self.assertItemsEqual(terms,
             ['Form stuff', 'Blah blah blah', 'Put some more text here'])
@@ -48,7 +48,7 @@ class TranslationToolsTestCase(unittest.TestCase):
         """ Test xml_translate() on plain text. """
         terms = []
         source = "Blah blah blah"
-        result = xml_translate(terms.append, source)
+        result = xml_translate(lambda term, id=0: terms.append(term), source)
         self.assertEquals(result, source)
         self.assertItemsEqual(terms, [source])
 
@@ -56,7 +56,7 @@ class TranslationToolsTestCase(unittest.TestCase):
         """ Test xml_translate() on plain text with HTML escaped entities. """
         terms = []
         source = "Blah&amp;nbsp;blah&amp;nbsp;blah"
-        result = xml_translate(terms.append, source)
+        result = xml_translate(lambda term, id=0: terms.append(term), source)
         self.assertEquals(result, source)
         self.assertItemsEqual(terms, [source])
 
@@ -68,7 +68,7 @@ class TranslationToolsTestCase(unittest.TestCase):
                         Put some <b>more text</b> here
                         <field name="foo"/>
                     </form>"""
-        result = xml_translate(terms.append, source)
+        result = xml_translate(lambda term, id=0: terms.append(term), source)
         self.assertEquals(result, source)
         self.assertItemsEqual(terms,
             ['Form stuff', 'Blah <i>blah</i> blah', 'Put some <b>more text</b> here'])
@@ -81,7 +81,7 @@ class TranslationToolsTestCase(unittest.TestCase):
                         Put <em>some <b>more text</b></em> here
                         <field name="foo"/>
                     </form>"""
-        result = xml_translate(terms.append, source)
+        result = xml_translate(lambda term, id=0: terms.append(term), source)
         self.assertEquals(result, source)
         self.assertItemsEqual(terms,
             ['Form stuff', 'Blah <i>blah</i> blah', 'Put <em>some <b>more text</b></em> here'])
@@ -98,7 +98,7 @@ class TranslationToolsTestCase(unittest.TestCase):
                             </span>
                         </div>
                     </form>"""
-        result = xml_translate(terms.append, source)
+        result = xml_translate(lambda term, id=0: terms.append(term), source)
         self.assertEquals(result, source)
         self.assertItemsEqual(terms,
             ['Form stuff', 'Blah blah blah'])
@@ -111,7 +111,7 @@ class TranslationToolsTestCase(unittest.TestCase):
                         <span t-field="o.name"/>
                         stuff after
                     </t>"""
-        result = xml_translate(terms.append, source)
+        result = xml_translate(lambda term, id=0: terms.append(term), source)
         self.assertEquals(result, source)
         self.assertItemsEqual(terms,
             ['stuff before', 'stuff after'])
@@ -124,7 +124,7 @@ class TranslationToolsTestCase(unittest.TestCase):
                         <div t-translation="off">Do not translate this</div>
                         stuff after
                     </div>"""
-        result = xml_translate(terms.append, source)
+        result = xml_translate(lambda term, id=0: terms.append(term), source)
         self.assertEquals(result, source)
         self.assertItemsEqual(terms,
             ['stuff before', 'stuff after'])
@@ -136,7 +136,7 @@ class TranslationToolsTestCase(unittest.TestCase):
                         <attribute name="string">Translate this</attribute>
                         <attribute name="option">Do not translate this</attribute>
                     </field>"""
-        result = xml_translate(terms.append, source)
+        result = xml_translate(lambda term, id=0: terms.append(term), source)
         self.assertEquals(result, source)
         self.assertItemsEqual(terms,
             ['Translate this'])
@@ -157,7 +157,7 @@ class TranslationToolsTestCase(unittest.TestCase):
                             </li>
                         </ul>
                     </t>"""
-        result = xml_translate(terms.append, source)
+        result = xml_translate(lambda term, id=0: terms.append(term), source)
         self.assertEquals(result, source)
         self.assertItemsEqual(terms,
             ['<span class="oe_menu_text">Blah</span>', 'More <b class="caret"/>'])
@@ -165,9 +165,9 @@ class TranslationToolsTestCase(unittest.TestCase):
     def test_translate_html(self):
         """ Test xml_translate() and html_translate() with <i> elements. """
         source = """<i class="fa-check"></i>"""
-        result = xml_translate(lambda term: term, source)
+        result = xml_translate(lambda term, seq=None: term, source)
         self.assertEquals(result, """<i class="fa-check"/>""")
-        result = html_translate(lambda term: term, source)
+        result = html_translate(lambda term, seq=None: term, source)
         self.assertEquals(result, source)
 
 

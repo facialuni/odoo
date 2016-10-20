@@ -3,7 +3,6 @@
 
 import logging
 from itertools import groupby
-from lxml import etree
 
 from odoo import api, fields, models
 from odoo import tools

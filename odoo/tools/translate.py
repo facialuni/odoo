@@ -128,6 +128,7 @@ class UNIX_LINE_TERMINATOR(csv.excel):
 
 csv.register_dialect("UNIX", UNIX_LINE_TERMINATOR)
 
+DEFAULT_LANGUAGE = 'en_US'
 
 #
 # Helper functions for translating fields
@@ -142,7 +143,7 @@ TRANSLATED_ELEMENTS = {
     'abbr', 'b', 'bdi', 'bdo', 'br', 'cite', 'code', 'data', 'del', 'dfn', 'em',
     'font', 'i', 'ins', 'kbd', 'keygen', 'mark', 'math', 'meter', 'output',
     'progress', 'q', 'ruby', 's', 'samp', 'small', 'span', 'strong', 'sub',
-    'sup', 'time', 'u', 'var', 'wbr', 'text',
+    'sup', 'time', 'u', 'var', 'wbr', 'text', 'a', 'img'
 }
 
 # which attributes must be translated
@@ -170,13 +171,14 @@ class XMLTranslator(object):
             </div>
 
     """
-    def __init__(self, callback, method, parser=None):
+    def __init__(self, callback, method, parser=None, seq=None):
         self.callback = callback        # callback function to translate terms
         self.method = method            # serialization method ('xml' or 'html')
         self.parser = parser            # parser for validating translations
         self._done = []                 # translated strings
         self._todo = []                 # todo strings that come after _done
         self.needs_trans = False        # whether todo needs translation
+        self.seq = seq
 
     def todo(self, text, needs_trans=True):
         self._todo.append(text)
@@ -209,7 +211,7 @@ class XMLTranslator(object):
     def process_text(self, text):
         """ Translate text.strip(), but keep the surrounding spaces from text. """
         term = text.strip()
-        trans = term and self.callback(term)
+        trans = term and self.callback(term, self.seq)
         if trans:
             try:
                 # parse the translation to validate it
@@ -220,10 +222,10 @@ class XMLTranslator(object):
             text = text.replace(term, trans)
         return text
 
-    def process_attr(self, attr):
+    def process_attr(self, attr, id=None):
         """ Translate the given node attribute value. """
         term = attr.strip()
-        trans = term and self.callback(term)
+        trans = term and self.callback(term, id)
         return attr.replace(term, trans) if trans else attr
 
     def process(self, node):
@@ -242,7 +244,7 @@ class XMLTranslator(object):
             return
 
         # process children nodes locally in child_trans
-        child_trans = XMLTranslator(self.callback, self.method, parser=self.parser)
+        child_trans = XMLTranslator(self.callback, self.method, parser=self.parser, seq=int(node.get('data-translation-seq', 0)))
         if node.text:
             if avoid_pattern.match(node.text):
                 child_trans.done(escape(node.text)) # do not translate <!DOCTYPE...
@@ -255,13 +257,14 @@ class XMLTranslator(object):
                 node.tag in TRANSLATED_ELEMENTS and
                 not any(attr.startswith("t-") for attr in node.attrib)):
             # serialize the node element as todo
-            self.todo(self.serialize(node.tag, node.attrib, child_trans.get_todo()),
+            text = self.serialize(node.tag, node.attrib, child_trans.get_todo())
+            self.todo(text,
                       child_trans.needs_trans)
         else:
             # complete translations and serialize result as done
             for attr in TRANSLATED_ATTRS:
                 if node.get(attr):
-                    node.set(attr, self.process_attr(node.get(attr)))
+                    node.set(attr, self.process_attr(node.get(attr), int(node.get('data-translation-%s-seq' % attr, 0))))
             self.done(self.serialize(node.tag, node.attrib, child_trans.get_done()))
 
         # add node tail as todo

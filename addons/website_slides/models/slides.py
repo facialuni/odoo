@@ -13,7 +13,6 @@ import urllib2
 
 from odoo import api, fields, models, SUPERUSER_ID, _
 from odoo.tools import image
-from odoo.tools.translate import html_translate
 from odoo.exceptions import Warning
 from odoo.addons.website.models.website import slug
 
@@ -34,7 +33,7 @@ class Channel(models.Model):
 
     name = fields.Char('Name', translate=True, required=True)
     active = fields.Boolean(default=True)
-    description = fields.Html('Description', translate=html_translate, sanitize_attributes=False)
+    description = fields.Html('Description', translate=True, sanitize_attributes=False)
     sequence = fields.Integer(default=10, help='Display order')
     category_ids = fields.One2many('slide.category', 'channel_id', string="Categories")
     slide_ids = fields.One2many('slide.slide', 'channel_id', string="Slides")
@@ -102,7 +101,7 @@ class Channel(models.Model):
         string='Channel Groups', help="Groups allowed to see presentations in this channel")
     access_error_msg = fields.Html(
         'Error Message', help="Message to display when not accessible due to access rights",
-        default="<p>This channel is private and its content is restricted to some users.</p>", translate=html_translate, sanitize_attributes=False)
+        default="<p>This channel is private and its content is restricted to some users.</p>", translate=True, sanitize_attributes=False)
     upload_group_ids = fields.Many2many(
         'res.groups', 'rel_upload_groups', 'channel_id', 'group_id',
         string='Upload Groups', help="Groups allowed to upload presentations in this channel. If void, every user can upload.")
