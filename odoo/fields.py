@@ -1172,7 +1172,8 @@ class Integer(Field):
 
     def _update(self, records, value):
         # special case, when an integer field is used as inverse for a one2many
-        records._cache[self] = value.id or 0
+        for record in records:
+            record._cache[self] = value.id or 0
 
     def convert_to_export(self, value, record):
         if value or value == 0:
@@ -1961,11 +1962,9 @@ class Many2one(_Relational):
             model.env['ir.model.constraint']._reflect_constraint(model, conname, 'f', None, self._module)
 
     def _update(self, records, value):
-        """ Update the cached value of ``self`` for ``records`` with ``value``.
-        This is used to reflect the assignment ``value[name] = records``, where
-        ``name`` is the inverse field of ``self``.
-        """
-        records._cache[self] = self.convert_to_cache(value, records, validate=False)
+        """ Update the cached value of ``self`` for ``records`` with ``value``. """
+        for record in records:
+            record._cache[self] = self.convert_to_cache(value, records, validate=False)
 
     def convert_to_column(self, value, record):
         return value or None
