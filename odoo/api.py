@@ -937,31 +937,34 @@ class Environment(Mapping):
 
     def check_cache(self):
         """ Check the cache consistency. """
-        from odoo.models import SpecialValue
+        from collections import namedtuple
+        Diff = namedtuple('Diff', ['record', 'field', 'cached', 'fetched'])
 
-        # make a full copy of the cache, and invalidate it
-        cache_dump = dict(
-            (field, dict(field_cache))
-            for field, field_cache in self.cache.iteritems()
-        )
+        # make a full copy of the cache
+        cache_dump = {}
+        for field in list(self.cache):
+            field_dump = cache_dump[field] = {}
+            for record in self.with_field(field):
+                if record.id:
+                    try:
+                        field_dump[record] = record[field.name]
+                    except Exception as exc:
+                        field_dump[record] = exc
+
+        # invalidate the cache
         self.invalidate_all()
 
-        # re-fetch the records, and compare with their former cache
+        # re-fetch the records, and compare with their former values
         invalids = []
         for field, field_dump in cache_dump.iteritems():
-            ids = filter(None, field_dump)
-            records = self[field.model_name].browse(ids)
-            for record in records:
+            for record, cached in field_dump.iteritems():
                 try:
-                    cached = field_dump[record.id]
-                    cached = cached.get() if isinstance(cached, SpecialValue) else cached
-                    value = field.convert_to_record(cached, record)
                     fetched = record[field.name]
-                    if fetched != value:
-                        info = {'cached': value, 'fetched': fetched}
-                        invalids.append((field, record, info))
-                except (AccessError, MissingError):
-                    pass
+                    if fetched != cached:
+                        invalids.append(Diff(record, field.name, cached, fetched))
+                except Exception as exc:
+                    if type(cached) != type(exc):
+                        invalids.append(Diff(record, field.name, cached, exc))
 
         if invalids:
             raise UserError('Invalid cache for fields\n' + pformat(invalids))
