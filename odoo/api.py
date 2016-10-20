@@ -874,6 +874,10 @@ class Environment(Mapping):
             self.clear()
             raise
 
+    def with_field(self, field):
+        """ Return the records that have a cached value for ``field``. """
+        return self[field.model_name].browse(self.cache[field])
+
     def protected(self, field):
         """ Return the recordset for which ``field`` should not be invalidated or recomputed. """
         return self[field.model_name].browse(self._protected.get(field, ()))

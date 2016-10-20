@@ -290,21 +290,25 @@ class TestAPI(common.TransactionCase):
         self.assertItemsEqual(partners.ids, partners._prefetch['res.partner'])
 
         # reading ONE partner should fetch them ALL
-        partner = next(p for p in partners)
-        partner.country_id
-        country_id_cache = self.env.cache[type(partners).country_id]
-        self.assertItemsEqual(partners.ids, country_id_cache)
+        for partner in partners:
+            partner.country_id
+            break
+        ids_with_country = [p.id for p in partners if 'country_id' in p._cache]
+        self.assertItemsEqual(partners.ids, ids_with_country)
 
         # partners' countries are ready for prefetching
-        country_ids = set(cid for cids in country_id_cache.itervalues() for cid in cids)
+        country_ids = set(cid for p in partners for cid in p._cache['country_id'])
         self.assertTrue(len(country_ids) > 1)
         self.assertItemsEqual(country_ids, partners._prefetch['res.country'])
 
         # reading ONE partner country should fetch ALL partners' countries
-        country = next(p.country_id for p in partners if p.country_id)
-        country.name
-        name_cache = self.env.cache[type(country).name]
-        self.assertItemsEqual(country_ids, name_cache)
+        for partner in partners:
+            if partner.country_id:
+                partner.country_id.name
+                break
+        countries = self.env['res.country'].browse(country_ids)
+        ids_with_name = [c.id for c in countries if 'name' in c._cache]
+        self.assertItemsEqual(country_ids, ids_with_name)
 
     @mute_logger('odoo.models')
     def test_60_prefetch_object(self):

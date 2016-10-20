@@ -4651,8 +4651,8 @@ class BaseModel(object):
             the records of model ``self`` in cache that have no value for ``field``
             (:class:`Field` instance).
         """
-        ids = filter(None, self._prefetch[self._name] - set(self.env.cache[field]))
-        return self.browse(ids)
+        records = self.browse(self._prefetch[self._name])
+        return (records - self.env.with_field(field)).filtered('id')
 
     @api.model
     def refresh(self):

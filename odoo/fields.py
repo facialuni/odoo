@@ -1095,16 +1095,13 @@ class Field(object):
                 # we would simply lose their values during an onchange!
                 continue
 
-            target = env[field.model_name]
-            protected = env.protected(field)
             if path == 'id' and field.model_name == records._name:
-                target = records - protected
+                target = records - env.protected(field)
             elif path and env.in_onchange:
-                target = (target.browse(env.cache[field]) - protected).filtered(
-                    lambda rec: rec if path == 'id' else rec._mapped_cache(path) & records
-                )
+                target = env.with_field(field) - env.protected(field)
+                target = target.filtered(lambda t: t if path == 'id' else t._mapped_cache(path) & records)
             else:
-                target = target.browse(env.cache[field]) - protected
+                target = env.with_field(field) - env.protected(field)
 
             if target:
                 spec.append((field, target._ids))
