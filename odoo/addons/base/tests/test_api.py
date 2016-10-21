@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import time
+
 from odoo import models
 from odoo.tools import mute_logger
 from odoo.tests import common
@@ -274,6 +276,57 @@ class TestAPI(common.TransactionCase):
         data = alice._convert_to_write(alice._cache)
         self.assertEqual(data['country_id'], alice.country_id.id)
         self.assertEqual(data['child_ids'], [(6, 0, alice.child_ids.ids)])
+
+    @mute_logger('odoo.models')
+    def test_60_cache_performance(self):
+        """ Test cache get/set/invalidate for large operations. """
+        ps = self.env['res.partner.category'].search([])
+        if len(ps) < 100:
+            for i in xrange(100 - len(ps)):
+                ps.create({'name': str(i)})
+            ps = ps.search([])
+        ps.mapped('name')
+        count = 1000
+        print ">>> number of operations:", len(ps) * count
+
+        start = time.time()
+        for _ in xrange(count):
+            for p in ps:
+                p._cache['name']
+        print ">>> time to get: %.3fs" % (time.time() - start)
+
+        start = time.time()
+        for _ in xrange(count):
+            for p in ps:
+                p._cache['name'] = 'Foo'
+        print ">>> time to set: %.3fs" % (time.time() - start)
+
+        start = time.time()
+        for _ in xrange(count):
+            ps.env.with_field(type(ps).name)
+        print ">>> time to with_field(name): %.3fs" % (time.time() - start)
+
+        ps.invalidate_cache()
+
+        total = 0
+        spec = [(type(ps).name, None)]
+        for _ in xrange(count):
+            for p in ps:
+                p._cache['name'] = 'Foo'
+            start = time.time()
+            self.env.invalidate(spec)
+            total += time.time() - start
+        print ">>> time to invalidate (total):   %.3fs" % total
+
+        total = 0
+        spec = [(type(ps).name, ps.ids)]
+        for _ in xrange(count):
+            for p in ps:
+                p._cache['name'] = 'Foo'
+            start = time.time()
+            self.env.invalidate(spec)
+            total += time.time() - start
+        print ">>> time to invalidate (partial): %.3fs" % total
 
     @mute_logger('odoo.models')
     def test_60_prefetch(self):
