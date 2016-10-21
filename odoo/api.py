@@ -46,7 +46,7 @@ __all__ = [
 ]
 
 import logging
-from collections import defaultdict, Mapping
+from collections import defaultdict, Mapping, MutableMapping
 from contextlib import contextmanager
 from inspect import currentframe, getargspec
 from pprint import pformat
@@ -732,7 +732,7 @@ class Environment(Mapping):
         self = object.__new__(cls)
         self.cr, self.uid, self.context = self.args = (cr, uid, frozendict(context))
         self.registry = Registry(cr.dbname)
-        self.cache = defaultdict(dict)              # {field: {id: value, ...}, ...}
+        self._cache = defaultdict(dict)             # {field: {id: value, ...}, ...}
         self._protected = defaultdict(frozenset)    # {field: ids, ...}
         self._dirty = defaultdict(set)              # {record: set(field_name), ...}
         self.all = envs
@@ -828,6 +828,9 @@ class Environment(Mapping):
         """ Return whether we are in 'onchange' draft mode. """
         return self.all.mode == 'onchange'
 
+    def get_cache(self, record):
+        return RecordCache(record)
+
     def invalidate(self, spec):
         """ Invalidate some fields for some records in the cache of all
             environments.
@@ -839,7 +842,7 @@ class Environment(Mapping):
         if not spec:
             return
         for env in list(self.all):
-            cache = env.cache
+            cache = env._cache
             for field, ids in spec:
                 if field in cache:
                     if ids is None:
@@ -852,7 +855,7 @@ class Environment(Mapping):
     def invalidate_all(self):
         """ Clear the cache of all environments. """
         for env in list(self.all):
-            env.cache.clear()
+            env._cache.clear()
             env._protected.clear()
             env._dirty.clear()
 
@@ -876,7 +879,7 @@ class Environment(Mapping):
 
     def with_field(self, field):
         """ Return the records that have a cached value for ``field``. """
-        return self[field.model_name].browse(self.cache[field])
+        return self[field.model_name].browse(self._cache[field])
 
     def protected(self, field):
         """ Return the recordset for which ``field`` should not be invalidated or recomputed. """
@@ -942,7 +945,7 @@ class Environment(Mapping):
 
         # make a full copy of the cache
         cache_dump = {}
-        for field in list(self.cache):
+        for field in list(self._cache):
             field_dump = cache_dump[field] = {}
             for record in self.with_field(field):
                 if record.id:
@@ -1000,7 +1003,87 @@ class Environments(object):
         return iter(self.envs)
 
 
+class RecordCache(MutableMapping):
+    """ Implements a proxy dictionary to read/update the cache of a record.
+        Upon iteration, it looks like a dictionary mapping field names to
+        values. However, fields may be used as keys as well.
+    """
+    def __init__(self, record):
+        assert len(record) == 1, "Unexpected RecordCache(%s)" % record
+        self._record = record
+
+    def __contains__(self, name):
+        """ Return whether the record has a cached value for field ``name``. """
+        field = self._record._fields[name]
+        return self._record.id in self._record.env._cache[field]
+
+    def __getitem__(self, name):
+        """ Return the cached value of field ``name`` for the record. """
+        field = self._record._fields[name]
+        value = self._record.env._cache[field][self._record.id]
+        return value.get() if isinstance(value, SpecialValue) else value
+
+    def __setitem__(self, name, value):
+        """ Assign the cached value of field ``name`` for the record. """
+        field = self._record._fields[name]
+        self._record.env.cache[field][self._record.id] = value
+
+    def __delitem__(self, name):
+        """ Remove the cached value of field ``name`` for the record. """
+        field = self._record._fields[name]
+        del self._record.env.cache[field][self._record.id]
+
+    def __iter__(self):
+        """ Iterate over the field names with a cached value. """
+        cache, id = self._record.env.cache, self._record.id
+        for name, field in self._record._fields.iteritems():
+            if name != 'id' and id in cache[field]:
+                yield name
+
+    def __len__(self):
+        """ Return the number of fields with a cached value. """
+        return sum(1 for name in self)
+
+    def has_value(self, name):
+        """ Return whether the record has a regular value for field ``name`` in cache. """
+        field = self._record._fields[name]
+        dummy = SpecialValue(None)
+        value = self._record.env.cache[field].get(self._record.id, dummy)
+        return not isinstance(value, SpecialValue)
+
+    def get_value(self, name, default=None):
+        """ Return the cached, regular value of field ``name``, or ``default``. """
+        field = self._record._fields[name]
+        dummy = SpecialValue(None)
+        value = self._record.env.cache[field].get(self._record.id, dummy)
+        return default if isinstance(value, SpecialValue) else value
+
+    @property
+    def dirty(self):
+        """ Return the dirty fields for the record, as a set of names. """
+        return self._record.env._dirty[self._record]
+
+    def set_special(self, name, getter):
+        """ Set the given ``getter`` as the cached value of field ``name``. """
+        field = self._record._fields[name]
+        self._record.env.cache[field][self._record.id] = SpecialValue(getter)
+
+    def set_failed(self, names, exception):
+        """ Mark the given fields with the given exception. """
+        def getter():
+            raise exception
+        for name in names:
+            self.set_special(name, getter)
+
+
+class SpecialValue(object):
+    """ Encapsulate a function that returns a field's value in cache. """
+    __slots__ = ['get']
+    def __init__(self, getter):
+        self.get = getter
+
+
 # keep those imports here in order to handle cyclic dependencies correctly
 from odoo import SUPERUSER_ID
-from odoo.exceptions import UserError, AccessError, MissingError
+from odoo.exceptions import UserError
 from odoo.modules.registry import Registry
