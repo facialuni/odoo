@@ -223,62 +223,57 @@ class TestAPI(common.TransactionCase):
     def test_60_cache(self):
         """ Check the record cache behavior """
         Partners = self.env['res.partner']
-        pids = []
-        data = {
-            'partner One': ['Partner One - One', 'Partner One - Two'],
-            'Partner Two': ['Partner Two - One'],
-            'Partner Three': ['Partner Three - One'],
-        }
-        for p in data:
-            pids.append(Partners.create({
-                'name': p,
-                'child_ids': [(0, 0, {'name': c}) for c in data[p]],
-            }).id)
+        alice = Partners.create({
+            'name': 'Alice',
+            'child_ids': [(0, 0, {'name': 'Bernard'}), (0, 0, {'name': 'Carol'})],
+        })
+        david = Partners.create({
+            'name': 'David',
+            'child_ids': [(0, 0, {'name': 'Emily'})],
+        })
 
-        partners = Partners.search([('id', 'in', pids)])
-        partner1, partner2 = partners[0], partners[1]
-        children1, children2 = partner1.child_ids, partner2.child_ids
+        children1 = alice.child_ids
+        children2 = david.child_ids
         self.assertTrue(children1)
         self.assertTrue(children2)
 
         # take a child contact
-        child = children1[0]
-        self.assertEqual(child.parent_id, partner1)
-        self.assertIn(child, partner1.child_ids)
-        self.assertNotIn(child, partner2.child_ids)
+        bernard = children1[0]
+        self.assertEqual(bernard.parent_id, alice)
+        self.assertIn(bernard, alice.child_ids)
+        self.assertNotIn(bernard, david.child_ids)
 
         # fetch data in the cache
-        for p in partners:
+        for p in (alice + david):
             p.name, p.company_id.name, p.user_id.name, p.contact_address
         self.env.check_cache()
 
         # change its parent
-        child.write({'parent_id': partner2.id})
+        bernard.write({'parent_id': david.id})
         self.env.check_cache()
 
         # check recordsets
-        self.assertEqual(child.parent_id, partner2)
-        self.assertNotIn(child, partner1.child_ids)
-        self.assertIn(child, partner2.child_ids)
-        self.assertEqual(set(partner1.child_ids + child), set(children1))
-        self.assertEqual(set(partner2.child_ids), set(children2 + child))
+        self.assertEqual(bernard.parent_id, david)
+        self.assertNotIn(bernard, alice.child_ids)
+        self.assertIn(bernard, david.child_ids)
+        self.assertEqual(alice.child_ids + bernard, children1)
+        self.assertEqual(david.child_ids, children2 + bernard)
         self.env.check_cache()
 
         # delete it
-        child.unlink()
+        bernard.unlink()
         self.env.check_cache()
 
         # check recordsets
-        self.assertEqual(set(partner1.child_ids), set(children1) - set([child]))
-        self.assertEqual(set(partner2.child_ids), set(children2))
+        self.assertEqual(alice.child_ids, children1 - bernard)
+        self.assertEqual(david.child_ids, children2)
         self.env.check_cache()
 
         # convert from the cache format to the write format
-        partner = partner1
-        partner.country_id, partner.child_ids
-        data = partner._convert_to_write(partner._cache)
-        self.assertEqual(data['country_id'], partner.country_id.id)
-        self.assertEqual(data['child_ids'], [(6, 0, partner.child_ids.ids)])
+        alice.country_id, alice.child_ids
+        data = alice._convert_to_write(alice._cache)
+        self.assertEqual(data['country_id'], alice.country_id.id)
+        self.assertEqual(data['child_ids'], [(6, 0, alice.child_ids.ids)])
 
     @mute_logger('odoo.models')
     def test_60_prefetch(self):
