@@ -4640,10 +4640,10 @@ class BaseModel(object):
     # Cache and recomputation management
     #
 
-    @lazy_property
+    @property
     def _cache(self):
         """ Return the cache of ``self``, mapping field names to values. """
-        return self.env.get_cache(self.ensure_one())
+        return self.env.get_cache(self)
 
     @api.model
     def _in_cache_without(self, field):

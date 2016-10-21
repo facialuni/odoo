@@ -732,9 +732,8 @@ class Environment(Mapping):
         self = object.__new__(cls)
         self.cr, self.uid, self.context = self.args = (cr, uid, frozendict(context))
         self.registry = Registry(cr.dbname)
-        self._cache = defaultdict(dict)             # {field: {id: value, ...}, ...}
+        self._cache = envs.cache[self]              # {record: {name: value}}
         self._protected = defaultdict(frozenset)    # {field: ids, ...}
-        self._dirty = defaultdict(set)              # {record: set(field_name), ...}
         self.all = envs
         envs.add(self)
         return self
@@ -804,7 +803,7 @@ class Environment(Mapping):
                 yield
             finally:
                 self.all.mode = False
-                self._dirty.clear()
+                self.all.cache.clear_dirty()
 
     def do_in_draft(self):
         """ Context-switch to draft mode, where all field updates are done in
@@ -829,7 +828,7 @@ class Environment(Mapping):
         return self.all.mode == 'onchange'
 
     def get_cache(self, record):
-        return RecordCache(record)
+        return self._cache[record]
 
     def invalidate(self, spec):
         """ Invalidate some fields for some records in the cache of all
@@ -839,25 +838,15 @@ class Environment(Mapping):
                 where ``field`` is a field object, and ``ids`` is a list of record
                 ids or ``None`` (to invalidate all records).
         """
-        if not spec:
-            return
-        for env in list(self.all):
-            cache = env._cache
-            for field, ids in spec:
-                if field in cache:
-                    if ids is None:
-                        del cache[field]
-                    else:
-                        field_cache = cache[field]
-                        for id in ids:
-                            field_cache.pop(id, None)
+        self._cache.invalidate(spec)
 
     def invalidate_all(self):
         """ Clear the cache of all environments. """
+        cache = self.all.cache
+        cache.invalidate()
         for env in list(self.all):
-            env._cache.clear()
+            env._cache = cache[env]
             env._protected.clear()
-            env._dirty.clear()
 
     def clear(self):
         """ Clear all record caches, and discard all fields to recompute.
@@ -879,7 +868,9 @@ class Environment(Mapping):
 
     def with_field(self, field):
         """ Return the records that have a cached value for ``field``. """
-        return self[field.model_name].browse(self._cache[field])
+        name, cache = field.name, self._cache
+        records = self[field.model_name].browse(cache.valid[field])
+        return records.filtered(lambda record: name in cache[record])
 
     def protected(self, field):
         """ Return the recordset for which ``field`` should not be invalidated or recomputed. """
@@ -945,29 +936,29 @@ class Environment(Mapping):
 
         # make a full copy of the cache
         cache_dump = {}
-        for field in list(self._cache):
-            field_dump = cache_dump[field] = {}
-            for record in self.with_field(field):
-                if record.id:
+        for record, record_cache in self._cache.items():
+            if record.id:
+                record_dump = cache_dump[record] = {}
+                for name in record_cache:
                     try:
-                        field_dump[record] = record[field.name]
+                        record_dump[name] = record[name]
                     except Exception as exc:
-                        field_dump[record] = exc
+                        record_dump[name] = exc
 
         # invalidate the cache
         self.invalidate_all()
 
         # re-fetch the records, and compare with their former values
         invalids = []
-        for field, field_dump in cache_dump.iteritems():
-            for record, cached in field_dump.iteritems():
+        for record, record_dump in cache_dump.iteritems():
+            for name, cached in record_dump.iteritems():
                 try:
-                    fetched = record[field.name]
+                    fetched = record[name]
                     if fetched != cached:
-                        invalids.append(Diff(record, field.name, cached, fetched))
+                        invalids.append(Diff(record, name, cached, fetched))
                 except Exception as exc:
                     if type(cached) != type(exc):
-                        invalids.append(Diff(record, field.name, cached, exc))
+                        invalids.append(Diff(record, name, cached, exc))
 
         if invalids:
             raise UserError('Invalid cache for fields\n' + pformat(invalids))
@@ -990,6 +981,7 @@ class Environments(object):
     """ A common object for all environments in a request. """
     def __init__(self):
         self.envs = WeakSet()           # weak set of environments
+        self.cache = Cache()            # cache for all environments
         self.todo = {}                  # recomputations {field: [records]}
         self.mode = False               # flag for draft/onchange
         self.recompute = True
@@ -1003,79 +995,113 @@ class Environments(object):
         return iter(self.envs)
 
 
+class Cache(dict):
+    """ A cache for the records, indexed by environment. """
+    __slots__ = ['valid', 'dirty']
+
+    def __init__(self):
+        super(Cache, self).__init__()
+        self.valid = defaultdict(set)           # {field: set(ids)}
+        self.dirty = defaultdict(set)           # {record: set(names)}
+
+    def __missing__(self, env):
+        cache = self[env] = EnvCache(self.valid, self.dirty)
+        return cache
+
+    def invalidate(self):
+        """ Invalidate the whole cache. """
+        self.clear()
+        self.valid.clear()
+        self.dirty.clear()
+
+    def clear_dirty(self):
+        """ Clear all the dirty flags. """
+        for names in self.dirty.itervalues():
+            names.clear()
+
+
+class EnvCache(dict):
+    """ A cache for the records in a given environment, indexed by record. """
+    __slots__ = ['valid', 'dirty']
+
+    def __init__(self, valid, dirty):
+        super(EnvCache, self).__init__()
+        self.valid = valid
+        self.dirty = dirty
+
+    def __missing__(self, record):
+        cache = self[record] = RecordCache(record, self.valid, self.dirty[record])
+        return cache
+
+    def invalidate(self, spec):
+        valid = self.valid
+        for field, ids in spec:
+            if field in valid:
+                # We must drop or replace valid[field]. The current value of
+                # valid[field] is shared by slots in all environments; adding an
+                # id could wrongly validate a slot that has been invalidated in
+                # another environment.
+                if ids is None:
+                    valid.pop(field).clear()
+                else:
+                    valid_ids = valid[field]
+                    valid_ids.difference_update(ids)
+                    valid[field] = set(valid_ids)
+
+
 class RecordCache(MutableMapping):
-    """ Implements a proxy dictionary to read/update the cache of a record.
-        Upon iteration, it looks like a dictionary mapping field names to
-        values. However, fields may be used as keys as well.
-    """
-    def __init__(self, record):
-        assert len(record) == 1, "Unexpected RecordCache(%s)" % record
-        self._record = record
+    """ A cache for the fields of a record, indexed by field name. """
+    __slots__ = ['_data', 'fields', 'valid', 'dirty', 'id']
+
+    def __init__(self, record, valid, dirty):
+        super(RecordCache, self).__init__()
+        self._data = {}
+        self.fields = record._fields
+        self.valid = valid
+        self.dirty = dirty
+        self.id = record.id
 
     def __contains__(self, name):
-        """ Return whether the record has a cached value for field ``name``. """
-        record = self._record
-        field = record._fields[name]
-        return record.id in record.env._cache[field]
+        slot = self._data.get(name)
+        return (slot is not None) and (self.id in slot.valid)
 
     def __getitem__(self, name):
-        """ Return the cached value of field ``name`` for the record. """
-        record = self._record
-        field = record._fields[name]
-        value = record.env._cache[field][record.id]
-        return value.get() if isinstance(value, SpecialValue) else value
+        slot = self._data[name]
+        if self.id in slot.valid:
+            return slot.value
+        raise KeyError(name)
 
     def __setitem__(self, name, value):
-        """ Assign the cached value of field ``name`` for the record. """
-        record = self._record
-        field = record._fields[name]
-        record.env._cache[field][record.id] = value
+        valid = self.valid[self.fields[name]]
+        valid.add(self.id)
+        self._data[name] = Slot(valid, value)
 
     def __delitem__(self, name):
-        """ Remove the cached value of field ``name`` for the record. """
-        record = self._record
-        field = record._fields[name]
-        del record.env._cache[field][record.id]
+        del self._data[name]
 
     def __iter__(self):
-        """ Iterate over the field names with a cached value. """
-        record = self._record
-        cache, id = record.env._cache, record.id
-        for name, field in record._fields.iteritems():
-            if name != 'id' and id in cache[field]:
+        for name, slot in self._data.iteritems():
+            if self.id in slot.valid:
                 yield name
 
     def __len__(self):
-        """ Return the number of fields with a cached value. """
         return sum(1 for name in self)
 
     def has_value(self, name):
         """ Return whether the record has a regular value for field ``name`` in cache. """
-        record = self._record
-        field = record._fields[name]
-        dummy = SpecialValue(None)
-        value = record.env._cache[field].get(record.id, dummy)
-        return not isinstance(value, SpecialValue)
+        slot = self._data.get(name)
+        return isinstance(slot, Slot) and self.id in slot.valid
 
     def get_value(self, name, default=None):
         """ Return the cached, regular value of field ``name``, or ``default``. """
-        record = self._record
-        field = record._fields[name]
-        dummy = SpecialValue(None)
-        value = record.env._cache[field].get(record.id, dummy)
-        return default if isinstance(value, SpecialValue) else value
-
-    @property
-    def dirty(self):
-        """ Return the dirty fields for the record, as a set of names. """
-        record = self._record
-        return record.env._dirty[record]
+        slot = self._data.get(name)
+        return slot.value if (isinstance(slot, Slot) and self.id in slot.valid) else default
 
     def set_special(self, name, getter):
         """ Set the given ``getter`` as the cached value of field ``name``. """
-        record = self._record
-        field = record._fields[name]
-        record.env._cache[field][record.id] = SpecialValue(getter)
+        valid = self.valid[self.fields[name]]
+        valid.add(self.id)
+        self._data[name] = SpecialSlot(valid, getter)
 
     def set_failed(self, names, exception):
         """ Mark the given fields with the given exception. """
@@ -1085,11 +1111,26 @@ class RecordCache(MutableMapping):
             self.set_special(name, getter)
 
 
-class SpecialValue(object):
-    """ Encapsulate a function that returns a field's value in cache. """
-    __slots__ = ['get']
-    def __init__(self, getter):
-        self.get = getter
+class Slot(object):
+    """ A slot for storing the value of a field, with a validation object. """
+    __slots__ = ['valid', 'value']
+
+    def __init__(self, valid, value):
+        self.valid = valid
+        self.value = value
+
+
+class SpecialSlot(object):
+    """ A slot for storing a getter for a field, with a validation object. """
+    __slots__ = ['valid', 'getter']
+
+    def __init__(self, valid, getter):
+        self.valid = valid
+        self.getter = getter
+
+    @property
+    def value(self):
+        return self.getter()
 
 
 # keep those imports here in order to handle cyclic dependencies correctly
