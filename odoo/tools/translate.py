@@ -156,7 +156,12 @@ RE_TRANSLATION_SEQ = re.compile(r'\[o-translation=([0-9]+)\]')
 
 
 def is_translatable(node):
-    return node.tag in TRANSLATED_ELEMENTS and not any(attr.startswith("t-") for attr in node.attrib)
+    if not (node.tag in TRANSLATED_ELEMENTS and not any(attr.startswith("t-") for attr in node.attrib)):
+        return False
+    for el in node.iter():
+        if not (el.tag in TRANSLATED_ELEMENTS and not any(attr.startswith("t-") for attr in el.attrib)):
+            return False
+    return True
 
 
 def XMLTranslator(arch, method='xml'):
