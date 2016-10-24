@@ -413,24 +413,27 @@ class TestNoModel(ViewCase):
             'type': 'qweb',
         })
 
+        view = view.with_context(lang='fr_FR')
+        self.assertEqual(view.arch, ARCH % TEXT_EN, "Wrong fallback view translation")
+
         data = {
             'type': 'model',
             'name': 'ir.ui.view,arch_db',
             'res_id': view.id,
             'lang': 'fr_FR',
             'src': '0',
+            'seq': 0,
             'value': TEXT_FR[0],
         }
         self.env['ir.translation'].create(data)
         data['src'] = '1'
+        data['seq'] = 1
         data['value'] = TEXT_FR[1]
         self.env['ir.translation'].create(data)
 
-        view = view.with_context(lang='fr_FR')
-        self.assertEqual(view.arch, ARCH % TEXT_FR, "Wrong view translation")
+        view.invalidate_cache()
 
-        view = view.with_context(lang='unknown')
-        self.assertEqual(view.arch, ARCH % TEXT_EN, "Wrong fallback view translation")
+        self.assertEqual(view.arch, ARCH % TEXT_FR, "Wrong view translation")
 
 
 class TestTemplating(ViewCase):

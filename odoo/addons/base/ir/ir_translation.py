@@ -408,11 +408,18 @@ class IrTranslation(models.Model):
 
     @api.model
     def _get_terms_query(self, field, records):
+        lang = self.env['res.lang'].get_installed() or [['en_US']]
+        default_lng = lang[0][0]
+
         """ Utility function that makes the query for field terms. """
-        query = """ SELECT * FROM ir_translation
-                    WHERE lang=%s AND type=%s AND name=%s AND res_id IN %s """
+        query = """ SELECT DISTINCT ON (res_id, src, seq) res_id, src, seq, value
+                    FROM ir_translation
+                    WHERE type=%s AND name=%s AND res_id IN %s
+                    ORDER BY res_id, src, seq, lang=%s DESC, lang=%s DESC
+        """
         name = "%s,%s" % (field.model_name, field.name)
-        params = (records.env.lang, 'model', name, tuple(records.ids))
+        params = ('model', name, tuple(records.ids), records.env.lang or default_lng, default_lng)
+
         return query, params
 
     @api.model

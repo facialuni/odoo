@@ -1236,9 +1236,6 @@ class Monetary(Field):
         return float(value or 0.0)
 
 
-RE_TRANSLATION_SEQ = re.compile(r'\[o-translation=([0-9]+)\]')
-
-
 class _String(Field):
     """ Abstract class for string fields. """
     _slots = {
@@ -1334,6 +1331,20 @@ class Text(_String):
         return ustr(value)
 
 
+class keydefaultdict(defaultdict):
+    def __missing__(self, key):
+        if self.default_factory is None:
+            raise KeyError( key )
+        else:
+            ret = self[key] = self.default_factory(key)
+            return ret
+
+
+class Translation(dict):
+    def __missing__(self, key):
+        return "Unknown translation: %s" % key
+
+
 class Xml(Text):
     type = 'xml'
 
@@ -1341,6 +1352,8 @@ class Xml(Text):
         return [value] if value else []
 
     def convert_to_translate(self, value, record):
+        if isinstance(value, unicode):
+            value = value.encode('utf8')
         trans = []
         try:
             root = etree.fromstring(value)
@@ -1365,9 +1378,8 @@ class Xml(Text):
         rec_src_trans = records.env['ir.translation']._get_terms_translations(self, records)
 
         def translate(record_id, value):
-            src_trans = rec_src_trans[record_id]
-            return value % defaultdict(str, src_trans)
-
+            trans = Translation(rec_src_trans[record_id])
+            return value % trans
         return translate
 
 

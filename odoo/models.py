@@ -3046,6 +3046,7 @@ class BaseModel(object):
         assert self in records and field in fs
         records = records.with_prefetch(self._prefetch)
         result = []
+
         try:
             result = records.read([f.name for f in fs], load='_classic_write')
         except AccessError:
@@ -3590,7 +3591,7 @@ class BaseModel(object):
         updend = []             # list of possibly inherited field names
         direct = []             # list of direcly updated columns
         translation = []
-        lang = self.env['res.lang'].get_installed()
+        lang = self.env['res.lang'].get_installed() or [['en_US']]
         default_lng = lang[0][0]
         single_lang = len(lang) <= 1
 
