@@ -38,7 +38,7 @@ except ImportError:
 
 from config import config
 from cache import *
-from .parse_version import parse_version 
+from .parse_version import parse_version
 
 import odoo
 # get_encodings, ustr and exception_to_unicode were originally from tools.misc.

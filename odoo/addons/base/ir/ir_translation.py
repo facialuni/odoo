@@ -311,7 +311,7 @@ class IrTranslation(models.Model):
                 break
 
     @api.model
-    def _set_ids(self, name, tt, lang, ids, value, src=None, seq=0):
+    def _set_ids(self, name, tt, lang, ids, value, src=None, seq=0, known=False):
         """ Update the translations of records.
 
         :param name: a string defined as "<model_name>,<field_name>"
@@ -321,7 +321,11 @@ class IrTranslation(models.Model):
         :param value: the value of the translation
         :param src: the source of the translation
         """
+
         self._modified_model(name.split(',')[0])
+
+        if not known:
+            self.sudo().search([('type', '=', tt), ('name', '=', name), ('seq', 'in', seq), ('res_id', 'in', ids)]).unlink()
 
         # update existing translations
         self._cr.execute("""UPDATE ir_translation

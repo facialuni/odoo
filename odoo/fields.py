@@ -1357,20 +1357,24 @@ class Xml(Text):
         trans = []
         try:
             root = etree.fromstring(value)
-            value, trans = XMLTranslator(root, method=self.type)
+            value, trans, known = XMLTranslator(root, method=self.type)
         except etree.ParseError:
             try:
                 # fallback for translated terms: use an HTML parser and wrap the term
                 wrapped = u"<div>%s</div>" % (value)
                 root = etree.fromstring(wrapped, etree.HTMLParser(encoding='utf-8'))
-                value, trans = XMLTranslator(root[0][0], method=self.type) # html > body > div
+                value, trans, known = XMLTranslator(root[0][0], method=self.type) # html > body > div
                 value = value[5:-6] # remove tags <div> and </div>
             except ValueError:
                 _logger.exception("Cannot translate malformed HTML, using source value instead")
 
         translation = []
         for t in trans:
-            translation.append((t[0], self.name, t[1]))
+            translation.append((t[0], self.name, t[1], t[0] in known))
+
+        print "--------------- convert_to_translate ----------------- %s", record
+        print value
+        print translation
 
         return (value, translation)
 

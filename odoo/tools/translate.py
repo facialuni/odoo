@@ -236,12 +236,16 @@ def XMLTranslator(arch, method='xml'):
     max_id = max([-1] + [t['id'] for t in translate if t['id'] is not None])
     id_max = itertools.count(max_id + 1)
 
+    known = []
     translation = []
     for t in translate:
         stripped = RE_STRIP.match(t['content'])
 
-        if t['id'] is None and stripped.group(2):
-            t['id'] = next(id_max)
+        if stripped.group(2):
+            if t['id'] is None:
+                t['id'] = next(id_max)
+            else:
+                known.append(t['id'])
             translation.append((t['id'], stripped.group(2)))
             value = '%s[o-translation=%s]%s' % (stripped.group(1), t['id'], stripped.group(3))
         else:
@@ -262,7 +266,7 @@ def XMLTranslator(arch, method='xml'):
     xml = etree.tostring(arch, method=method)
     xml = RE_TRANSLATION_SEQ.sub(r'%(\1)s', xml.replace('%', '%%'))
 
-    return xml, translation
+    return xml, translation, known
 
 
 #
