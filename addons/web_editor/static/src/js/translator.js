@@ -11,7 +11,6 @@ var editor_widget = require('web_editor.widget');
 
 var _t = core._t;
 
-var translatable = !!$('html').data('translatable');
 var edit_translations = !!$('html').data('edit_translations');
 
 $.fn.extend({
@@ -323,7 +322,6 @@ if (edit_translations) {
 }
 
 var data = {
-    'translatable': translatable,
     'edit_translations': edit_translations,
     'Class': Translate,
 };

@@ -41,7 +41,6 @@ class Web_Editor(http.Controller):
 
         trans = dict(
             lang=kwargs.get('lang', request.env.context.get('lang')),
-            translatable=kwargs.get('translatable'),
             edit_translations=kwargs.get('edit_translations'),
             editable=kwargs.get('enable_editor'))
 

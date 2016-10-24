@@ -11,14 +11,9 @@ var local_storage = require('web.local_storage');
 
 var qweb = core.qweb;
 
-if (!translate.translatable) {
-    return;
-}
-
 
 website.TopBar.include({
     events: _.extend({}, website.TopBar.prototype.events, {
-        'click [data-action="edit_master"]': 'edit_master',
         'click [data-action="translate"]': 'translate',
     }),
     translate: function (ev) {
@@ -28,20 +23,6 @@ website.TopBar.include({
         } else {
             location.search += '&edit_translations';
         }
-    },
-    edit_master: function (ev) {
-        ev.preventDefault();
-        var $link = $('.js_language_selector a[data-default-lang]');
-        if (!$link.length) {
-            // Fallback for old website
-            var l = false;
-            _.each($('.js_language_selector a'), function(a) {
-               if (!l || a.href.length < l.href.length) { l = a; }
-            });
-            $link = $(l);
-        }
-        $link[0].search += ($link[0].search ? '&' : '?') + 'enable_editor=1';
-        $link.click();
     },
 });
 

@@ -92,16 +92,10 @@ class Report(models.Model):
         if values is None:
             values = {}
 
-        context = dict(self.env.context, inherit_branding=True)  # Tell QWeb to brand the generated html
-
-        view_obj = self.env['ir.ui.view']
+        view_obj = self.env['ir.ui.view'].with_context(inherit_branding=True)
         # Browse the user instead of using the sudo self.env.user
         user = self.env['res.users'].browse(self.env.uid)
         website = None
-        if request and hasattr(request, 'website'):
-            if request.website is not None:
-                website = request.website
-                context = dict(context, translatable=context.get('lang') != request.website.default_lang_code)
 
         values.update(
             time=time,

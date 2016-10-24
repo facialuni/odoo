@@ -71,14 +71,11 @@
                     <li>
                         <a data-action="new_page" href="#" data-toggle="modal" data-target="#o_website_add_page_modal"><span class="fa fa-plus"/>New</a>
                     </li>
-                    <li t-if="not translatable">
+                    <li>
                         <a data-action="edit" href="#"><span class="fa fa-pencil"/>Edit</a>
                     </li>
-                    <li t-if="translatable">
+                    <li>
                         <a data-action="translate" href="#">TRANSLATE</a>
-                    </li>
-                    <li t-if="translatable">
-                        <a data-action="edit_master" href="#">or Edit Master</a>
                     </li>
                 </ul>
             </nav>

@@ -93,7 +93,7 @@ class View(models.Model):
                 qcontext.update(values)
 
             # in edit mode ir.ui.view will tag nodes
-            if not qcontext.get('translatable') and not qcontext.get('rendering_bundle'):
+            if not qcontext.get('rendering_bundle'):
                 if qcontext.get('editable'):
                     new_context = dict(self._context, inherit_branding=True)
                 elif request.env.user.has_group('website.group_website_publisher'):
@@ -116,8 +116,6 @@ class View(models.Model):
         company = request.website.company_id.sudo()
 
         editable = request.website.is_publisher()
-        translatable = editable and self._context.get('lang') != request.website.default_lang_code
-        editable = not translatable and editable
 
         qcontext = dict(
             self._context.copy(),
@@ -128,7 +126,6 @@ class View(models.Model):
             user_id=self.env["res.users"].browse(self.env.user.id),
             default_lang_code=request.website.default_lang_code,
             languages=request.website.get_languages(),
-            translatable=translatable,
             editable=editable,
             menu_data=self.env['ir.ui.menu'].load_menus_root() if request.website.is_user() else None,
         )

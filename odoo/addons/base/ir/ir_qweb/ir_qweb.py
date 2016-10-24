@@ -62,7 +62,7 @@ class IrQWeb(models.AbstractModel, QWeb):
     # assume cache will be invalidated by third party on write to ir.ui.view
     def _get_template_cache_keys(self):
         """ Return the list of context keys to use for caching ``_get_template``. """
-        return ['lang', 'inherit_branding', 'editable', 'translatable', 'edit_translations']
+        return ['lang', 'inherit_branding', 'editable', 'edit_translations']
 
     # apply ormcache_context decorator unless in dev mode...
     @tools.conditional(
@@ -189,8 +189,7 @@ class IrQWeb(models.AbstractModel, QWeb):
     def _get_asset_content(self, xmlid, options):
         options = dict(options,
             inherit_branding=False, inherit_branding_auto=False,
-            edit_translations=False, translatable=False,
-            rendering_bundle=True)
+            edit_translations=False, rendering_bundle=True)
 
         env = self.env(context=options)
 
@@ -250,7 +249,7 @@ class IrQWeb(models.AbstractModel, QWeb):
         field_options['type'] = field_options.get('widget', field.type)
         inherit_branding = options.get('inherit_branding', options.get('inherit_branding_auto') and record.check_access_rights('write', False))
         field_options['inherit_branding'] = inherit_branding
-        translate = options.get('edit_translations') and options.get('translatable') and field.translate
+        translate = options.get('edit_translations') and field.translate
         field_options['translate'] = translate
 
         # field converter
