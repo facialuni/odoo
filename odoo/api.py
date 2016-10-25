@@ -732,7 +732,7 @@ class Environment(Mapping):
         self = object.__new__(cls)
         self.cr, self.uid, self.context = self.args = (cr, uid, frozendict(context))
         self.registry = Registry(cr.dbname)
-        self._cache = envs.cache[self]              # {record: {name: value}}
+        self._cache = Cache()                       # {record: {name: value}}
         self._protected = defaultdict(frozenset)    # {field: ids, ...}
         self.all = envs
         envs.add(self)
@@ -803,7 +803,8 @@ class Environment(Mapping):
                 yield
             finally:
                 self.all.mode = False
-                self.all.cache.clear_dirty()
+                for env in list(self.all):
+                    env._cache.clear_dirty()
 
     def do_in_draft(self):
         """ Context-switch to draft mode, where all field updates are done in
@@ -838,14 +839,13 @@ class Environment(Mapping):
                 where ``field`` is a field object, and ``ids`` is a list of record
                 ids or ``None`` (to invalidate all records).
         """
-        self._cache.invalidate(spec)
+        for env in list(self.all):
+            env._cache.invalidate(spec)
 
     def invalidate_all(self):
         """ Clear the cache of all environments. """
-        cache = self.all.cache
-        cache.invalidate()
         for env in list(self.all):
-            env._cache = cache[env]
+            env._cache.invalidate_all()
             env._protected.clear()
 
     def clear(self):
@@ -868,9 +868,7 @@ class Environment(Mapping):
 
     def with_field(self, field):
         """ Return the records that have a cached value for ``field``. """
-        name, cache = field.name, self._cache
-        records = self[field.model_name].browse(cache.valid[field])
-        return records.filtered(lambda record: name in cache[record])
+        return self[field.model_name].browse(self._cache.valid[field])
 
     def protected(self, field):
         """ Return the recordset for which ``field`` should not be invalidated or recomputed. """
@@ -981,7 +979,6 @@ class Environments(object):
     """ A common object for all environments in a request. """
     def __init__(self):
         self.envs = WeakSet()           # weak set of environments
-        self.cache = Cache()            # cache for all environments
         self.todo = {}                  # recomputations {field: [records]}
         self.mode = False               # flag for draft/onchange
         self.recompute = True
@@ -996,112 +993,89 @@ class Environments(object):
 
 
 class Cache(dict):
-    """ A cache for the records, indexed by environment. """
-    __slots__ = ['valid', 'dirty']
+    """ A cache for the records in a given environment, indexed by record. """
+    __slots__ = ['valid']
 
     def __init__(self):
         super(Cache, self).__init__()
         self.valid = defaultdict(set)           # {field: set(ids)}
-        self.dirty = defaultdict(set)           # {record: set(names)}
-
-    def __missing__(self, env):
-        cache = self[env] = EnvCache(self.valid, self.dirty)
-        return cache
-
-    def invalidate(self):
-        """ Invalidate the whole cache. """
-        self.clear()
-        self.valid.clear()
-        self.dirty.clear()
-
-    def clear_dirty(self):
-        """ Clear all the dirty flags. """
-        for names in self.dirty.itervalues():
-            names.clear()
-
-
-class EnvCache(dict):
-    """ A cache for the records in a given environment, indexed by record. """
-    __slots__ = ['valid', 'dirty']
-
-    def __init__(self, valid, dirty):
-        super(EnvCache, self).__init__()
-        self.valid = valid
-        self.dirty = dirty
 
     def __missing__(self, record):
-        cache = self[record] = RecordCache(record, self.valid, self.dirty[record])
-        return cache
+        record_cache = self[record] = RecordCache(record, self.valid)
+        return record_cache
 
     def invalidate(self, spec):
-        valid = self.valid
         for field, ids in spec:
-            if field in valid:
-                # We must drop or replace valid[field]. The current value of
-                # valid[field] is shared by slots in all environments; adding an
-                # id could wrongly validate a slot that has been invalidated in
-                # another environment.
-                if ids is None:
-                    valid.pop(field).clear()
-                else:
-                    valid_ids = valid[field]
-                    valid_ids.difference_update(ids)
-                    valid[field] = set(valid_ids)
+            if ids is None:
+                self.valid[field].clear()
+            else:
+                self.valid[field].difference_update(ids)
+
+    def invalidate_all(self):
+        for record_cache in self.itervalues():
+            record_cache.clear()
+        self.valid.clear()
+
+    def clear_dirty(self):
+        for record_cache in self.itervalues():
+            record_cache.dirty.clear()
 
 
 class RecordCache(MutableMapping):
     """ A cache for the fields of a record, indexed by field name. """
     __slots__ = ['_data', 'fields', 'valid', 'dirty', 'id']
 
-    def __init__(self, record, valid, dirty):
+    def __init__(self, record, valid):
         super(RecordCache, self).__init__()
         self._data = {}
         self.fields = record._fields
         self.valid = valid
-        self.dirty = dirty
+        self.dirty = set()
         self.id = record.id
 
     def __contains__(self, name):
         slot = self._data.get(name)
-        return (slot is not None) and (self.id in slot.valid)
+        return (slot is not None) and slot.valid
 
     def __getitem__(self, name):
         slot = self._data[name]
-        if self.id in slot.valid:
+        if slot.valid:
             return slot.value
         raise KeyError(name)
 
     def __setitem__(self, name, value):
         valid = self.valid[self.fields[name]]
-        valid.add(self.id)
-        self._data[name] = Slot(valid, value)
+        self._data[name] = ValueSlot(self.id, valid, value)
 
     def __delitem__(self, name):
         del self._data[name]
+        self.valid[self.fields[name]].discard(self.id)
 
     def __iter__(self):
         for name, slot in self._data.iteritems():
-            if self.id in slot.valid:
+            if slot.valid:
                 yield name
 
     def __len__(self):
         return sum(1 for name in self)
 
+    def clear(self):
+        self._data.clear()
+
     def has_value(self, name):
         """ Return whether the record has a regular value for field ``name`` in cache. """
         slot = self._data.get(name)
-        return isinstance(slot, Slot) and self.id in slot.valid
+        return isinstance(slot, ValueSlot) and slot.valid
 
     def get_value(self, name, default=None):
         """ Return the cached, regular value of field ``name``, or ``default``. """
         slot = self._data.get(name)
-        return slot.value if (isinstance(slot, Slot) and self.id in slot.valid) else default
+        return slot.value if isinstance(slot, ValueSlot) and slot.valid else default
 
     def set_special(self, name, getter):
         """ Set the given ``getter`` as the cached value of field ``name``. """
         valid = self.valid[self.fields[name]]
-        valid.add(self.id)
-        self._data[name] = SpecialSlot(valid, getter)
+        self._data[name] = SpecialSlot(self.id, valid, getter)
 
     def set_failed(self, names, exception):
         """ Mark the given fields with the given exception. """
@@ -1111,22 +1085,34 @@ class RecordCache(MutableMapping):
             self.set_special(name, getter)
 
 
-class Slot(object):
+class ValueSlot(object):
     """ A slot for storing the value of a field, with a validation object. """
-    __slots__ = ['valid', 'value']
+    __slots__ = ['id', 'valid_ids', 'value']
 
-    def __init__(self, valid, value):
-        self.valid = valid
+    def __init__(self, record_id, valid, value):
+        self.id = record_id
+        self.valid_ids = valid
         self.value = value
+        valid.add(record_id)
+
+    @property
+    def valid(self):
+        return self.id in self.valid_ids
 
 
 class SpecialSlot(object):
     """ A slot for storing a getter for a field, with a validation object. """
-    __slots__ = ['valid', 'getter']
+    __slots__ = ['id', 'valid_ids', 'getter']
 
-    def __init__(self, valid, getter):
-        self.valid = valid
+    def __init__(self, record_id, valid, getter):
+        self.id = record_id
+        self.valid_ids = valid
         self.getter = getter
+        valid.add(record_id)
+
+    @property
+    def valid(self):
+        return self.id in self.valid_ids
 
     @property
     def value(self):
