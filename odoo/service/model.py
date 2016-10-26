@@ -10,8 +10,7 @@ import time
 import odoo
 from odoo.exceptions import UserError, ValidationError, QWebException
 from odoo.models import check_method_name
-from odoo.tools.translate import translate
-from odoo.tools.translate import _
+from odoo.tools.translate import translate, _
 
 import security
 

@@ -694,21 +694,6 @@ def _push(callback, term, source_line):
         callback(term, source_line)
 
 
-# tests whether an object is in a list of modules
-def in_modules(object_name, modules):
-    if 'all' in modules:
-        return True
-
-    module_dict = {
-        'ir': 'base',
-        'res': 'base',
-        'workflow': 'base',
-    }
-    module = object_name.split('.')[0]
-    module = module_dict.get(module, module)
-    return module in modules
-
-
 def _extract_translatable_qweb_terms(element, callback):
     """ Helper method to walk an etree document representing
         a QWeb template, and call ``callback(term)`` for each
