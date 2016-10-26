@@ -325,7 +325,7 @@ class IrTranslation(models.Model):
         self._modified_model(name.split(',')[0])
 
         if not known:
-            self.sudo().search([('type', '=', tt), ('name', '=', name), ('seq', 'in', seq), ('res_id', 'in', ids)]).unlink()
+            self.sudo().search([('type', '=', tt), ('name', '=', name), ('seq', '=', seq), ('res_id', 'in', ids)]).unlink()
 
         # update existing translations
         self._cr.execute("""UPDATE ir_translation

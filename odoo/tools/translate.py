@@ -167,15 +167,29 @@ def is_translatable(node):
 def XMLTranslator(arch, method='xml'):
     todo = [arch]
     translate = []
+    ids = set()
+    invalid = set()
 
-    def add_trans_to_replace(child_content, id=None, index=None):
-        trans = u''.join(child_content)
-
-        node_trans = etree.Element('translation')
-        if index is None:
-            node.append(node_trans)
+    def check_id(node):
+        id = node.attrib.pop('data-o-translation-seq', None)
+        if id in ids:
+            invalid.add(id)
         else:
-            node.insert(index, node_trans)
+            ids.add(id)
+        return id
+
+    def add_trans_to_replace(node, child_content, id=None, index=None):
+        if node.tag == 'translation':
+            node_trans = node
+        else:
+            node_trans = etree.Element('translation')
+            if index is None:
+                node.append(node_trans)
+            else:
+                node.insert(index, node_trans)
+
+        node_trans.attrib['id'] = str(id)
+        trans = u''.join(child_content)
 
         translate.append({
             'id': id,
@@ -187,8 +201,7 @@ def XMLTranslator(arch, method='xml'):
     while todo:
         node = todo.pop()
 
-        if (
-            isinstance(node, SKIPPED_ELEMENT_TYPES) or
+        if (isinstance(node, SKIPPED_ELEMENT_TYPES) or
             node.tag in SKIPPED_ELEMENTS or
             node.get("t-translation", "").strip() == "off" or
             node.tag == "attribute" and node.get("name") not in TRANSLATED_ATTRS or
@@ -199,14 +212,15 @@ def XMLTranslator(arch, method='xml'):
         for attr in TRANSLATED_ATTRS:
             if node.get(attr):
                 translate.append({
-                    'id': node.attrib.pop('data-translation-%s-seq' % attr, None),
+                    'id': node.attrib.pop('data-o-translation-%s-seq' % attr, None),
                     'content': node.get(attr),
                     'node': node,
                     'type': 'attribute',
                     'attr': attr
                 })
 
-        id = node.attrib.pop('data-translation-seq', None)
+        id = check_id(node)
+
         all_content = True
         child_content = []
         if node.text:
@@ -217,23 +231,25 @@ def XMLTranslator(arch, method='xml'):
             if not is_translatable(child):
                 all_content = False
                 if child_content:
-                    add_trans_to_replace(child_content, id=None if id is None else int(id), index=node.index(child))
+                    add_trans_to_replace(node, child_content, id=None if id is None else int(id), index=node.index(child))
                     id = None
                     child_content = []
-                todo.append(child)
                 if child.tail:
                     child_content.append(child.tail)
                     child.tail = None
+                todo.append(child)
                 continue
-            node.remove(child)
+            if id is None:
+                id = check_id(child)
             child_content.append(etree.tostring(child, method=method))
+            node.remove(child)
 
-        add_trans_to_replace(child_content, id=id)
+        add_trans_to_replace(node, child_content, id=id)
 
         if node.tail:
-            add_trans_to_replace([node.tail])
+            add_trans_to_replace(node, [node.tail])
 
-    max_id = max([-1] + [t['id'] for t in translate if t['id'] is not None])
+    max_id = max([-1] + [int(t['id']) for t in translate if t['id'] is not None])
     id_max = itertools.count(max_id + 1)
 
     known = []
@@ -242,26 +258,34 @@ def XMLTranslator(arch, method='xml'):
         stripped = RE_STRIP.match(t['content'])
 
         if stripped.group(2):
-            if t['id'] is None:
+            if t['id'] is None or t['id'] in invalid:
                 t['id'] = next(id_max)
             else:
+                t['id'] = int(t['id'])
                 known.append(t['id'])
             translation.append((t['id'], stripped.group(2)))
-            value = '%s[o-translation=%s]%s' % (stripped.group(1), t['id'], stripped.group(3))
+            value = u'%s[o-translation=%s]%s' % (stripped.group(1), t['id'], stripped.group(3))
         else:
             value = t['content'] or None
 
         if t['type'] == 'content':
             t['node'].text = value
+        elif t['type'] == 'attribute':
+            t['node'].set(t['attr'], value)
         elif t['type'] == 'replace':
+            if t['node'].tail:
+                value = u'%s%s' % (value, t['node'].tail)
+
             parent = t['node'].getparent()
             if parent.index(t['node']) == 0:
                 parent.text = value
             else:
-                t['node'].getprevious().tail = value
+                previous = t['node'].getprevious()
+                if previous.tail:
+                    previous.tail = u'%s%s' % (previous.tail, value)
+                else:
+                    previous.tail = value
             parent.remove(t['node'])
-        elif t['type'] == 'attribute':
-            t['node'].set(t['attr'], value)
 
     xml = etree.tostring(arch, method=method)
     xml = RE_TRANSLATION_SEQ.sub(r'%(\1)s', xml.replace('%', '%%'))
