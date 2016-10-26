@@ -293,6 +293,51 @@ def XMLTranslator(arch, method='xml'):
     return xml, translation, known
 
 
+RE_TRANSLATION_PLACEHOLDER = re.compile(r'((\s*)(%\(([0-9]+)\)s)([^<>]*))')
+
+
+def XMLTranslatorBranding(node, attrib=None):
+    attrib = attrib or dict()
+
+    def addAttribute(node):
+        for att in attrib.items():
+            node.attrib[att[0]] = str(att[1])
+
+    def nodeTranslation(trans):
+        node = etree.Element('translation')
+        node.attrib['data-o-translation-seq'] = str(trans[3])
+        node.text = trans[0]
+        addAttribute(node)
+        return node
+
+    for child in node.getchildren():
+        if child.tag == 'translation':
+            continue
+        if child.text:
+            translations = RE_TRANSLATION_PLACEHOLDER.findall(child.text)[::-1]
+            if translations:
+                child.text = None
+                for trans in translations:
+                    child.insert(0, nodeTranslation(trans))
+
+        if child.tail:
+            translations = RE_TRANSLATION_PLACEHOLDER.findall(child.tail)
+            if translations:
+                child.tail = None
+            for trans in translations:
+                parent = child.getparent()
+                parent.insert(parent.index(child)+1, nodeTranslation(trans))
+
+        if child.attrib:
+            for att in child.attrib.items():
+                trans = RE_TRANSLATION_PLACEHOLDER.match(att[1])
+                if trans:
+                    addAttribute(child)
+                    child.attrib[u'data-o-translation-%s-seq' % att[0]] = trans.group(4)
+
+        XMLTranslatorBranding(child, attrib=attrib)
+
+
 #
 # Warning: better use self.env['ir.translation']._get_source if you can
 #

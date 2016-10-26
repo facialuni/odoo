@@ -512,13 +512,22 @@ class TestTemplating(ViewCase):
             arch,
             E.root(
                 E.item(
-                    E.content("bar", {
-                        't-att-href': "foo",
-                        'data-oe-model': 'ir.ui.view',
-                        'data-oe-id': str(view2.id),
-                        'data-oe-field': 'arch',
-                        'data-oe-xpath': '/xpath/item/content[1]',
-                    }), {
+                    E.content(
+                        E.translation(
+                            {
+                                'data-o-translation-field': 'arch_db',
+                                'data-o-translation-id': '%s' % view2.id,
+                                'data-o-translation-model': 'ir.ui.view',
+                                'data-o-translation-seq': '0',
+                            },
+                            "bar"
+                        ), {
+                            't-att-href': "foo",
+                            'data-oe-model': 'ir.ui.view',
+                            'data-oe-id': str(view2.id),
+                            'data-oe-field': 'arch',
+                            'data-oe-xpath': '/xpath/item/content[1]',
+                        }), {
                         'order': '2',
                     }),
                 E.item({
@@ -564,6 +573,9 @@ class TestTemplating(ViewCase):
                 <item order="2">
                     <content t-att-href="foo">bar</content>
                 </item>
+                <item order="3">
+                    <content t-att-href="foo2" t-translation="off">bar2</content>
+                </item>
             </xpath>"""
         })
 
@@ -572,20 +584,42 @@ class TestTemplating(ViewCase):
         arch = etree.fromstring(arch_string)
         self.View.distribute_branding(arch)
 
+        test_arch = E.root(
+            E.item(
+                {'t-ignore': 'true', 'order': '1'},
+                E.t({'t-esc': 'foo'}),
+                E.item(
+                    {'order': '2'},
+                    E.content(
+                        {
+                            't-att-href': 'foo',
+                        },
+                        E.translation(
+                            {
+                                'data-o-translation-field': 'arch_db',
+                                'data-o-translation-id': '%s' % view2.id,
+                                'data-o-translation-model': 'ir.ui.view',
+                                'data-o-translation-seq': '0',
+                            },
+                            "bar"
+                        )
+                    )
+                ),
+                E.item(
+                    {'order': '3'},
+                    E.content(
+                        {
+                            't-att-href': 'foo2',
+                            't-translation': 'off',
+                        },
+                        "bar2")
+                )
+            )
+        )
+
         self.assertEqual(
             arch,
-            E.root(
-                E.item(
-                    {'t-ignore': 'true', 'order': '1'},
-                    E.t({'t-esc': 'foo'}),
-                    E.item(
-                        {'order': '2'},
-                        E.content(
-                            {'t-att-href': 'foo'},
-                            "bar")
-                    )
-                )
-            ),
+            test_arch,
             "t-ignore should apply to injected sub-view branding, not just to"
             " the main view's"
         )

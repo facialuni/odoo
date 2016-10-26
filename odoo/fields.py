@@ -22,7 +22,7 @@ from odoo.tools import float_precision, float_repr, float_round, frozendict, \
                        html_sanitize, human_size, pg_varchar, ustr, OrderedSet
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT as DATE_FORMAT
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT as DATETIME_FORMAT
-from odoo.tools.translate import XMLTranslator, _
+from odoo.tools.translate import XMLTranslator, XMLTranslatorBranding, _
 
 
 DATE_LENGTH = len(date.today().strftime(DATE_FORMAT))
@@ -1381,14 +1381,24 @@ class Xml(Text):
     def get_trans_func(self, records):
         rec_src_trans = records.env['ir.translation']._get_terms_translations(self, records)
 
-        def translate(record_id, value):
-            trans = Translation(rec_src_trans[record_id])
-            return value % trans
+        if records._context.get('inherit_branding'):
+            def translate(record_id, value):
+                node = etree.fromstring(value)
+                XMLTranslatorBranding(node, attrib={'data-o-translation-model': records._name, 'data-o-translation-field': self.name, 'data-o-translation-id': record_id})
+                value = etree.tostring(node, method=self.type)
+
+                trans = Translation(rec_src_trans[record_id], method=self.type)
+                return value % trans
+        else:
+            def translate(record_id, value):
+                trans = Translation(rec_src_trans[record_id], method=self.type)
+                return value % trans
         return translate
 
 
 class Html(Xml):
     type = 'html'
+
     _slots = {
         'sanitize': True,               # whether value must be sanitized
         'sanitize_tags': True,          # whether to sanitize tags (only a white list of attributes is accepted)

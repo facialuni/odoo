@@ -999,7 +999,7 @@ actual arch.
         :rtype: boolean
         """
         return any(
-            (attr in ('data-oe-model', 'group') or (attr.startswith('t-')))
+            (attr in ('data-oe-model', 'group') or (attr.startswith('t-') and not attr == 't-translation'))
             for attr in node.attrib
         )
 
