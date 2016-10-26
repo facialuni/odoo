@@ -142,7 +142,8 @@ TRANSLATED_ELEMENTS = {
     'abbr', 'b', 'bdi', 'bdo', 'br', 'cite', 'code', 'data', 'del', 'dfn', 'em',
     'font', 'i', 'ins', 'kbd', 'keygen', 'mark', 'math', 'meter', 'output',
     'progress', 'q', 'ruby', 's', 'samp', 'small', 'span', 'strong', 'sub',
-    'sup', 'time', 'u', 'var', 'wbr', 'text', 'a', 'img'
+    'sup', 'time', 'u', 'var', 'wbr', 'text', 'a', 'img', 'p', 'h1', 'h2', 'h3',
+    'h4', 'h5'
 }
 
 # which attributes must be translated
@@ -351,6 +352,7 @@ def translate(cr, name, source_type, lang, source=None):
     res_trans = cr.fetchone()
     res = res_trans and res_trans[0] or False
     return res
+
 
 class GettextAlias(object):
 
