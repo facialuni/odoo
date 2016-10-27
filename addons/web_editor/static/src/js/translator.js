@@ -290,12 +290,7 @@ var Translate = Widget.extend({
 
         new Translate_Modal(null, {}, event.data, event.target).open();
     },
-    save: function () {
-        this.save_lang();
-        console.log('save !!!', this.translations);
-    },
-    cancel: function () {
-        var self = this;
+    close: function () {
         this.rte.cancel();
         this.display_lang(this.defaultLang, true);
         this.$target.add(this.$target_attr).removeClass('o_editable o_is_inline_editable o_dirty');
@@ -305,6 +300,15 @@ var Translate = Widget.extend({
         this.trigger("cancel");
         this.$el.hide();
         window.onbeforeunload = null;
+    },
+    save: function () {
+        this.save_lang();
+        console.log('save !!!', this.translations);
+        this.close();
+    },
+    cancel: function () {
+        var self = this;
+        this.close();
     },
     destroy: function () {
         this.cancel();
