@@ -163,9 +163,9 @@ class TranslationToolsTestCase(unittest.TestCase):
     def test_translate_html(self):
         """ Test XMLTranslator(method='html') and XMLTranslator(method='xml') with <i> elements. """
         source = """<i class="fa-check"></i>"""
-        result, terms, known = XMLTranslator(lambda term, seq=None: term, source, method='xml')
+        result, terms, known = XMLTranslator(source, method='xml')
         self.assertEquals(result, """<i class="fa-check"/>""")
-        result, terms, known = XMLTranslator(lambda term, seq=None: term, source, method='html')
+        result, terms, known = XMLTranslator(source, method='html')
         self.assertEquals(result, source)
 
 

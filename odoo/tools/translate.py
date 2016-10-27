@@ -166,6 +166,8 @@ def is_translatable(node):
 
 
 def XMLTranslator(arch, method='xml'):
+    if isinstance(arch, basestring):
+        arch = etree.fromstring(arch)
     todo = [arch]
     translate = []
     ids = set()
