@@ -3632,9 +3632,7 @@ class BaseModel(object):
                 if cr.rowcount != len(sub_ids):
                     raise MissingError(_('One of the records you are trying to modify has already been deleted (Document type: %s).') % self._description)
 
-            for id, name, trans, known in translation:
-                tname = "%s,%s" % (self._name, name)
-                self.env['ir.translation']._set_ids(tname, 'model', self.env.lang or default_lng, self.ids, trans, src=id, seq=id, known=known)
+            self.env['ir.translation']._set_ids(self._name, self.ids, translation)
 
         # invalidate and mark new-style fields to recompute; do this before
         # setting other fields, because it can require the value of computed
@@ -3893,10 +3891,7 @@ class BaseModel(object):
         self = self.browse(id_new)
 
         if translation:
-            default_lng = self.env['res.lang'].get_installed()[0][0]
-            for id, name, trans, known in translation:
-                tname = "%s,%s" % (self._name, name)
-                self.env['ir.translation']._set_ids(tname, 'model', self.env.lang or default_lng, self.ids, trans, src=id, seq=id, known=known)
+            self.env['ir.translation']._set_ids(self._name, self.ids, translation)
 
         if self._parent_store and not self._context.get('defer_parent_store_computation'):
             if self.pool._init:

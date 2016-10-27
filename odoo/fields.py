@@ -1370,11 +1370,7 @@ class Xml(Text):
 
         translation = []
         for t in trans:
-            translation.append((t[0], self.name, t[1], t[0] in known))
-
-        print "--------------- convert_to_translate ----------------- %s", record
-        print value
-        print translation
+            translation.append((self.name, t[0], t[1], t[0] in known))
 
         return (value, translation)
 

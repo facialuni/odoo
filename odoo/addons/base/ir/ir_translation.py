@@ -311,7 +311,8 @@ class IrTranslation(models.Model):
                 break
 
     @api.model
-    def _set_ids(self, name, tt, lang, ids, value, src=None, seq=0, known=False):
+    def _set_ids(self, model, ids, translation, ttype='model'):
+
         """ Update the translations of records.
 
         :param name: a string defined as "<model_name>,<field_name>"
@@ -321,32 +322,50 @@ class IrTranslation(models.Model):
         :param value: the value of the translation
         :param src: the source of the translation
         """
+        lang = self.env.lang or (self.env['res.lang'].get_installed() or [['en_US']])[0][0]
 
-        self._modified_model(name.split(',')[0])
+        # remove outdated translations
+        domain = []
+        for field, seq, trans, known in translation:
+            if not known:
+                if domain:
+                    domain = ['|'] + domain
+                domain += ['&', '&', ('type', '=', ttype), ('name', '=', "%s,%s" % (model, field)), ('seq', '=', seq)]
+        if domain:
+            domain = [('res_id', 'in', ids)] + domain
+            self.sudo().search(domain).unlink()
 
-        if not known:
-            self.sudo().search([('type', '=', tt), ('name', '=', name), ('seq', '=', seq), ('res_id', 'in', ids)]).unlink()
+        # update existing translations or insert
+        for field, seq, trans, known in translation:
+            req = """UPDATE ir_translation
+                        SET value=%%(value)s, src=%%(src)s
+                        WHERE type=%%(type)s and name=%%(name)s AND res_id in %%(ids)s AND seq=%%(seq)s AND lang=%%(lang)s;
+                    INSERT INTO ir_translation (type, name, res_id, seq, lang, value, src)
+                        SELECT %%(type)s, %%(name)s, res_id, %%(seq)s, %%(lang)s, %%(value)s, %%(src)s
+                        FROM (
+                            SELECT res_id
+                            FROM (VALUES%s) V(res_id)
+                            EXCEPT SELECT res_id
+                                FROM ir_translation
+                                WHERE type=%%(type)s and name=%%(name)s AND res_id in %%(ids)s AND seq=%%(seq)s AND lang=%%(lang)s
+                        ) as foo;
+            """ % ('(%s)' % '),('.join(map(str, ids)))
 
-        # update existing translations
-        self._cr.execute("""UPDATE ir_translation
-                            SET value=%s, src=%s, state=%s
-                            WHERE lang=%s AND type=%s AND name=%s AND seq=%s AND res_id IN %s
-                            RETURNING res_id""",
-                         (value, str(src), 'translated', lang, tt, name, seq, tuple(ids)))
-        existing_ids = [row[0] for row in self._cr.fetchall()]
-
-        # create missing translations
-        for res_id in set(ids) - set(existing_ids):
-            self.create({
-                'lang': lang,
-                'type': tt,
-                'name': name,
-                'res_id': res_id,
-                'value': value,
-                'src': str(src),
-                'seq': seq,
+            values = {
+                'value': trans,
+                'src': str(seq),
                 'state': 'translated',
-            })
+                'lang': lang,
+                'type': ttype,
+                'name': "%s,%s" % (model, field),
+                'seq': seq,
+                'ids': tuple(ids),
+            }
+
+            self._cr.execute(req, values)
+
+        self._modified_model(model)
+
         return len(ids)
 
     @api.model
