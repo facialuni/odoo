@@ -10,6 +10,7 @@ var rte = require('web_editor.rte');
 var editor_widget = require('web_editor.widget');
 
 var _t = core._t;
+var qweb = core.qweb;
 
 var edit_translations = !!$('html').data('edit_translations');
 
@@ -100,10 +101,20 @@ var Translate_Modal = editor_widget.Dialog.extend({
     }
 });
 
+function getItem (t, model, field, res_id, seq) {
+    t = t[model] || (t[model] = {});
+    t = t[field] || (t[field] = {});
+    t = t[res_id] || (t[res_id] = {});
+    return t[seq] || (t[seq] = {});
+}
+
 var Translate = Widget.extend({
     events: {
-        'click [data-action="save"]': 'save_and_reload',
+        'click [data-action="save"]': 'save',
         'click [data-action="cancel"]': 'cancel',
+        'click .o_translation_languages a': 'active_lang',
+        'mouseenter .o_translation_languages a': 'mouseenter_lang',
+        'mouseleave .o_translation_languages a': 'mouseleave_lang',
     },
     template: 'web_editor.editorbar',
     init: function (parent, $target, lang) {
@@ -114,29 +125,32 @@ var Translate = Widget.extend({
         this._super.apply(this, arguments);
 
         this.rte = new RTE_Translate(this, this.config);
-        this.rte.on('change', this, this.rte_changed);
     },
     start: function () {
-        this._super.apply(this, arguments);
-        this.$('#web_editor-toolbars').remove();
+        this._super();
+
+        var languages = [];
+        $('.js_language_selector .js_change_lang').each(function () {
+            languages.push([$(this).data('lang'), _.str.strip($(this).text())]);
+        });
+
+        var $lang = $(qweb.render('website.TranslatorLanguages', {'languages': languages}));
+        $("#web_editor-top-edit form").prepend($lang);
+
         return this.edit();
     },
     setTarget: function ($target) {
-        var $edit = $target.find('[data-oe-translation-id], [data-oe-model][data-oe-id][data-oe-field]');
-        $edit.filter(':has([data-oe-translation-id], [data-oe-model][data-oe-id][data-oe-field])').attr('data-oe-readonly', true);
-
-        this.$target = $edit.not('[data-oe-readonly]');
+        this.$target = $target.find('[data-o-translation-seq]');
 
         // attributes
 
         var attrs = ['placeholder', 'title', 'alt'];
         _.each(attrs, function (attr) {
-            $target.find('['+attr+'*="data-oe-translation-id="]').filter(':empty, input, select, textarea, img').each(function () {
+            $target.find('[data-o-translation-' + attrs.join('-seq], [data-o-translation-') + '-seq]').filter(':empty, input, select, textarea, img').each(function () {
                 var $node = $(this);
                 var translation = $node.data('translation') || {};
                 var trans = $node.attr(attr);
-                var match = trans.match(/<span [^>]*data-oe-translation-id="([0-9]+)"[^>]*>(.*)<\/span>/);
-                var $trans = $(trans).addClass('hidden o_editable o_editable_translatable_attribute').appendTo('body');
+                var $trans = $('<span/>').addClass('hidden o_editable o_editable_translatable_attribute').appendTo('body');
                 $trans.data('$node', $node).data('attribute', attr);
                 translation[attr] = $trans[0];
                 $node.attr(attr, match[2]);
@@ -155,11 +169,90 @@ var Translate = Widget.extend({
         this.$target_attr = $target.find('.o_translatable_attribute');
         this.$target_attribute = $('.o_editable_translatable_attribute');
     },
-    find: function (selector) {
-        return selector ? this.$target.find(selector).addBack().filter(selector) : this.$target;
+    get_lang: function () {
+        var  list = [];
+        $('#wrapwrap [data-o-translation-model]').each(function () {
+            var $node = $(this);
+            var model = $node.data('o-translation-model');
+            var field = $node.data('o-translation-field');
+            var id = $node.data('o-translation-id');
+            var seq = $node.data('o-translation-seq');
+            if (seq !== null) {
+                list.push({
+                    'model': model,
+                    'field': field,
+                    'res_id': id,
+                    'seq': parseInt(seq),
+                    '$node': $node,
+                });
+            }
+            _.each(this.attributes, function (attr) {
+                var name = attr.name.match(/o-translation-(.*)-seq/);
+                if (name) {
+                    list.push({
+                        'model': model,
+                        'field': field,
+                        'res_id': id,
+                        'seq': parseInt(attr.value),
+                        'attr': name[0],
+                        '$node': $node,
+                    });
+                }
+            });
+        });
+        return list;
+    },
+    save_lang: function () {
+        if (this.lang !== this.lang_displayed) {
+            return;
+        }
+        var translations = this.translations[this.lang];
+        _.each(this.get_lang(), function (data) {
+            if (!data.$node.hasClass('o_dirty')) {
+                return;
+            }
+            var value = data.attr ? data.$node.attr(data.attr) : data.$node.html();
+            var item = getItem(translations, data.model, data.field, data.res_id, data.seq);
+            if (item.value.replace(/[ \t\n\r]+/, ' ') === value.replace(/[ \t\n\r]+/, ' ')) {
+                return;
+            }
+            item.state = 'translated';
+            item.value = value;
+            item.changed = true;
+        });
+    },
+    display_lang: function (lang) {
+        if (this.lang_displayed === lang) {
+            return;
+        }
+        $('#wrapwrap [data-o-translation-model]').removeClass('o_translation_to_translate o_translation_inprogress o_translation_translated');
+
+        var translations = this.translations[this.lang_displayed = lang];
+        _.each(this.get_lang(), function (data) {
+            var item = getItem(translations, data.model, data.field, data.res_id, data.seq);
+            data.attr ? data.$node.attr(data.attr, item.value || '...') : data.$node.html(item.value || '...');
+            data.$node.addClass('o_translation_' + (item.state || 'to_translate'));
+        });
+    },
+    active_lang: function (el) {
+        this.save_lang();
+        this.lang = $(el.target).data('lang');
+        this.display_lang(this.lang);
+    },
+    mouseenter_lang: function (el) {
+        this.save_lang();
+        var lang = $(el.target).data('lang');
+        this.display_lang(lang);
+    },
+    mouseleave_lang: function (el) {
+        this.display_lang(this.lang);
     },
     edit: function () {
+        var self = this;
         var flag = false;
+        var domain = [];
+        var list = this.get_lang();
+
         window.onbeforeunload = function (event) {
             if ($('.o_editable.o_dirty').length && !flag) {
                 flag = true;
@@ -167,34 +260,44 @@ var Translate = Widget.extend({
                 return _t('This document is not saved!');
             }
         };
+
         this.$target.addClass("o_editable");
         this.rte.start();
-        this.translations = [];
-        this.markTranslatableNodes();
         this.onTranslateReady();
+
+        _.each(list, function (data) {
+            if (domain.length) {
+                domain.unshift('|');
+            }
+            domain = domain.concat(['&', '&', ['name', '=', data.model+','+data.field], ['res_id', '=', data.res_id], ['seq', '=', data.seq]]);
+        });
+
+        this.translations = {};
+        this.lang =  base.get_context().lang;
+
+        return ajax.jsonRpc('/web/dataset/call', 'call', {
+            model: 'ir.translation',
+            method: 'search_read',
+            args: [domain, ['name', 'type', 'res_id', 'seq', 'lang', 'value', 'state']],
+        }).then(function (datas) {
+            _.each(datas, function (data) {
+                var t = self.translations;
+                var name = data.name.split(',');
+                var item = getItem(t[data.lang] || (t[data.lang] = {}), name[0], name[1], data.res_id, data.seq);
+                for (var k in data) {
+                    item[k] = data[k];
+                }
+            });
+            self.display_lang(self.lang);
+        });
+
     },
     onTranslateReady: function () {
         this.$el.show();
         this.trigger("edit");
-    },
-    rte_changed: function (node) {
-        var $node = $(node);
-        var trans = this.getTranlationObject($node[0]);
-        $node.toggleClass('o_dirty', trans.value !== $node.html().replace(/[ \t\n\r]+/, ' '));
-    },
-    getTranlationObject: function (node) {
-        var $node = $(node);
-        var id = +$node.data('oe-translation-id');
-        if (!id) {
-            id = $node.data('oe-model')+','+$node.data('oe-id')+','+$node.data('oe-field');
-        }
-        var trans = _.find(this.translations, function (trans) {
-            return trans.id === id;
-        });
-        if (!trans) {
-            this.translations.push(trans = {'id': id});
-        }
-        return trans;
+        this.$target.parent().prependEvent('click', this.__unbind_click);
+        this.$target_attr.prependEvent('mousedown click mouseup', this, this.__translate_attribute);
+        console.info('Click on CTRL when you click in an translatable area to have the default behavior');
     },
     __unbind_click: function (event) {
         if (event.ctrlKey || !$(event.target).is(':o_editable')) {
@@ -215,41 +318,6 @@ var Translate = Widget.extend({
 
         new Translate_Modal(null, {}, event.data, event.target).open();
     },
-    markTranslatableNodes: function (node) {
-        var self = this;
-        this.$target.add(this.$target_attribute).each(function () {
-            var $node = $(this);
-            var trans = self.getTranlationObject(this);
-            trans.value = (trans.value ? trans.value : $node.html() ).replace(/[ \t\n\r]+/, ' ');
-        });
-        this.$target.parent().prependEvent('click', this, this.__unbind_click);
-
-        // attributes
-
-        this.$target_attr.each(function () {
-            var $node = $(this);
-            var translation = $node.data('translation');
-            _.each(translation, function (node, attr) {
-                var trans = self.getTranlationObject(node);
-                trans.value = (trans.value ? trans.value : $node.html() ).replace(/[ \t\n\r]+/, ' ');
-                $node.attr('data-oe-translation-state', (trans.state || 'to_translate'));
-            });
-        });
-
-        this.$target_attr.prependEvent('mousedown click mouseup', this, this.__translate_attribute);
-
-        console.info('Click on CTRL when you click in an translatable area to have the default behavior');
-    },
-    unarkTranslatableNode: function () {
-        this.$target.removeClass('o_editable').removeAttr('contentEditable');
-        this.$target.parent().off('click', this.__unbind_click);
-        this.$target_attr.off('mousedown click mouseup', this.__translate_attribute);
-    },
-    save_and_reload: function () {
-        return this.save().then(function () {
-            window.location.href = window.location.href.replace(/&?edit_translations(=[^&]*)?/g, '');
-        });
-    },
     save: function () {
         var context = base.get_context();
         context.lang = this.lang;
@@ -258,10 +326,14 @@ var Translate = Widget.extend({
     cancel: function () {
         var self = this;
         this.rte.cancel();
-        this.$target.each(function () {
-            $(this).html(self.getTranlationObject(this).value);
-        });
-        this.unarkTranslatableNode();
+        this.$target.removeClass('o_editable o_is_inline_editable o_translation_to_translate o_translation_inprogress o_translation_translated');
+        if (this.$target.attr('class') === '') {
+            this.$target.removeAttr('class');
+        }
+        this.$target.removeAttr('data-note-id');
+        this.$target.removeAttr('contentEditable');
+        this.$target.parent().off('click', this.__unbind_click);
+        this.$target_attr.off('mousedown click mouseup', this, this.__translate_attribute);
         this.trigger("cancel");
         this.$el.hide();
         window.onbeforeunload = null;
