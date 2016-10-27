@@ -458,8 +458,8 @@ var RTE = Widget.extend({
         $(document).off(".rte");
         $('#wrapwrap, .o_editable').off('.rte');
 
-        $('.o_not_editable').removeAttr("contentEditable");
-        $(document).off('content_changed').removeClass('o_is_inline_editable').removeData('rte');
+        $('.o_not_editable').removeAttr("contentEditable").removeClass('o_dirty o_is_inline_editable');
+        $(document).off('content_changed').removeData('rte');
         $(document).tooltip('destroy');
         $('body').removeClass("editor_enable");
         this.trigger('rte:stop');

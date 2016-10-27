@@ -30,10 +30,6 @@ $.fn.extend({
 });
 
 var RTE_Translate = rte.Class.extend({
-    saveElement: function ($el, context) {
-        console.log("saveElement");
-        return $.when();
-    },
     editable: function () {
         return $('#wrapwrap [data-o-translation-seq]');
     },
@@ -295,17 +291,15 @@ var Translate = Widget.extend({
         new Translate_Modal(null, {}, event.data, event.target).open();
     },
     save: function () {
-        var context = base.get_context();
-        context.lang = this.lang;
-        return this.rte.save(context);
+        this.save_lang();
+        console.log('save !!!', this.translations);
     },
     cancel: function () {
         var self = this;
         this.rte.cancel();
         this.display_lang(this.defaultLang, true);
-        this.$target.removeClass('o_editable o_is_inline_editable');
-        this.$target.removeAttr('data-note-id');
-        this.$target.removeAttr('contentEditable');
+        this.$target.add(this.$target_attr).removeClass('o_editable o_is_inline_editable o_dirty');
+        this.$target.removeAttr('data-note-id').removeAttr('contentEditable');
         this.$target.parent().off('click', this.__unbind_click);
         this.$target_attr.off('mousedown click mouseup', this, this.__translate_attribute);
         this.trigger("cancel");
