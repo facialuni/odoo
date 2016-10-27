@@ -202,7 +202,7 @@ def XMLTranslator(arch, method='xml'):
     while todo:
         node = todo.pop()
 
-        if (isinstance(node, SKIPPED_ELEMENT_TYPES) or
+        if (isinstance(node, (SKIPPED_ELEMENT_TYPES, str)) or
             node.tag in SKIPPED_ELEMENTS or
             node.get("t-translation", "").strip() == "off" or
             node.tag == "attribute" and node.get("name") not in TRANSLATED_ATTRS or
