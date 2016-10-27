@@ -324,16 +324,22 @@ class IrTranslation(models.Model):
         """
         lang = self.env.lang or (self.env['res.lang'].get_installed() or [['en_US']])[0][0]
 
-        # remove outdated translations
+        # remove outdated translations and keep translation from xml
         domain = []
         for field, seq, trans, known in translation:
             if not known:
                 if domain:
                     domain = ['|'] + domain
-                domain += ['&', '&', ('type', '=', ttype), ('name', '=', "%s,%s" % (model, field)), ('seq', '=', seq)]
+                domain += ['&', '&', '&', ('type', '=', ttype), ('name', '=', "%s,%s" % (model, field)), ('seq', '=', seq), ('value', '!=', trans)]
         if domain:
-            domain = [('res_id', 'in', ids)] + domain
-            self.sudo().search(domain).unlink()
+            data = self.sudo().search_read([('lang', '=', lang), ('res_id', 'in', ids)] + domain, ['type', 'name', 'res_id', 'seq'])
+            if data:
+                domain = []
+                for d in data:
+                    if domain:
+                        domain = ['|'] + domain
+                    domain += ['&', '&', ('type', '=', d['type']), ('name', '=', d['name']), ('seq', '=', d['seq'])]
+                self.sudo().search([('res_id', 'in', ids)] + domain).unlink()
 
         # update existing translations or insert
         for field, seq, trans, known in translation:
