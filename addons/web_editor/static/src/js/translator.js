@@ -63,6 +63,9 @@ var RTE_Translate = rte.Class.extend({
             });
         }
     },
+    editable: function () {
+        return $('#wrapwrap [data-o-translation-seq]');
+    },
 });
 
 var Translate_Modal = editor_widget.Dialog.extend({

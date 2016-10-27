@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <templates id="template" xml:space="preserve">
-
-<t t-name="website.TranslatorAdditionalButtons">
-    <li><a class="btn btn-link" data-action="edit_master" href="#"> or Edit Master</a></li>
-</t>
-
 <t t-name="website.TranslatorDialog">
     <div class="modal o_website_modal fade oe_website_translator" tabindex="-1" role="dialog">
         <div class="modal-dialog">
@@ -21,10 +16,13 @@
                         <p>
                             Here are the visuals used to help you translate efficiently:
                             <ul class="oe_translate_examples">
-                                <li data-oe-translation-state="to_translate">
+                                <li data-o-translation-model="" class="o_translation_to_translate">
                                     Content to translate
                                 </li>
-                                <li data-oe-translation-state="translated">
+                                <li data-o-translation-model="" class="o_translation_inprogress">
+                                    Need to check translation
+                                </li>
+                                <li data-o-translation-model="" class="o_translation_translated">
                                     Translated content
                                 </li>
                             </ul>
@@ -47,6 +45,17 @@
                 </div>
             </div>
         </div>
+    </div>
+</t>
+
+<t t-name="website.TranslatorLanguages">
+    <div class="dropdown o_translation_languages" style="display: inline-block;">
+        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Languages <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li t-foreach="languages" t-as="lg"><a href="#" t-att-data-lang="lg[0]"><t t-esc="lg[1]"/></a></li>
+        </ul>
     </div>
 </t>
 </templates>

@@ -75,7 +75,7 @@
                         <a data-action="edit" href="#"><span class="fa fa-pencil"/>Edit</a>
                     </li>
                     <li>
-                        <a data-action="translate" href="#">TRANSLATE</a>
+                        <a data-action="translate" href="#"><span class="fa fa-pencil"/>Translate</a>
                     </li>
                 </ul>
             </nav>
