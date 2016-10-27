@@ -344,10 +344,10 @@ class IrTranslation(models.Model):
         # update existing translations or insert
         for field, seq, trans, known in translation:
             req = """UPDATE ir_translation
-                        SET value=%%(value)s, src=%%(src)s
+                        SET value=%%(value)s, src=%%(src)s, state='translated'
                         WHERE type=%%(type)s and name=%%(name)s AND res_id in %%(ids)s AND seq=%%(seq)s AND lang=%%(lang)s;
-                    INSERT INTO ir_translation (type, name, res_id, seq, lang, value, src)
-                        SELECT %%(type)s, %%(name)s, res_id, %%(seq)s, %%(lang)s, %%(value)s, %%(src)s
+                    INSERT INTO ir_translation (type, name, res_id, seq, lang, value, src, state)
+                        SELECT %%(type)s, %%(name)s, res_id, %%(seq)s, %%(lang)s, %%(value)s, %%(src)s, 'translated'
                         FROM (
                             SELECT res_id
                             FROM (VALUES%s) V(res_id)
