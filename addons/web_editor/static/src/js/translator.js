@@ -31,38 +31,8 @@ $.fn.extend({
 
 var RTE_Translate = rte.Class.extend({
     saveElement: function ($el, context) {
-        // remove multi edition
-        var key = $el.data('oe-translation-id') ? 'translation:'+$el.data('oe-translation-id') :
-                ($el.data('oe-model') ? $el.data('oe-model')+":"+$el.data('oe-id')+":"+$el.data('oe-field')+":"+$el.data('oe-type')+":"+$el.data('oe-expression') : false);
-        if (!key || this.__saved[key]) return true;
-        this.__saved[key] = true;
-
-        if ($el.data('oe-translation-id')) {
-            var translation_content = this.getEscapedElement($el).html();
-
-            return ajax.jsonRpc('/web/dataset/call', 'call', {
-                model: 'ir.translation',
-                method: 'save_html',
-                args: [
-                    [+$el.data('oe-translation-id')],
-                    translation_content,
-                    context || base.get_context()
-                ],
-            });
-        } else {
-            var markup = this.getEscapedElement($el).prop('outerHTML');
-
-            return ajax.jsonRpc('/web/dataset/call', 'call', {
-                model: 'ir.ui.view',
-                method: 'save',
-                args: [
-                    $el.data('oe-id'),
-                    markup,
-                    $el.data('oe-xpath') || null,
-                    context || base.get_context()
-                ],
-            });
-        }
+        console.log("saveElement");
+        return $.when();
     },
     editable: function () {
         return $('#wrapwrap [data-o-translation-seq]');
@@ -221,17 +191,23 @@ var Translate = Widget.extend({
             item.changed = true;
         });
     },
-    display_lang: function (lang) {
-        if (this.lang_displayed === lang) {
+    display_lang: function (lang, getDefault) {
+        if (!getDefault && this.lang_displayed === lang) {
             return;
         }
-        $('#wrapwrap [data-o-translation-model]').removeClass('o_translation_to_translate o_translation_inprogress o_translation_translated');
+        this.$target.add(this.$target_attr).removeClass('o_translation_to_translate o_translation_inprogress o_translation_translated');
+        if (this.$target.attr('class') === '') {
+            this.$target.removeAttr('class');
+        }
 
         var translations = this.translations[this.lang_displayed = lang];
         _.each(this.get_lang(), function (data) {
             var item = getItem(translations, data.model, data.field, data.res_id, data.seq);
-            data.attr ? data.$node.attr(data.attr, item.value || '...') : data.$node.html(item.value || '...');
-            data.$node.addClass('o_translation_' + (item.state || 'to_translate'));
+            var value = (getDefault ? item.default : item.value) || '...';
+            data.attr ? data.$node.attr(data.attr, value) : data.$node.html(value);
+            if (!getDefault) {
+                data.$node.addClass('o_translation_' + (item.state || 'to_translate'));
+            }
         });
     },
     active_lang: function (el) {
@@ -263,7 +239,6 @@ var Translate = Widget.extend({
 
         this.$target.addClass("o_editable");
         this.rte.start();
-        this.onTranslateReady();
 
         _.each(list, function (data) {
             if (domain.length) {
@@ -273,7 +248,7 @@ var Translate = Widget.extend({
         });
 
         this.translations = {};
-        this.lang =  base.get_context().lang;
+        this.defaultLang =  this.lang;
 
         return ajax.jsonRpc('/web/dataset/call', 'call', {
             model: 'ir.translation',
@@ -284,15 +259,16 @@ var Translate = Widget.extend({
                 var t = self.translations;
                 var name = data.name.split(',');
                 var item = getItem(t[data.lang] || (t[data.lang] = {}), name[0], name[1], data.res_id, data.seq);
+                item.default = data.value;
                 for (var k in data) {
                     item[k] = data[k];
                 }
             });
             self.display_lang(self.lang);
+            self.onTranslateReady();
         });
-
     },
-    onTranslateReady: function () {
+    onTranslateReady: function (datas) {
         this.$el.show();
         this.trigger("edit");
         this.$target.parent().prependEvent('click', this.__unbind_click);
@@ -326,10 +302,8 @@ var Translate = Widget.extend({
     cancel: function () {
         var self = this;
         this.rte.cancel();
-        this.$target.removeClass('o_editable o_is_inline_editable o_translation_to_translate o_translation_inprogress o_translation_translated');
-        if (this.$target.attr('class') === '') {
-            this.$target.removeAttr('class');
-        }
+        this.display_lang(this.defaultLang, true);
+        this.$target.removeClass('o_editable o_is_inline_editable');
         this.$target.removeAttr('data-note-id');
         this.$target.removeAttr('contentEditable');
         this.$target.parent().off('click', this.__unbind_click);
