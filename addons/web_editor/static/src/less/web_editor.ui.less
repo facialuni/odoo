@@ -81,6 +81,10 @@ html[lang] > body.translation_enable [data-o-translation-model] {
 
     background: fade(@o-color-content-inprogress, 50%)!important;
 
+    &:hover {
+        box-shadow: @odoo-brand-primary 0 0 5px 2px inset;
+    }
+
     &.o_translation_to_translate {
         background: fade(@o-color-content-to-translate, 50%)!important;
     }
