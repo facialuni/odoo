@@ -60,7 +60,7 @@ var Translate = translate.Class.include({
         $("#oe_main_menu_navbar").hide();
         return this._super();
     },
-    cancel: function () {
+    close: function () {
         $("#oe_main_menu_navbar").show();
         return this._super();
     }

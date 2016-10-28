@@ -67,7 +67,8 @@ var Translate_Modal = editor_widget.Dialog.extend({
     }
 });
 
-function getItem (t, model, field, res_id, seq) {
+function getItem (t, lang, model, field, res_id, seq) {
+    t = t[lang] || (t[lang] = {});
     t = t[model] || (t[model] = {});
     t = t[field] || (t[field] = {});
     t = t[res_id] || (t[res_id] = {});
@@ -168,19 +169,26 @@ var Translate = Widget.extend({
         });
         return list;
     },
-    save_lang: function () {
+    save_change: function () {
+        var self = this;
         if (this.lang !== this.lang_displayed) {
             return;
         }
-        var translations = this.translations[this.lang];
         _.each(this.get_lang(), function (data) {
             if (!data.$node.hasClass('o_dirty')) {
                 return;
             }
             var value = data.attr ? data.$node.attr(data.attr) : data.$node.html();
-            var item = getItem(translations, data.model, data.field, data.res_id, data.seq);
-            if (item.value.replace(/[ \t\n\r]+/, ' ') === value.replace(/[ \t\n\r]+/, ' ')) {
+            var item = getItem(self.translations, self.lang, data.model, data.field, data.res_id, data.seq);
+            if (item.value && item.value.replace(/[ \t\n\r]+/, ' ') === value.replace(/[ \t\n\r]+/, ' ')) {
                 return;
+            } else if (!item.model) {
+                item.model = data.model;
+                item.field = data.field;
+                item.res_id = data.res_id;
+                item.seq = data.seq;
+                item.lang = self.lang;
+                item.type = 'model';
             }
             item.state = 'translated';
             item.value = value;
@@ -188,6 +196,7 @@ var Translate = Widget.extend({
         });
     },
     display_lang: function (lang, getDefault) {
+        var self = this;
         if (!getDefault && this.lang_displayed === lang) {
             return;
         }
@@ -196,23 +205,25 @@ var Translate = Widget.extend({
             this.$target.removeAttr('class');
         }
 
-        var translations = this.translations[this.lang_displayed = lang];
+        this.lang_displayed = lang;
         _.each(this.get_lang(), function (data) {
-            var item = getItem(translations, data.model, data.field, data.res_id, data.seq);
-            var value = (getDefault ? item.default : item.value) || '...';
-            data.attr ? data.$node.attr(data.attr, value) : data.$node.html(value);
+            var item = getItem(self.translations, lang, data.model, data.field, data.res_id, data.seq);
+            var value = getDefault ? item.default : item.value;
+            if (value) {
+                data.attr ? data.$node.attr(data.attr, value) : data.$node.html(value);
+            }
             if (!getDefault) {
                 data.$node.addClass('o_translation_' + (item.state || 'to_translate'));
             }
         });
     },
     active_lang: function (el) {
-        this.save_lang();
+        this.save_change();
         this.lang = $(el.target).data('lang');
         this.display_lang(this.lang);
     },
     mouseenter_lang: function (el) {
-        this.save_lang();
+        this.save_change();
         var lang = $(el.target).data('lang');
         this.display_lang(lang);
     },
@@ -242,6 +253,7 @@ var Translate = Widget.extend({
             }
             domain = domain.concat(['&', '&', ['name', '=', data.model+','+data.field], ['res_id', '=', data.res_id], ['seq', '=', data.seq]]);
         });
+        domain.unshift(['type', '=', 'model']);
 
         this.translations = {};
         this.defaultLang =  this.lang;
@@ -252,9 +264,11 @@ var Translate = Widget.extend({
             args: [domain, ['name', 'type', 'res_id', 'seq', 'lang', 'value', 'state']],
         }).then(function (datas) {
             _.each(datas, function (data) {
-                var t = self.translations;
                 var name = data.name.split(',');
-                var item = getItem(t[data.lang] || (t[data.lang] = {}), name[0], name[1], data.res_id, data.seq);
+                var item = getItem(self.translations, data.lang, name[0], name[1], data.res_id, data.seq);
+                if (data.value) {
+                    data.value = data.value.replace('&amp;', '&');
+                }
                 item.default = data.value;
                 for (var k in data) {
                     item[k] = data[k];
@@ -267,6 +281,7 @@ var Translate = Widget.extend({
     onTranslateReady: function (datas) {
         this.$el.show();
         this.trigger("edit");
+        $('body').addClass('translation_enable');
         this.$target.parent().prependEvent('click', this.__unbind_click);
         this.$target_attr.prependEvent('mousedown click mouseup', this, this.__translate_attribute);
         console.info('Click on CTRL when you click in an translatable area to have the default behavior');
@@ -292,23 +307,53 @@ var Translate = Widget.extend({
     },
     close: function () {
         this.rte.cancel();
-        this.display_lang(this.defaultLang, true);
+        $('body').removeClass('translation_enable');
         this.$target.add(this.$target_attr).removeClass('o_editable o_is_inline_editable o_dirty');
         this.$target.removeAttr('data-note-id').removeAttr('contentEditable');
         this.$target.parent().off('click', this.__unbind_click);
         this.$target_attr.off('mousedown click mouseup', this, this.__translate_attribute);
-        this.trigger("cancel");
         this.$el.hide();
         window.onbeforeunload = null;
     },
     save: function () {
-        this.save_lang();
-        console.log('save !!!', this.translations);
+        this.save_change();
+        var translations = _.chain(this.translations).values()
+            .map(_.values).flatten() // model
+            .map(_.values).flatten() // field
+            .map(_.values).flatten() // res_id
+            .map(_.values).flatten() // seq
+            .value();
+        console.log('save !!! TODO parse server side to xml', translations);
+
+        for (var k in translations) {
+            var trans = translations[k];
+            if (!trans.changed) continue;
+            var value = _.pick(trans, 'type', 'res_id', 'seq', 'lang', 'value', 'state');
+            value.name = trans.model+','+trans.field;
+            value.src = ''+value.seq;
+
+            console.log(trans, '=>', value);
+            if (trans.id) {
+                ajax.jsonRpc('/web/dataset/call', 'call', {
+                    model: 'ir.translation',
+                    method: 'write',
+                    args: [[trans.id], value],
+                });
+            } else {
+                ajax.jsonRpc('/web/dataset/call', 'call', {
+                    model: 'ir.translation',
+                    method: 'create',
+                    args: [value],
+                });
+            }
+        }
         this.close();
     },
     cancel: function () {
         var self = this;
+        this.display_lang(this.defaultLang, true);
         this.close();
+        this.trigger("cancel");
     },
     destroy: function () {
         this.cancel();
