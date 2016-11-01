@@ -7,6 +7,10 @@ from odoo.tools.translate import quote, unquote, XMLTranslator
 from odoo.tests.common import TransactionCase
 
 
+def list_to_dict(l):
+    return [(str(i[0]), i[1]) for i in l]
+
+
 class TranslationToolsTestCase(unittest.TestCase):
 
     def test_quote_unquote(self):
@@ -39,7 +43,7 @@ class TranslationToolsTestCase(unittest.TestCase):
                         <field name="foo"/>
                     </form>"""
         result, terms, known = XMLTranslator(source, method='xml')
-        self.assertEquals(result % dict(terms), source)
+        self.assertEquals(result % list_to_dict(terms), source)
         self.assertItemsEqual([t[1] for t in terms],
             ['Form stuff', 'Blah blah blah', 'Put some more text here'])
 
@@ -47,7 +51,7 @@ class TranslationToolsTestCase(unittest.TestCase):
         """ Test XMLTranslator(method='xml') on plain text. """
         source = "Blah blah blah"
         result, terms, known = XMLTranslator(source, method='xml')
-        self.assertEquals(result % dict(terms), source)
+        self.assertEquals(result % list_to_dict(terms), source)
         self.assertItemsEqual(terms, [source])
 
     def test_translate_xml_text_entity(self):
@@ -55,7 +59,7 @@ class TranslationToolsTestCase(unittest.TestCase):
         terms = []
         source = "Blah&amp;nbsp;blah&amp;nbsp;blah"
         result, terms, known = XMLTranslator(source, method='xml')
-        self.assertEquals(result % dict(terms), source)
+        self.assertEquals(result % list_to_dict(terms), source)
         self.assertItemsEqual(terms, [source])
 
     def test_translate_xml_inline1(self):
@@ -67,7 +71,7 @@ class TranslationToolsTestCase(unittest.TestCase):
                         <field name="foo"/>
                     </form>"""
         result, terms, known = XMLTranslator(source, method='xml')
-        self.assertEquals(result % dict(terms), source)
+        self.assertEquals(result % list_to_dict(terms), source)
         self.assertItemsEqual(terms,
             ['Form stuff', 'Blah <i>blah</i> blah', 'Put some <b>more text</b> here'])
 
@@ -80,7 +84,7 @@ class TranslationToolsTestCase(unittest.TestCase):
                         <field name="foo"/>
                     </form>"""
         result, terms, known = XMLTranslator(source, method='xml')
-        self.assertEquals(result % dict(terms), source)
+        self.assertEquals(result % list_to_dict(terms), source)
         self.assertItemsEqual(terms,
             ['Form stuff', 'Blah <i>blah</i> blah', 'Put <em>some <b>more text</b></em> here'])
 
@@ -97,7 +101,7 @@ class TranslationToolsTestCase(unittest.TestCase):
                         </div>
                     </form>"""
         result, terms, known = XMLTranslator(source, method='xml')
-        self.assertEquals(result % dict(terms), source)
+        self.assertEquals(result % list_to_dict(terms), source)
         self.assertItemsEqual(terms,
             ['Form stuff', 'Blah blah blah'])
 
@@ -110,7 +114,7 @@ class TranslationToolsTestCase(unittest.TestCase):
                         stuff after
                     </t>"""
         result, terms, known = XMLTranslator(source, method='xml')
-        self.assertEquals(result % dict(terms), source)
+        self.assertEquals(result % list_to_dict(terms), source)
         self.assertItemsEqual(terms,
             ['stuff before', 'stuff after'])
 
@@ -123,7 +127,7 @@ class TranslationToolsTestCase(unittest.TestCase):
                         stuff after
                     </div>"""
         result, terms, known = XMLTranslator(source, method='xml')
-        self.assertEquals(result % dict(terms), source)
+        self.assertEquals(result % list_to_dict(terms), source)
         self.assertItemsEqual(terms,
             ['stuff before', 'stuff after'])
 
@@ -135,7 +139,7 @@ class TranslationToolsTestCase(unittest.TestCase):
                         <attribute name="option">Do not translate this</attribute>
                     </field>"""
         result, terms, known = XMLTranslator(source, method='xml')
-        self.assertEquals(result % dict(terms), source)
+        self.assertEquals(result % list_to_dict(terms), source)
         self.assertItemsEqual(terms,
             ['Translate this'])
 
@@ -156,7 +160,7 @@ class TranslationToolsTestCase(unittest.TestCase):
                         </ul>
                     </t>"""
         result, terms, known = XMLTranslator(source, method='xml')
-        self.assertEquals(result % dict(terms), source)
+        self.assertEquals(result % list_to_dict(terms), source)
         self.assertItemsEqual(terms,
             ['<span class="oe_menu_text">Blah</span>', 'More <b class="caret"/>'])
 
