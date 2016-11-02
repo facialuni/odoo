@@ -130,14 +130,16 @@ class TranslationToolsTestCase(unittest.TestCase):
     def test_translate_xml_attribute(self):
         """ Test XMLTranslator(method='xml') with <attribute> elements. """
         terms = []
+        print "----------------"
+        print ""
         source = """<field name="foo" position="attributes">
                         <attribute name="string">Translate this</attribute>
                         <attribute name="option">Do not translate this</attribute>
                     </field>"""
         result, terms, known = XMLTranslator(source, method='xml')
-        print ""
         print result
         print terms
+        print known
         self.assertEquals(result % dict(terms), source)
         self.assertItemsEqual(terms,
             ['Translate this'])
