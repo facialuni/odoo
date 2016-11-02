@@ -154,6 +154,7 @@ TRANSLATED_ATTRS = {
 # avoid_pattern = re.compile(r"[\s\n]*<!DOCTYPE", re.IGNORECASE)
 RE_STRIP = re.compile(r"^([\s\r\n]*)([\s\S]*?)([\s\r\n]*)$", re.IGNORECASE)
 RE_TRANSLATION_SEQ = re.compile(r'\[o-translation=([0-9]+)\]')
+RE_TEXT = re.compile(r'[<>]')
 
 
 def is_translatable(node):
@@ -166,8 +167,14 @@ def is_translatable(node):
 
 
 def XMLTranslator(arch, method='xml'):
+    wrapped = None
     if isinstance(arch, basestring):
-        arch = etree.fromstring(arch)
+        try:
+            arch = etree.fromstring(encode(arch))
+        except etree.XMLSyntaxError:
+            wrapped = True
+            arch = etree.fromstring("<div>%s</div>" % encode(arch))
+
     todo = [arch]
     translate = []
     ids = set()
@@ -192,7 +199,7 @@ def XMLTranslator(arch, method='xml'):
                 node.insert(index, node_trans)
 
         node_trans.attrib['id'] = str(id)
-        trans = u''.join(child_content)
+        trans = ''.join(child_content)
 
         translate.append({
             'id': id,
@@ -227,7 +234,8 @@ def XMLTranslator(arch, method='xml'):
         all_content = True
         child_content = []
         if node.text:
-            child_content.append(node.text)
+            xml = etree.tostring(node, method=method, encoding='utf-8')
+            child_content.append(RE_TEXT.split(xml)[2].decode('utf-8'))
             node.text = None
 
         for child in node.getchildren():
@@ -292,6 +300,8 @@ def XMLTranslator(arch, method='xml'):
 
     xml = etree.tostring(arch, method=method)
     xml = RE_TRANSLATION_SEQ.sub(r'%(\1)s', xml.replace('%', '%%'))
+
+    if wrapped: xml = xml[5:-6] # remove tags <div> and </div>
 
     return xml, translation, known
 
