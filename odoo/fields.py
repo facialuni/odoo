@@ -1382,13 +1382,10 @@ class Xml(Text):
                 node = etree.fromstring(value)
                 XMLTranslatorBranding(node, attrib={'data-o-translation-model': records._name, 'data-o-translation-field': self.name, 'data-o-translation-id': record_id})
                 value = etree.tostring(node, method=self.type)
-
-                trans = Translation(rec_src_trans[record_id], method=self.type)
-                return value % trans
+                return value % Translation(rec_src_trans[record_id], method=self.type)
         else:
             def translate(record_id, value):
-                trans = Translation(rec_src_trans[record_id], method=self.type)
-                return value % trans
+                return value % Translation(rec_src_trans[record_id], method=self.type)
         return translate
 
 

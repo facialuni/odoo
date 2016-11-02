@@ -316,38 +316,21 @@ var Translate = Widget.extend({
         window.onbeforeunload = null;
     },
     save: function () {
+        this.$('button').prop('disabled', true);
         this.save_change();
         var translations = _.chain(this.translations).values()
             .map(_.values).flatten() // model
             .map(_.values).flatten() // field
             .map(_.values).flatten() // res_id
             .map(_.values).flatten() // seq
+            .filter(function (trans) { return trans.changed; })
+            .map(function (trans) { return _.pick(trans, 'id', 'type', 'res_id', 'seq', 'lang', 'value', 'state'); })
             .value();
-        console.log('save !!! TODO parse server side to xml', translations);
-
-        for (var k in translations) {
-            var trans = translations[k];
-            if (!trans.changed) continue;
-            var value = _.pick(trans, 'type', 'res_id', 'seq', 'lang', 'value', 'state');
-            value.name = trans.model+','+trans.field;
-            value.src = ''+value.seq;
-
-            console.log(trans, '=>', value);
-            if (trans.id) {
-                ajax.jsonRpc('/web/dataset/call', 'call', {
-                    model: 'ir.translation',
-                    method: 'write',
-                    args: [[trans.id], value],
-                });
-            } else {
-                ajax.jsonRpc('/web/dataset/call', 'call', {
-                    model: 'ir.translation',
-                    method: 'create',
-                    args: [value],
-                });
-            }
-        }
-        this.close();
+        return ajax.jsonRpc('/web/dataset/call', 'call', {
+            model: 'ir.translation',
+            method: 'save',
+            args: [translations],
+        }).then(this.close.bind(this));
     },
     cancel: function () {
         var self = this;
