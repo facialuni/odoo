@@ -588,16 +588,19 @@ actual arch.
             root_id = source_id
         sql_inherit = self.get_inheriting_views_arch(source_id, model)
         for (specs, view_id) in sql_inherit:
-            print ""
-            print ""
-            print ""
-            print specs
-            print ""
-            specs_tree = etree.fromstring(specs.encode('utf-8'))
-            if self._context.get('inherit_branding'):
-                self.inherit_branding(specs_tree, view_id, root_id)
-            source = self.apply_inheritance_specs(source, specs_tree, view_id)
-            source = self.apply_view_inheritance(source, view_id, model, root_id=root_id)
+            try:
+                specs_tree = etree.fromstring(specs.encode('utf-8'))
+                if self._context.get('inherit_branding'):
+                    self.inherit_branding(specs_tree, view_id, root_id)
+                source = self.apply_inheritance_specs(source, specs_tree, view_id)
+                source = self.apply_view_inheritance(source, view_id, model, root_id=root_id)
+            except Exception, e:
+                print ""
+                print ""
+                print ""
+                print specs
+                print ""
+                raise e
         return source
 
     @api.multi
