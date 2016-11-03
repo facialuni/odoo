@@ -36,35 +36,47 @@ var RTE_Translate = rte.Class.extend({
 });
 
 var Translate_Modal = editor_widget.Dialog.extend({
-    init: function (p, options, parent, node) {
-        this._super(p, _.extend({}, {
+    init: function (parent, options, node) {
+        this._super(parent, _.extend({}, {
             title: _t("Translate Attribute"),
             buttons: [
                 {text:  _t("Close"), classes: "btn-primary o_save_button", close: true, click: this.save}
             ]
         }, options || {}));
+
         this.parent = parent;
+        this.node = node;
         this.$target = $(node);
-        this.translation = $(node).data('translation');
+        this.attrs = $(node).data('o-trans-attrs');
     },
     start: function () {
         var self = this;
         var def = this._super.apply(this, arguments);
         var $group = $("<div/>", {"class": "form-group"}).appendTo(this.$el);
-        _.each(this.translation, function (node, attr) {
-            var $node = $(node);
+        _.each(this.attrs, function (attr) {
+            var item = getItem (self.parent.translations, self.parent.lang,
+                self.$target.data('o-translation-model'),
+                self.$target.data('o-translation-field'),
+                self.$target.data('o-translation-id'),
+                self.$target.data('o-translation-'+attr+'-seq'));
+            item.attr = attr;
+            item.type = 'model';
+
             var $label = $('<label class="control-label"></label>').text(attr);
-            var $input = $('<input class="form-control"/>').val($node.html());
-            $input.on('change keyup', function () {
-                var value = $input.val();
-                $node.html(value).trigger('change', node);
-                $node.data('$node').attr($node.data('attribute'), value).trigger('translate');
-                self.parent.rte_changed(node);
-            });
+            var $input = $('<input class="form-control"/>').val(item.value || self.$target.attr(attr))
+                .on('input', function () {
+                    item.value = $input.val();
+                    item.state = item.value === '' ? 'to_translate' : 'translated';
+                    item.changed = true;
+                });
             $group.append($label).append($input);
         });
         return def;
-    }
+    },
+    close: function () {
+        this.parent.display_lang(this.parent.lang, null, true);
+        this._super();
+    },
 });
 
 function getItem (t, lang, model, field, res_id, seq) {
@@ -72,7 +84,7 @@ function getItem (t, lang, model, field, res_id, seq) {
     t = t[model] || (t[model] = {});
     t = t[field] || (t[field] = {});
     t = t[res_id] || (t[res_id] = {});
-    return t[seq] || (t[seq] = {});
+    return t[seq] || (t[seq] = {'lang': lang, 'model': model, 'field': field, 'res_id': res_id, 'seq': seq });
 }
 
 var Translate = Widget.extend({
@@ -88,9 +100,10 @@ var Translate = Widget.extend({
         this.parent = parent;
         this.ir_translation = new Model('ir.translation');
         this.lang = lang || base.get_context().lang;
+        this.__unbind_click = this.__unbind_click.bind(this);
+        this.__translate_attribute = this.__translate_attribute.bind(this);
         this.setTarget($target);
         this._super.apply(this, arguments);
-
         this.rte = new RTE_Translate(this, this.config);
     },
     start: function () {
@@ -107,20 +120,19 @@ var Translate = Widget.extend({
         return this.edit();
     },
     setTarget: function ($target) {
+        var self = this;
         this.$target = $target.find('[data-o-translation-seq]');
 
         // attributes
 
+        this.$target_attr = $();
         var attrs = ['placeholder', 'title', 'alt'];
         _.each(attrs, function (attr) {
-            $target.find('[data-o-translation-' + attrs.join('-seq], [data-o-translation-') + '-seq]').filter(':empty, input, select, textarea, img').each(function () {
+            $target.find('[data-o-translation-' + attr + '-seq]').filter(':empty, input, select, textarea, img').each(function () {
                 var $node = $(this);
-                var translation = $node.data('translation') || {};
-                var trans = $node.attr(attr);
-                var $trans = $('<span/>').addClass('hidden o_editable o_editable_translatable_attribute').appendTo('body');
-                $trans.data('$node', $node).data('attribute', attr);
-                translation[attr] = $trans[0];
-                $node.attr(attr, match[2]);
+                var trans = $node.data('o-trans-attrs') || [];
+                trans.push(attr);
+                $node.data('o-trans-attrs', trans);
 
                 var select2 = $node.data('select2');
                 if (select2) {
@@ -130,11 +142,9 @@ var Translate = Widget.extend({
                     });
                     $node = select2.container.find('input');
                 }
-                $node.addClass('o_translatable_attribute').data('translation', translation);
+                self.$target_attr = self.$target_attr.add($node);
             });
         });
-        this.$target_attr = $target.find('.o_translatable_attribute');
-        this.$target_attribute = $('.o_editable_translatable_attribute');
     },
     get_lang: function () {
         var  list = [];
@@ -161,7 +171,7 @@ var Translate = Widget.extend({
                         'field': field,
                         'res_id': id,
                         'seq': parseInt(attr.value),
-                        'attr': name[0],
+                        'attr': name[1],
                         '$node': $node,
                     });
                 }
@@ -182,12 +192,7 @@ var Translate = Widget.extend({
             var item = getItem(self.translations, self.lang, data.model, data.field, data.res_id, data.seq);
             if (item.value && item.value.replace(/[ \t\n\r]+/, ' ') === value.replace(/[ \t\n\r]+/, ' ')) {
                 return;
-            } else if (!item.model) {
-                item.model = data.model;
-                item.field = data.field;
-                item.res_id = data.res_id;
-                item.seq = data.seq;
-                item.lang = self.lang;
+            } else if (!item.type) {
                 item.type = 'model';
             }
             item.state = 'translated';
@@ -195,9 +200,9 @@ var Translate = Widget.extend({
             item.changed = true;
         });
     },
-    display_lang: function (lang, getDefault) {
+    display_lang: function (lang, getDefault, force) {
         var self = this;
-        if (!getDefault && this.lang_displayed === lang) {
+        if (!getDefault && !force && this.lang_displayed === lang) {
             return;
         }
         this.$target.add(this.$target_attr).removeClass('o_translation_to_translate o_translation_inprogress o_translation_translated');
@@ -266,9 +271,6 @@ var Translate = Widget.extend({
             _.each(datas, function (data) {
                 var name = data.name.split(',');
                 var item = getItem(self.translations, data.lang, name[0], name[1], data.res_id, data.seq);
-                if (data.value) {
-                    data.value = data.value.replace('&amp;', '&');
-                }
                 item.default = data.value;
                 for (var k in data) {
                     item[k] = data[k];
@@ -303,7 +305,7 @@ var Translate = Widget.extend({
             return;
         }
 
-        new Translate_Modal(null, {}, event.data, event.target).open();
+        new Translate_Modal(this, {}, event.target).open();
     },
     close: function () {
         this.rte.cancel();
@@ -316,7 +318,7 @@ var Translate = Widget.extend({
         window.onbeforeunload = null;
     },
     save: function () {
-        this.$('button').prop('disabled', true);
+        this.$('button[data-action="save"]').prop('disabled', true);
         this.save_change();
         var translations = _.chain(this.translations).values()
             .map(_.values).flatten() // model
@@ -324,7 +326,9 @@ var Translate = Widget.extend({
             .map(_.values).flatten() // res_id
             .map(_.values).flatten() // seq
             .filter(function (trans) { return trans.changed; })
-            .map(function (trans) { return _.pick(trans, 'id', 'type', 'res_id', 'seq', 'lang', 'value', 'state'); })
+            .map(function (trans) {
+                return _.pick(trans, 'id', 'type', 'model', 'field', 'res_id', 'seq', 'lang', 'value', 'state');
+            })
             .value();
         return ajax.jsonRpc('/web/dataset/call', 'call', {
             model: 'ir.translation',

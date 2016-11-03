@@ -19,6 +19,9 @@ class IrTranslation(models.Model):
                 root = etree.fromstring(wrapped, etree.HTMLParser(encoding='utf-8'))
                 trans['value'] = etree.tostring(root[0][0])[5:-6]           # html > body > div then remove tags <div> and </div>
 
+            trans['name'] = "%s,%s" % (trans.pop('model'), trans.pop('field'))
+            trans['src'] = trans['seq']
+
             if trans.get('id'):
                 self.browse(trans.pop('id')).write(trans)
             else:
