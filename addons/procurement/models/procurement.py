@@ -255,7 +255,7 @@ class ProcurementOrder(models.Model):
         # if the procurement already has a rule assigned, we keep it (it has a higher priority as it may have been chosen manually)
         if self.rule_id:
             return True
-        elif self.product_id.type not in ('service', 'digital'):
+        elif self.product_id.type != 'service':
             rule = self._find_suitable_rule()
             if rule:
                 self.write({'rule_id': rule.id})

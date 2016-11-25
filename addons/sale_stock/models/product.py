@@ -10,6 +10,6 @@ class ProductProduct(models.Model):
     @api.multi
     def _need_procurement(self):
         for product in self:
-            if product.type not in ['service', 'digital']:
+            if product.type != 'service':
                 return True
         return super(ProductProduct, self)._need_procurement()
