@@ -3,6 +3,7 @@
 
 from .common import TestCrmCases
 from odoo import fields
+from odoo.tests.views import Form
 from datetime import date
 
 
@@ -99,31 +100,25 @@ class TestCrmActivity(TestCrmCases):
         # Check the next activity is correct
         self.assertEqual(self.lead.title_action, self.activity1.description, 'Activity title should be the same on the lead and on the chosen activity')
 
-        # Instanciate the wizard to schedule the next activity
-        wizard = self.env['crm.activity.log'].sudo(self.crm_salesman.id).create({
-            'note': 'Content of the activity to log',
-            'lead_id': self.lead.id,
-        })
-        wizard.onchange_lead_id()
-        wizard.write({
-            'next_activity_id': self.activity2.id,
-        })
+
+        Wizard = self.env['crm.activity.log'].sudo(self.crm_salesman.id)
+
+        # Instantiate the wizard to schedule the next activity
+        form = Form(Wizard, self.env.ref('crm.crm_activity_log_view_form').id)
+        form['note'] = 'Content of the activity to log'
+        form['lead_id'] = self.lead.id
+        form['next_activity_id'] = self.activity2.id
+        wizard = Wizard.create(form)
         wizard.action_log()
 
         # Check the next activity on the lead has been removed
         self.assertFalse(self.lead.next_activity_id.id, 'No next activity should be set on lead, since we jsut log another activity')
 
-        # Instanciate the wizard to schedule the next activity
-        self.env['crm.activity.log'].sudo(self.crm_salesman.id).create({
-            'next_activity_id': self.activity3.id,
-            'note': 'Content of the activity to log',
-            'lead_id': self.lead.id,
-        })
-        wizard.onchange_lead_id()
-        wizard.write({
-            'next_activity_id': self.activity3.id,
-        })
-        wizard.onchange_next_activity_id()
+        # Instantiate the wizard to schedule the next activity
+        form = Form(Wizard, self.env.ref('crm.crm_activity_log_view_form_schedule').id)
+        form['lead_id'] = self.lead.id
+        form['next_activity_id'] = self.activity3.id
+        wizard = Wizard.create(form)
         wizard.action_schedule()
 
         # Check the activity is well scheldule on lead
