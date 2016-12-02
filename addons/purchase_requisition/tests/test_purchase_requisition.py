@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo.tests import common
+from odoo.tests.views import Form
 from odoo.tools import float_compare
 
 
@@ -67,8 +68,9 @@ class TestPurchaseRequisition(common.TransactionCase):
 
         # Vendor send one RFQ so I create a RfQ of that agreement.
         PurchaseOrder = self.env['purchase.order']
-        purchase_order = PurchaseOrder.new({'partner_id': self.res_partner_1_id, 'requisition_id': self.requisition1.id})
-        purchase_order._onchange_requisition_id()
-        po_dict = purchase_order._convert_to_write({name: purchase_order[name] for name in purchase_order._cache})
-        self.po_requisition = PurchaseOrder.create(po_dict)
-        self.assertEqual(len(self.po_requisition.order_line), 1, 'Purchase order should have one line')
+        form = Form(PurchaseOrder)
+        form['partner_id'] = self.res_partner_1_id
+        form['requisition_id'] = self.requisition1.id
+
+        po_requisition = PurchaseOrder.create(form)
+        self.assertEqual(len(po_requisition.order_line), 1, 'Purchase order should have one line')

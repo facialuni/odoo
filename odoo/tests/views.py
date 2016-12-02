@@ -95,12 +95,27 @@ class Form(collections.MutableMapping):
     def __iter__(self):
         return iter(self.data)
 
-    def _fixup(self, values):
-        """ un-nameget-ify m2o fields """
+    def _fixup(self, values, fields=None):
+        """ un-nameget-ify m2o fields (recursively into o2m and m2m) """
+        if fields is None:
+            fields = self.fields
+
         for k in list(values):
-            if self.fields[k]['type'] == 'many2one' and isinstance(values[k], (list, tuple)):
+            # remove field of values not in view
+            if k not in fields:
+                del values[k]
+                continue
+
+            field = fields[k]
+            field_type = field['type']
+            if field_type == 'many2one' and isinstance(values[k], (list, tuple)):
                 values[k] = values[k][0]
-            # FIXME: handle name_get values in o2m/m2m sub-fields (as in purchase order)
+            elif field_type in ('one2many', 'many2many'):
+                sub_fvg = field['views'].get('form') or \
+                          self.Model.env[field['relation']].fields_view_get()
+                for command in values[k] or []:
+                    if command[0] in (0, 1):
+                        self._fixup(command[2], sub_fvg['fields'])
         return values
 
     def _onchange(self, fields):
