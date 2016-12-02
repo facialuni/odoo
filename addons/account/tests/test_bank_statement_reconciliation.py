@@ -1,5 +1,8 @@
 from odoo.addons.account.tests.account_test_classes import AccountingTestCase
 
+from odoo.tests.views import Form
+
+
 class TestBankStatementReconciliation(AccountingTestCase):
 
     def setUp(self):
@@ -48,16 +51,12 @@ class TestBankStatementReconciliation(AccountingTestCase):
 
     def create_invoice(self, amount):
         """ Return the move line that gets to be reconciled (the one in the receivable account) """
-        vals = {'partner_id': self.partner_agrolait.id,
-                'type': 'out_invoice',
-                'name': '-',
-                'currency_id': self.env.user.company_id.currency_id.id,
-                }
-        # new creates a temporary record to apply the on_change afterwards
-        invoice = self.i_model.new(vals)
-        invoice._onchange_partner_id()
-        vals.update({'account_id': invoice.account_id.id})
-        invoice = self.i_model.create(vals)
+        form = Form(self.i_model)
+        form['partner_id'] = self.partner_agrolait.id
+        form['type'] = 'out_invoice'
+        form['name'] = '-'
+        form['currency_id'] = self.env.user.company_id.currency_id.id
+        invoice = self.i_model.create(form)
 
         self.il_model.create({
             'quantity': 1,
@@ -70,7 +69,7 @@ class TestBankStatementReconciliation(AccountingTestCase):
 
         mv_line = None
         for l in invoice.move_id.line_ids:
-            if l.account_id.id == vals['account_id']:
+            if l.account_id.id == form['account_id']:
                 mv_line = l
         self.assertIsNotNone(mv_line)
 

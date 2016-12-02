@@ -64,7 +64,7 @@ class Form(collections.MutableMapping):
     def __init__(self, model, view_id=None):
         self.Model = model
 
-        fvg = model.fields_view_get(view_id=view_id)
+        fvg = model.fields_view_get(view_id=view_id, view_type='form')
         self.onchanges = model._onchange_spec(fvg)
 
         self.fields = fvg['fields']
@@ -112,7 +112,7 @@ class Form(collections.MutableMapping):
                 values[k] = values[k][0]
             elif field_type in ('one2many', 'many2many'):
                 sub_fvg = field['views'].get('form') or \
-                          self.Model.env[field['relation']].fields_view_get()
+                          self.Model.env[field['relation']].fields_view_get(view_type='form')
                 for command in values[k] or []:
                     if command[0] in (0, 1):
                         self._fixup(command[2], sub_fvg['fields'])
