@@ -75,7 +75,4 @@
             </field>
         </record>
 
-        <menuitem id="menu_base_automation_form"
-            parent="base.menu_automation" action="base_automation_act" sequence="1"/>
-
 </odoo>
