@@ -12,7 +12,7 @@
                         <field name="website_published"
                             attrs="{'invisible': [('state', '!=', 'code')]}"/>
                     </xpath>
-                    <xpath expr="//field[@name='sequence']" position="after">
+                    <xpath expr="//field[@name='menu_ir_values_id']" position="after">
                         <field name="xml_id" invisible="1"/>
                         <field name="website_path"
                             attrs="{'invisible': ['|', ('website_published', '!=', True), ('state', '!=', 'code')]}"/>
