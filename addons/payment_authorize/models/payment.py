@@ -229,6 +229,7 @@ class TxAuthorize(models.Model):
         elif status_code == self._authorize_cancel_tx_status:
             self.write({
                 'state': 'cancel',
+                'state_message': data.get('x_response_reason_text'),
                 'acquirer_reference': data.get('x_trans_id'),
             })
             return True
