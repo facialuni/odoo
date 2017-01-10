@@ -1014,29 +1014,34 @@ class RecordCache(MutableMapping):
 
     def __contains__(self, name):
         """ Return whether the record has a cached value for field ``name``. """
-        field = self._record._fields[name]
-        return self._record.id in self._record.env._cache[field]
+        record = self._record
+        field = record._fields[name]
+        return record.id in record.env._cache[field]
 
     def __getitem__(self, name):
         """ Return the cached value of field ``name`` for the record. """
-        field = self._record._fields[name]
-        value = self._record.env._cache[field][self._record.id]
+        record = self._record
+        field = record._fields[name]
+        value = record.env._cache[field][record.id]
         return value.get() if isinstance(value, SpecialValue) else value
 
     def __setitem__(self, name, value):
         """ Assign the cached value of field ``name`` for the record. """
-        field = self._record._fields[name]
-        self._record.env.cache[field][self._record.id] = value
+        record = self._record
+        field = record._fields[name]
+        record.env._cache[field][record.id] = value
 
     def __delitem__(self, name):
         """ Remove the cached value of field ``name`` for the record. """
-        field = self._record._fields[name]
-        del self._record.env.cache[field][self._record.id]
+        record = self._record
+        field = record._fields[name]
+        del record.env._cache[field][record.id]
 
     def __iter__(self):
         """ Iterate over the field names with a cached value. """
-        cache, id = self._record.env.cache, self._record.id
-        for name, field in self._record._fields.iteritems():
+        record = self._record
+        cache, id = record.env._cache, record.id
+        for name, field in record._fields.iteritems():
             if name != 'id' and id in cache[field]:
                 yield name
 
@@ -1046,27 +1051,31 @@ class RecordCache(MutableMapping):
 
     def has_value(self, name):
         """ Return whether the record has a regular value for field ``name`` in cache. """
-        field = self._record._fields[name]
+        record = self._record
+        field = record._fields[name]
         dummy = SpecialValue(None)
-        value = self._record.env.cache[field].get(self._record.id, dummy)
+        value = record.env._cache[field].get(record.id, dummy)
         return not isinstance(value, SpecialValue)
 
     def get_value(self, name, default=None):
         """ Return the cached, regular value of field ``name``, or ``default``. """
-        field = self._record._fields[name]
+        record = self._record
+        field = record._fields[name]
         dummy = SpecialValue(None)
-        value = self._record.env.cache[field].get(self._record.id, dummy)
+        value = record.env._cache[field].get(record.id, dummy)
         return default if isinstance(value, SpecialValue) else value
 
     @property
     def dirty(self):
         """ Return the dirty fields for the record, as a set of names. """
-        return self._record.env._dirty[self._record]
+        record = self._record
+        return record.env._dirty[record]
 
     def set_special(self, name, getter):
         """ Set the given ``getter`` as the cached value of field ``name``. """
-        field = self._record._fields[name]
-        self._record.env.cache[field][self._record.id] = SpecialValue(getter)
+        record = self._record
+        field = record._fields[name]
+        record.env._cache[field][record.id] = SpecialValue(getter)
 
     def set_failed(self, names, exception):
         """ Mark the given fields with the given exception. """
