@@ -26,8 +26,8 @@ class ProductProduct(models.Model):
     _inherit = 'product.product'
 
     @api.multi
-    def _need_procurement(self):
+    def _compute_need_procurement(self):
+        super(ProductProduct, self)._compute_need_procurement()
         for product in self:
             if product.type == 'service' and product.track_service == 'task':
-                return True
-        return super(ProductProduct, self)._need_procurement()
+                product.need_procurement = True

@@ -21,3 +21,10 @@ class ProductProduct(models.Model):
         return r
 
     sales_count = fields.Integer(compute='_sales_count', string='# Sales')
+
+    need_procurement = fields.Boolean('Need Procurement', compute='_compute_need_procurement')
+
+    @api.multi
+    def _compute_need_procurement(self):
+        for product in self:
+            product.need_procurement = False
