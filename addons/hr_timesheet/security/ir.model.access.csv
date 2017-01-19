@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_product_product_user,product.product user,product.model_product_product,timesheet.group_timesheet_user,1,1,1,1
+access_product_template_timesheet,product.template.hr.timesheet,product.model_product_template,timesheet.group_timesheet_user,1,1,1,1
+access_product_uom_timesheet,product.uom.hr.timesheet,product.model_product_uom,timesheet.group_timesheet_user,1,1,1,1

@@ -16,9 +16,11 @@ UPDATE ME
         'hr',
     ],
     'data': [
-        'security/hr_timesheet_security.xml',
+        'security/timesheet_security.xml',
         'security/ir.model.access.csv',
         'views/timesheet_views.xml',
+        'views/account_analytic_views.xml',
+        'report/timesheet_report_views.xml',
         'views/hr_views.xml',
     ],
     'demo': [
