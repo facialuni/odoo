@@ -1,4 +1,6 @@
 <odoo>
+
+<!--
     <template id="report_timesheet">
         <t t-call="report.html_container">
             <t t-call="report.external_layout">
@@ -72,4 +74,6 @@
             name="hr_timesheet.report_timesheet"
             file="report_timesheet"
     />
+
+-->
 </odoo>
