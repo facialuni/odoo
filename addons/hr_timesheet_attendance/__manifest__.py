@@ -13,5 +13,6 @@
         'report/hr_timesheet_attendance_report_view.xml',
         'views/hr_timesheet_sheet_views.xml',
     ],
-    'auto_install': True,
+    'auto_install': False,
+    'installable': False,
 }

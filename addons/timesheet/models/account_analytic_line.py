@@ -8,7 +8,7 @@ class AccountAnalyticLine(models.Model):
     _inherit = 'account.analytic.line'
 
     department_id = fields.Many2one('hr.department', "Department", related='user_id.employee_ids.department_id', store=True, readonly=True)
-    timesheet_pack_id = fields.Many2one('timesheet.pack', 'Task')
+    timesheet_pack_id = fields.Many2one('timesheet.pack', 'TS Pack')
 
     res_model = fields.Char('Model')
     res_id = fields.Integer('ID')

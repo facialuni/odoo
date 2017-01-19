@@ -35,7 +35,7 @@ The validation can be configured in the company:
         'views/hr_timesheet_sheet_views.xml',
         'views/hr_department_views.xml',
     ],
-    'installable': True,
+    'installable': False,
     'auto_install': False,
     'qweb': ['static/src/xml/timesheet.xml', ],
 }

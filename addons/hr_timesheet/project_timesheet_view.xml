@@ -99,15 +99,17 @@
                 </field>
                 <xpath expr="//notebook/page[@name='description_page']" position="after">
                     <page string="Timesheets" attrs="{'invisible': [('project_id', '=', False)]}">
-                    <field name="timesheet_ids" context="{'default_project_id': project_id}">
-                        <tree editable="bottom" string="Timesheet Activities" default_order="date">
-                            <field name="date"/>
-                            <field name="user_id" required="1"/>
-                            <field name="name"/>
-                            <field name="unit_amount" string="Duration" widget="float_time"/>
-                            <field name="project_id" invisible="1"/>
-                        </tree>
-                    </field>
+                        <field name="timesheet_ids" context="{'default_project_id': project_id, 'default_res_model': 'project.task', 'default_res_id': id}">
+                            <tree editable="bottom" string="Timesheet Activities" default_order="date">
+                                <field name="date"/>
+                                <field name="user_id" required="1"/>
+                                <field name="name"/>
+                                <field name="unit_amount" string="Duration" widget="float_time"/>
+                                <field name="project_id" invisible="1"/>
+                                <field name="res_model" invisible="1"/>
+                                <field name="res_id" invisible="1"/>
+                            </tree>
+                        </field>
                     <group>
                      <group class="oe_subtotal_footer oe_right" name="project_hours">
                         <field name="effective_hours" widget="float_time" />

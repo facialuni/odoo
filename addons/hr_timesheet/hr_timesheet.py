@@ -7,7 +7,7 @@ from odoo import api, fields, models
 class AccountAnalyticLine(models.Model):
     _inherit = 'account.analytic.line'
 
-    task_id = fields.Many2one('project.task', 'Task')
+    #task_id = fields.Many2one('project.task', 'Task')
     project_id = fields.Many2one('project.project', 'Project', domain=[('allow_timesheets', '=', True)])
 
     @api.onchange('project_id')
@@ -19,6 +19,7 @@ class AccountAnalyticLine(models.Model):
         if vals.get('project_id'):
             project = self.env['project.project'].browse(vals.get('project_id'))
             vals['account_id'] = project.analytic_account_id.id
+            vals['timesheet_pack_id'] = project.timesheet_pack_id
         return super(AccountAnalyticLine, self).create(vals)
 
     @api.multi
@@ -26,4 +27,5 @@ class AccountAnalyticLine(models.Model):
         if vals.get('project_id'):
             project = self.env['project.project'].browse(vals.get('project_id'))
             vals['account_id'] = project.analytic_account_id.id
+            vals['timesheet_pack_id'] = project.timesheet_pack_id
         return super(AccountAnalyticLine, self).write(vals)
