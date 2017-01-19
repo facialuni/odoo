@@ -13,10 +13,13 @@ UPDATE ME
     'depends': [
         'analytic',
         'resource',
+        'hr',
     ],
     'data': [
+        'security/hr_timesheet_security.xml',
         'security/ir.model.access.csv',
         'views/timesheet_views.xml',
+        'views/hr_views.xml',
     ],
     'demo': [
     ],
