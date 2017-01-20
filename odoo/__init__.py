@@ -17,6 +17,17 @@ if len(sys.argv) > 1 and sys.argv[1] == 'gevent':
     psycogreen.gevent.patch_psycopg()
     evented = True
 
+import logging
+import os
+logging.captureWarnings(True)
+HERE = os.path.realpath(os.path.dirname(__file__))
+
+class Py3kFilter(logging.Filter):
+    def filter(self, record):
+        return record.pathname.startswith(HERE)
+
+logging.getLogger('py.warnings').addFilter(Py3kFilter())
+
 # Is the server running in prefork mode (e.g. behind Gunicorn).
 # If this is True, the processes have to communicate some events,
 # e.g. database update or cache invalidation. Each process has also
