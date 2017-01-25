@@ -49,7 +49,7 @@ class StockMove(models.Model):
         digits=0, store=True,
         help='Quantity in the default UoM of the product')
     product_uom_qty = fields.Float(
-        'Quantity',
+        'Uom Quantity',
         digits=dp.get_precision('Product Unit of Measure'),
         default=1.0, required=True, states={'done': [('readonly', True)]},
         help="This is the quantity of products from an inventory "

@@ -68,7 +68,7 @@ class MarketingCampaign(models.Model):
              "campaign activity. Cost and Revenue statistics are included in Campaign Reporting.",
         digits=dp.get_precision('Product Price'))
     segment_ids = fields.One2many('marketing.campaign.segment', 'campaign_id', 'Segments', readonly=False)
-    segments_count = fields.Integer(compute='_compute_segments_count', string='Segments')
+    segments_count = fields.Integer(compute='_compute_segments_count', string='Segments count')
 
     @api.multi
     def _compute_segments_count(self):

@@ -89,12 +89,12 @@ class StockMove(models.Model):
     quantity_available = fields.Float(
         'Quantity Available', compute="_qty_available",
         digits=dp.get_precision('Product Unit of Measure'))
-    quantity_done_store = fields.Float('Quantity', digits=0)
+    quantity_done_store = fields.Float('Done Quantity in store', digits=0)
     quantity_done = fields.Float(
-        'Quantity', compute='_qty_done_compute', inverse='_qty_done_set',
+        'Done Quantity', compute='_qty_done_compute', inverse='_qty_done_set',
         digits=dp.get_precision('Product Unit of Measure'))
     move_lot_ids = fields.One2many('stock.move.lots', 'move_id', string='Lots')
-    active_move_lot_ids = fields.One2many('stock.move.lots', 'move_id', domain=[('done_wo', '=', True)], string='Lots')
+    active_move_lot_ids = fields.One2many('stock.move.lots', 'move_id', domain=[('done_wo', '=', True)], string='Active Lots')
     bom_line_id = fields.Many2one('mrp.bom.line', 'BoM Line')
     unit_factor = fields.Float('Unit Factor')
     is_done = fields.Boolean(
