@@ -3,7 +3,6 @@
 import json
 import re
 from lxml import etree
-from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from werkzeug.urls import url_encode
 
@@ -43,7 +42,8 @@ class AccountInvoice(models.Model):
     _order = "date_invoice desc, number desc, id desc"
 
     @api.one
-    @api.depends('invoice_line_ids.price_subtotal', 'tax_line_ids.amount', 'currency_id', 'company_id', 'date_invoice', 'type')
+    @api.depends('invoice_line_ids.price_subtotal', 'tax_line_ids.amount', 'currency_id', 'company_id', 'date_invoice',
+                 'type')
     def _compute_amount(self):
         self.amount_untaxed = sum(line.price_subtotal for line in self.invoice_line_ids)
         self.amount_tax = sum(line.amount for line in self.tax_line_ids)
@@ -344,6 +344,9 @@ class AccountInvoice(models.Model):
     outstanding_credits_debits_widget = fields.Text(compute='_get_outstanding_info_JSON')
     payments_widget = fields.Text(compute='_get_payment_info_JSON')
     has_outstanding = fields.Boolean(compute='_get_outstanding_info_JSON')
+    cash_rounding_id = fields.Many2one('account.cash.rounding', string='Cash Rounding',
+        readonly=True, states={'draft': [('readonly', False)]},
+        help = 'The smallest coinage of the currency used to pay by cash.')
 
     #fields use to set the sequence, on the first invoice of the journal
     sequence_number_next = fields.Char(string='Next Number', compute="_get_sequence_prefix", inverse="_set_sequence_next")
@@ -549,12 +552,13 @@ class AccountInvoice(models.Model):
 
     @api.onchange('invoice_line_ids')
     def _onchange_invoice_line_ids(self):
-        taxes_grouped = self.get_taxes_values()
-        tax_lines = self.tax_line_ids.filtered('manual')
-        for tax in pycompat.values(taxes_grouped):
-            tax_lines += tax_lines.new(tax)
-        self.tax_line_ids = tax_lines
-        return
+        for inv in self:
+            # Recompute tax_line_ids
+            taxes_grouped = inv.get_taxes_values()
+            tax_lines = inv.tax_line_ids.browse([])
+            for tax in pycompat.values(taxes_grouped):
+                tax_lines += tax_lines.new(tax)
+            inv.tax_line_ids = tax_lines
 
     @api.onchange('partner_id', 'company_id')
     def _onchange_partner_id(self):
@@ -637,6 +641,38 @@ class AccountInvoice(models.Model):
             self.date_due = max(line[0] for line in pterm_list)
         elif self.date_due and (date_invoice > self.date_due):
             self.date_due = date_invoice
+
+    @api.onchange('cash_rounding_id', 'currency_id', 'amount_total', 'tax_line_ids')
+    def _onchange_cash_rounding_id(self):
+        # Drop previous cash rounding lines
+        lines_to_remove = self.invoice_line_ids.filtered(lambda l: l.is_rounding_line)
+        if lines_to_remove:
+            self.invoice_line_ids = self.invoice_line_ids - lines_to_remove
+
+        if self.cash_rounding_id:
+            rounding_amount = self.cash_rounding_id.compute_difference(self.currency_id, self.amount_total)
+            if not self.currency_id.is_zero(rounding_amount):
+                if self.cash_rounding_id.strategy == 'biggest_tax':
+                    # Search for the biggest tax line and add the rounding amount to it
+                    if not self.tax_line_ids:
+                        raise UserError(_('The cash rounding cannot be applied because there is no tax set.\n'
+                                          'Please set up a tax or change the cash rounding method.'))
+                    biggest_tax_line = None
+                    for tax_line in self.tax_line_ids:
+                        if not biggest_tax_line or tax_line.amount > biggest_tax_line.amount:
+                            biggest_tax_line = tax_line
+                    biggest_tax_line.amount += rounding_amount
+                elif self.cash_rounding_id.strategy == 'add_invoice_line':
+                    # Create a new invoice line to perform the rounding
+                    self.env['account.invoice.line'].new({
+                        'name': self.cash_rounding_id.name,
+                        'invoice_id': self.id,
+                        'account_id': self.cash_rounding_id.account_id.id,
+                        'price_unit': rounding_amount,
+                        'quantity': 1,
+                        'is_rounding_line': True,
+                        'sequence': 9999  # always last line
+                    })
 
     @api.multi
     def action_invoice_draft(self):
@@ -1393,6 +1429,7 @@ class AccountInvoiceLine(models.Model):
         related='invoice_id.partner_id', store=True, readonly=True, related_sudo=False)
     currency_id = fields.Many2one('res.currency', related='invoice_id.currency_id', store=True, related_sudo=False)
     company_currency_id = fields.Many2one('res.currency', related='invoice_id.company_currency_id', readonly=True, related_sudo=False)
+    is_rounding_line = fields.Boolean(string='Rounding Line', help='Is a rounding line in case of cash rounding.')
 
     @api.model
     def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):

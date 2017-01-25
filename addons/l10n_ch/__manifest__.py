@@ -45,7 +45,8 @@ Here is how it works:
     'demo': [
         '../account/demo/account_bank_statement.yml',
         '../account/demo/account_invoice_demo.yml',
+        'demo/account_cash_rounding.xml',
     ],
-    'post_init_hook': 'load_translations',
+    'post_init_hook': 'post_init',
 
 }
