@@ -29,6 +29,12 @@
                 <t t-set="counter" t-value="starred_counter"/>
                 <t t-call="mail.chat.SidebarNeedaction"/>
             </div>
+            <div t-if="is_moderator" t-attf-class="o_mail_chat_channel_item #{(active_channel_id == 'channel_moderation') ? 'o_active': ''}"
+                 data-channel-id="channel_moderation">
+                <span class="o_channel_name"> <i class="fa fa-envelope"/> Moderation Queue </span>
+                <t t-set="counter" t-value="moderation_counter"/>
+                <t t-call="mail.chat.SidebarNeedaction"/>
+            </div>
 
             <t t-set="channel_type" t-value="'public'"/>
             <t t-call="mail.chat.SidebarTitle">
@@ -129,11 +135,19 @@
             <button type="button" class="btn btn-primary btn-sm o_mail_chat_button_unstar_all" title="Unstar all messages">Unstar all</button>
             <button type="button" class="btn btn-default btn-sm o_mail_chat_button_unsubscribe" title="Unsubscribe from channel">Unsubscribe</button>
             <button type="button" class="btn btn-default btn-sm o_mail_chat_button_settings" title="Open channel settings">Settings</button>
+            <button type="button" data-moderator-action="accept" class="btn btn-default btn-sm o_mail_chat_button_moderate_all" title="Accept selected messages">Accept</button>
+            <button type="button" data-moderator-action="reject" class="btn btn-default btn-sm o_mail_chat_button_moderate_all" title="Reject selected messages">Reject</button>
+            <button type="button" data-moderator-action="discard" class="btn btn-default btn-sm o_mail_chat_button_moderate_all" title="Discard selected messages">Discard</button>
         </div>
     </t>
 
     <!-- Invite dialog's content -->
     <div t-name="mail.PartnerInviteDialog">
         <input type="text" class="o_mail_chat_partner_invite_input" id="mail_search_partners"/>
+    </div>
+
+    <div t-name="mail.ModeratorRejectMessageDialog">
+        <input class="form-control" type="text" id="message_title" placeholder="Subject" value="Message Rejected"/>
+        <textarea class="form-control mt16" id="reject_message" placeholder="Mail Body">Your message was rejected by moderator.</textarea>
     </div>
 </templates>
