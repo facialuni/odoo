@@ -344,6 +344,10 @@ class Product(models.Model):
         return res
 
     @api.multi
+    def action_create_inventory_adjustment(self):
+        return self.product_tmpl_id.with_context({'default_product_id': self.id}).action_create_inventory_adjustment()
+
+    @api.multi
     def action_view_routes(self):
         return self.mapped('product_tmpl_id').action_view_routes()
 
@@ -497,6 +501,18 @@ class ProductTemplate(models.Model):
         action = self.env.ref('stock.action_routes_form').read()[0]
         action['domain'] = [('id', 'in', routes.ids)]
         return action
+
+    @api.multi
+    def action_create_inventory_adjustment(self):
+        product_ref_name = self.name + ' - ' + datetime.today().strftime('%m/%d/%y')
+        ctx = {'default_filter': 'product', 'default_product_id': self._context.get('default_product_id', self.product_variant_id.id), 'default_name': product_ref_name}
+        return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'stock.inventory',
+            'context': ctx,
+        }
 
     @api.multi
     def action_open_quants(self):
