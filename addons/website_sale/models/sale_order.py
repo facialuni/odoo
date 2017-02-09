@@ -2,6 +2,9 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import logging
 import random
+import uuid
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 from odoo import api, models, fields, _
 from odoo.http import request
@@ -21,6 +24,10 @@ class SaleOrder(models.Model):
     )
     cart_quantity = fields.Integer(compute='_compute_cart_info', string='Cart Quantity')
     only_services = fields.Boolean(compute='_compute_cart_info', string='Only Services')
+    is_abandoned_cart = fields.Boolean(compute='_compute_abandoned_cart', string='Abandoned Cart')
+    cart_recovery_email_sent = fields.Boolean(
+        default=False,
+        string='Cart recovery email already sent')
     can_directly_mark_as_paid = fields.Boolean(compute='_compute_can_directly_mark_as_paid',
         string="Can be directly marked as paid", store=True,
         help="""Checked if the sales order can directly be marked as paid, i.e. if the quotation
@@ -38,6 +45,14 @@ class SaleOrder(models.Model):
         for order in self:
             order.cart_quantity = int(sum(order.mapped('website_order_line.product_uom_qty')))
             order.only_services = all(l.product_id.type in ('service', 'digital') for l in order.website_order_line)
+
+    @api.multi
+    @api.depends('team_id.team_type', 'date_order', 'order_line', 'state', 'partner_id')
+    def _compute_abandoned_cart(self):
+        time_constraint = fields.Datetime.to_string(datetime.now() - relativedelta(hours=1))
+        for order in self:
+            domain = order.date_order <= time_constraint and order.team_id.team_type == 'website' and order.state == 'draft' and order.partner_id.id != self.env.ref('base.public_partner').id and order.order_line
+            order.is_abandoned_cart = bool(domain)
 
     @api.multi
     def _cart_find_product_line(self, product_id=None, line_id=None, **kwargs):
@@ -173,6 +188,28 @@ class SaleOrder(models.Model):
             accessory_products = order.website_order_line.mapped('product_id.accessory_product_ids').filtered(lambda product: product.website_published)
             accessory_products -= order.website_order_line.mapped('product_id')
             return random.sample(accessory_products, len(accessory_products))
+
+    @api.multi
+    def action_recovery_email_send(self):
+        compose_form_id = self.env.ref('mail.email_compose_message_wizard_form').id
+        template_id = self.env.ref('website_sale.mail_template_sale_cart_recovery').id
+        ctx = {
+            'default_composition_mode': 'mass_mail' if len(self) > 1 else 'comment',
+            'default_res_id': self.ids[0],
+            'default_model': 'sale.order',
+            'default_use_template': bool(template_id),
+            'default_template_id': template_id,
+            'active_ids': self.ids,
+            }
+        return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'mail.compose.message',
+            'view_id': compose_form_id,
+            'target': 'new',
+            'context': ctx,
+        }
 
     def action_mark_as_paid(self):
         """ Mark directly a sales order as paid if:

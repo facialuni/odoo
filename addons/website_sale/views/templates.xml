@@ -1766,4 +1766,21 @@
           </div>
         </t>
     </template>
+
+    <!-- When open cart from abandoned email template and already existing diffrent cart then link in session, Ask for replace/merge the existing cart with the new cart -->
+    <template id="abandoned_cart_restore" inherit_id="website_sale.cart" name="abandoned cart restore">
+        <xpath expr="//t[@t-call='website_sale.cart_lines']" position="before">
+            <div class="row">
+                <div t-if="proceed" class="mt8 bg-danger" style="padding: 15px;">
+                    <p>Your Previous Cart has been completed.</p>
+                    <p t-if="website_sale_order">Please proceed your current cart.</p>
+                </div>
+                <div t-if="token" class="mt8 bg-danger" style="padding: 15px;">
+                    <p>This is your Current cart.</p>
+                    <p><a t-attf-href="/shop/cart/#{token}?new=true">Click Here</a> if you want to restore your previous cart. Your Current cart will be replace with your previous cart.</p>
+                    <p><a t-attf-href="/shop/cart/#{token}?merge=true">Click Here</a> if you want to merge your previous cart into current cart.</p>
+                </div>
+            </div>
+        </xpath>
+    </template>
 </odoo>

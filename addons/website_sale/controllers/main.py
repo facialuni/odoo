@@ -996,3 +996,29 @@ class WebsiteSale(http.Controller):
             states=[(st.id, st.name, st.code) for st in country.get_website_sale_states(mode=mode)],
             phone_code=country.phone_code
         )
+
+    @http.route("/shop/cart/<token>", type='http', auth="public", website=True)
+    def access_abandoned_cart(self, token=None, **post):
+        """
+        Token will be pass from revival email template and it will redirect to the selected cart.
+        """
+        order = request.env['sale.order'].sudo().search([('access_token', '=', token)], limit=1)
+        if not order:
+            return request.render('website.404')
+        if order.state != 'draft': # check that cart has been procced or not.
+            response = self.cart()
+            response.qcontext.update({'proceed': 1})
+            return response
+        if post.get('new'):  # redirect to previous cart
+            request.session['sale_order_id'] = order.id
+            return request.redirect("/shop/cart")
+        if post.get('merge'): # merge previous cart into current cart
+            order.order_line.write({'order_id': request.session['sale_order_id']})
+            order.action_cancel()
+            return request.redirect("/shop/cart")
+        if request.session.get('sale_order_id') and order.id != request.session['sale_order_id']:
+            response = self.cart()
+            response.qcontext.update({'token': order.access_token})
+            return response
+        request.session['sale_order_id'] = order.id
+        return request.redirect("/shop/cart")
