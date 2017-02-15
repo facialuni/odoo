@@ -18,6 +18,68 @@
         </div>
     </t>
 
+    <t t-name="Attachment.Slideshow">
+        <div class="container">
+            <div t-attf-id="Slideshow_#{widget.active_attachment.id}" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner" role="listbox">
+                    <t t-foreach="widget.attachment_ids" t-as="attachment">
+                        <div t-attf-class="item #{attachment.id == widget.active_attachment.id and 'active' or ''}">
+                            <t t-if="attachment.type == 'video'">
+                                <video  controls="controls">
+                                    <source t-attf-src="/web/image/#{attachment.id}" t-att-data-type="attachment.mimetype"/>
+                                </video>
+                            </t>
+                            <t t-if="attachment.type == 'image'">
+                                <img class="img" t-attf-src="/web/image/#{attachment.id}" t-att-alt="attachment.alt"/>
+                            </t>
+                            <div class="carousel-caption hidden">
+                                <h2>
+                                    <a t-att-href='attachment.url' target="_blank" t-att-data-mimetype="attachment.mimetype" t-attf-data-src="/web/image/#{attachment.id}/100x80">
+                                        <i class='fa fa-download'/> <t t-esc='attachment.name'/>
+                                    </a>
+                                </h2>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+
+                <t t-if="widget.attachment_ids.length > 1">
+                    <a class="carousel-control left" t-attf-href="#Slideshow_#{widget.active_attachment.id}" data-slide="prev">
+                        <span class="fa fa-chevron-left"/>
+                    </a>
+                    <a class="carousel-control right" t-attf-href="#Slideshow_#{widget.active_attachment.id}" data-slide="next">
+                        <span class="fa fa-chevron-right"/>
+                    </a>
+                </t>
+            </div>
+        </div>
+        <div class="text-center o_attachment_download">
+            <h2>
+                <a t-att-href='widget.active_attachment.url' target="_blank" t-att-data-mimetype="widget.active_attachment.mimetype" t-attf-data-src="/web/image/#{widget.active_attachment.id}/100x80">
+                    <i class='fa fa-download'/> <t t-esc='widget.active_attachment.name'/>
+                </a>
+            </h2>
+        </div>
+    </t>
+
+    <t t-name="Attachment.Popup.Modal">
+        <t t-if="widget.attachment_ids">
+            <div class="modal fade" id="o_attacment_popup" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-body o_attachment_popup_content">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span aria-hidden="true">&amp;times;</span>
+                                <span class="sr-only">Close</span>
+                            </button>
+                            <t t-call="Attachment.Slideshow"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </t>
+
     <!-- When a channel is empty-->
     <div t-name="mail.EmptyChannel" class="o_mail_no_content">
         <t t-if="options.channel_id==='channel_inbox'">
@@ -175,10 +237,19 @@
     </t>
 
     <t t-name="mail.Attachment">
+        <t t-set="type" t-value="attachment.mimetype.split('/').shift()"/>
         <div t-attf-class="o_attachment #{attachment.upload ? 'o_attachment_uploading' : ''}" t-att-title="attachment.name">
-            <a class="o_image" t-att-href='attachment.url' target="_blank" t-att-data-mimetype="attachment.mimetype" t-attf-data-src="/web/image/#{attachment.id}/100x80">
-                <span class='o_attachment_name'><t t-esc='attachment.name'/></span>
-            </a>
+            <t t-if="type == 'image'">
+                <img t-att-data-id="attachment.id" class="o_image o_attachment_popup" t-attf-src="/web/image/#{attachment.id}" t-attf-alt="#{attachment.name}">
+                    <span class='o_attachment_name'><t t-esc='attachment.name'/></span>
+                </img>
+            </t>
+
+            <t t-if="type != 'image'">
+                <a t-att-data-id="attachment.id" t-attf-class="o_image #{type == 'video' ? 'o_attachment_popup' : ''}"  t-att-href='attachment.url' target="_blank" t-att-data-mimetype="attachment.mimetype" t-attf-data-src="/web/image/#{attachment.id}/100x80" t-attf-title="#{attachment.name}">
+                    <span class='o_attachment_name'><t t-esc='attachment.name'/></span>
+                </a>
+           </t>
             <t t-if="editable">
                 <div class="o_attachment_delete">
                     <i class='fa fa-times-circle' title="Delete this attachment" t-att-data-id="attachment.id"/>

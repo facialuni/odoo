@@ -3,6 +3,7 @@ odoo.define('mail.ChatThread', function (require) {
 
 var core = require('web.core');
 var Widget = require('web.Widget');
+var document_viewer = require('mail.attachment.popup');
 
 var QWeb = core.qweb;
 var _t = core._t;
@@ -30,6 +31,11 @@ var Thread = Widget.extend({
         "click img": "on_click_redirect",
         "click strong": "on_click_redirect",
         "click .o_thread_show_more": "on_click_show_more",
+        "click .o_attachment_popup": function(event) {
+            event.preventDefault();
+            var attachment_id = $(event.target).data('id');
+            this.document_viewer.on_attachment_popup(attachment_id);
+        },
         "click .o_thread_message_needaction": function (event) {
             var message_id = $(event.currentTarget).data('message-id');
             this.trigger("mark_as_read", message_id);
@@ -109,6 +115,12 @@ var Thread = Widget.extend({
             options: options,
             ORDER: ORDER,
         }));
+
+        var attachments = _.flatten(_.map(messages, function(msg){
+            return msg.attachment_ids
+        }));
+        this.set('attachment_ids', attachments);
+        this.document_viewer = new document_viewer(this);
 
         _.each(msgs, function(msg) {
             var $msg = self.$('.o_thread_message[data-message-id="'+ msg.id +'"]');

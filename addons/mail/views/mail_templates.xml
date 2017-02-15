@@ -44,6 +44,12 @@
             </xpath>
         </template>
 
+        <template id="assets_common" name="attachment popup assets" inherit_id="web.assets_common">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/mail/static/src/js/document_viewer.js"></script>
+            </xpath>
+        </template>
+
         <template id="message_origin_link">
             <p>This <t t-esc="self._description.lower()"/> has been <span t-if="edit">modified</span><span t-if="not edit">created</span> from:
                 <t t-foreach="origin" t-as="o">
