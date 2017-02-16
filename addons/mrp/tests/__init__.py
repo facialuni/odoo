@@ -5,3 +5,4 @@ import test_order
 import test_stock
 import test_workorder_operation
 import test_procurement
+import test_oee
