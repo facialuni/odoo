@@ -18,7 +18,7 @@ class CrmTeam(models.Model):
         help="Invoice revenue for the current month. This is the amount the sales "
                 "channel has invoiced this month. It is used to compute the progression ratio "
                 "of the current and target revenue on the kanban view.")
-    invoiced_target = fields.Integer(
+    invoiced_target = fields.Float(
         string='Invoicing Target',
         help="Target of invoice revenue for the current month. This is the amount the sales "
              "channel estimates to be able to invoice this month.")
