@@ -137,7 +137,6 @@ setup(
         'babel >= 1.0',
         'decorator',
         'docutils',
-        'feedparser',
         'gevent',
         'Jinja2',
         'lxml',  # windows binary http://www.lfd.uci.edu/~gohlke/pythonlibs/
