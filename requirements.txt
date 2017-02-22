@@ -4,7 +4,6 @@ docutils==0.12
 ebaysdk==2.1.4
 gevent==1.1.2
 greenlet==0.4.10
-jcconv==0.2.3
 Jinja2==2.8
 lxml==3.5.0
 Mako==1.0.4

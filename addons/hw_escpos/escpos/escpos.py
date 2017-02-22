@@ -11,11 +11,6 @@ import xml.etree.ElementTree as ET
 
 from PIL import Image
 
-try:
-    import jcconv
-except ImportError:
-    jcconv = None
-
 try: 
     import qrcode
 except ImportError:
@@ -23,6 +18,7 @@ except ImportError:
 
 from constants import *
 from exceptions import *
+from . import jcconv
 
 def utfstr(stuff):
     """ converts stuff to string and does without failing if stuff is a utf8 string """
@@ -765,15 +761,12 @@ class Escpos:
             while True: # Trying all encoding until one succeeds
                 try:
                     if encoding == 'katakana': # Japanese characters
-                        if jcconv:
-                            # try to convert japanese text to a half-katakanas 
-                            kata = jcconv.kata2half(jcconv.hira2kata(char_utf8))
-                            if kata != char_utf8:
-                                self.extra_chars += len(kata.decode('utf-8')) - 1
-                                # the conversion may result in multiple characters
-                                return encode_str(kata.decode('utf-8')) 
-                        else:
-                             kata = char_utf8
+                        # try to convert japanese text to a half-katakanas
+                        kata = jcconv.kata2half(jcconv.hira2kata(char_utf8))
+                        if kata != char_utf8:
+                            self.extra_chars += len(kata.decode('utf-8')) - 1
+                            # the conversion may result in multiple characters
+                            return encode_str(kata.decode('utf-8'))
                         
                         if kata in TXT_ENC_KATAKANA_MAP:
                             encoded = TXT_ENC_KATAKANA_MAP[kata]
