@@ -426,7 +426,7 @@ class report_sxw(report_rml, preprocess.report):
                 results.append(result)
             if results:
                 if results[0][1]=='pdf':
-                    from pyPdf import PdfFileWriter, PdfFileReader
+                    from PyPDF2 import PdfFileWriter, PdfFileReader
                     output = PdfFileWriter()
                     for r in results:
                         reader = PdfFileReader(cStringIO.StringIO(r[0]))

@@ -22,7 +22,7 @@ import time
 from contextlib import closing
 from distutils.version import LooseVersion
 from functools import partial
-from pyPdf import PdfFileWriter, PdfFileReader
+from PyPDF2 import PdfFileWriter, PdfFileReader
 from reportlab.graphics.barcode import createBarcodeDrawing
 
 
