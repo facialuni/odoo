@@ -86,7 +86,6 @@ def py2exe_options():
                         'mock',
                         'ofxparse',
                         'odoo',
-                        'openid',
                         'passlib',
                         'PIL',
                         'poplib',
@@ -157,7 +156,6 @@ setup(
         'pyserial',
         'python-dateutil',
         'python-ldap',  # optional
-        'python-openid',
         'pytz',
         'pyusb >= 1.0.0b1',
         'pyyaml',
