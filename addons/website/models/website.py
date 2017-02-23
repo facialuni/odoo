@@ -541,7 +541,7 @@ class Website(models.Model):
             convitems = converters.items()
             # converters with a domain are processed after the other ones
             gd = lambda x: hasattr(x[1], 'domain') and (x[1].domain != '[]')
-            convitems.sort(lambda x, y: cmp(gd(x), gd(y)))
+            convitems.sort(key=gd)
             for (i, (name, converter)) in enumerate(convitems):
                 newval = []
                 for val in values:

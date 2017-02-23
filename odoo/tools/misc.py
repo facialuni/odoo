@@ -247,6 +247,11 @@ def _fileopen(path, mode, basedir, pathinfo, basename=None):
 #----------------------------------------------------------
 # iterables
 #----------------------------------------------------------
+def unique(elems):
+    """ Return a list with the elements of ``elems`` without duplicates """
+    seen = set()
+    return [elem for elem in elems if not (elem in seen or seen.add(elem))]
+
 def flatten(list):
     """Flatten a list of elements into a uniqu list
     Author: Christophe Simonis (christophe@tinyerp.com)

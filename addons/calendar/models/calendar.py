@@ -62,6 +62,25 @@ def is_calendar_id(record_id):
     return len(str(record_id).split('-')) != 1
 
 
+class Desc(object):
+    """ Value wrapper that reverses order. """
+    __slots__ = ['val']
+    def __init__(self, val):
+        self.val = val
+    def __eq__(self, other):
+        return self.val == other.val
+    def __ne__(self, other):
+        return self.val != other.val
+    def __ge__(self, other):
+        return self.val <= other.val
+    def __gt__(self, other):
+        return self.val < other.val
+    def __le__(self, other):
+        return self.val >= other.val
+    def __lt__(self, other):
+        return self.val > other.val
+
+
 class Contacts(models.Model):
     _name = 'calendar.contacts'
 
@@ -1044,20 +1063,24 @@ class Meeting(models.Model):
                 result_data.append(meeting.get_search_fields(order_fields, r_date=r_date))
 
         if order_fields:
-            uniq = lambda it: collections.OrderedDict((id(x), x) for x in it).values()
+            fmapping = {
+                'start': 'sort_start',
+                'start_date': 'sort_start',
+                'start_datetime': 'sort_start',
+            }
+            fmap = lambda name: fmapping.get(name, name)
 
-            def comparer(left, right):
-                for fn, mult in comparers:
-                    result = cmp(fn(left), fn(right))
-                    if result:
-                        return mult * result
-                return 0
-
-            sort_params = [key.split()[0] if key[-4:].lower() != 'desc' else '-%s' % key.split()[0] for key in (order or self._order).split(',')]
-            sort_params = uniq([comp if comp not in ['start', 'start_date', 'start_datetime'] else 'sort_start' for comp in sort_params])
-            sort_params = uniq([comp if comp not in ['-start', '-start_date', '-start_datetime'] else '-sort_start' for comp in sort_params])
-            comparers = [((itemgetter(col[1:]), -1) if col[0] == '-' else (itemgetter(col), 1)) for col in sort_params]
-            ids = [r['id'] for r in sorted(result_data, cmp=comparer)]
+            # retrieve the fields to order by, and whether order is descending
+            sort_params = tools.unique(
+                (fmap(key.split()[0]), key.lower().endswith(' desc'))
+                for key in (order or self._order).split(',')
+            )
+            # determine sorting key: list of field values
+            def key(data):
+                return [Desc(data[name]) if desc else data[name]
+                        for name, desc in sort_params]
+            # sort data
+            ids = [data['id'] for data in sorted(result_data, key=key)]
 
         return ids
 

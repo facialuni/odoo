@@ -254,10 +254,8 @@ class Cursor(object):
             sqllogs = {'from': self.sql_from_log, 'into': self.sql_into_log}
             sum = 0
             if sqllogs[type]:
-                sqllogitems = sqllogs[type].items()
-                sqllogitems.sort(key=lambda k: k[1][1])
+                sqllogitems = sorted(sqllogs[type].items(), key=lambda k: k[1])
                 _logger.debug("SQL LOG %s:", type)
-                sqllogitems.sort(lambda x, y: cmp(x[1][0], y[1][0]))
                 for r in sqllogitems:
                     delay = timedelta(microseconds=r[1][1])
                     _logger.debug("table: %s: %s/%s", r[0], delay, r[1][0])
