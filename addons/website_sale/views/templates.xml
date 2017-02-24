@@ -1351,7 +1351,7 @@
                                 </table>
                             </div>
                             <div class="row">
-                                <div class="col-lg-5 col-sm-4 col-md-4 text-muted" id="right_column"/>
+                                <div class="col-lg-5 col-sm-4 col-md-4 text-muted" id="coupon_box"/>
                                 <t t-call="website_sale.total">
                                     <t t-set='extra_class' t-value='"col-lg-7 col-sm-8 col-md-8"'/>
                                 </t>
@@ -1440,7 +1440,7 @@
     </template>
 
     <template id="reduction_code_payment" inherit_id="website_sale.payment" active="True" customize_show="True" name="Coupon Code">
-        <xpath expr="//div[@id='right_column']" position="inside">
+        <xpath expr="//div[@id='coupon_box']" position="inside">
             <p>
               Have a coupon code? Fill in this field and apply.
             </p>
