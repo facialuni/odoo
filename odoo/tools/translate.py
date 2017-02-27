@@ -23,7 +23,7 @@ import odoo
 from odoo.tools import config
 from odoo.tools.misc import file_open, get_iso_codes, SKIPPED_ELEMENT_TYPES
 from odoo.tools.osutil import walksymlinks
-from odoo import sql_db, SUPERUSER_ID
+from odoo import SUPERUSER_ID
 
 _logger = logging.getLogger(__name__)
 
@@ -337,7 +337,7 @@ class GettextAlias(object):
         # find current DB based on thread/worker db name (see netsvc)
         db_name = getattr(threading.currentThread(), 'dbname', None)
         if db_name:
-            return sql_db.db_connect(db_name)
+            return odoo.sql_db.db_connect(db_name)
 
     def _get_cr(self, frame, allow_create=True):
         # try, in order: cr, cursor, self.env.cr, self.cr,

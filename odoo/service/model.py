@@ -13,7 +13,7 @@ from odoo.models import check_method_name
 from odoo.tools.translate import translate
 from odoo.tools.translate import _
 
-import security
+from . import security
 
 _logger = logging.getLogger(__name__)
 
