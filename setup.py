@@ -150,11 +150,11 @@ setup(
         'psycopg2 >= 2.2',
         'python-chart',
         'pydot',
+        'pyldap',  # optional
         'pyparsing',
         'PyPDF2',
         'pyserial',
         'python-dateutil',
-        'python-ldap',  # optional
         'pytz',
         'pyusb >= 1.0.0b1',
         'pyyaml',
