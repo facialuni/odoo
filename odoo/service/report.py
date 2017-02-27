@@ -59,7 +59,7 @@ def exp_render_report(db, uid, object, ids, datas=None, context=None):
         self_reports[id]['result'] = result
         self_reports[id]['format'] = format
         self_reports[id]['state'] = True
-    except Exception, exception:
+    except Exception as exception:
 
         _logger.exception('Exception: %s\n', exception)
         if hasattr(exception, 'name') and hasattr(exception, 'value'):
@@ -98,7 +98,7 @@ def exp_report(db, uid, object, ids, datas=None, context=None):
                 self_reports[id]['result'] = result
                 self_reports[id]['format'] = format
                 self_reports[id]['state'] = True
-            except Exception, exception:
+            except Exception as exception:
                 _logger.exception('Exception: %s\n', exception)
                 if hasattr(exception, 'name') and hasattr(exception, 'value'):
                     self_reports[id]['exception'] = odoo.exceptions.DeferredException(tools.ustr(exception.name), tools.ustr(exception.value))
@@ -141,6 +141,6 @@ def exp_report_get(db, uid, report_id):
         if self_reports[report_id]['uid'] == uid:
             return _check_report(report_id)
         else:
-            raise Exception, 'AccessDenied'
+            raise Exception('AccessDenied')
     else:
-        raise Exception, 'ReportNotFound'
+        raise Exception('ReportNotFound')
