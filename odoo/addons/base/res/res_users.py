@@ -779,7 +779,7 @@ class GroupsView(models.Model):
                 others += g
         # build the result
         res = []
-        for app, gs in sorted(by_app.iteritems(), key=lambda (a, _): a.sequence or 0):
+        for app, gs in sorted(by_app.iteritems(), key=lambda kv: kv[0].sequence or 0):
             res.append(linearize(app, gs))
         if others:
             res.append((self.env['ir.module.category'], 'boolean', others))
