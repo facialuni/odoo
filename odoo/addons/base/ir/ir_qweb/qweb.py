@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import ast
 from collections import OrderedDict, Sized, Mapping, defaultdict
+from functools import reduce
 from lxml import etree, html
 import re
 import traceback

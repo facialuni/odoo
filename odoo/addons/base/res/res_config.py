@@ -4,7 +4,7 @@ import json
 import logging
 import re
 
-from operator import attrgetter, add
+from operator import attrgetter
 from lxml import etree
 
 from odoo import api, models, registry, SUPERUSER_ID, _
@@ -467,7 +467,7 @@ class ResConfigSettings(models.TransientModel, ResConfigModuleInstallationMixin)
             elif name.startswith('group_') and field.type in ('boolean', 'selection') and \
                     hasattr(field, 'implied_group'):
                 field_group_xmlids = getattr(field, 'group', 'base.group_user').split(',')
-                field_groups = reduce(add, map(ref, field_group_xmlids))
+                field_groups = sum(map(ref, field_group_xmlids))
                 groups.append((name, field_groups, ref(field.implied_group)))
             elif name.startswith('module_') and field.type in ('boolean', 'selection'):
                 module = IrModule.sudo().search([('name', '=', name[7:])], limit=1)

@@ -4,6 +4,7 @@
 import cStringIO
 import os
 import time
+from functools import reduce
 
 from lxml import etree
 from pychart import area, arrow, axis, bar_plot, canvas, category_coord, \
