@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from __future__ import print_function
 import re
 
 from lxml import etree
@@ -83,4 +84,4 @@ if __name__=='__main__':
 </story>''')
     a = report()
     result = a.preprocess_rml(node)
-    print etree.tostring(result)
+    print(etree.tostring(result))

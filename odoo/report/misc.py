@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from __future__ import print_function
 from pychart import color
 
 colorline = [color.T(r=((r+3) % 11)/10.0,
@@ -14,4 +15,4 @@ def choice_colors(n):
     return []
 
 if __name__=='__main__':
-    print choice_colors(10)
+    print(choice_colors(10))

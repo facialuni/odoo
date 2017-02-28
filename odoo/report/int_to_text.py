@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from __future__ import print_function
 unites = {
     0: '', 1:'un', 2:'deux', 3:'trois', 4:'quatre', 5:'cinq', 6:'six', 7:'sept', 8:'huit', 9:'neuf',
     10:'dix', 11:'onze', 12:'douze', 13:'treize', 14:'quatorze', 15:'quinze', 16:'seize',
@@ -53,4 +54,4 @@ def int_to_text(i):
 
 if __name__=='__main__':
     for i in range(1,999999,139):
-        print int_to_text(i)
+        print(int_to_text(i))

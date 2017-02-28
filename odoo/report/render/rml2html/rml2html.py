@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from __future__ import print_function
 import copy
 import cStringIO
 import sys
@@ -409,15 +410,15 @@ def parseString(data,localcontext = {}, fout=None):
         return fp.getvalue()
 
 def rml2html_help():
-    print 'Usage: rml2html input.rml >output.html'
-    print 'Render the standard input (RML) and output an HTML file'
+    print('Usage: rml2html input.rml >output.html')
+    print('Render the standard input (RML) and output an HTML file')
     sys.exit(0)
 
 if __name__=="__main__":
     if len(sys.argv)>1:
         if sys.argv[1]=='--help':
             rml2html_help()
-        print parseString(file(sys.argv[1], 'r').read()),
+        print(parseString(file(sys.argv[1], 'r').read()), end=' ')
     else:
-        print 'Usage: rml2html input.rml >output.html'
-        print 'Try \'rml2html --help\' for more information.'
+        print('Usage: rml2html input.rml >output.html')
+        print('Try \'rml2html --help\' for more information.')

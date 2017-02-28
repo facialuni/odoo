@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from __future__ import print_function
 import sys
 import StringIO
 
@@ -470,15 +471,15 @@ def parseString(rml, localcontext=None,fout=None, images=None, path='.',title=No
         return fp.getvalue()
 
 def trml2pdf_help():
-    print 'Usage: rml2txt input.rml >output.html'
-    print 'Render the standard input (RML) and output an TXT file'
+    print('Usage: rml2txt input.rml >output.html')
+    print('Render the standard input (RML) and output an TXT file')
     sys.exit(0)
 
 if __name__=="__main__":
     if len(sys.argv)>1:
         if sys.argv[1]=='--help':
             trml2pdf_help()
-        print parseString(file(sys.argv[1], 'r').read()).encode('iso8859-7')
+        print(parseString(file(sys.argv[1], 'r').read()).encode('iso8859-7'))
     else:
-        print 'Usage: trml2txt input.rml >output.pdf'
-        print 'Try \'trml2txt --help\' for more information.'
+        print('Usage: trml2txt input.rml >output.pdf')
+        print('Try \'trml2txt --help\' for more information.')
