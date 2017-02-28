@@ -498,7 +498,7 @@ def scan_languages():
         result = []
         with open(csvpath) as csvfile:
             reader = csv.reader(csvfile, delimiter=',', quotechar='"')
-            fields = reader.next()
+            fields = next(reader)
             code_index = fields.index("code")
             name_index = fields.index("name")
             for row in reader:
