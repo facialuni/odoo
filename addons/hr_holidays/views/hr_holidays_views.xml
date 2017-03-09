@@ -20,6 +20,9 @@
             <field name="model">hr.holidays</field>
             <field name="arch" type="xml">
                 <search string="Search Leave">
+                    <field name="employee_id"/>
+                    <field name="department_id"/>
+                    <field name="holiday_status_id"/>
                     <field name="name"/>
                     <filter domain="[('state','in',('confirm','validate1'))]" string="To Approve" name="approve"/>
                     <filter string="Approved Leaves" domain="[('state', '=', 'validate')]" name="validated"/>
@@ -42,9 +45,6 @@
                     <separator/>
                     <filter name="leaves" string="Leaves" domain="[('type', '=', 'remove')]"/>
                     <filter name="allocations" string="Allocations" domain="[('type', '=', 'add')]"/>
-                    <field name="employee_id"/>
-                    <field name="department_id"/>
-                    <field name="holiday_status_id"/>
                     <group expand="0" string="Group By">
                         <filter name="group_name" string="Description" context="{'group_by':'name'}"/>
                         <filter name="group_employee" string="Employee" context="{'group_by':'employee_id'}"/>
@@ -329,7 +329,7 @@
             groups="hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user"/>
 
         <record id="open_ask_holidays" model="ir.actions.act_window">
-            <field name="name">Leaves Request</field>
+            <field name="name">Leave Request</field>
             <field name="res_model">hr.holidays</field>
             <field name="view_type">form</field>
             <field name="view_id" ref="edit_holiday_new"/>
