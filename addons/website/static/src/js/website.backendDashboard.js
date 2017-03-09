@@ -152,7 +152,7 @@ var Dashboard = Widget.extend(ControlPanelMixin, {
                 .append("svg");
 
             svg
-                .attr("height", '24em')
+                .attr("height", '28em')
                 .datum(chart_values)
                 .call(chart);
 

@@ -30,14 +30,14 @@
         <div t-if="widget.groups.sale_salesman" class="row o_dashboard_sales">
             <div class="col-xs-12 o_box">
                 <div t-if="widget.dashboards_data.sales.summary.order_count">
-                    <div class="col-md-7 col-xs-12">
+                    <div class="col-md-6 col-xs-12">
                         <t t-if="widget.date_range">
                             <h2>Sales Since Last <t t-esc="widget.date_range"></t></h2>
                         </t>
                         <t t-else=""><h2>Sales</h2></t>
                         <div id="o_graph_sales" class="o_graph" data-type="sales"/>
                     </div>
-                    <div class="col-md-5 col-xs-12">
+                    <div class="col-md-6 col-xs-12">
                         <t t-call="website_sale.products_table"/>
                     </div>
                 </div>
@@ -62,7 +62,7 @@
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="row">
-                    <h4>AT A GLANCE</h4>
+                    <h4>STATISTICS</h4>
                     <a href="#" class="o_dashboard_action" name="website_sale.sale_report_action_dashboard">
                         <div class="col-sm-4 o_link_enable" title="Orders">
                             <div class="o_highlight">
@@ -101,19 +101,21 @@
             </div>
             <div class="col-md-12 col-xs-12 o_top_margin">
                 <div class="row">
-                    <h4>Best Sellers</h4>
-                    <table class="table table-responsive table-hover">
-                        <tr>
-                            <th>Product</th>
-                            <th>Quantity</th>
-                            <th>Sold</th>
-                        </tr>
-                        <tr class="o_product_template" t-foreach="widget.dashboards_data.sales.best_sellers" t-as="product" t-att-data-product-id="product.id">
-                            <td><t t-esc="product.name"/></td>
-                            <td><t t-esc="product.qty"/></td>
-                            <td><t t-esc="widget.render_monetary_field(product.sales, widget.data.currency)"/></td>
-                        </tr>
-                    </table>
+                    <div class="col-md-12 col-xs-12">
+                        <h4>Best Sellers</h4>
+                        <table class="table table-responsive table-hover">
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Sold</th>
+                            </tr>
+                            <tr class="o_product_template" t-foreach="widget.dashboards_data.sales.best_sellers" t-as="product" t-att-data-product-id="product.id">
+                                <td><t t-esc="product.name"/></td>
+                                <td><t t-esc="product.qty"/></td>
+                                <td><t t-esc="widget.render_monetary_field(product.sales, widget.data.currency)"/></td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

@@ -45,6 +45,7 @@ class WebsiteConfigSettings(models.TransientModel):
     module_website_sale = fields.Boolean("eCommerce")
     module_website_contract = fields.Boolean("Subscriptions")
     module_website_event_sale = fields.Boolean("Event Tickets")
+    module_website_links = fields.Boolean(string="Link Trackers")
 
     favicon = fields.Binary('Favicon', related='website_id.favicon')
     # Set as global config parameter since methods using it are not website-aware. To be changed

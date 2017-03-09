@@ -32,4 +32,6 @@ WebsiteBackend.include({
     },
 });
 
+return WebsiteBackend;
+
 });
