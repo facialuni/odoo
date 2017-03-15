@@ -8,6 +8,7 @@
         <template id="assets_backend" name="im_livechat assets backend" inherit_id="web.assets_backend">
             <xpath expr="." position="inside">
                 <script type="text/javascript" src="/im_livechat/static/src/js/im_livechat_backend.js"></script>
+                <link rel="stylesheet" href="/im_livechat/static/src/less/im_livechat_backend.less"/>
             </xpath>
         </template>
 
