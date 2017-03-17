@@ -22,6 +22,7 @@ class SaleOrder(models.Model):
     cart_quantity = fields.Integer(compute='_compute_cart_info', string='Cart Quantity')
     payment_acquirer_id = fields.Many2one('payment.acquirer', string='Payment Acquirer', copy=False)
     payment_tx_id = fields.Many2one('payment.transaction', string='Last Transaction', copy=False)
+    payment_state = fields.Selection(related='payment_tx_id.state', readonly=True, store=True, track_visibility=None)
     only_services = fields.Boolean(compute='_compute_cart_info', string='Only Services')
 
     @api.multi
