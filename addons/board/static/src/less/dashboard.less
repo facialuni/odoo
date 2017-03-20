@@ -41,6 +41,10 @@
     }
     .oe_dashboard_column {
         vertical-align: top;
+        @media (max-width: @screen-md-max){
+            display: block;
+            width: 100% !important;
+        }
     }
 
     // Layout selector
@@ -52,6 +56,9 @@
     // Dashboard content
     .oe_dashboard {
         width: 100%;
+        @media (max-width: @screen-md-max){
+            table-layout: fixed;
+        }
         .oe_action {
             margin: 0 8px 8px 0;
             background-color: white;
@@ -86,12 +93,6 @@
                 .oe_maximize:after {
                     content: "+";
                     margin-left: 4px;
-                }
-                .oe_header_text {
-                    width: auto;
-                    visibility: hidden;
-                    display: inline-block;
-                    cursor: text;
                 }
                 span {
                     cursor: pointer;
