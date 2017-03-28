@@ -586,7 +586,7 @@ class Holidays(models.Model):
             if holiday.double_validation:
                 holiday.write({'second_approver_id': current_employee.id})
             else:
-                holiday.write({'first_approver_id': current_employee.id})
+                holiday.write({'first_approver_id': current_employee.id, 'second_approver_id': current_employee.id})
             if holiday.holiday_type == 'employee' and holiday.type == 'remove':
                 holiday._validate_leave_request()
             elif holiday.holiday_type in ['category', 'department']:
