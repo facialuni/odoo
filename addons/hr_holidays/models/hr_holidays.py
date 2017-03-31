@@ -14,7 +14,7 @@ from odoo.tools.translate import _
 _logger = logging.getLogger(__name__)
 
 
-HOURS_PER_DAY = 8 # doesn't seem right ...
+HOURS_PER_DAY = 8
 
 
 class HolidaysType(models.Model):
@@ -176,6 +176,24 @@ class Holidays(models.Model):
     def _default_employee(self):
         return self.env.context.get('default_employee_id') or self.env['hr.employee'].search([('user_id', '=', self.env.uid)], limit=1)
 
+    def _default_date_from(self):
+        if self.env.context.get('default_type') == 'add':
+            return False
+        employee_id = self.env.context.get('default_employee_id')
+        employee = self.env['hr.employee'].browse(employee_id) or self.env['hr.employee'].search([('user_id', '=', self.env.uid)], limit=1)
+        if not employee:
+            return False
+        return employee.get_start_work_hour(datetime.now())
+
+    def _default_date_to(self):
+        if self.env.context.get('default_type') == 'add':
+            return False
+        employee_id = self.env.context.get('default_employee_id')
+        employee = self.env['hr.employee'].browse(employee_id) or self.env['hr.employee'].search([('user_id', '=', self.env.uid)], limit=1)
+        if not employee:
+            return False
+        return employee.get_end_work_hour(datetime.now())
+
     name = fields.Char('Description')
     state = fields.Selection([
         ('draft', 'To Submit'),
@@ -192,9 +210,9 @@ class Holidays(models.Model):
         help='Green this button when the leave has been taken into account in the payslip.')
     report_note = fields.Text('HR Comments')
     user_id = fields.Many2one('res.users', string='User', related='employee_id.user_id', related_sudo=True, store=True, readonly=True)
-    date_from = fields.Datetime('Start Date', readonly=True, index=True, copy=False,
+    date_from = fields.Datetime('Start Date', default=_default_date_from, readonly=True, index=True, copy=False,
         states={'draft': [('readonly', False)]}, track_visibility='onchange')
-    date_to = fields.Datetime('End Date', readonly=True, copy=False,
+    date_to = fields.Datetime('End Date', default=_default_date_to, readonly=True, copy=False,
         states={'draft': [('readonly', False)]}, track_visibility='onchange')
     holiday_status_id = fields.Many2one(
         "hr.holidays.status", string="Leave Type", required=True, readonly=True,
@@ -292,11 +310,12 @@ class Holidays(models.Model):
 
     @api.constrains('date_from', 'date_to')
     def _check_date(self):
-        for holiday in self:
+        for holiday in self.filtered(lambda h: h.type == 'remove'):
             domain = [
                 ('date_from', '<=', holiday.date_to),
                 ('date_to', '>=', holiday.date_from),
                 ('employee_id', '=', holiday.employee_id.id),
+                ('type', '=', 'remove'),
                 ('id', '!=', holiday.id),
                 ('type', '=', holiday.type),
                 ('state', 'not in', ['refuse', 'draft']),
@@ -349,14 +368,16 @@ class Holidays(models.Model):
         date_from = self.date_from
         date_to = self.date_to
 
-        # No date_to set so far: automatically compute one 8 hours later
         if date_from and (not date_to or date_to < date_from):
-            date_to_with_delta = fields.Datetime.from_string(date_from) + timedelta(hours=HOURS_PER_DAY)
-            self.date_to = str(date_to_with_delta)
+            if self.employee_id:
+                self.date_to = self.employee_id.get_end_work_hour(fields.Date.from_string(date_from))
+            else:
+                date_to_with_delta = fields.Datetime.from_string(date_from) + timedelta(hours=HOURS_PER_DAY)
+                self.date_to = str(date_to_with_delta)
 
         # Compute and update the number of days
-        if (date_to and date_from) and (date_from <= date_to):
-            self.number_of_days_temp = self._get_number_of_days(date_from, date_to, self.employee_id.id)
+        if (date_to and date_from) and (date_from <= self.date_to):
+            self.number_of_days_temp = self._get_number_of_days(date_from, self.date_to, self.employee_id.id)
         else:
             self.number_of_days_temp = 0
 
