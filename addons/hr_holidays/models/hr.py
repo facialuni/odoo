@@ -31,7 +31,7 @@ class Department(models.Model):
         today_end = fields.Datetime.to_string(today_date + relativedelta(hours=23, minutes=59, seconds=59))
         for department in self:
             data = self.env['hr.holidays'].search_read(
-                [('department_id', '=', department.id), ('state', 'not in', ['cancel', 'refuse']),
+                [('department_id', '=', department.id), ('state', '!=', 'refuse'),
                  ('date_from', '<=', today_end), ('date_to', '>=', today_start), ('type', '=', 'remove')],
                 ['employee_id'])
             ids = [d['employee_id'][0] for d in data]
@@ -54,7 +54,7 @@ class Department(models.Model):
              ('state', '=', 'confirm'), ('type', '=', 'add')], # validate1 ?
             ['department_id'], ['department_id'])
         absence_data = Holiday.read_group(
-            [('department_id', 'in', self.ids), ('state', 'not in', ['cancel', 'refuse']), # draft ?
+            [('department_id', 'in', self.ids), ('state', 'not in', ['draft', 'refuse']),
              ('date_from', '<=', today_end), ('date_to', '>=', today_start), ('type', '=', 'remove')],
             ['department_id'], ['department_id'])
 
@@ -109,7 +109,6 @@ class Employee(models.Model):
             ('refuse', 'Refused'), # why ? it'll never take this value
             ('validate1', 'Waiting Second Approval'),
             ('validate', 'Approved'),
-            ('cancel', 'Cancelled') # why ? it'll never take this value
         ])
     current_leave_id = fields.Many2one('hr.holidays.status', compute='_compute_leave_status', string="Current Leave Type")
     leave_date_from = fields.Date('From Date', compute='_compute_leave_status')
@@ -186,7 +185,7 @@ class Employee(models.Model):
             ('date_from', '<=', fields.Datetime.now()), # why is this compared to now(), but the absent employee id above relative to the day ?
             ('date_to', '>=', fields.Datetime.now()),
             ('type', '=', 'remove'),
-            ('state', 'not in', ('cancel', 'refuse')) # draft ?
+            ('state', 'not in', ('draft', 'refuse')),
         ])
         leave_data = {}
         for holiday in holidays:
@@ -229,7 +228,7 @@ class Employee(models.Model):
         today_end = fields.Datetime.to_string(today_date + relativedelta(hours=23, minutes=59, seconds=59))
         data = self.env['hr.holidays'].read_group([
             ('employee_id', 'in', self.ids),
-            ('state', 'not in', ['cancel', 'refuse']), # draft ...
+            ('state', 'not in', ['draft', 'refuse']),
             ('date_from', '<=', today_end), # here we are working with day start & end again ...
             ('date_to', '>=', today_start),
             ('type', '=', 'remove')
@@ -248,7 +247,7 @@ class Employee(models.Model):
         today_end = fields.Datetime.to_string(today_date + relativedelta(hours=23, minutes=59, seconds=59))
         holidays = self.env['hr.holidays'].sudo().search([
             ('employee_id', '!=', False),
-            ('state', 'not in', ['cancel', 'refuse']),
+            ('state', 'not in', ['draft', 'refuse']),
             ('date_from', '<=', today_end),
             ('date_to', '>=', today_start),
             ('type', '=', 'remove')

@@ -179,7 +179,6 @@ class Holidays(models.Model):
     name = fields.Char('Description')
     state = fields.Selection([
         ('draft', 'To Submit'),
-        ('cancel', 'Cancelled'), # this state is unused, (and ≃ to refuse ?) -> can I remove ?
         ('confirm', 'To Approve'),
         ('refuse', 'Refused'),
         ('validate1', 'Second Approval'),
@@ -300,7 +299,7 @@ class Holidays(models.Model):
                 ('employee_id', '=', holiday.employee_id.id),
                 ('id', '!=', holiday.id),
                 ('type', '=', holiday.type),
-                ('state', 'not in', ['cancel', 'refuse', 'draft']),
+                ('state', 'not in', ['refuse', 'draft']),
             ]
             nholidays = self.search_count(domain)
             if nholidays:
@@ -420,7 +419,7 @@ class Holidays(models.Model):
 
     @api.multi
     def unlink(self):
-        for holiday in self.filtered(lambda holiday: holiday.state not in ['draft', 'cancel', 'refuse']):
+        for holiday in self.filtered(lambda holiday: holiday.state not in ['draft', 'refuse']):
             raise UserError(_('You cannot delete a leave which is in %s state.') % (holiday.state,))
         return super(Holidays, self).unlink()
 
