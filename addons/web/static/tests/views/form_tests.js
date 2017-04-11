@@ -554,6 +554,27 @@ QUnit.module('Views', {
         form.destroy();
     });
 
+    QUnit.test('form view must be in edit mode if no record', function (assert) {
+        assert.expect(1);
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            viewOptions: {mode: 'readonly'},
+            arch: '<form string="Partners">' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="foo"/>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+        });
+
+        assert.strictEqual(form.mode, 'edit', 'form view should be in edit mode');
+        form.destroy();
+    });
+
     QUnit.test('required fields should have o_form_required in readonly mode', function (assert) {
         assert.expect(2);
 

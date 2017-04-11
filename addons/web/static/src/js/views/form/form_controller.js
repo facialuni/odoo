@@ -29,7 +29,10 @@ var FormController = BasicController.extend({
         this.defaultButtons = params.defaultButtons;
         this.hasSidebar = params.hasSidebar;
         this.toolbar = params.toolbar;
-        this.mode = params.mode;
+
+        var record = this.model.get(this.handle, {raw: true});
+        // always in edit mode if no record
+        this.mode = record.res_id ? params.mode : 'edit';
     },
 
     //--------------------------------------------------------------------------
