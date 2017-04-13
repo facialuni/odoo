@@ -14,6 +14,7 @@ var QuickCreate = require('web.CalendarQuickCreate');
 var dialogs = require('web.view_dialogs');
 var Dialog = require('web.Dialog');
 var core = require('web.core');
+var config = require('web.config');
 
 var _t = core._t;
 var QWeb = core.qweb;
@@ -63,7 +64,7 @@ var CalendarController = AbstractController.extend({
      */
     renderButtons: function ($node) {
         var self = this;
-        this.$buttons = $(QWeb.render("CalendarView.buttons", {'widget': this}));
+        this.$buttons = $(QWeb.render("CalendarView.buttons", {'widget': this, 'isMobile': config.isMobile}));
         this.$buttons.on('click', 'button.o_calendar_button_new', function () {
             self.trigger_up('switch_view', {view_type: 'form'});
         });
@@ -82,6 +83,13 @@ var CalendarController = AbstractController.extend({
         });
 
         this.$buttons.find('.o_calendar_button_' + this.mode).addClass('active');
+        if(config.isMobile) {
+            this.$buttons.on('click', '.dropdown-menu li a', function(event){
+                self.$buttons.find('.o_calendar_period_selector').html($(event.currentTarget).text());
+                self.$buttons.find('.active').removeClass('active');
+                self.$buttons.find(event.currentTarget).addClass('active');
+            });
+        }
 
         if ($node) {
             this.$buttons.appendTo($node);

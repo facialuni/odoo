@@ -6,6 +6,7 @@ var core = require('web.core');
 var fieldUtils = require('web.field_utils');
 var session = require('web.session');
 var time = require('web.time');
+var config = require('web.config');
 
 var _t = core._t;
 
@@ -363,7 +364,7 @@ return AbstractModel.extend({
             allDayText: _t("All day"),
             views: {
                 week: {
-                    columnFormat: 'ddd ' + time.strftime_to_moment_format(_t.database.parameters.date_format),
+                    columnFormat: config.isMobile ? 'ddd \n D' : 'ddd ' + time.strftime_to_moment_format(_t.database.parameters.date_format),
                     titleFormat: time.strftime_to_moment_format(_t.database.parameters.time_format),
                 }
             },

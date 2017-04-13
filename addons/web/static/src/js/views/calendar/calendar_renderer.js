@@ -11,6 +11,7 @@ var Widget = require('web.Widget');
 var utils = require('web.utils');
 var core = require('web.core');
 var QWeb = require('web.QWeb');
+var config = require('web.config');
 
 var _t = core._t;
 var qweb = core.qweb;
@@ -257,6 +258,29 @@ return AbstractRenderer.extend({
     //--------------------------------------------------------------------------
 
     /**
+    * @private
+    * Swipe function to handle view change on user swipe in mobile view
+    */
+    _doSwipe: function() {
+         var self = this;
+         var $fc_view = this.$calendar.find('.fc-view');
+         var touchStartX;
+         var touchEndX;
+         $fc_view.on('touchstart', function (event) {
+            touchStartX = event.originalEvent.touches[0].pageX;
+         });
+         $fc_view.on('touchend', function (event) {
+            touchEndX = event.originalEvent.changedTouches[0].pageX;
+            if (touchStartX - touchEndX > 100) {
+                self.$calendar.fullCalendar('next');
+                $fc_view.scrollLeft(0);
+             } else if (touchStartX - touchEndX < -100) {
+                self.$calendar.fullCalendar('prev');
+             }
+         });
+     },
+
+    /**
      * @param {any} event
      * @returns {string} the html for the rendered event
      */
@@ -381,6 +405,9 @@ return AbstractRenderer.extend({
         if (this.target_date !== this.state.target_date.toString()) {
             $calendar.fullCalendar('gotoDate', moment(this.state.target_date));
             this.target_date = this.state.target_date.toString();
+        }
+        if(config.isMobile){
+            this._doSwipe();
         }
 
         var highlightDate = moment(this.state.highlight_date).format('YYYY-MM-DD');
