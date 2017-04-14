@@ -896,14 +896,14 @@ class WebsiteSale(http.Controller):
                 # Orders are confirmed by payment transactions, but there is none for free orders,
                 # (e.g. free events), so confirm immediately
                 order.with_context(send_email=True).action_confirm()
-        # clean context and session, then redirect to the confirmation page
-        request.website.sale_reset()
-        if tx.state == 'draft':
-            return request.redirect('/shop')
-        elif tx.state == 'cancel':
+        elif tx and tx.state == 'cancel':
             # cancel the quotation
             order.action_cancel()
-            return request.redirect('/shop/cancel')
+
+        # clean context and session, then redirect to the confirmation page
+        request.website.sale_reset()
+        if tx and tx.state == 'draft':
+            return request.redirect('/shop')
 
         return request.redirect('/shop/confirmation')
 
@@ -911,13 +911,6 @@ class WebsiteSale(http.Controller):
     @http.route(['/shop/terms'], type='http', auth="public", website=True)
     def terms(self, **kw):
         return request.render("website_sale.terms")
-
-    @http.route(['/shop/cancel'], type='http', auth="public", website=True)
-    def payment_cancel(self, **kw):
-        sale_order_id = request.session.get('sale_last_order_id')
-        if sale_order_id:
-            order = request.env['sale.order'].sudo().browse(sale_order_id)
-            return request.render("website_sale.cancel", {'order': order})
 
     @http.route(['/shop/confirmation'], type='http', auth="public", website=True)
     def payment_confirmation(self, **post):
@@ -934,6 +927,16 @@ class WebsiteSale(http.Controller):
             return request.render("website_sale.confirmation", {'order': order})
         else:
             return request.redirect('/shop')
+
+    @http.route(['/shop/payment/retry'], type='http', auth="public", website=True)
+    def confirmation_redirect_payment(self, **post):
+        sale_order_id = request.session.get('sale_last_order_id')
+        if sale_order_id:
+            order = request.env['sale.order'].sudo().browse(sale_order_id)
+            order.action_draft()
+            request.session['sale_order_id'] = order.id
+            return request.redirect('/shop/payment')
+        return request.redirect('/shop')
 
     @http.route(['/shop/print'], type='http', auth="public", website=True)
     def print_saleorder(self):
