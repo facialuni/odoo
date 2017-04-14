@@ -2,9 +2,16 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import json
+import logging
 import math
 import re
 import time
+
+try:
+    from num2words import num2words
+except ImportError:
+    logging.getLogger(__name__).warning("The num2words python library is not installed, l10n_mx_edi features won't be fully available.")
+    num2words = None
 
 from odoo import api, fields, models, tools, _
 
@@ -17,7 +24,7 @@ class Currency(models.Model):
     _order = "name"
 
     # Note: 'code' column was removed as of v6.0, the 'name' should now hold the ISO code.
-    name = fields.Char(string='Currency', size=3, required=True, help="Currency Code (ISO 4217)")
+    name = fields.Char(string='Currency code', size=3, required=True, help="Currency Code (ISO 4217)")
     symbol = fields.Char(help="Currency sign, to be used when printing amounts.", required=True)
     rate = fields.Float(compute='_compute_current_rate', string='Current Rate', digits=(12, 6),
                         help='The rate of the currency to the currency of rate 1.')
@@ -28,6 +35,8 @@ class Currency(models.Model):
     position = fields.Selection([('after', 'After Amount'), ('before', 'Before Amount')], default='after',
         string='Symbol Position', help="Determines where the currency symbol should be placed after or before the amount.")
     date = fields.Date(compute='_compute_date')
+    currency_name = fields.Char(string="Currency", help="Currency Name")
+    sub_currency_name = fields.Char(string="Sub Currency", help="Sub Currency Name")
 
     _sql_constraints = [
         ('unique_name', 'unique (name)', 'The currency code must be unique!'),
@@ -78,6 +87,34 @@ class Currency(models.Model):
     @api.multi
     def name_get(self):
         return [(currency.id, tools.ustr(currency.name)) for currency in self]
+
+    @api.multi
+    def amount_to_text(self, amount):
+        self.ensure_one()
+        def _num2words(number, lang):
+            try:
+                return num2words(number, lang=lang).title()
+            except NotImplementedError:
+                return num2words(number, lang='en').title()
+
+        if num2words is None:
+            logging.getLogger(__name__).warning("The library 'num2words' is missing, cannot render textual amounts.")
+            return amount
+
+        fractional_value, integer_value = math.modf(amount)
+        fractional_amount = round(fractional_value, self.decimal_places) * (math.pow(10, self.decimal_places))
+        lang_code = self.env.context.get('lang') or self.env.user.lang
+        lang = self.env['res.lang'].search([('code', '=', lang_code)])
+        amount_words = tools.ustr('{amt_value} {amt_word}').format(
+                        amt_value=_num2words(int(integer_value), lang=lang.iso_code),
+                        amt_word=self.currency_name,
+                        )
+        if fractional_value > 0:
+            amount_words += _(' and') + tools.ustr(' {amt_value} {amt_word}').format(
+                        amt_value=_num2words(int(fractional_amount), lang=lang.iso_code),
+                        amt_word=self.sub_currency_name,
+                        )
+        return amount_words
 
     @api.multi
     def round(self, amount):

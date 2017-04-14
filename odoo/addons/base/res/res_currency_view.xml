@@ -134,9 +134,15 @@
                                     options='{"terminology": "active"}'/>
                             </button>
                         </div>
-                        <group col="4">
-                            <field name="name"/>
-                            <field name="rate"/>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="rate"/>
+                            </group>
+                            <group>
+                                <field name="currency_name"/>
+                                <field name="sub_currency_name"/>
+                            </group>
                         </group>
 
                         <group groups="base.group_no_one">
