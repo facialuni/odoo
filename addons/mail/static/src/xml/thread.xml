@@ -64,7 +64,7 @@
 
     <t t-name="Attachment.Popup.Modal">
         <t t-if="widget.attachment_ids">
-            <div class="modal fade" id="o_attacment_popup" role="dialog" aria-hidden="true">
+            <div class="modal fade o_attachment_carousel" role="dialog" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-body o_attachment_popup_content">
