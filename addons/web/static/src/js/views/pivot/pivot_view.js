@@ -62,7 +62,12 @@ var PivotView = AbstractView.extend({
             if (field.attrs.interval) {
                 name += ':' + field.attrs.interval;
             }
-
+            //remove the disabled fields from measures and groupable fields
+            if (field.attrs.disabled) {
+                delete measures[name];
+                delete groupableFields[name];
+                return;
+            }
             // add active measures to the measure list.  This is very rarely
             // necessary, but it can be useful if one is working with a
             // functional field non stored, but in a model with an overrided

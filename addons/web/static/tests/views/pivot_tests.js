@@ -521,6 +521,24 @@ QUnit.module('Views', {
         pivot.destroy();
     });
 
+// Test Case For Checking the disabled fields is not in measures and groupablefields
+QUnit.test('disabled fields  is not in measures and groupablefields', function (assert) {
+        assert.expect(2);
+
+        var pivot = createView({
+            View: PivotView,
+            model: "partner",
+            data: this.data,
+            arch: '<pivot>'+
+                    '<field name="foo" disabled ="1"/>'+
+            '</pivot>',
+        });
+
+        assert.equal("foo" in pivot.measures,false,"not in measures")
+        assert.equal("foo" in pivot.groupableFields,false,"not in groupablefields ")
+        pivot.destroy();
+    });
+
     QUnit.test('can sort data in a column by clicking on header', function (assert) {
         assert.expect(3);
 
