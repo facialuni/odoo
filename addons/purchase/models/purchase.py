@@ -291,6 +291,7 @@ class PurchaseOrder(models.Model):
             'default_use_template': bool(template_id),
             'default_template_id': template_id,
             'default_composition_mode': 'comment',
+            'mark_rfq_as_sent': True,
             'custom_layout': "purchase.mail_template_data_notification_email_purchase_order"
         })
         return {
@@ -304,6 +305,15 @@ class PurchaseOrder(models.Model):
             'target': 'new',
             'context': ctx,
         }
+
+    @api.multi
+    @api.returns('self', lambda value: value.id)
+    def message_post(self, **kwargs):
+        if self.env.context.get('mark_rfq_as_sent'):
+            for order in self:
+                if order.state == 'draft':
+                    order.state = 'sent'
+        return super(PurchaseOrder, self.with_context(mail_post_autofollow=True)).message_post(**kwargs)
 
     @api.multi
     def print_quotation(self):
@@ -1131,16 +1141,3 @@ class ProductCategory(models.Model):
         'account.account', string="Price Difference Account",
         company_dependent=True,
         help="This account will be used to value price difference between purchase price and accounting cost.")
-
-
-class MailComposeMessage(models.TransientModel):
-    _inherit = 'mail.compose.message'
-
-    @api.multi
-    def send_mail(self, auto_commit=False):
-        if self._context.get('default_model') == 'purchase.order' and self._context.get('default_res_id'):
-            if not self.filtered('subtype_id.internal'):
-                order = self.env['purchase.order'].browse([self._context['default_res_id']])
-                if order.state == 'draft':
-                    order.state = 'sent'
-        return super(MailComposeMessage, self.with_context(mail_post_autofollow=True)).send_mail(auto_commit=auto_commit)

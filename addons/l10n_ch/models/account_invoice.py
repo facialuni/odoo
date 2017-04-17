@@ -166,3 +166,13 @@ class AccountInvoice(models.Model):
             rslt['context']['l10n_ch_mark_isr_as_sent'] = True
 
         return rslt
+
+    @api.multi
+    @api.returns('self', lambda value: value.id)
+    def message_post(self, **kwargs):
+        if self.env.context.get('l10n_ch_mark_isr_as_sent'):
+            for invoice in self:
+                if not invoice.l10n_ch_isr_sent:
+                    invoice.l10n_ch_isr_sent = True
+                    invoice.message_post(body=_("ISR sent"))
+        return super(AccountInvoice, self.with_context(mail_post_autofollow=True)).message_post(**kwargs)
