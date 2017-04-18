@@ -18,9 +18,7 @@ Install some generic chart of accounts.
         'data/l10n_generic_coa_chart_data.xml',
         'data/account_chart_template_data.yml',
     ],
-    'test': [
-        '../account/test/account_bank_statement.yml',
-    ],
+    'test': [],
     'demo': [
         '../account/demo/account_bank_statement.yml',
         '../account/demo/account_invoice_demo.yml',

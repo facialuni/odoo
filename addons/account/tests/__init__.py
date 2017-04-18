@@ -17,3 +17,4 @@ from . import test_search
 from . import test_tax
 from . import test_templates_consistency
 from . import test_account_invoice_state
+from . import test_account_bank_statement
