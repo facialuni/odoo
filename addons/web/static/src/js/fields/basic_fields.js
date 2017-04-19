@@ -903,9 +903,6 @@ var FieldPhone = FieldEmail.extend({
      */
     init: function () {
         this._super.apply(this, arguments);
-        if (this.mode === 'readonly' && !this._canCall()) {
-            this.tagName = 'span';
-        }
     },
     /**
      * Returns the associated link only if there is one.
@@ -932,15 +929,11 @@ var FieldPhone = FieldEmail.extend({
      */
     _renderReadonly: function () {
         this._super();
-        if (this._canCall()) {
-            // Split phone number into two to prevent Skype app from finding it
-            var text = this.$el.text();
-            var part1 = _.escape(text.substr(0, text.length/2));
-            var part2 = _.escape(text.substr(text.length/2));
-            this.$el.html(part1 + "&shy;" + part2);
-        } else {
-            this.$el.removeClass('o_form_uri');
-        }
+        // Split phone number into two to prevent Skype app from finding it
+        var text = this.$el.text();
+        var part1 = _.escape(text.substr(0, text.length/2));
+        var part2 = _.escape(text.substr(text.length/2));
+        this.$el.html(part1 + "&shy;" + part2);
     },
 
     /**
