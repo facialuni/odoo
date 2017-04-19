@@ -25,6 +25,7 @@ var field_utils = require('web.field_utils');
 var KanbanRenderer = require('web.KanbanRenderer');
 var ListRenderer = require('web.ListRenderer');
 var Pager = require('web.Pager');
+var config = require('web.config');
 
 var _t = core._t;
 var qweb = core.qweb;
@@ -981,6 +982,9 @@ var FieldOne2Many = FieldX2Many.extend({
      * @private
      */
     _renderButtons: function () {
+        if(config.isMobile){
+            _.extend(this.nodeOptions, { create_text: _t('Add an Item')});
+        }
         if (this.activeActions.create) {
             this._super.apply(this, arguments);
         }

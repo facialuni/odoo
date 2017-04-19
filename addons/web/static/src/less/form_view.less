@@ -652,3 +652,24 @@ label.o_light_label, .o_light_label label {
         }
     }
 }
+
+@media (max-width: @screen-xs-max) {
+    .o_form_view {
+        .o_notebook {
+            .nav-tabs {
+                overflow-x : auto;
+                li {
+                    display: table-cell;
+                    float : none;
+                    white-space: nowrap;
+                }
+            }
+        }
+        .o_cp_buttons {
+            width: 100%;
+            div, .o-kanban-button-new{
+                width: 100%;
+            }
+        }
+    }
+}
