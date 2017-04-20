@@ -5,46 +5,29 @@ odoo.define('sales_team.dashboard', function (require) {
  * This file defines the Sales Team Dashboard view (alongside its renderer,
  * model and controller), extending the Kanban view.
  * The Sales Team Dashboard view is registered to the view registry.
- * A large part of this code should be extracted in an AbstractDashboard
- * widget in web, to avoid code duplication (see HelpdeskDashboard).
  */
 
 var core = require('web.core');
+var DashboardMixins = require('web.DashboardMixins');
 var field_utils = require('web.field_utils');
-var KanbanView = require('web.KanbanView');
+var KanbanController = require('web.KanbanController');
 var KanbanModel = require('web.KanbanModel');
 var KanbanRenderer = require('web.KanbanRenderer');
-var KanbanController = require('web.KanbanController');
+var KanbanView = require('web.KanbanView');
 var session = require('web.session');
 var view_registry = require('web.view_registry');
 
 var QWeb = core.qweb;
 var _t = core._t;
-var _lt = core._lt;
 
-var SalesTeamDashboardRenderer = KanbanRenderer.extend({
-    events: _.extend({}, KanbanRenderer.prototype.events, {
-        'click .o_dashboard_action': '_onDashboardActionClicked',
-        'click .o_target_to_set': '_onDashboardTargetClicked',
-    }),
 
+var SalesTeamDashboardRenderer = KanbanRenderer.extend(DashboardMixins.Renderer, {
+    events: _.extend({}, KanbanRenderer.prototype.events,
+                     DashboardMixins.Renderer.events),
     //--------------------------------------------------------------------------
     // Private
     //--------------------------------------------------------------------------
 
-    /**
-     * Notifies the controller that the target has changed.
-     *
-     * @private
-     * @param {string} target_name the name of the changed target
-     * @param {string} value the new value
-     */
-    _notifyTargetChange: function (target_name, value) {
-        this.trigger_up('dashboard_edit_target', {
-            target_name: target_name,
-            target_value: value,
-        });
-    },
     /**
      * @override
      * @private
@@ -88,55 +71,24 @@ var SalesTeamDashboardRenderer = KanbanRenderer.extend({
     //--------------------------------------------------------------------------
 
     /**
+     * @override
      * @private
      * @param {MouseEvent}
      */
-    _onDashboardActionClicked: function (e) {
-        e.preventDefault();
-        var $action = $(e.currentTarget);
-        this.trigger_up('dashboard_open_action', {
-            action_name: $action.attr('name'),
-            action_context: $action.data('context'),
-        });
-    },
-    /**
-     * @private
-     * @param {MouseEvent}
-     */
-    _onDashboardTargetClicked: function (e) {
+    _onDashboardTargetClicked: function () {
+        // The user is not allowed to modify the targets in demo mode
         if (!this.show_demo) {
-            // The user is not allowed to modify the targets in demo mode
-            var self = this;
-            var $target = $(e.currentTarget);
-            var target_name = $target.attr('name');
-            var target_value = $target.attr('value');
-
-            var $input = $('<input/>', {type: "text", name: target_name});
-            if (target_value) {
-                $input.attr('value', target_value);
-            }
-            $input.on('keyup input', function (e) {
-                if(e.which === $.ui.keyCode.ENTER) {
-                    self._notifyTargetChange(target_name, $input.val());
-                }
-            });
-            $input.on('blur', function () {
-                self._notifyTargetChange(target_name, $input.val());
-            });
-
-            $input.replaceAll($target)
-                  .focus()
-                  .select();
+            DashboardMixins.Renderer._onDashboardTargetClicked.apply(this, arguments);
         }
     },
 });
 
-var SalesTeamDashboardModel = KanbanModel.extend({
+var SalesTeamDashboardModel = KanbanModel.extend(DashboardMixins.Model, {
     /**
      * @override
      */
     init: function () {
-        this.dashboardValues = {};
+        DashboardMixins.Model.init.apply(this, arguments);
         this._super.apply(this, arguments);
     },
 
@@ -149,10 +101,7 @@ var SalesTeamDashboardModel = KanbanModel.extend({
      */
     get: function (localID) {
         var result = this._super.apply(this, arguments);
-        if (this.dashboardValues[localID]) {
-            result.dashboardValues = this.dashboardValues[localID];
-        }
-        return result;
+        return DashboardMixins.Model.get.call(this, localID, result);
     },
     /**
      * @override
@@ -168,45 +117,17 @@ var SalesTeamDashboardModel = KanbanModel.extend({
     reload: function () {
         return this._loadDashboard(this._super.apply(this, arguments));
     },
-
-    //--------------------------------------------------------------------------
-    // Private
-    //--------------------------------------------------------------------------
-
-    /**
-     * @abstract
-     * @private
-     * @returns {Deferred -> Object} resolves to the required dashboard data
-     */
-    _fetchDashboardData: function () {
-        return $.when();
-    },
-    /**
-     * @private
-     * @param {Deferred} super_def a deferred that resolves with a dataPoint id
-     * @returns {Deferred -> string} resolves to the dataPoint id
-     */
-    _loadDashboard: function (super_def) {
-        var self = this;
-        var dashboard_def = this._fetchDashboardData();
-        return $.when(super_def, dashboard_def).then(function (id, dashboardValues) {
-            self.dashboardValues[id] = dashboardValues;
-            return id;
-        });
-    },
 });
 
-var SalesTeamDashboardController = KanbanController.extend({
-    custom_events: _.extend({}, KanbanController.prototype.custom_events, {
-        dashboard_open_action: '_onDashboardOpenAction',
-        dashboard_edit_target: '_onDashboardEditTarget',
-    }),
-
+var SalesTeamDashboardController = KanbanController.extend(DashboardMixins.Controller, {
+    custom_events: _.extend({}, KanbanController.prototype.custom_events,
+        DashboardMixins.Controller.custom_events),
     //--------------------------------------------------------------------------
     // Handlers
     //--------------------------------------------------------------------------
 
     /**
+     * @override
      * @private
      * @param {OdooEvent} e
      */
@@ -224,36 +145,24 @@ var SalesTeamDashboardController = KanbanController.extend({
                 .then(this.reload.bind(this));
         }
     },
-    /**
-     * @private
-     * @param {OdooEvent} e
-     */
-    _onDashboardOpenAction: function (e) {
-        var action_name = e.data.action_name;
-        var action_context = e.data.action_context;
-        this.do_action(action_name, {
-            additional_context: action_context,
-        });
-    },
 });
 
-var SalesTeamDashboardView = KanbanView.extend({
+var SalesTeamDashboardView = KanbanView.extend(DashboardMixins.View, {
     config: _.extend({}, KanbanView.prototype.config, {
+        Controller: SalesTeamDashboardController,
         Model: SalesTeamDashboardModel,
         Renderer: SalesTeamDashboardRenderer,
-        Controller: SalesTeamDashboardController,
     }),
-    display_name: _lt('Dashboard'),
-    icon: 'fa-dashboard',
     searchview_hidden: false,
 });
 
 view_registry.add('sales_team_dashboard', SalesTeamDashboardView);
 
 return {
+    Controller: SalesTeamDashboardController,
     Model: SalesTeamDashboardModel,
     Renderer: SalesTeamDashboardRenderer,
-    Controller: SalesTeamDashboardController,
+    View: SalesTeamDashboardView,
 };
 
 });
