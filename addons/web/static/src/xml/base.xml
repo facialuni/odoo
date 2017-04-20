@@ -1274,4 +1274,10 @@
     </div>
 </t>
 
+<t t-name="CopyClipboard">
+    <button class="btn btn-xs btn-primary o_clipboard_button o_btn_text_copy">
+         <i class="fa fa-clipboard"/> Copy Text
+    </button>
+</t>
+
 </templates>

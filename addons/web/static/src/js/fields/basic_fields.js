@@ -2209,6 +2209,42 @@ var AceEditor = DebouncedField.extend({
     },
 });
 
+var CopyClipboard = FieldText.extend({
+    supportedFieldTypes: ['chat','text'],
+    add_clipboard: function (event) {
+        var self = this;
+        var $clipboardBtn = this.$('.o_clipboard_button');
+        $clipboardBtn.tooltip({title: _t('Copied !'), trigger: 'manual', placement: 'right'});
+        this.clipboard = new window.Clipboard($clipboardBtn[0], {
+            text: function () {
+                return self.get_copy_text();
+            }
+        });
+        this.clipboard.on('success', function () {
+            _.defer(function () {
+                $clipboardBtn.tooltip('show');
+                _.delay(function () {
+                    $clipboardBtn.tooltip('hide');
+                }, 800);
+            });
+        });
+    },
+    get_copy_text: function () {
+        return this.value.trim();
+    },
+    destory: function() {
+        this._super.apply(this, arguments);
+        this.clipboard.destory();
+    },
+    _render: function() {
+        this._super.apply(this, arguments);
+        this.$el.addClass('o_field_copy');
+        this.$el.append($(qweb.render('CopyClipboard')));
+        this.add_clipboard();
+    }
+});
+
+
 return {
     DebouncedField: DebouncedField,
     FieldEmail: FieldEmail,
@@ -2239,6 +2275,7 @@ return {
     UrlWidget: UrlWidget,
     JournalDashboardGraph: JournalDashboardGraph,
     AceEditor: AceEditor,
+    CopyClipboard: CopyClipboard,
 };
 
 });
