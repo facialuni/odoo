@@ -191,7 +191,7 @@ class MailActivityMixin(models.AbstractModel):
     activity_state = fields.Selection([
         ('overdue', 'Overdue'),
         ('today', 'Today'),
-        ('planned', 'Planned')], string='State',
+        ('planned', 'Planned')], string='Activity State',
         compute='_compute_activity_state',
         help='Status based on activities\nOverdue: Due date is already passed\n'
              'Today: Activity date is today\nPlanned: Future activities.')
