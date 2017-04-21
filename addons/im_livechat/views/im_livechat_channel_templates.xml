@@ -11,6 +11,11 @@
             </xpath>
         </template>
 
+        <template id="qunit_suite" name="im_livechat tests" inherit_id="web.qunit_suite">
+            <xpath expr="//script[contains(@src, '/web/static/tests/views/form_tests.js')]" position="after">
+                <script type="text/javascript" src="/im_livechat/static/tests/copy_text.js"></script>
+            </xpath>
+        </template>
 
         <!--
             Template rendering the external HTML support page

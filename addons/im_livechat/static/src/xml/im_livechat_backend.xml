@@ -11,4 +11,5 @@
             <t t-call="mail.chat.SidebarItems"/>
         </t>
     </t>
+
 </template>
