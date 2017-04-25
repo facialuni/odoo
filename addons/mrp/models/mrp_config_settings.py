@@ -16,9 +16,9 @@ class MrpConfigSettings(models.TransientModel):
         implied_group='product.group_product_variant')
     module_mrp_byproduct = fields.Boolean("By-Products")
     module_mrp_mps = fields.Boolean("Master Production Schedule")
-    module_mrp_plm = fields.Boolean("Product Lifecycle Management")
+    module_mrp_plm = fields.Boolean("Product Lifecycle Management (PLM)")
     module_mrp_maintenance = fields.Boolean("Maintenance")
-    module_quality_mrp = fields.Boolean("Quality Control")
+    module_quality_mrp = fields.Boolean("Quality")
     group_mrp_routings = fields.Boolean("Work Orders",
         implied_group='mrp.group_mrp_routings')
     module_mrp_repair = fields.Boolean("Repair")
