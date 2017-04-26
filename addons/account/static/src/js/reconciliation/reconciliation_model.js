@@ -131,7 +131,7 @@ var StatementModel = BasicModel.extend({
      */
     autoReconciliation: function () {
         var self = this;
-        var ids = _.pluck(_.filter(_.values(this.lines), {'reconciled': false}), 'id');
+        var ids = _.pluck(_.filter(this.lines, {'reconciled': false}), 'id');
         return this._rpc({
                 model: 'account.bank.statement.line',
                 method: 'reconciliation_widget_auto_reconcile',
