@@ -362,6 +362,139 @@ options.registry.parallax = options.Class.extend({
     },
 });
 
+ajax.loadXML('/website/static/src/xml/website.facebook_page.xml', core.qweb);
+options.registry.facebook_page = options.Class.extend({
+    start: function () {
+        var self = this;
+        this._super.apply(this, arguments);
+
+        // Initialize facebook page data for iframe
+        var defaults = {
+            'href': false,
+            'adapt_container_width': true,
+            'height': 215,
+            'width': 350,
+            'tabs': '',
+            'small_header': false,
+            'hide_cover': false,
+            'show_facepile': false
+        };
+        this.fb_data = _.defaults(_.pick(this.$target.data(),_.keys(defaults)), defaults);
+
+        if (!this.fb_data.href) {
+            this.fetch_fb_url();
+        }
+
+        this.$target.on('click', '.o_add_facebook_page', function (e) {
+            e.preventDefault();
+            self.fb_page_options(e.type);
+        });
+    },
+    fetch_fb_url: function () {
+        // Fetch page url from odoo website config if not provided
+        var self = this;
+        return rpc.query({
+            model: 'website',
+            method: 'search_read',
+            args: [[], ['social_facebook']],
+            limit: 1
+        }).then(function (res) {
+            if (res) {
+                self.fb_data.href = res[0].social_facebook || 'https://www.facebook.com/Odoo';
+            }
+        });
+    },
+    fb_page_options: function(type) {
+        if (type !== "click") return;
+
+        var self = this;
+        var $dialog = new Dialog(null, {
+            title: _t("Facebook page"),
+            $content: $(core.qweb.render("website.facebook_page_dialog", self.fb_data)),
+            buttons: [
+                {text: _t("Save"), classes: "btn-primary", close: true, click: function() {
+                    self.$target.empty();
+                    _.each(self.fb_data, function(value, key) {
+                        self.$target.attr('data-'+key, value);
+                    });
+                    var actual_width = self.$target.width();
+                    self.fb_data.width = actual_width > 500 ? 500 : actual_width < 180 ? 180 : actual_width;
+                    var iframe_src = $.param.querystring('https://www.facebook.com/plugins/page.php', self.fb_data);
+                    self.$target.append(_.str.sprintf('<iframe src="%s" width="%s" height="%s" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>', iframe_src, self.fb_data.width, self.fb_data.height));
+                }},
+                {text: _t("Discard"), close: true}
+            ]
+        }).open();
+
+        $dialog.$footer.find('.btn-primary').prop('disabled', true);
+        $dialog.$el.find('.form-horizontal').on('change', function(e) {
+            // Update values in fb_data
+            self.fb_data.tabs = _.map($dialog.$('.o_facebook_tabs input:checked'), function(a) {return a.name}).join(',');
+            self.fb_data.href = $dialog.$('.o_facebook_page_url').prop('value');
+            _.each($dialog.$('.o_facebook_options input'), function(el) {
+                self.fb_data[el.name] = $(el).prop('checked');
+            });
+            self._renderPreview($dialog);
+        });
+        if (this.fb_data.href) {
+            self._renderPreview($dialog);
+        }
+    },
+    _renderPreview: function ($dialog) {
+        var self = this;
+
+        var regex = /^(?:http(?:s)?:\/\/)?(?:www.)?(facebook.com|fb.com)\/([a-zA-Z0-9]+)/;
+
+        var match = regex.exec(self.fb_data.href);
+        if (match !== null) {
+            var picture_url= "https://graph.facebook.com/" + match[2] + "/picture";
+            // Check Page is exist or not in Facebook
+            $.ajax({
+                url : picture_url,
+                statusCode: {
+                    200: function () {
+                        self.toggle_warning($dialog, true);
+
+                        // Managing height based on options
+                        if (self.fb_data.tabs) {
+                            if (self.fb_data.tabs == 'events') {
+                                self.fb_data.height = 300;
+                            } else {
+                                self.fb_data.height = 500;
+                            }
+                        } else if (self.fb_data.small_header) {
+                            if (self.fb_data.show_facepile) {
+                                self.fb_data.height = 165;
+                            } else {
+                                self.fb_data.height = 70;
+                            }
+                        } else if (!self.fb_data.small_header) {
+                            if (self.fb_data.show_facepile) {
+                                self.fb_data.height = 225;
+                            } else {
+                                self.fb_data.height = 150;
+                            }
+                        }
+                        self.fb_data.width = $dialog.$('.o_facebook_preview').width();
+                        var iframe_src = $.param.querystring('https://www.facebook.com/plugins/page.php', self.fb_data);
+                        $dialog.$('.o_facebook_preview').append(_.str.sprintf('<iframe src="%s" width="%s" height="%s" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>', iframe_src, self.fb_data.width, self.fb_data.height));
+                    },
+                    404: function () {
+                        self.toggle_warning($dialog, false);
+                    }
+                }
+            });
+        } else {
+            self.toggle_warning($dialog, false);
+        }
+    },
+    toggle_warning: function($dialog, toggle) {
+        $dialog.$('.o_facebook_preview iframe').remove();
+        $dialog.$('.facebook_page_warning').toggleClass('hidden', toggle);
+        $dialog.$footer.find('.btn-primary').prop('disabled', !toggle);
+    }
+});
+
 options.registry.ul = options.Class.extend({
     start: function () {
         var self = this;
