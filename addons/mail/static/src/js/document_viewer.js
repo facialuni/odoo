@@ -34,11 +34,11 @@ odoo.define('mail.attachment.popup', function (require) {
          },
 
         on_carousel_control: function(){
-            var download_link = this.$el.find('div.o_attachment_download');
-            this.$el.find('.carousel').on('slide.bs.carousel', function (event){
+            var self = this;
+            this.$('.carousel').on('slide.bs.carousel', function (event){
                 var $carousel_caption = $(event.relatedTarget).find('.carousel-caption').html();
                 // set download link at proper place in modal
-                download_link.html($carousel_caption);
+                self.$('div.o_attachment_download').html($carousel_caption);
             });
         },
 
