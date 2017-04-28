@@ -23,6 +23,7 @@ from werkzeug import url_encode
 
 from odoo import _, api, exceptions, fields, models, tools
 from odoo.tools import pycompat
+from odoo.tools.pycompat import text_type
 from odoo.tools.safe_eval import safe_eval
 
 
@@ -1262,7 +1263,8 @@ class MailThread(models.AbstractModel):
         # we don't know its encoding until we parse its headers and hence can't
         # convert it to utf-8 for transport between the mailgate script and here.
         if isinstance(message, xmlrpclib.Binary):
-            message = str(message.data)
+            message = bytes(message.data)
+        # FIXME: message_from_string parses from a *native string*
         # Warning: message_from_string doesn't always work correctly on unicode,
         # we must use utf-8 strings here :-(
         if isinstance(message, unicode):

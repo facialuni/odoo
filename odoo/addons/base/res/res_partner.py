@@ -287,7 +287,7 @@ class Partner(models.Model):
 
         if partner_type in ['other'] and parent_id:
             parent_image = self.browse(parent_id).image
-            image = parent_image and parent_image.decode('base64') or None
+            image = parent_image and base64.b64decode(parent_image) or None
 
         if not image and partner_type == 'invoice':
             img_path = get_module_resource('base', 'static/src/img', 'money.png')
@@ -305,7 +305,7 @@ class Partner(models.Model):
         if image and colorize:
             image = tools.image_colorize(image)
 
-        return tools.image_resize_image_big(image.encode('base64'))
+        return tools.image_resize_image_big(base64.b64encode(image))
 
     @api.model
     def _fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
