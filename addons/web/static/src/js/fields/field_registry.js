@@ -47,8 +47,7 @@ registry
     .add('progressbar', basic_fields.FieldProgressBar)
     .add('toggle_button', basic_fields.FieldToggleBoolean)
     .add('dashboard_graph', basic_fields.JournalDashboardGraph)
-    .add('ace', basic_fields.AceEditor)
-    .add('copy_clipboard',basic_fields.CopyClipboard);
+    .add('ace', basic_fields.AceEditor);
 
 // Relational fields
 registry

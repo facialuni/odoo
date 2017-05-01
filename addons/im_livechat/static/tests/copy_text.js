@@ -27,8 +27,8 @@ QUnit.module('im_livechat', {
 }, function () {
 
     QUnit.test('copy_text_button', function (assert) {
-        assert.expect(1);
         var done = assert.async();
+        assert.expect(1);
 
         createAsyncView({
             View: FormView,
@@ -37,11 +37,12 @@ QUnit.module('im_livechat', {
             arch: '<form string="Partners">' +
                     '<sheet>' +
                             '<group>' +
-                                '<field name="script_external" widget="copy_clipboard"/>' +
+                                '<field name="script_external" widget="CopyClipboard"/>' +
+                                '<field name="web_page" widget="CopyClipboard"/>' +
                             '</group>' +
                     '</sheet>' +
                 '</form>',
-        }).then(function(form){   
+        }).then(function(form){
         var buttons = form.$el.find('.o_clipboard_button');
         assert.strictEqual(form.$('.o_clipboard_button').length, 1,"should contain a 1 button with some html");
         form.destroy();

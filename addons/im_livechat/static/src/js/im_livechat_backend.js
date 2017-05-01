@@ -4,6 +4,10 @@ odoo.define('im_livechat.chat_client_action', function (require) {
 require('mail.chat_client_action');
 var chat_manager = require('mail.chat_manager');
 var core = require('web.core');
+var field_registry = require('web.field_registry');
+
+var qweb = core.qweb;
+var _t = core._t;
 
 core.action_registry.get('mail.chat.instant_messaging').include({
     _renderSidebar: function (options) {
@@ -28,4 +32,57 @@ chat_manager.bus.on('new_message', null, function (msg) {
     });
 });
 
+var FieldText = field_registry.get('text');
+var FieldChar = field_registry.get('char');
+
+var CopyClipboard = {
+    add_clipboard: function (event) {
+        var self = this;
+        var $clipboardBtn = this.$('.o_clipboard_button');
+        $clipboardBtn.tooltip({title: _t('Copied !'), trigger: 'manual', placement: 'right'});
+        this.clipboard = new Clipboard($clipboardBtn.get(0), {
+            text: function () {
+                return self.get_copy_text();
+            }
+        });
+        this.clipboard.on('success', function () {
+            _.defer(function () {
+                $clipboardBtn.tooltip('show');
+                _.delay(function () {
+                    $clipboardBtn.tooltip('hide');
+                }, 800);
+            });
+        });
+    },
+    get_copy_text: function () {
+        return this.value.trim();
+    },
+    destory: function() {
+        this._super.apply(this, arguments);
+        this.clipboard.destory();
+    }
+};
+
+var TextCopyClipboard = FieldText.extend(CopyClipboard, {
+    _render: function() {
+        this._super.apply(this, arguments);
+        // console.log("fgnrjgs")
+        this.$el.addClass('o_field_copy');
+        this.$el.append($(qweb.render('CopyClipboardText')));
+        this.add_clipboard();
+    }
+});
+
+var CharCopyClipboard = FieldChar.extend(CopyClipboard, {
+    _render: function() {
+        this._super.apply(this, arguments);
+        this.$el.addClass('o_field_copy');
+        this.$el.append($(qweb.render('CopyClipboardChar')));
+        this.add_clipboard();
+    }
+});
+
+field_registry
+    .add('CopyClipboardText', TextCopyClipboard)
+    .add('CopyClipboardChar', CharCopyClipboard);
 });
