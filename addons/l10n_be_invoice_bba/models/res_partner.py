@@ -14,15 +14,16 @@ class ResPartner(models.Model):
     def _get_comm_type(self):
         return self.env['account.invoice']._get_reference_type()
 
-    out_inv_comm_type = fields.Selection('_get_comm_type', string='Communication Type', change_default=True,
-        help='Select Default Communication Type for Outgoing Invoices.', default='none')
-    out_inv_comm_algorithm = fields.Selection([
+    property_out_inv_comm_type = fields.Selection('_get_comm_type', company_dependent=True, string='Communication Type', change_default=True,
+        help='Select Default Communication Type for Outgoing Invoices.', oldname='out_inv_comm_type')
+    property_out_inv_comm_algorithm = fields.Selection([
         ('random', 'Random'),
         ('date', 'Date'),
         ('partner_ref', 'Customer Reference'),
         ], string='Communication Algorithm',
+        company_dependent=True, oldname='out_inv_comm_algorithm',
         help='Select Algorithm to generate the Structured Communication on Outgoing Invoices.')
 
     @api.model
     def _commercial_fields(self):
-        return super(ResPartner, self)._commercial_fields() + ['out_inv_comm_type', 'out_inv_comm_algorithm']
+        return super(ResPartner, self)._commercial_fields() + ['property_out_inv_comm_type', 'property_out_inv_comm_algorithm']

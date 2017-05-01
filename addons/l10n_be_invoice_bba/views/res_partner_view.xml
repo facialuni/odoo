@@ -7,8 +7,8 @@
       <field name="inherit_id" ref="account.view_partner_property_form"/>
       <field name="arch" type="xml">
         <group name="acc_sale" position="inside">
-          <field name="out_inv_comm_type"/>
-          <field name="out_inv_comm_algorithm" attrs="{'invisible':[('out_inv_comm_type','!=','bba')]}"/>
+          <field name="property_out_inv_comm_type"/>
+          <field name="property_out_inv_comm_algorithm" attrs="{'invisible':[('property_out_inv_comm_type','!=','bba')]}"/>
         </group>
       </field>
     </record>

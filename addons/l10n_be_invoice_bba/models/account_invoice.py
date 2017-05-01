@@ -48,25 +48,33 @@ class AccountInvoice(models.Model):
             if mod == int(bbacomm[-2:]):
                 return True
 
-    @api.onchange('partner_id', 'type', 'reference_type')
-    def _onchange_partner_id(self):
-        result = super(AccountInvoice, self)._onchange_partner_id()
+    def _get_reference_info(self):
         reference = False
         reference_type = 'none'
         if self.partner_id:
             if (self.type == 'out_invoice'):
-                reference_type = self.partner_id.out_inv_comm_type
+                reference_type = self.partner_id.with_context(force_company=self.company_id.id).property_out_inv_comm_type
                 if reference_type:
-                    reference = self.generate_bbacomm(self.type, reference_type, self.partner_id.id, '')['value']['reference']
-        self.reference_type = reference_type or 'none'
-        self.reference = reference
+                    reference = self.with_context(invoice_company=self.company_id.id).generate_bbacomm(self.type, reference_type, self.partner_id.id, '')['value']['reference']
+        return (reference, reference_type or 'none')
+
+    @api.onchange('company_id')
+    def _onchange_company_id(self):
+        self.reference, self.reference_type = self._get_reference_info()
+
+    @api.onchange('partner_id', 'type', 'reference_type')
+    def _onchange_partner_id(self):
+        result = super(AccountInvoice, self)._onchange_partner_id()
+        self.reference, self.reference_type = self._get_reference_info()
         return result
 
     def generate_bbacomm(self, type, reference_type, partner_id, reference):
         reference = reference or ''
         algorithm = False
         if partner_id:
-            algorithm = self.env['res.partner'].browse(partner_id).out_inv_comm_algorithm
+            company_id = self.env.context.get('invoice_company') or self.env.user.company_id.id
+            # Forcing invoice company in context so that it gets correct property values for BBA related fields when generating structured code for invoice
+            algorithm = self.env['res.partner'].browse(partner_id).with_context(force_company=company_id).property_out_inv_comm_algorithm
         algorithm = algorithm or 'random'
         if (type == 'out_invoice'):
             if reference_type == 'bba':
@@ -129,12 +137,13 @@ class AccountInvoice(models.Model):
     def create(self, vals):
         reference = vals.get('reference', False)
         reference_type = vals.get('reference_type', False)
+        company_id = vals.get('company_id') or self.default_get(['company_id'])['company_id']
         if vals.get('type') == 'out_invoice' and not reference_type:
             # fallback on default communication type for partner
             partner = self.env['res.partner'].browse(vals['partner_id'])
-            reference_type = partner.out_inv_comm_type
+            reference_type = partner.with_context(force_company=company_id).property_out_inv_comm_type
             if reference_type == 'bba':
-                reference = self.generate_bbacomm(vals['type'], reference_type, partner.id, '')['value']['reference']
+                reference = self.with_context(invoice_company=company_id).generate_bbacomm(vals['type'], reference_type, partner.id, '')['value']['reference']
             vals.update({
                 'reference_type': reference_type or 'none',
                 'reference': reference,
@@ -180,5 +189,5 @@ class AccountInvoice(models.Model):
             reference_type = self.reference_type or 'none'
             default['reference_type'] = reference_type
             if reference_type == 'bba':
-                default['reference'] = self.generate_bbacomm(self.type, reference_type, self.partner_id.id, '')['value']['reference']
+                default['reference'] = self.with_context(invoice_company=self.company_id.id).generate_bbacomm(self.type, reference_type, self.partner_id.id, '')['value']['reference']
         return super(AccountInvoice, self).copy(default)
