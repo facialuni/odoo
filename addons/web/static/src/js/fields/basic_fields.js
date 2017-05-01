@@ -2215,7 +2215,7 @@ var CopyClipboard = FieldText.extend({
         var self = this;
         var $clipboardBtn = this.$('.o_clipboard_button');
         $clipboardBtn.tooltip({title: _t('Copied !'), trigger: 'manual', placement: 'right'});
-        this.clipboard = new window.Clipboard($clipboardBtn[0], {
+        this.clipboard = new Clipboard($clipboardBtn.get(0), {
             text: function () {
                 return self.get_copy_text();
             }
