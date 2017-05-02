@@ -39,4 +39,5 @@ generated if no algorithm is specified on the Partner record.
         'views/report_invoice.xml',
         'views/res_config_view.xml',
     ],
+    'auto_install': True,
 }
