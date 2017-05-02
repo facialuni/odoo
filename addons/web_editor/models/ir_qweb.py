@@ -48,7 +48,10 @@ class QWeb(models.AbstractModel):
         el.set('t-call', el.attrib.pop('t-snippet'))
         name = self.env['ir.ui.view'].search([('key', '=', el.attrib.get('t-call'))]).display_name
         thumbnail = el.attrib.pop('t-thumbnail', "oe-thumbnail")
-        div = u'<div name="%s" data-oe-type="snippet" data-oe-thumbnail="%s">' % (escape(ir_qweb.unicodifier(name)), escape(ir_qweb.unicodifier(thumbnail)))
+        div = u'<div name="%s" data-oe-type="snippet" data-oe-thumbnail="%s">' % (
+            escape(pycompat.text_type(name)),
+            escape(pycompat.text_type(thumbnail))
+        )
         return [self._append(ast.Str(div))] + self._compile_node(el, options) + [self._append(ast.Str(u'</div>'))]
 
     def _compile_directive_tag(self, el, options):
@@ -189,7 +192,7 @@ class DateTime(models.AbstractModel):
     def attributes(self, record, field_name, options, values):
         attrs = super(DateTime, self).attributes(record, field_name, options, values)
         value = record[field_name]
-        if isinstance(value, basestring):
+        if isinstance(value, pycompat.string_types):
             value = fields.Datetime.from_string(value)
         if value:
             # convert from UTC (server timezone) to user timezone
@@ -313,7 +316,7 @@ class Image(models.AbstractModel):
 
         img = '<img class="%s" src="%s" style="%s"%s%s/>' % \
             (classes, src, options.get('style', ''), ' alt="%s"' % alt if alt else '', ' data-zoom="1" data-zoom-image="%s"' % src_zoom if src_zoom else '')
-        return ir_qweb.unicodifier(img)
+        return pycompat.to_text(img)
 
     local_url_re = re.compile(r'^/(?P<module>[^]]+)/static/(?P<rest>.+)$')
 

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import ast
 import logging
+import os.path
 import re
 import traceback
 
@@ -156,13 +157,6 @@ class QWebException(Exception):
 
 # Avoid DeprecationWarning while still remaining compatible with werkzeug pre-0.9
 escape = (lambda text: _escape(text, quote=True)) if getattr(werkzeug, '__version__', '0.0') < '0.9.0' else _escape
-
-def unicodifier(val):
-    if val is None or val is False:
-        return u''
-    if isinstance(val, str):
-        return val.decode('utf-8')
-    return unicode(val)
 
 def foreach_iterator(base_ctx, enum, name):
     ctx = base_ctx.copy()
@@ -360,10 +354,11 @@ class QWeb(object):
             if isinstance(document, etree._Element):
                 element = document
                 document = etree.tostring(document)
-            elif document.startswith("<?xml"):
-                element = etree.fromstring(document)
-            else:
+            elif os.path.exists(document):
                 element = etree.parse(document).getroot()
+            else:
+                element = etree.fromstring(document)
+
             for node in element:
                 if node.get('t-name') == str(template):
                     return (node, document)
@@ -507,12 +502,14 @@ class QWeb(object):
         * itertools
         Define:
         * escape
-        * unicodifier (empty string for a None or False, otherwise unicode string)
+        * to_text (empty string for a None or False, otherwise unicode string)
+        * string_types (replacement for basestring)
         """
         return ast.parse(dedent("""
             from collections import OrderedDict
             from odoo.tools import pycompat
-            from odoo.addons.base.ir.ir_qweb.qweb import escape, unicodifier, foreach_iterator
+            from odoo.tools.pycompat import to_text, string_types
+            from odoo.addons.base.ir.ir_qweb.qweb import escape, foreach_iterator
             """))
 
     def _create_def(self, options, body, prefix='fn', lineno=None):
@@ -757,7 +754,7 @@ class QWeb(object):
 
         if unqualified_el_tag == 't':
             return content
-        tag = u'<%s%s' % (el_tag, u''.join([u' %s="%s"' % (name, escape(unicodifier(value))) for name, value in pycompat.items(attrib)]))
+        tag = u'<%s%s' % (el_tag, u''.join([u' %s="%s"' % (name, escape(pycompat.to_text(value))) for name, value in pycompat.items(attrib)]))
         if unqualified_el_tag in self._void_elements:
             return [self._append(ast.Str(tag + '/>'))] + content
         else:
@@ -859,7 +856,7 @@ class QWeb(object):
             #         append(u' ')
             #         append(name)
             #         append(u'="')
-            #         append(escape(unicodifier((value)))
+            #         append(escape(to_text((value)))
             #         append(u'"')
             body.append(ast.For(
                 target=ast.Tuple(elts=[ast.Name(id='name', ctx=ast.Store()), ast.Name(id='value', ctx=ast.Store())], ctx=ast.Store()),
@@ -881,7 +878,7 @@ class QWeb(object):
                                 func=ast.Name(id='isinstance', ctx=ast.Load()),
                                 args=[
                                     ast.Name(id='value', ctx=ast.Load()),
-                                    ast.Name(id='basestring', ctx=ast.Load())
+                                    ast.Name(id='string_types', ctx=ast.Load())
                                 ],
                                 keywords=[],
                                 starargs=None, kwargs=None
@@ -895,7 +892,7 @@ class QWeb(object):
                         self._append(ast.Call(
                             func=ast.Name(id='escape', ctx=ast.Load()),
                             args=[ast.Call(
-                                func=ast.Name(id='unicodifier', ctx=ast.Load()),
+                                func=ast.Name(id='to_text', ctx=ast.Load()),
                                 args=[ast.Name(id='value', ctx=ast.Load())], keywords=[],
                                 starargs=None, kwargs=None
                             )], keywords=[],
@@ -935,7 +932,7 @@ class QWeb(object):
         if unqualified_el_tag == 't':
             return content
 
-        body = [self._append(ast.Str(u'<%s%s' % (el_tag, u''.join([u' %s="%s"' % (name, escape(unicodifier(value))) for name, value in pycompat.items(extra_attrib)]))))]
+        body = [self._append(ast.Str(u'<%s%s' % (el_tag, u''.join([u' %s="%s"' % (name, escape(pycompat.to_text(value))) for name, value in pycompat.items(extra_attrib)]))))]
         body.extend(self._compile_all_attributes(el, options, attr_already_created))
         if unqualified_el_tag in self._void_elements:
             body.append(self._append(ast.Str(u'/>')))
@@ -1024,7 +1021,7 @@ class QWeb(object):
     def _compile_directive_content(self, el, options):
         body = []
         if el.text is not None:
-            body.append(self._append(ast.Str(unicodifier(el.text))))
+            body.append(self._append(ast.Str(pycompat.to_text(el.text))))
         if el.getchildren():
             for item in el:
                 # ignore comments & processing instructions
@@ -1115,7 +1112,7 @@ class QWeb(object):
         )]
 
     def _compile_tail(self, el):
-        return el.tail is not None and [self._append(ast.Str(unicodifier(el.tail)))] or []
+        return el.tail is not None and [self._append(ast.Str(pycompat.to_text(el.tail)))] or []
 
     def _compile_directive_esc(self, el, options):
         field_options = self._compile_widget_options(el, 'esc')
@@ -1128,14 +1125,14 @@ class QWeb(object):
         return content + self._compile_widget_value(el, options)
 
     def _compile_widget(self, el, expression, field_options, escape=None):
-        # if isinstance(value, basestring):
-        #   value = escape(unicodifier(value))
+        # if isinstance(value, string_types):
+        #   value = escape(to_text(value))
         escaped = ast.If(
             test=ast.Call(
                 func=ast.Name(id='isinstance', ctx=ast.Load()),
                 args=[
                     ast.Name(id='content', ctx=ast.Load()),
-                    ast.Name(id='basestring', ctx=ast.Load())
+                    ast.Name(id='string_types', ctx=ast.Load())
                 ], keywords=[],
                 starargs=None, kwargs=None
             ),
@@ -1144,7 +1141,7 @@ class QWeb(object):
                 value=ast.Call(
                     func=ast.Name(id=escape, ctx=ast.Load()),
                     args=[ast.Call(
-                        func=ast.Name(id='unicodifier', ctx=ast.Load()),
+                        func=ast.Name(id='to_text', ctx=ast.Load()),
                         args=[ast.Name(id='content', ctx=ast.Load())], keywords=[],
                         starargs=None, kwargs=None
                     )], keywords=[],
@@ -1312,7 +1309,7 @@ class QWeb(object):
             ]
 
         # if content is not None:
-        #    display the tag (unicodifier(content))
+        #    display the tag (to_text(content))
         # else
         #    if default_content:
         #       display the tag with default content
@@ -1321,7 +1318,7 @@ class QWeb(object):
         return [self._if_content_is_not_Falsy(
             body=self._compile_tag(el, [self._append(
                 ast.Call(
-                    func=ast.Name(id='unicodifier', ctx=ast.Load()),
+                    func=ast.Name(id='to_text', ctx=ast.Load()),
                     args=[ast.Name(id='content', ctx=ast.Load())], keywords=[],
                     starargs=None, kwargs=None
                 )
@@ -1441,7 +1438,7 @@ class QWeb(object):
                 keys = []
                 values = []
                 for key, value in pycompat.items(options['nsmap']):
-                    if isinstance(key, basestring):
+                    if isinstance(key, pycompat.string_types):
                         keys.append(ast.Str(s=key))
                     elif key is None:
                         keys.append(ast.Name(id='None', ctx=ast.Load()))
@@ -1527,7 +1524,7 @@ class QWeb(object):
     def _compile_strexpr(self, expr):
         # ensure result is unicode
         return ast.Call(
-            func=ast.Name(id='unicodifier', ctx=ast.Load()),
+            func=ast.Name(id='to_text', ctx=ast.Load()),
             args=[self._compile_expr(expr)], keywords=[],
             starargs=None, kwargs=None
         )
@@ -1571,7 +1568,7 @@ class QWeb(object):
         for m in _FORMAT_REGEX.finditer(f):
             literal = f[base_idx:m.start()]
             if literal:
-                elts.append(ast.Str(literal if isinstance(literal, unicode) else literal.decode('utf-8')))
+                elts.append(ast.Str(literal if isinstance(literal, pycompat.text_type) else literal.decode('utf-8')))
 
             expr = m.group(1) or m.group(2)
             elts.append(self._compile_strexpr(expr))
@@ -1579,7 +1576,7 @@ class QWeb(object):
         # string past last regex match
         literal = f[base_idx:]
         if literal:
-            elts.append(ast.Str(literal if isinstance(literal, unicode) else literal.decode('utf-8')))
+            elts.append(ast.Str(literal if isinstance(literal, pycompat.text_type) else literal.decode('utf-8')))
 
         return reduce(lambda acc, it: ast.BinOp(
             left=acc,

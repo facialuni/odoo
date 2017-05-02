@@ -170,7 +170,7 @@ class NewId(object):
     def __nonzero__(self):
         return False
 
-IdType = pycompat.integer_types + (str, unicode, NewId)
+IdType = pycompat.integer_types + pycompat.string_types + (NewId,)
 
 
 # maximum number of prefetched records
@@ -181,6 +181,7 @@ LOG_ACCESS_COLUMNS = ['create_uid', 'create_date', 'write_uid', 'write_date']
 MAGIC_COLUMNS = ['id'] + LOG_ACCESS_COLUMNS
 
 
+@pycompat.implements_to_string
 class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
     """ Base class for Odoo models.
 
@@ -402,7 +403,7 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
 
         # determine inherited models
         parents = cls._inherit
-        parents = [parents] if isinstance(parents, basestring) else (parents or [])
+        parents = [parents] if isinstance(parents, pycompat.string_types) else (parents or [])
 
         # determine the model's name
         name = cls._name or (len(parents) == 1 and parents[0]) or cls.__name__
@@ -766,7 +767,7 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
                 # avoid broken transaction) and keep going
                 cr.execute('ROLLBACK TO SAVEPOINT model_load_save')
             except Exception as e:
-                message = (_('Unknown error during import:') + ' %s: %s' % (type(e), unicode(e)))
+                message = (_(u'Unknown error during import:') + u' %s: %s' % (type(e), e))
                 moreinfo = _('Resolve other errors first')
                 messages.append(dict(info, type='error', message=message, moreinfo=moreinfo))
                 # Failed for some reason, perhaps due to invalid data supplied,
@@ -883,7 +884,7 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
             # processing of response, but injects human readable in message
             exc_vals = dict(base, record=record, field=field_names[field])
             record = dict(base, type=type, record=record, field=field,
-                          message=unicode(exception.args[0]) % exc_vals)
+                          message=pycompat.text_type(exception.args[0]) % exc_vals)
             if len(exception.args) > 1 and exception.args[1]:
                 record.update(exception.args[1])
             log(record)
@@ -1706,7 +1707,7 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
         value = False if value is None else value
         gb = groupby_dict.get(key)
         if gb and gb['type'] in ('date', 'datetime') and value:
-            if isinstance(value, basestring):
+            if isinstance(value, pycompat.string_types):
                 dt_format = DEFAULT_SERVER_DATETIME_FORMAT if gb['type'] == 'datetime' else DEFAULT_SERVER_DATE_FORMAT
                 value = datetime.datetime.strptime(value, dt_format)
             if gb['tz_convert']:
@@ -1813,7 +1814,7 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
         """
         result = self._read_group_raw(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
 
-        groupby = [groupby] if isinstance(groupby, basestring) else list(OrderedSet(groupby))
+        groupby = [groupby] if isinstance(groupby, pycompat.string_types) else list(OrderedSet(groupby))
         dt = [
             f for f in groupby
             if self._fields[f.split(':')[0]].type in ('date', 'datetime')
@@ -1837,7 +1838,7 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
         query = self._where_calc(domain)
         fields = fields or [f.name for f in pycompat.values(self._fields) if f.store]
 
-        groupby = [groupby] if isinstance(groupby, basestring) else list(OrderedSet(groupby))
+        groupby = [groupby] if isinstance(groupby, pycompat.string_types) else list(OrderedSet(groupby))
         groupby_list = groupby[:1] if lazy else groupby
         annotated_groupbys = [self._read_group_process_groupby(gb, query) for gb in groupby_list]
         groupby_fields = [g['field'] for g in annotated_groupbys]
@@ -4392,7 +4393,7 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
         """
         if not func:
             return self                 # support for an empty path of fields
-        if isinstance(func, basestring):
+        if isinstance(func, pycompat.string_types):
             recs = self
             for name in func.split('.'):
                 recs = recs._mapped_func(operator.itemgetter(name))
@@ -4417,7 +4418,7 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
 
             :param func: a function or a dot-separated sequence of field names
         """
-        if isinstance(func, basestring):
+        if isinstance(func, pycompat.string_types):
             name = func
             func = lambda rec: any(rec.mapped(name))
         return self.browse([rec.id for rec in self if func(rec)])
@@ -4434,7 +4435,7 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
         if key is None:
             recs = self.search([('id', 'in', self.ids)])
             return self.browse(reversed(recs._ids)) if reverse else recs
-        if isinstance(key, basestring):
+        if isinstance(key, pycompat.string_types):
             key = itemgetter(key)
         return self.browse(item.id for item in sorted(self, key=key, reverse=reverse))
 
@@ -4518,7 +4519,7 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
         """
         if isinstance(item, BaseModel) and self._name == item._name:
             return len(item) == 1 and item.id in self._ids
-        elif isinstance(item, basestring):
+        elif isinstance(item, pycompat.string_types):
             return item in self._fields
         else:
             raise TypeError("Mixing apples and oranges: %s in %s" % (item, self))
@@ -4611,11 +4612,8 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
 
     def __str__(self):
         return "%s%s" % (self._name, getattr(self, '_ids', ""))
-
-    def __unicode__(self):
-        return unicode(str(self))
-
-    __repr__ = __str__
+    def __repr__(self):
+        return str(self)
 
     def __hash__(self):
         if hasattr(self, '_ids'):
@@ -4635,7 +4633,7 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
                 rs = inst[10:20]            # subset of inst
                 nm = rs['name']             # name of first record in inst
         """
-        if isinstance(key, basestring):
+        if isinstance(key, pycompat.string_types):
             # important: one must call the field's getter
             return self._fields[key].__get__(self, type(self))
         elif isinstance(key, slice):
@@ -4939,7 +4937,7 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
 
         # At the moment, the client does not support updates on a *2many field
         # while this one is modified by the user.
-        if isinstance(field_name, basestring) and \
+        if isinstance(field_name, pycompat.string_types) and \
                 self._fields[field_name].type in ('one2many', 'many2many'):
             dirty.discard(field_name)
 
@@ -4962,13 +4960,13 @@ class RecordCache(MutableMapping):
 
     def contains(self, field):
         """ Return whether `records[0]` has a value for ``field`` in cache. """
-        if isinstance(field, basestring):
+        if isinstance(field, pycompat.string_types):
             field = self._recs._fields[field]
         return self._recs.id in self._recs.env.cache[field]
 
     def __contains__(self, field):
         """ Return whether `records[0]` has a regular value for ``field`` in cache. """
-        if isinstance(field, basestring):
+        if isinstance(field, pycompat.string_types):
             field = self._recs._fields[field]
         dummy = SpecialValue(None)
         value = self._recs.env.cache[field].get(self._recs.id, dummy)
@@ -4976,7 +4974,7 @@ class RecordCache(MutableMapping):
 
     def get(self, field, default=None):
         """ Return the cached, regular value of ``field`` for `records[0]`, or ``default``. """
-        if isinstance(field, basestring):
+        if isinstance(field, pycompat.string_types):
             field = self._recs._fields[field]
         dummy = SpecialValue(None)
         value = self._recs.env.cache[field].get(self._recs.id, dummy)
@@ -4984,14 +4982,14 @@ class RecordCache(MutableMapping):
 
     def __getitem__(self, field):
         """ Return the cached value of ``field`` for `records[0]`. """
-        if isinstance(field, basestring):
+        if isinstance(field, pycompat.string_types):
             field = self._recs._fields[field]
         value = self._recs.env.cache[field][self._recs.id]
         return value.get() if isinstance(value, SpecialValue) else value
 
     def __setitem__(self, field, value):
         """ Assign the cached value of ``field`` for all records in ``records``. """
-        if isinstance(field, basestring):
+        if isinstance(field, pycompat.string_types):
             field = self._recs._fields[field]
         values = dict.fromkeys(self._recs._ids, value)
         self._recs.env.cache[field].update(values)
@@ -5010,7 +5008,7 @@ class RecordCache(MutableMapping):
 
     def __delitem__(self, field):
         """ Remove the cached value of ``field`` for all ``records``. """
-        if isinstance(field, basestring):
+        if isinstance(field, pycompat.string_types):
             field = self._recs._fields[field]
         field_cache = self._recs.env.cache[field]
         for id in self._recs._ids:
