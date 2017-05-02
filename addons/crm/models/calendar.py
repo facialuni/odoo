@@ -24,3 +24,11 @@ class CalendarEvent(models.Model):
         if event.opportunity_id:
             event.opportunity_id.log_meeting(event.name, event.start, event.duration)
         return event
+
+    def action_open_resource_document(self):
+        self.ensure_one()
+        res = super(CalendarEvent, self).action_open_resource_document()
+        if self.activity_id.res_model == 'crm.lead':
+            form_view_id = self.env.ref('crm.crm_case_form_view_oppor').id
+            res['views'] = [[form_view_id, 'form']]
+        return res
