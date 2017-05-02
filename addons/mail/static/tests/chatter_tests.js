@@ -55,23 +55,6 @@ QUnit.module('Chatter', {
                     activity_ids: [],
                 }]
             },
-            'mail.message':{
-                fields: {
-                    attachment_ids: {
-                        string: 'Attachments',
-                        type: 'many2many',
-                        relation: 'ir.attachment',
-                    },
-                },
-            },
-            'ir.attachment': {
-                fields: {
-                    name: { string: "Name", type: "char"},
-                    datas_fname: { string: "File name", type: "char"},
-                    datas: { type: "base64"},
-                    mimetype: {type: "char"},
-                },
-            },
             'mail.activity': {
                 fields: {
                     activity_type_id: { string: "Activity type", type: "many2one", relation: "mail.activity.type" },
@@ -588,8 +571,10 @@ QUnit.test('chatter: Attachement viewer', function (assert) {
             "Modal popup shoud have now second image src");
         assert.strictEqual($('.modal .o_attachment_download a').attr('href'), '/web/content/2?download=true',
             "Modal popup should correct download link");
+        // close attachment carousel
+        $('.modal .close').click();
+        form.destroy();
     });
-
 });
 
 QUnit.test('form activity widget: schedule next activity', function (assert) {

@@ -20,7 +20,7 @@
 
     <t t-name="Attachment.Slideshow">
         <div class="container">
-            <div t-attf-id="Slideshow_#{widget.active_attachment.id}" class="carousel slide" data-ride="carousel">
+            <div t-attf-id="Slideshow_#{widget.active_attachment.id}" class="carousel slide" data-ride="carousel" data-interval="false">
                 <div class="carousel-inner" role="listbox">
                     <t t-foreach="widget.attachment_ids" t-as="attachment">
                         <div t-attf-class="item #{attachment.id == widget.active_attachment.id and 'active' or ''}">
