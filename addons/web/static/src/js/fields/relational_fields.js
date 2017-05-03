@@ -1042,7 +1042,7 @@ var FieldOne2Many = FieldX2Many.extend({
             fields_view: this.attrs.views && this.attrs.views.form,
             parentID: this.value.id,
             viewInfo: this.view,
-            relational_field_info: {view_type: this.view.type, record: this},
+            active_actions: this.activeActions,
         }));
     },
 
@@ -1094,6 +1094,7 @@ var FieldOne2Many = FieldX2Many.extend({
      */
     _onOpenRecord: function (ev) {
         // we don't want interference with the components upstream.
+        var self = this;
         ev.stopPropagation();
 
         var id = ev.data.id;
@@ -1105,6 +1106,10 @@ var FieldOne2Many = FieldX2Many.extend({
         this._openFormDialog({
             id: id,
             on_saved: onSaved,
+            on_remove: function (record) {
+                self._setValue({operation: 'DELETE', ids: [record.id]});
+            },
+            active_actions: this.activeActions,
             readonly: this.mode === 'readonly',
         });
     },
@@ -1177,7 +1182,11 @@ var FieldMany2Many = FieldX2Many.extend({
                 self._setValue({operation: 'TRIGGER_ONCHANGE'}, {forceChange: true});
                 self.trigger_up('reload', {db_id: ev.data.id});
             },
+            on_remove: function (record) {
+                self._setValue({operation: 'DELETE', ids: [record.id]});
+            },
             readonly: this.mode === 'readonly',
+            active_actions: this.activeActions,
             string: this.string,
         });
     },
