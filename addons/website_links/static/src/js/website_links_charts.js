@@ -231,8 +231,7 @@ if(!$('.o_website_links_chart').length) {
         });
 
         // Copy to clipboard link
-        ZeroClipboard.config({swfPath: location.origin + "/website_links/static/lib/zeroclipboard/ZeroClipboard.swf" });
-        new ZeroClipboard($('.copy-to-clipboard'));
+        new Clipboard($('.copy-to-clipboard').get(0));
 
         var animating_copy = false;
 
