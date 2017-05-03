@@ -66,7 +66,6 @@ var CopyClipboard = {
 var TextCopyClipboard = FieldText.extend(CopyClipboard, {
     _render: function() {
         this._super.apply(this, arguments);
-        // console.log("fgnrjgs")
         this.$el.addClass('o_field_copy');
         this.$el.append($(qweb.render('CopyClipboardText')));
         this.add_clipboard();
