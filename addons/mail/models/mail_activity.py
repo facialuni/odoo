@@ -34,7 +34,6 @@ class MailActivityType(models.Model):
         'mail.activity.type', 'mail_activity_rel', 'recommended_id', 'activity_id',
         string='Preceding Activities')
 
-
 class MailActivity(models.Model):
     """ An actual activity to perform. Activities are linked to
     documents using res_id and res_model_id fields. Activities have a deadline
