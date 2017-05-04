@@ -163,6 +163,33 @@ var FormController = BasicController.extend({
             this._updateSidebar();
         }
     },
+    /**
+     * Show a warning message if the user modified a translated field.  For each
+     * field, the notification provides a link to edit the field's translations.
+     *
+     * @override
+     * @param {string} [recordID] - default to main recordID
+     * @param {Object} [options]
+     * @returns {Deferred}
+     */
+    saveRecord: function () {
+        var self = this;
+        var def = this._super.apply(this, arguments);
+        if (!_t.database.multi_lang) {
+            return def;
+        }
+        var record = this.model.localData[this.handle];
+        var changes = this.model._generateChanges(record);
+        var alert_fields = _.filter(this.renderer.state.fields, function (field) {
+            return field.translate && _.has(changes, field.name);
+        });
+        if (alert_fields.length) {
+            def.then(function () {
+                self.renderer.displayTranslationAlert(alert_fields);
+            });
+        }
+        return def;
+    },
 
     //--------------------------------------------------------------------------
     // Private

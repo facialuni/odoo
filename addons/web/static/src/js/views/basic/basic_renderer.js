@@ -12,6 +12,7 @@ var config = require('web.config');
 var core = require('web.core');
 var Domain = require('web.Domain');
 
+var _t = core._t;
 var qweb = core.qweb;
 
 var BasicRenderer = AbstractRenderer.extend({
@@ -118,6 +119,24 @@ var BasicRenderer = AbstractRenderer.extend({
         return $.when.apply($, defs).then(function () {
             return resetWidgets;
         });
+    },
+    /*
+     * Show a warning message if the user modified a translated field.  For each
+     * field, the notification provides a link to edit the field's translations.
+     */
+    displayTranslationAlert: function (alert_fields) {
+        var self = this;
+        var $notification = $(qweb.render('notification-box', {type: 'info'}))
+            .append(qweb.render('translation-alert', {
+                fields: alert_fields,
+                lang: _t.database.parameters.name
+            }));
+        // bind click event on "Update translations" links
+        $notification.on('click', '.oe_field_translate', function (ev) {
+            ev.preventDefault();
+            _.find(self.getChildren(), {'name': ev.target.name})._onTranslate();
+        });
+        this.$('.o_form_statusbar').after($notification);
     },
 
     //--------------------------------------------------------------------------
