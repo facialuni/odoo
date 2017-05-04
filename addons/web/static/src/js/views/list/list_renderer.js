@@ -54,7 +54,7 @@ var ListRenderer = BasicRenderer.extend({
             if (c.attrs.widget === 'handle') {
                 self.hasHandle = true;
             }
-            return !!JSON.parse(c.attrs.modifiers || "{}").tree_invisible;
+            return c.attrs.modifiers && c.attrs.modifiers.tree_invisible;
         });
         this.rowDecorations = _.chain(this.arch.attrs)
             .pick(function (value, key) {

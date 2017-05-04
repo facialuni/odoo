@@ -286,9 +286,9 @@ return core.Class.extend({
         // this should change, for instance the server might set the evaluated
         // value in invisible, which could then be seen as static by the client,
         // and add another key in debug mode containing the raw value.
-        // for now, we do an hack to detect if the value is static and retrieve
-        // it from the modifiers,
-        if (attrs.invisible && attrs.modifiers.match('"(?:tree_)?invisible": ?true')) {
+        // for now, we look inside the modifiers and consider the value only if
+        // it is static (=== true),
+        if (attrs.modifiers.invisible === true || attrs.modifiers.tree_invisible === true) {
             attrs.__no_fetch = true;
         }
 
@@ -372,6 +372,9 @@ return core.Class.extend({
         utils.traverse(arch, function (node) {
             if (typeof node === 'string') {
                 return false;
+            }
+            if (node.attrs.modifiers) {
+                node.attrs.modifiers = JSON.parse(node.attrs.modifiers);
             }
             if (node.tag === 'field') {
                 fieldsInfo[node.attrs.name] = self._processField(viewType,
