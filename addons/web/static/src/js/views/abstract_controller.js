@@ -193,6 +193,7 @@ var AbstractController = Widget.extend({
      * @returns {Deferred}
      */
     update: function (params, options) {
+        var ts = Date.now();
         var self = this;
         var shouldReload = (options && 'reload' in options) ? options.reload : true;
         var def = shouldReload ? this.model.reload(this.handle, params) : $.when();
@@ -204,6 +205,9 @@ var AbstractController = Widget.extend({
                 self.renderer.setLocalState(localState);
                 self._update(state);
             });
+        }).then(function () {
+            var current = Date.now();
+            console.log('delta', current - ts, -(ts - current)/1000)
         });
     },
 
