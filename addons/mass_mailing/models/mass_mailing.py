@@ -723,3 +723,21 @@ class MassMailing(models.Model):
                 mass_mailing.send_mail()
             else:
                 mass_mailing.state = 'done'
+
+    @api.model
+    def get_mail_templates(self):
+        mail_template_dict = {}
+        mass_mail_id = self.env['ir.model'].sudo().search([('model', '=', 'mail.mass_mailing')], limit=1).id
+        is_manager = self.user_has_groups('mass_mailing.group_mass_mailing_manager')
+        mail_template = self.env['mail.template'].sudo().search_read(
+            [('model_id', '=', mass_mail_id)],
+            ['id', 'name', 'body_html', 'image', 'create_date', 'create_uid', 'write_date', 'write_uid'])
+        user_templates = [x for x in mail_template if x['create_uid'][0] == self.env.uid]
+        other_templates = [x for x in mail_template if x not in user_templates]
+        mail_template_dict = {
+            'is_manager': is_manager,
+            'user_templates': user_templates,
+            'other_templates': other_templates,
+            'mass_mail_id': mass_mail_id,
+        }
+        return mail_template_dict
