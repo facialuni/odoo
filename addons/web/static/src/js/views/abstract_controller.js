@@ -191,9 +191,12 @@ var AbstractController = Widget.extend({
      * @returns {Deferred}
      */
     update: function (params, options) {
+        console.log("Inside AbstractController update ::: ");
+        console.trace();
         var self = this;
         var shouldReload = (options && 'reload' in options) ? options.reload : true;
         var def = shouldReload ? this.model.reload(this.handle, params) : $.when();
+
         return def.then(function (handle) {
             self.handle = handle || self.handle; // update handle if we reloaded
             var state = self.model.get(self.handle);

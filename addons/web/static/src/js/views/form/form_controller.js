@@ -19,6 +19,20 @@ var FormController = BasicController.extend({
         toggle_column_order: '_onToggleColumnOrder',
     }),
     /**
+     * Called each time the form view is attached into the DOM
+     */
+    on_attach_callback: function() {
+        this.trigger('attached');
+        this.autofocus();
+        this.renderer.setTabindexWidgets();
+    },
+    /**
+     * Called each time the form view is detached from the DOM
+     */
+    on_detach_callback: function() {
+        this.trigger('detached');
+    },
+    /**
      * @override
      *
      * @param {boolean} params.hasSidebar

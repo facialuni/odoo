@@ -30,16 +30,17 @@ var FormRenderer = BasicRenderer.extend({
      * Focuses the field having attribute 'default_focus' set, if any, or the
      * first focusable field otherwise.
      */
-    autofocus: function () {
+    autofocus: function() {
         if (this.mode === 'readonly') {
             return;
         }
         var focusWidget = this.defaultFocusField;
         if (!focusWidget || !focusWidget.isFocusable()) {
-            var widgets = this.allFieldWidgets[this.state.id];
+            var widgets = (!_.isEmpty(this.tabindexWidgets) &&  this.tabindexWidgets[this.state.id]) || this.allFieldWidgets[this.state.id];
             for (var i = 0; i < (widgets ? widgets.length : 0); i++) {
                 var widget = widgets[i];
-                if (widget.isFocusable()) {
+                // TODO: Use isFocusable method instead of following condition
+                if (!widget.$el.is('.o_form_invisible') && !widget.$el.is('.o_readonly') && !widget.$el.is(":hidden")) {
                     focusWidget = widget;
                     break;
                 }
@@ -48,6 +49,17 @@ var FormRenderer = BasicRenderer.extend({
         if (focusWidget) {
             focusWidget.activate({noselect: true});
         }
+    },
+    setTabindexWidgets: function() {
+        var self = this;
+        this.tabindexWidgets[this.state.id] = [];
+        _.each(this.tabindexFieldWidgets[this.state.id], function (widget) {
+            self.tabindexWidgets[self.state.id].push(widget);
+        });
+        _.each(this.tabindexButtons[this.state.id], function (widget) {
+            self.tabindexWidgets[self.state.id].push(widget);
+        });
+        console.log("tabindexWidgets ::: ", this.tabindexWidgets);
     },
     /**
      * Extend the method so that labels also receive the 'o_field_invalid' class
@@ -359,6 +371,11 @@ var FormRenderer = BasicRenderer.extend({
                 },
             });
         }
+        if (node.attrs.class && (node.attrs.class.indexOf('btn-primary') != -1
+            || node.attrs.class.indexOf('oe_highlight') != -1
+            || node.attrs.class.indexOf('oe_stat_button') != -1)) {
+            this.tabindexButtons[this.state.id].push($button);
+        }
         return $button;
     },
     /**
@@ -524,6 +541,11 @@ var FormRenderer = BasicRenderer.extend({
         this._addOnClickAction($button, node);
         this._handleAttributes($button, node);
         this._registerModifiers(node, this.state, $button);
+        if (node.attrs.class && (node.attrs.class.indexOf('btn-primary') != -1
+            || node.attrs.class.indexOf('oe_highlight') != -1
+            || node.attrs.class.indexOf('oe_stat_button') != -1)) {
+            this.tabindexButtons[this.state.id].push($button);
+        }
         return $button;
     },
     /**
@@ -568,6 +590,11 @@ var FormRenderer = BasicRenderer.extend({
         this._addOnClickAction($button, node);
         this._handleAttributes($button, node);
         this._registerModifiers(node, this.state, $button);
+        if (node.attrs.class && (node.attrs.class.indexOf('btn-primary') != -1
+            || node.attrs.class.indexOf('oe_highlight') != -1
+            || node.attrs.class.indexOf('oe_stat_button') != -1)) {
+            this.tabindexButtons[this.state.id].push($button);
+        }
         return $button;
     },
     /**
@@ -779,6 +806,10 @@ var FormRenderer = BasicRenderer.extend({
         // render the form and evaluate the modifiers
         var defs = [];
         this.defs = defs;
+        this.tabindexButtons = {};
+        if (this.tabindexButtons[this.state.id] === undefined) {
+            this.tabindexButtons[this.state.id] = [];
+        }
         var $form = this._renderNode(this.arch).addClass(this.className);
         delete this.defs;
 
@@ -786,6 +817,8 @@ var FormRenderer = BasicRenderer.extend({
             self._updateView($form.contents());
         }, function () {
             $form.remove();
+            self.autofocus();
+            self.setTabindexWidgets();
         });
     },
     /**
@@ -845,10 +878,10 @@ var FormRenderer = BasicRenderer.extend({
 
         var index;
         if (ev.data.direction === "next") {
-            index = this.allFieldWidgets[this.state.id].indexOf(ev.data.target);
+            index = this.tabindexWidgets[this.state.id].indexOf(ev.data.target);
             this._activateNextFieldWidget(this.state, index);
         } else if (ev.data.direction === "previous") {
-            index = this.allFieldWidgets[this.state.id].indexOf(ev.data.target);
+            index = this.tabindexWidgets[this.state.id].indexOf(ev.data.target);
             this._activatePreviousFieldWidget(this.state, index);
         }
     },
@@ -861,7 +894,7 @@ var FormRenderer = BasicRenderer.extend({
     _onTranslate: function (event) {
         event.preventDefault();
         this.trigger_up('translate', {fieldName: event.target.name, id: this.state.id});
-    },
+    }
 });
 
 return FormRenderer;
