@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="l10n_in_report_invoice_document_inherit" inherit_id="account.report_invoice_document">
+        <xpath expr="//div[@id='total']" position="after">
+            <div id="total_in_words" class="row mb16">
+                <div class="col-xs-2">
+                    <strong>Total (In Words): </strong>
+                </div>
+                <div class="col-xs-8">
+                    <span t-field="o.amount_total_words"/>
+                </div>
+            </div>
+        </xpath>
+
+        <xpath expr="//div[@name='invoice_address']//div[@t-if='o.partner_id.vat']" position="replace">
+            <div t-if="o.partner_id.vat" class="mt16">GSTIN: <span t-field="o.partner_id.vat"/></div>
+        </xpath>
+    </template>
+
+</odoo>
