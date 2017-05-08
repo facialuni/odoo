@@ -59,7 +59,6 @@ var FormRenderer = BasicRenderer.extend({
         _.each(this.tabindexButtons[this.state.id], function (widget) {
             self.tabindexWidgets[self.state.id].push(widget);
         });
-        console.log("tabindexWidgets ::: ", this.tabindexWidgets);
     },
     /**
      * Extend the method so that labels also receive the 'o_field_invalid' class
