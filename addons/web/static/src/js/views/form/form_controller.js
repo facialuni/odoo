@@ -23,8 +23,8 @@ var FormController = BasicController.extend({
      */
     on_attach_callback: function() {
         this.trigger('attached');
-        this.autofocus();
         this.renderer.setTabindexWidgets();
+        this.autofocus();
     },
     /**
      * Called each time the form view is detached from the DOM

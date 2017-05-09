@@ -223,6 +223,38 @@ var FormRenderer = BasicRenderer.extend({
             });
         });
     },
+    _activateButton: function($button) {
+        var activate = function() {
+            if ($button.focus() !== false) {
+                return true;
+            } 
+            return false;
+        }
+        return activate;
+    },
+    _getFocusTip: function(node) {
+        var show_focus_tip = function() {
+            var content = node.attrs.on_focus_tip ? node.attrs.on_focus_tip : _.str.sprintf(_t("Press ENTER to %s"), node.attrs.string);
+            return content;
+        }
+        return show_focus_tip;
+    },
+    _addOnFocusAction: function($el, node) {
+        var self = this;
+        var options = _.extend({
+            delay: { show: 1000, hide: 0 },
+            trigger: 'focus',
+            title: function() {
+                return qweb.render('FocusTooltip', {
+                    getFocusTip: self._getFocusTip(node)
+                });
+            }
+        }, {});
+        $el.tooltip(options);
+    },
+    _addOnEnterAction: function($el, node) {
+        this._addOnClickAction($el, node);
+    },
     /**
      * @private
      * @param {string} name
@@ -354,6 +386,8 @@ var FormRenderer = BasicRenderer.extend({
                         .text(node.attrs.string)
                         .addClass('btn btn-sm btn-default');
         this._addOnClickAction($button, node);
+        this._addOnFocusAction($button, node);
+        this._addOnEnterAction($button, node);
         this._handleAttributes($button, node);
         this._registerModifiers(node, this.state, $button);
 
@@ -373,7 +407,7 @@ var FormRenderer = BasicRenderer.extend({
         if (node.attrs.class && (node.attrs.class.indexOf('btn-primary') != -1
             || node.attrs.class.indexOf('oe_highlight') != -1
             || node.attrs.class.indexOf('oe_stat_button') != -1)) {
-            this.tabindexButtons[this.state.id].push($button);
+            this.tabindexButtons[this.state.id].push({'$el': $button, activate: this._activateButton($button)});
         }
         return $button;
     },
@@ -538,12 +572,15 @@ var FormRenderer = BasicRenderer.extend({
         }
         $button.append(_.map(node.children, this._renderNode.bind(this)));
         this._addOnClickAction($button, node);
+        this._addOnFocusAction($button, node);
+        this._addOnEnterAction($button, node);
         this._handleAttributes($button, node);
         this._registerModifiers(node, this.state, $button);
         if (node.attrs.class && (node.attrs.class.indexOf('btn-primary') != -1
             || node.attrs.class.indexOf('oe_highlight') != -1
             || node.attrs.class.indexOf('oe_stat_button') != -1)) {
-            this.tabindexButtons[this.state.id].push($button);
+            // TODO: Add into tabindexWidgets but mainatain separate object and push inside tabindexWidgets in last so that stat buttons get focus in last
+            // this.tabindexButtons[this.state.id].push({'$el': $button, activate: this._activateButton($button)});
         }
         return $button;
     },
@@ -587,12 +624,16 @@ var FormRenderer = BasicRenderer.extend({
         });
         $button.append(_.map(node.children, this._renderNode.bind(this)));
         this._addOnClickAction($button, node);
+        this._addOnFocusAction($button, node);
+        this._addOnEnterAction($button, node);
         this._handleAttributes($button, node);
         this._registerModifiers(node, this.state, $button);
         if (node.attrs.class && (node.attrs.class.indexOf('btn-primary') != -1
             || node.attrs.class.indexOf('oe_highlight') != -1
             || node.attrs.class.indexOf('oe_stat_button') != -1)) {
-            this.tabindexButtons[this.state.id].push($button);
+            widget['$el'] = $button;
+            widget['activate'] = this._activateButton($button);
+            this.tabindexButtons[this.state.id].push(widget);
         }
         return $button;
     },
@@ -878,6 +919,8 @@ var FormRenderer = BasicRenderer.extend({
         var index;
         if (ev.data.direction === "next") {
             index = this.tabindexWidgets[this.state.id].indexOf(ev.data.target);
+            var recordWidgets = this.tabindexWidgets[this.state.id] || [];
+            var nextWidget = this._getNextTabindexWidget(index+1, recordWidgets);
             this._activateNextFieldWidget(this.state, index);
         } else if (ev.data.direction === "previous") {
             index = this.tabindexWidgets[this.state.id].indexOf(ev.data.target);
@@ -893,7 +936,20 @@ var FormRenderer = BasicRenderer.extend({
     _onTranslate: function (event) {
         event.preventDefault();
         this.trigger_up('translate', {fieldName: event.target.name, id: this.state.id});
-    }
+    },
+    _getNextTabindexWidget: function(currentIndex, recordWidgets) {
+        for (var i = 0 ; i < recordWidgets.length ; i++) {
+            var widget = recordWidgets[currentIndex];
+            if (widget && widget.$el.is(':visible') && !widget.$el.hasClass("o_readonly_modifier")) { // check it is visible and not readonly
+                return widget;
+            }
+        }
+    },
+    _onMoveNextButton: function($el) {
+        var index = this.tabindexWidgets[this.state.id].indexOf($el);
+        var recordWidgets = this.tabindexWidgets[this.state.id] || [];
+        this._activateNextFieldWidget(this.state, index);
+    },
 });
 
 return FormRenderer;
