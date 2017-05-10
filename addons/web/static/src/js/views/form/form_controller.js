@@ -57,6 +57,9 @@ var FormController = BasicController.extend({
      */
     autofocus: function () {
         this.renderer.autofocus();
+        if (this.$buttons && this.mode == 'readonly') {
+            this.$buttons.find('.o_form_button_edit').focus();
+        }
     },
     /**
      * This method switches the form view in edit mode, with a new record.
