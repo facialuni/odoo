@@ -21,6 +21,9 @@ var ViewWidget = Widget.extend({
     custom_events: {
         navigation_move: '_onNavigationMove',
     },
+
+    // TODO: override init here and move commong stuff here, like attrs, string, name etc. etc.
+
     //--------------------------------------------------------------------------
     // Public
     //--------------------------------------------------------------------------
@@ -51,6 +54,24 @@ var ViewWidget = Widget.extend({
             return true;
         }
         return false;
+    },
+    /**
+     * Returns the main field's DOM element (jQuery form) which can be focused
+     * by the browser.
+     *
+     * @returns {jQuery} main focusable element inside the widget
+     */
+    getFocusableElement: function () {
+        return $();
+    },
+    /**
+     * Returns true iff the widget has a visible element that can take the focus
+     *
+     * @returns {boolean}
+     */
+    isFocusable: function () {
+        var $focusable = this.getFocusableElement();
+        return $focusable.length && $focusable.is(':visible');
     },
 
     //--------------------------------------------------------------------------
