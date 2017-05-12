@@ -599,6 +599,7 @@ var FieldX2Many = AbstractField.extend({
         save_line: '_onSaveLine',
         resequence: '_onResequence',
         toggle_column_order: '_onToggleColumnOrder',
+        cancel_line: '_onCancelLine',
     }),
 
     /**
@@ -951,6 +952,9 @@ var FieldX2Many = AbstractField.extend({
                 });
             },
         });
+    },
+    _onCancelLine: function() {
+        this.$el.focus();
     },
     /**
      * Forces a resequencing of the records.

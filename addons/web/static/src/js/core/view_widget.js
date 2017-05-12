@@ -128,6 +128,9 @@ var ViewWidget = Widget.extend({
                 this.trigger_up('navigation_move', {direction: 'left'});
                 break;
         }
+        if (event.which === $.ui.keyCode.ESCAPE) {
+            this.trigger_up('cancel_line'); // writing cancel line related stuff looks wiered here
+        }
     },
     /**
      * Updates the target data value with the current AbstractField instance.
