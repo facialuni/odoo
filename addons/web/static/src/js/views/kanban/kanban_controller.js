@@ -29,6 +29,8 @@ var KanbanController = BasicController.extend({
         kanban_column_archive_records: '_onArchiveRecords',
         kanban_load_more: '_onLoadMore',
         column_toggle_fold: '_onToggleColumn',
+        kanban_column_edit: '_onColumnEdit',
+        create_undefined_column: '_onUndefinedCreate',
     }),
     /**
      * @override
@@ -185,6 +187,21 @@ var KanbanController = BasicController.extend({
         }
     },
     /**
+     * @private
+     * @param {OdooEvent} event
+     */
+    _onColumnEdit: function(event) {
+        self = this;
+        var target = event.target;
+        this._rpc({
+            model: target.relation,
+            method: 'write',
+            args: [target.id, {name: event.data.name}],
+        }).done(function () {
+            self.reload();
+        });
+    },
+    /**
      * @param {OdooEvent} event
      */
     _onColumnResequence: function (event) {
@@ -338,6 +355,27 @@ var KanbanController = BasicController.extend({
         this.model.toggleGroup(column.db_id).then(function (db_id) {
             var data = self.model.get(db_id);
             self.renderer.updateColumn(db_id, data);
+        });
+    },
+    /**
+     * @param {OdooEvent} event
+     */
+    _onUndefinedCreate: function (event) {
+        var self = this;
+        var undefinedColumn = _.findWhere(this.renderer.widgets, {id: false});
+        this.model.createGroup(event.data.value, this.handle).then(function (newGroupID) {
+            var def = $.Deferred();
+            _.each(undefinedColumn.records, function (record, index) {
+                self.model.moveRecord(record.db_id, newGroupID, self.handle).then(function () {
+                    if(index+1 === undefinedColumn.records.length){
+                        def.resolve();
+                    }
+                });
+            });
+            def.then(function () {
+                self.renderer.updateColumn(undefinedColumn.db_id, self.model.get(newGroupID));
+                self.reload();
+            });
         });
     },
     /**
