@@ -881,6 +881,9 @@ var FormRenderer = BasicRenderer.extend({
             index = this.tabindexWidgets[this.state.id].indexOf(ev.data.target);
             var recordWidgets = this.tabindexWidgets[this.state.id] || [];
             var nextWidget = this._getNextTabindexWidget(index+1, recordWidgets);
+            if (nextWidget instanceof ButtonWidget) {
+                return this.trigger_up('focus_button_save');
+            }
             this._activateNextFieldWidget(this.state, index);
         } else if (ev.data.direction === "previous") {
             index = this.tabindexWidgets[this.state.id].indexOf(ev.data.target);
@@ -898,8 +901,8 @@ var FormRenderer = BasicRenderer.extend({
         this.trigger_up('translate', {fieldName: event.target.name, id: this.state.id});
     },
     _getNextTabindexWidget: function(currentIndex, recordWidgets) {
-        for (var i = 0 ; i < recordWidgets.length ; i++) {
-            var widget = recordWidgets[currentIndex];
+        for (var i = currentIndex ; i < recordWidgets.length ; i++) {
+            var widget = recordWidgets[i];
             if (widget && widget.$el.is(':visible') && !widget.$el.hasClass("o_readonly_modifier")) { // check it is visible and not readonly
                 return widget;
             }
@@ -910,6 +913,21 @@ var FormRenderer = BasicRenderer.extend({
         var recordWidgets = this.tabindexWidgets[this.state.id] || [];
         this._activateNextFieldWidget(this.state, index);
     },
+    setButtonFocus: function() {
+        // TODO: Move focus to first button, if there is not button then next widget if it is in edit mode else on edit button
+        var recordWidgets = this.tabindexWidgets[this.state.id] || [];
+        var firstButtonWidget = _.find(recordWidgets, function(widget) {
+            // FIXME: widget.__node, we may remove __node in future
+            return widget.__node.tag === 'button'
+                && (widget.__node.attrs.class.indexOf('oe_highlight') != -1
+                || widget.__node.attrs.class.indexOf('btn-primary') != -1
+                && widget.$el.is(':visible')
+                && !widget.$el.hasClass("o_readonly_modifier"));
+        });
+        if (firstButtonWidget) {
+            firstButtonWidget.activate();
+        }
+    }
 });
 
 return FormRenderer;

@@ -17,6 +17,7 @@ var FormController = BasicController.extend({
         button_clicked: '_onButtonClicked',
         open_record: '_onOpenRecord',
         toggle_column_order: '_onToggleColumnOrder',
+        focus_button_save: '_focusButtonSave'
     }),
     /**
      * Called each time the form view is attached into the DOM
@@ -123,6 +124,7 @@ var FormController = BasicController.extend({
      * @param {jQueryElement} $node
      */
     renderButtons: function ($node) {
+        var self = this;
         var $footer = this.footerToButtons ? this.$('footer') : null;
         var mustRenderFooterButtons = $footer && $footer.length;
         if (!this.defaultButtons && !mustRenderFooterButtons) {
@@ -135,7 +137,23 @@ var FormController = BasicController.extend({
             this.$buttons.append(qweb.render("FormView.buttons", {widget: this}));
             this.$buttons.on('click', '.o_form_button_edit', this._onEdit.bind(this));
             this.$buttons.on('click', '.o_form_button_create', this._onCreate.bind(this));
-            this.$buttons.on('click', '.o_form_button_save', this._onSave.bind(this));
+
+            this.$buttons.find(".o_form_button_save")
+                .on("click", this._onSave.bind(this))
+                .on("keydown", function(event){
+                    event.preventDefault();
+                    if (event.which == $.ui.keyCode.TAB) {
+                        var is_shiftkey = event.shiftKey ? true : false;
+                        // TODO: Move focus to first button if !is_shiftkey else previous field
+                    } else if (event.which == $.ui.keyCode.ENTER) {
+                        self._onSave(event).then(function() {
+                            self.renderer.setButtonFocus();
+                        });
+                    } else if (event.which == $.ui.keyCode.ESCAPE) {
+                        self._onDiscard();
+                    }
+                });
+
             this.$buttons.on('click', '.o_form_button_cancel', this._onDiscard.bind(this));
 
             this._updateButtons();
@@ -514,7 +532,7 @@ var FormController = BasicController.extend({
      */
     _onSave: function (ev) {
         ev.stopPropagation(); // Prevent x2m lines to be auto-saved
-        this.saveRecord();
+        return this.saveRecord();
     },
     /**
      * This method is called when someone tries to sort a column, most likely
@@ -529,6 +547,12 @@ var FormController = BasicController.extend({
         var state = this.model.get(this.handle);
         this.renderer.confirmChange(state, state.id, [field]);
     },
+    _focusButtonSave: function(event) {
+        if (this.$buttons.find(".o_form_button_save").length) {
+            return this.$buttons.find(".o_form_button_save").focus();
+        }
+        return this.renderer.setButtonFocus();
+    }
 });
 
 return FormController;

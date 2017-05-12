@@ -23,11 +23,12 @@ var ButtonWidget = ViewWidget.extend({
 		this._super(parent);
 
 		this.node = node;
+		this.__node = node // To get rid of this, added because we are finding first button based on this
 
 		// the datapoint fetched from the model
         this.record = record;
 
-        this.string = this.node.attrs.string;
+        this.string = this.node.attrs.string; // Should be on ViewWidget
 
         if (node.attrs.icon) {
             this.fa_icon = node.attrs.icon.indexOf('fa-') === 0;
