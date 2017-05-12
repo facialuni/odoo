@@ -31,6 +31,7 @@
                                     <field name="website" widget="url" placeholder="e.g. www.odoo.com"/>
                                     <field name="report_footer" placeholder="e.g. Your Bank Accounts, one per line"/>
                                     <field name="report_header" placeholder="e.g. Global Business Solutions"/>
+                                    <field name="watermark_id"/>
                                 </group>
                                 <group>
                                     <field name="phone"/>
