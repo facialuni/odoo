@@ -1257,7 +1257,7 @@ QUnit.module('basic_fields', {
     });
 
     QUnit.test('date field in form view', function (assert) {
-        assert.expect(7);
+        assert.expect(8);
 
         var form = createView({
             View: FormView,
@@ -1290,6 +1290,7 @@ QUnit.module('basic_fields', {
         // click on the input and select another value
         form.$('.o_datepicker_input').click();
         assert.ok(form.$('.bootstrap-datetimepicker-widget').length, 'datepicker should be open');
+        assert.strictEqual(form.$('.day.active').data('day'), '02/03/2017', 'datepicker should be highlight February 3');
         form.$('.bootstrap-datetimepicker-widget .picker-switch').first().click();  // Month selection
         form.$('.bootstrap-datetimepicker-widget .picker-switch').first().click();  // Year selection
         form.$('.bootstrap-datetimepicker-widget .year:contains(2017)').click();
@@ -1389,6 +1390,56 @@ QUnit.module('basic_fields', {
         // save
         form.$buttons.find('.o_form_button_save').click();
         assert.strictEqual(form.$('.o_field_date').text(), '',
+            'the selected date should be displayed after saving');
+        form.destroy();
+    });
+
+    QUnit.test('date field in form view with existing value', function (assert) {
+        assert.expect(7);
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch:'<form string="Partners"><field name="date"/></form>',
+            res_id: 1,
+            mockRPC: function (route, args) {
+                if (route === '/web/dataset/call_kw/partner/write') {
+                    assert.strictEqual(args.args[1].date, '2017-02-22', 'the correct value should be saved');
+                }
+                return this._super.apply(this, arguments);
+            },
+            translateParameters: {  // Avoid issues due to localization formats
+              date_format: '%m/%d/%Y',
+            },
+            session: {
+                tzOffset: 120
+            },
+        });
+
+        assert.strictEqual(form.$('.o_field_date').text(), '02/03/2017',
+            'the date should be correctly displayed in readonly');
+
+        // switch to edit mode
+        form.$buttons.find('.o_form_button_edit').click();
+        assert.strictEqual(form.$('.o_datepicker_input').val(), '02/03/2017',
+            'the date should be correct in edit mode');
+
+        // click on the input and select another value
+        form.$('.o_datepicker_input').click();
+        assert.ok(form.$('.bootstrap-datetimepicker-widget').length, 'datepicker should be open');
+        form.$('.bootstrap-datetimepicker-widget .picker-switch').first().click();  // Month selection
+        form.$('.bootstrap-datetimepicker-widget .picker-switch').first().click();  // Year selection
+        form.$('.bootstrap-datetimepicker-widget .year:contains(2017)').click();
+        form.$('.bootstrap-datetimepicker-widget .month').eq(1).click();  // February
+        form.$('.day:contains(22)').click(); // select the 22 February
+        assert.ok(!form.$('.bootstrap-datetimepicker-widget').length, 'datepicker should be closed');
+        assert.strictEqual(form.$('.o_datepicker_input').val(), '02/22/2017',
+            'the selected date should be displayed in the input');
+
+        // save
+        form.$buttons.find('.o_form_button_save').click();
+        assert.strictEqual(form.$('.o_field_date').text(), '02/22/2017',
             'the selected date should be displayed after saving');
         form.destroy();
     });

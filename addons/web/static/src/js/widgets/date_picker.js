@@ -12,9 +12,9 @@ var DateWidget = Widget.extend({
     template: "web.datepicker",
     type_of_date: "date",
     events: {
-        'dp.change': 'change_datetime',
-        'dp.show': 'set_datetime_default',
-        'change .o_datepicker_input': 'change_datetime',
+        'dp.change': 'changeDatetime',
+        'dp.show': 'setDatetimeDefault',
+        'change .o_datepicker_input': 'changeDatetime',
     },
     init: function(parent, options) {
         this._super.apply(this, arguments);
@@ -49,60 +49,62 @@ var DateWidget = Widget.extend({
         this.$input.datetimepicker(this.options);
         this.picker = this.$input.data('DateTimePicker');
         this.$input.click(this.picker.toggle.bind(this.picker));
-        this.set_readonly(false);
+        this.setReadonly(false);
     },
-    set_value: function(value) {
+    setValue: function(value) {
         this.set({'value': value});
-        var formatted_value = value ? this.format_client(value) : null;
+        var formatted_value = value ? this.formatClient(value) : null;
         this.$input.val(formatted_value);
         if (this.picker) {
-            this.picker.date(formatted_value);
+            this.picker.date(value || null);
         }
     },
-    get_value: function() {
+    getValue: function() {
         var value = this.get('value');
         return value && value.clone();
     },
-    set_value_from_ui: function() {
+    setValueFromUi: function() {
         var value = this.$input.val() || false;
-        this.set_value(this.parse_client(value));
+        this.setValue(this.parseClient(value));
     },
-    set_readonly: function(readonly) {
+    setReadonly: function(readonly) {
         this.readonly = readonly;
         this.$input.prop('readonly', this.readonly);
     },
-    is_valid: function() {
+    isValid: function() {
         var value = this.$input.val();
         if(value === "") {
             return true;
         } else {
             try {
-                this.parse_client(value);
+                this.parseClient(value);
                 return true;
             } catch(e) {
                 return false;
             }
         }
     },
-    parse_client: function(v) {
+    parseClient: function(v) {
         return field_utils.parse[this.type_of_date](v, null, {timezone: false});
     },
-    format_client: function(v) {
+    formatClient: function(v) {
         return field_utils.format[this.type_of_date](v, null, {timezone: false});
     },
-    set_datetime_default: function() {
+    setDatetimeDefault: function() {
         //when opening datetimepicker the date and time by default should be the one from
         //the input field if any or the current day otherwise
-        var value = moment().second(0);
-        if(this.$input.val().length !== 0 && this.is_valid()) {
-            value = this.$input.val();
+        var value;
+        if(this.$input.val().length !== 0 && this.isValid()) {
+            value = this.parseClient(this.$input.val());
+        } else {
+            value = moment().second(0);
         }
 
         this.picker.date(value);
     },
-    change_datetime: function() {
-        if(this.is_valid()) {
-            this.set_value_from_ui();
+    changeDatetime: function() {
+        if(this.isValid()) {
+            this.setValueFromUi();
             this.trigger("datetime_changed");
         }
     },
