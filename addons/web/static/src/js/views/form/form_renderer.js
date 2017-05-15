@@ -913,7 +913,7 @@ var FormRenderer = BasicRenderer.extend({
         var recordWidgets = this.tabindexWidgets[this.state.id] || [];
         this._activateNextFieldWidget(this.state, index);
     },
-    setButtonFocus: function() {
+    setFirstButtonFocus: function() {
         // TODO: Move focus to first button, if there is not button then next widget if it is in edit mode else on edit button
         var recordWidgets = this.tabindexWidgets[this.state.id] || [];
         var firstButtonWidget = _.find(recordWidgets, function(widget) {

@@ -126,7 +126,10 @@
 </t>
 
 <t t-name="FocusTooltip">
-    <div class='oe_tooltip_string'><p t-esc="getFocusTip()"></p></div>
+    <div class='oe_tooltip_string'>
+        <p t-if="title" t-esc="title"></p>
+        <p t-if="!title &amp;&amp; getFocusTip" t-esc="getFocusTip()"></p>
+    </div>
 </t>
 
 </templates>

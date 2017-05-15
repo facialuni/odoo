@@ -1,6 +1,7 @@
 odoo.define('web.FormController', function (require) {
 "use strict";
 
+var Framework = require('web.framework');
 var BasicController = require('web.BasicController');
 var dialogs = require('web.view_dialogs');
 var core = require('web.core');
@@ -144,10 +145,10 @@ var FormController = BasicController.extend({
                     event.preventDefault();
                     if (event.which == $.ui.keyCode.TAB) {
                         var is_shiftkey = event.shiftKey ? true : false;
-                        // TODO: Move focus to first button if !is_shiftkey else previous field
+                        self.renderer.setFirstButtonFocus();
                     } else if (event.which == $.ui.keyCode.ENTER) {
                         self._onSave(event).then(function() {
-                            self.renderer.setButtonFocus();
+                            self.renderer.setFirstButtonFocus();
                         });
                     } else if (event.which == $.ui.keyCode.ESCAPE) {
                         self._onDiscard();
@@ -549,9 +550,10 @@ var FormController = BasicController.extend({
     },
     _focusButtonSave: function(event) {
         if (this.$buttons.find(".o_form_button_save").length) {
+            Framework.showFocusTip({attachTo: this.$buttons.find(".o_form_button_save"), message: _t("Press ENTER to Save or ESC to Discard")});
             return this.$buttons.find(".o_form_button_save").focus();
         }
-        return this.renderer.setButtonFocus();
+        return this.renderer.setFirstButtonFocus();
     }
 });
 

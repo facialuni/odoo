@@ -176,10 +176,26 @@ function ReloadContext (parent, action) {
 core.action_registry.add("reload_context", ReloadContext);
 
 
+function showFocusTip(options) {
+    // Keep here so in future we can create dynamic position tip
+    var $attachTo = $(options.attachTo);
+    var $template = core.qweb.render('FocusTooltip', { title: options.message });
+    var options = _.extend({
+            delay: { show: 1000, hide: 0 },
+            trigger: 'manual',
+            title: function() {
+                return $template;
+            }
+        }, {});
+    $attachTo.tooltip(options);
+    $attachTo.tooltip('show');
+};
+
 return {
     blockUI: blockUI,
     unblockUI: unblockUI,
     redirect: redirect,
+    showFocusTip: showFocusTip
 };
 
 });
