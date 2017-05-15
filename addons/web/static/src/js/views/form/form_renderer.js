@@ -882,9 +882,13 @@ var FormRenderer = BasicRenderer.extend({
             var recordWidgets = this.tabindexWidgets[this.state.id] || [];
             var nextWidget = this._getNextTabindexWidget(index+1, recordWidgets);
             if (nextWidget instanceof ButtonWidget) {
-                return this.trigger_up('focus_button_save');
+                return this.trigger_up('focus_control_button');
             }
-            this._activateNextFieldWidget(this.state, index);
+            if (nextWidget && this.mode !== 'readonly') {
+                return this._activateNextFieldWidget(this.state, index);
+            } else {
+                return this.trigger_up('focus_control_button');
+            }
         } else if (ev.data.direction === "previous") {
             index = this.tabindexWidgets[this.state.id].indexOf(ev.data.target);
             this._activatePreviousFieldWidget(this.state, index);
@@ -901,17 +905,15 @@ var FormRenderer = BasicRenderer.extend({
         this.trigger_up('translate', {fieldName: event.target.name, id: this.state.id});
     },
     _getNextTabindexWidget: function(currentIndex, recordWidgets) {
+        if (recordWidgets.length-1 == currentIndex) {
+            currentIndex -= recordWidgets.length; // If we are on last widget index then move user back to first widget
+        }
         for (var i = currentIndex ; i < recordWidgets.length ; i++) {
             var widget = recordWidgets[i];
             if (widget && widget.$el.is(':visible') && !widget.$el.hasClass("o_readonly_modifier")) { // check it is visible and not readonly
                 return widget;
             }
         }
-    },
-    _onMoveNextButton: function($el) {
-        var index = this.tabindexWidgets[this.state.id].indexOf($el);
-        var recordWidgets = this.tabindexWidgets[this.state.id] || [];
-        this._activateNextFieldWidget(this.state, index);
     },
     setFirstButtonFocus: function() {
         // TODO: Move focus to first button, if there is not button then next widget if it is in edit mode else on edit button

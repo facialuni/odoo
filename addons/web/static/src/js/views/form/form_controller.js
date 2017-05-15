@@ -18,7 +18,7 @@ var FormController = BasicController.extend({
         button_clicked: '_onButtonClicked',
         open_record: '_onOpenRecord',
         toggle_column_order: '_onToggleColumnOrder',
-        focus_button_save: '_focusButtonSave'
+        focus_control_button: '_focusControlButton'
     }),
     /**
      * Called each time the form view is attached into the DOM
@@ -136,12 +136,40 @@ var FormController = BasicController.extend({
             this.$buttons.append($footer);
         } else {
             this.$buttons.append(qweb.render("FormView.buttons", {widget: this}));
-            this.$buttons.on('click', '.o_form_button_edit', this._onEdit.bind(this));
-            this.$buttons.on('click', '.o_form_button_create', this._onCreate.bind(this));
+            this.$buttons.find(".o_form_button_edit")
+                .on('click', this._onEdit.bind(this))
+                .on('focus', function() {
+                    Framework.showFocusTip({attachTo: this, message: _t("Press ENTER to Edit or ESC to Cancel")})
+                })
+                .on('keydown', function(e) {
+                    if (e.which == $.ui.keyCode.ESCAPE) {
+                        $(this).tooltip('hide'); //forcefully hide tooltip as firefox doesn't hide it when element get hidden
+                        self.trigger_up('history_back');
+                    }
+                });
+
+            this.$buttons.find(".o_form_button_create")
+                .on('click', this._onCreate.bind(this))
+                .on('focus', function() {
+                    Framework.showFocusTip({attachTo: this, message: _t("Press ENTER to <b>Create</b> and ESC to go back to the list view")})
+                })
+                .on('keydown', function(e) {
+                    if (e.which == $.ui.keyCode.TAB) {
+                        e.preventDefault();
+                        var is_shiftkey = e.shiftKey ? true : false;
+                        self.renderer.setFirstButtonFocus();
+                    } else if (e.which == $.ui.keyCode.ESCAPE) {
+                        $(this).tooltip('hide'); //forcefully hide tooltip as firefox doesn't hide it when element get hidden
+                        self.trigger_up('history_back');
+                    }
+                });
 
             this.$buttons.find(".o_form_button_save")
-                .on("click", this._onSave.bind(this))
-                .on("keydown", function(event){
+                .on('click', this._onSave.bind(this))
+                .on('focus', function() {
+                    Framework.showFocusTip({attachTo: this, message: _t("Press ENTER to Save or ESC to Discard")})
+                })
+                .on('keydown', function(event) {
                     event.preventDefault();
                     if (event.which == $.ui.keyCode.TAB) {
                         var is_shiftkey = event.shiftKey ? true : false;
@@ -548,12 +576,14 @@ var FormController = BasicController.extend({
         var state = this.model.get(this.handle);
         this.renderer.confirmChange(state, state.id, [field]);
     },
-    _focusButtonSave: function(event) {
-        if (this.$buttons.find(".o_form_button_save").length) {
-            Framework.showFocusTip({attachTo: this.$buttons.find(".o_form_button_save"), message: _t("Press ENTER to Save or ESC to Discard")});
+    _focusControlButton: function(event) {
+        if (this.mode != "readonly" && this.$buttons && this.$buttons.find(".o_form_button_save").length) {
             return this.$buttons.find(".o_form_button_save").focus();
+        } else if (this.mode == "readonly" && this.$buttons && this.$buttons.find(".o_form_button_edit")) {
+            return this.$buttons.find(".o_form_button_edit").focus();
+        } else {
+            return this.renderer.setFirstButtonFocus();
         }
-        return this.renderer.setFirstButtonFocus();
     }
 });
 

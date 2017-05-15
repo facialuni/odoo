@@ -127,8 +127,8 @@
 
 <t t-name="FocusTooltip">
     <div class='oe_tooltip_string'>
-        <p t-if="title" t-esc="title"></p>
-        <p t-if="!title &amp;&amp; getFocusTip" t-esc="getFocusTip()"></p>
+        <p t-if="title" t-raw="title"></p>
+        <p t-if="!title &amp;&amp; getFocusTip" t-raw="getFocusTip()"></p>
     </div>
 </t>
 
