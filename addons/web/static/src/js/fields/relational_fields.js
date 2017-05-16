@@ -463,7 +463,7 @@ var FieldMany2One = AbstractField.extend({
                 context: context,
             })
             .then(function (view_id) {
-                new dialogs.FormViewDialog(self, {
+                var FormViewDialog = new dialogs.FormViewDialog(self, {
                     res_model: self.field.relation,
                     res_id: self.value.res_id,
                     context: context,
@@ -475,6 +475,9 @@ var FieldMany2One = AbstractField.extend({
                         self.trigger_up('reload', {db_id: self.value.id});
                     },
                 }).open();
+                FormViewDialog.on('closed', self, function() {
+                    self.activate();
+                })
             });
     },
     /**
@@ -1065,6 +1068,7 @@ var FieldOne2Many = FieldX2Many.extend({
             fields_view: this.attrs.views && this.attrs.views.form,
             parentID: this.value.id,
             viewInfo: this.view,
+            widget: this
         }));
     },
 

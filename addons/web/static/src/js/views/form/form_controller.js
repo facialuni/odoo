@@ -529,7 +529,7 @@ var FormController = BasicController.extend({
             record = this.model.get(data.id, {raw: true});
         }
 
-        new dialogs.FormViewDialog(this, {
+        var FormViewDialog = new dialogs.FormViewDialog(this, {
             context: data.context,
             domain: data.domain,
             fields_view: data.fields_view,
@@ -543,6 +543,12 @@ var FormController = BasicController.extend({
             shouldSaveLocally: true,
             title: (record ? _t("Open: ") : _t("Create ")) + (event.target.string || data.field.string),
         }).open();
+        FormViewDialog.on('closed', this, function(e) {
+            console.log("data.field ::: ", data, data.field);
+            _.delay(function () {
+                data.widget.$el.focus();
+            }, 100);
+        });
     },
     /**
      * Open an existing record in a form view dialog

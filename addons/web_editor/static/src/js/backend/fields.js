@@ -119,10 +119,21 @@ var FieldTextHtmlSimple = basic_fields.DebouncedField.extend(TranslatableFieldMi
         this.$textarea = $('<textarea>');
         this.$textarea.appendTo(this.$el);
         this.$textarea.summernote(this._getSummernoteConfig());
+
+        // Forcefully stop tab/untab, Do nothing on tab and Untab, maybe we can override plugin method or we can pass special config and avoid tab/untab
+        $.summernote.options.keyMap.pc['TAB'] = $.summernote.options.keyMap.mac['TAB'] = false;
+        $.summernote.options.keyMap.pc['SHIFT+TAB'] = $.summernote.options.keyMap.mac['SHIFT+TAB'] = false;
+
         this.$content = this.$('.note-editable:first');
         this.$content.html(this._textToHtml(this.value));
         // trigger a mouseup to refresh the editor toolbar
         this.$content.trigger('mouseup');
+
+        // Note: fix: Forcefully call autofocus as mouseup of this.$content will set focus on current widget
+        setTimeout(function() {
+            // self.autofocus(); // TODO: Call form renderer's autofocus
+        }, 0);
+
         if (this.nodeOptions['style-inline']) {
             transcoder.styleToClass(this.$content);
         }
@@ -205,7 +216,7 @@ var FieldTextHtmlSimple = basic_fields.DebouncedField.extend(TranslatableFieldMi
 var FieldTextHtml = AbstractField.extend({
     template: 'web_editor.FieldTextHtml',
     supportedFieldTypes: ['html'],
-
+    noTabindex: true,
     start: function () {
         var self = this;
 

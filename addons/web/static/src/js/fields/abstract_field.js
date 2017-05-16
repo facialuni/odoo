@@ -207,6 +207,7 @@ var AbstractField = ViewWidget.extend({
     isValid: function () {
         return this._isValid;
     },
+    isBlank: function() {},
     /**
      * this method is supposed to be called from the outside of field widgets.
      * The typical use case is when an onchange has changed the widget value.

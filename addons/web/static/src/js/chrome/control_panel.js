@@ -239,6 +239,9 @@ var ControlPanel = Widget.extend({
         }
 
         this.nodes.$searchview.toggle(!is_hidden);
+        if (searchview) {
+            searchview.set_input_focus();
+        }
         this.$el.toggleClass('o_breadcrumb_full', !!is_hidden);
     },
 });
