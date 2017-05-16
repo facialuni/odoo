@@ -603,7 +603,7 @@ var FieldX2Many = AbstractField.extend({
         save_line: '_onSaveLine',
         resequence: '_onResequence',
         toggle_column_order: '_onToggleColumnOrder',
-        cancel_line: '_onCancelLine',
+        discard_record: '_onCancelLine',
     }),
 
     /**
@@ -740,7 +740,6 @@ var FieldX2Many = AbstractField.extend({
                 viewType: 'kanban',
             });
         }
-        // TODO: To test
         // To set tabindex on main div of o2m so that focus is possible on escape
         this.$el.attr("tabindex", 0);
         return this.renderer ? this.renderer.appendTo(this.$el) : this._super();
@@ -958,8 +957,11 @@ var FieldX2Many = AbstractField.extend({
         });
     },
     _onCancelLine: function(ev) {
-        ev.stopPropagation();
-        this.$el.focus();
+        // Note: On First Escape set focus on o2m and on second escape discard parent records
+        if (!this.$el.is(":focus")) {
+            ev.stopPropagation();
+            return this.$el.focus();
+        }
     },
     /**
      * Forces a resequencing of the records.

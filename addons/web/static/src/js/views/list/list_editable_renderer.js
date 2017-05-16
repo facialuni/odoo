@@ -20,7 +20,7 @@ var _t = core._t;
 ListRenderer.include({
     custom_events: _.extend({}, ListRenderer.prototype.custom_events, {
         navigation_move: '_onNavigationMove',
-        cancel_line: '_onCancelLine' // TODO: Convert it in to _onNavigationMove direction
+        discard_record: '_onCancelLine' // TODO: Convert it in to _onNavigationMove direction
     }),
     events: _.extend({}, ListRenderer.prototype.events, {
         'click tbody td.o_data_cell': '_onCellClick',

@@ -16,7 +16,7 @@ var FormController = BasicController.extend({
         open_one2many_record: '_onOpenOne2ManyRecord',
         bounce_edit: '_onBounceEdit',
         button_clicked: '_onButtonClicked',
-        button_cancel: '_onCancel',
+        discard_record: '_onCancel',
         open_record: '_onOpenRecord',
         toggle_column_order: '_onToggleColumnOrder',
         focus_control_button: '_focusControlButton'

@@ -129,7 +129,7 @@ var ViewWidget = Widget.extend({
                 break;
         }
         if (event.which === $.ui.keyCode.ESCAPE) {
-            this.trigger_up('cancel_line'); // writing cancel line related stuff looks wiered here
+            this.trigger_up('discard_record');
         }
     },
     /**
