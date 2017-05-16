@@ -394,7 +394,7 @@ var FieldMany2One = AbstractField.extend({
      */
     _searchCreatePopup: function (view, ids, context) {
         var self = this;
-        new dialogs.SelectCreateDialog(this, _.extend({}, this.nodeOptions, {
+        var selectCreateDialog = new dialogs.SelectCreateDialog(this, _.extend({}, this.nodeOptions, {
             res_model: this.field.relation,
             domain: this.record.getDomain({fieldName: this.name}),
             context: _.extend({}, this.record.getContext(this.recordParams), context || {}),
@@ -407,6 +407,10 @@ var FieldMany2One = AbstractField.extend({
                 self.activate();
             }
         })).open();
+        selectCreateDialog.on('closed', this, function(e) {
+            // Note: Need to add timeout because focus is not set on element when CompletionMixin/m2o is in bootstrap modal, because focus for bootstrap model(we did it in dialog.js) is called after some timeout
+            _.delay(function() { self.activate(); }, 100);
+        });
     },
     /**
      * @private
@@ -953,7 +957,8 @@ var FieldX2Many = AbstractField.extend({
             },
         });
     },
-    _onCancelLine: function() {
+    _onCancelLine: function(ev) {
+        ev.stopPropagation();
         this.$el.focus();
     },
     /**
@@ -989,7 +994,6 @@ var FieldX2Many = AbstractField.extend({
             return false;
         }
         if (!this.isReadonly) {
-            // this._onAddRecord();
             this.trigger_up('add_record');
             return true;
         }

@@ -111,6 +111,7 @@ var FormViewDialog = ViewDialog.extend({
                 text: (readonly ? _t("Close") : _t("Discard")),
                 classes: "btn-default o_form_button_cancel",
                 close: true,
+                tabindex: '-1',
                 click: function () {
                     if (!readonly) {
                         self.form_view.model.discardChanges(self.form_view.handle, {
@@ -118,12 +119,23 @@ var FormViewDialog = ViewDialog.extend({
                         });
                     }
                 },
+                // Note: Add support for keydown TAB and set next tabindex widget on Save button
+                keydown: function(e) {
+                    if (e.which == $.ui.keyCode.TAB) {
+                        var is_shiftkey = e.shiftKey ? true : false;
+                        if (!is_shiftkey) {
+                            // TODO: Test this code, goto save button and press shift + tab, it should moved to last widget
+                            var is_shiftkey = e.shiftKey ? true : false;
+                            self.form_view.renderer.setFirstButtonFocus({focus_first_button: !is_shiftkey, reverse: is_shiftkey, keep_focus_on_current: is_shiftkey});
+                        }
+                    }
+                }
             }];
 
             if (!readonly) {
                 options.buttons.unshift({
                     text: _t("Save") + ((multi_select)? " " + _t(" & Close") : ""),
-                    classes: "btn-primary",
+                    classes: "btn-primary o_form_button_save",
                     click: function () {
                         this._save().then(self.close.bind(self));
                     }
@@ -132,10 +144,17 @@ var FormViewDialog = ViewDialog.extend({
                 if (multi_select) {
                     options.buttons.splice(1, 0, {
                         text: _t("Save & New"),
-                        classes: "btn-primary",
+                        classes: "btn-primary o_form_button_save",
                         click: function () {
                             this._save().then(self.form_view.createRecord.bind(self.form_view, self.parentID));
                         },
+                        keydown: function(e) {
+                            if (e.which == $.ui.keyCode.TAB) {
+                                // TODO: Test this code, goto save button and press shift + tab, it should moved to last widget
+                                var is_shiftkey = e.shiftKey ? true : false;
+                                self.form_view.renderer.setFirstButtonFocus({focus_first_button: !is_shiftkey, reverse: is_shiftkey, keep_focus_on_current: is_shiftkey});
+                            }
+                        }
                     });
                 }
             }
@@ -180,6 +199,7 @@ var FormViewDialog = ViewDialog.extend({
                 model: self.model,
                 parentID: self.parentID,
                 recordID: self.recordID,
+                formview_in_popup: true, // TODO: Is it still needed, check with multiple popup and escape
             });
             return formview.getController(self);
         }).then(function (formView) {
@@ -314,6 +334,9 @@ var SelectCreateDialog = ViewDialog.extend({
                     self.set_buttons(self.__buttons);
                 });
                 _super();
+            })
+            .then(function() {
+                this.searchview.$('.o_searchview_input').focus(); //Set focus to search input  by default when dialog is opened
             });
         return this;
     },
@@ -331,9 +354,9 @@ var SelectCreateDialog = ViewDialog.extend({
             $buttons: $('<div/>').addClass('o_search_options').appendTo($header),
             search_defaults: search_defaults,
         };
-        var searchview = new SearchView(this, this.dataset, fields_views.search, options);
-        searchview.prependTo($header).done(function () {
-            var d = searchview.build_search_data();
+        this.searchview = new SearchView(this, this.dataset, fields_views.search, options);
+        this.searchview.prependTo($header).done(function () {
+            var d = self.searchview.build_search_data();
             if (self.initial_ids) {
                 d.domains.push([["id", "in", self.initial_ids]]);
                 self.initial_ids = undefined;
@@ -381,7 +404,7 @@ var SelectCreateDialog = ViewDialog.extend({
             }
             return self.list_controller.appendTo(fragment);
         }).then(function () {
-            searchview.toggle_visibility(true);
+            self.searchview.toggle_visibility(true);
             self.list_controller.do_show();
             self.list_controller.renderPager($pager);
             return fragment;

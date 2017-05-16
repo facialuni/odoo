@@ -41,6 +41,7 @@ var FormView = BasicView.extend({
 
         this.rendererParams.mode = mode;
         this.model = params.model;
+        this.formview_in_popup = params.formview_in_popup
     },
 
     //--------------------------------------------------------------------------

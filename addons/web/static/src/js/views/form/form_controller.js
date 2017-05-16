@@ -16,6 +16,7 @@ var FormController = BasicController.extend({
         open_one2many_record: '_onOpenOne2ManyRecord',
         bounce_edit: '_onBounceEdit',
         button_clicked: '_onButtonClicked',
+        button_cancel: '_onCancel',
         open_record: '_onOpenRecord',
         toggle_column_order: '_onToggleColumnOrder',
         focus_control_button: '_focusControlButton'
@@ -475,7 +476,16 @@ var FormController = BasicController.extend({
      * @private
      */
     _onDiscard: function () {
-        this._discardChanges();
+        var self = this;
+        // TODO: To check whether this code is required or not?
+        // Note: formview_in_popup option will decide whether form view is in popup, if it is in popup then we will not do history back
+        if (!this.formview_in_popup && !this.model.isDirty(this.handle) && this.mode != 'readonly') {
+            this.do_action('history_back');
+        } else {
+            this._discardChanges().then(function() {
+                self.$buttons && self.$buttons.find(".o_form_button_edit").focus();
+            });
+        }
     },
     /**
      * Called when the user clicks on 'Duplicate Record' in the sidebar
@@ -563,6 +573,19 @@ var FormController = BasicController.extend({
         ev.stopPropagation(); // Prevent x2m lines to be auto-saved
         return this.saveRecord();
     },
+    _onCancel: function() {
+        // If popups are open and by chance if popup does not have focus instead focus is on some other form maybe on main form
+        // then first close the top popup otherwise main form's cancel will move us to history_back(maybe on listview) but popup still remains open
+        // this should never happen so to avoid this worst case scenario we check if popup is available then close top popup
+        var modals = $('body > .modal').filter(':visible');
+        if(modals.length) {
+            var lastModal = modals.last();
+            lastModal.modal('hide');
+            lastModal.remove();
+            return;
+        }
+        return this._onDiscard();
+    },
     /**
      * This method is called when someone tries to sort a column, most likely
      * in a x2many list view
@@ -582,7 +605,7 @@ var FormController = BasicController.extend({
         } else if (this.mode == "readonly" && this.$buttons && this.$buttons.find(".o_form_button_edit")) {
             return this.$buttons.find(".o_form_button_edit").focus();
         } else {
-            return this.renderer.setFirstButtonFocus();
+            return this.renderer.setFirstButtonFocus(); // TODO: Change name: focusFirstButton
         }
     }
 });
