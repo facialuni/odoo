@@ -11,6 +11,25 @@
 .o_attachment_popup {
     cursor: pointer;
 }
+
+.modal-backdrop.in {
+    opacity: 0.80;
+}
+.modal-header {
+    border-bottom: 0;
+}
+.close {
+    cursor: pointer;
+    opacity: .8;
+    font-size: 3em;
+    color: #fff;
+    background: transparent;
+    line-height: 0;
+    &:hover {
+        color: #fff;
+    }
+}
+
 .o_attachment_carousel{
     .o_attachment_popup_content {
         .container {
@@ -20,7 +39,7 @@
                height: auto !important;
             }
             @media (min-width: @screen-sm-max) {
-                height: 400px;
+                height: 550px;
             }
         }
         .carousel, .carousel-inner {
@@ -40,7 +59,7 @@
             video {
                 width: 100%;
                 @media (min-width: @screen-sm-max) {
-                    height: 400px;
+                    height: 550px;
                 }
                 @media (max-width: @screen-xs-min) {
                     height: auto !important;
@@ -60,10 +79,10 @@
                 }
             }
             &.left {
-                left: -30px;
+                left: -45px;
             }
             &.right {
-                right: -15px;
+                right: -30px;;
             }
         }
     }

@@ -64,19 +64,15 @@
 
     <t t-name="Attachment.Popup.Modal">
         <t t-if="widget.attachment_ids">
-            <div class="modal fade o_attachment_carousel" role="dialog" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal">
-                                <span aria-hidden="true">&amp;times;</span>
-                                <span class="sr-only">Close</span>
-                            </button>
-                        </div>
-                        <div class="modal-body o_attachment_popup_content">
-                            <t t-call="Attachment.Slideshow"/>
-                        </div>
-                    </div>
+            <div class="modal fade o_attachment_carousel" aria-hidden="true">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span class="close_button" aria-hidden="true">&amp;times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                </div>
+                <div class="modal-body o_attachment_popup_content">
+                    <t t-call="Attachment.Slideshow"/>
                 </div>
             </div>
         </t>
