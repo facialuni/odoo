@@ -641,6 +641,7 @@ ListRenderer.include({
                 }
                 break;
             case 'next_line':
+                ev.stopPropagation();
                 this._moveToNextLine();
                 break;
             case 'cancel':

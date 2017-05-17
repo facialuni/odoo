@@ -61,7 +61,7 @@ var DateWidget = Widget.extend({
                 self.picker.toggle.bind(self.picker);
             }
         });
-        this.set_readonly(false);
+        this._setReadonly(false);
     },
     /**
      * @override

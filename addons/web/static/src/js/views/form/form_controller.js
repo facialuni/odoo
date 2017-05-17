@@ -19,7 +19,8 @@ var FormController = BasicController.extend({
         discard_record: '_onCancel',
         open_record: '_onOpenRecord',
         toggle_column_order: '_onToggleColumnOrder',
-        focus_control_button: '_focusControlButton'
+        focus_control_button: '_focusControlButton',
+        shift_enter_pressed: '_onShiftEnterPress'
     }),
     /**
      * Called each time the form view is attached into the DOM
@@ -591,6 +592,24 @@ var FormController = BasicController.extend({
             return;
         }
         return this._onDiscard();
+    },
+    _onShiftEnterPress: function(ev) {
+        var self = this;
+        if (this.$buttons && this.$buttons.find(".o_form_button_save").length) {
+            this._onSave(ev).then(function() {
+                var FirstButton = self.renderer.getFirstButton(); // Need to get FirstButton in if..else both because reload will re-render
+                if (FirstButton) {
+                    FirstButton.activate();
+                } else {
+                    self.$buttons && self.$buttons.find(".o_form_button_edit").focus();
+                }
+            });
+        } else {
+            var FirstButton = this.renderer.getFirstButton();
+            if (FirstButton) {
+                FirstButton.$el.trigger("click");
+            }
+        }
     },
     /**
      * This method is called when someone tries to sort a column, most likely

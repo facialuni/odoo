@@ -101,7 +101,6 @@ var ViewWidget = Widget.extend({
                 });
                 break;
             case $.ui.keyCode.ENTER:
-                ev.stopPropagation();
                 this.trigger_up('navigation_move', {direction: 'next_line'});
                 break;
             case $.ui.keyCode.ESCAPE:

@@ -815,10 +815,10 @@ var FormRenderer = BasicRenderer.extend({
 
         return $.when.apply($, defs).then(function () {
             self._updateView($form.contents());
+            self.setTabindexWidgets();
+            self.autofocus();
         }, function () {
             $form.remove();
-            self.autofocus();
-            self.setTabindexWidgets();
         });
     },
     /**
@@ -915,8 +915,8 @@ var FormRenderer = BasicRenderer.extend({
             }
         }
     },
-    setFirstButtonFocus: function() {
-        // TODO: Move focus to first button, if there is not button then next widget if it is in edit mode else on edit button
+    getFirstButton: function() {
+        // TODO: Move to public method section, if it is going to remain public
         var recordWidgets = this.tabindexWidgets[this.state.id] || [];
         var firstButtonWidget = _.find(recordWidgets, function(widget) {
             // FIXME: widget.__node, we may remove __node in future
@@ -926,6 +926,12 @@ var FormRenderer = BasicRenderer.extend({
                 && widget.$el.is(':visible')
                 && !widget.$el.hasClass("o_readonly_modifier"));
         });
+        return firstButtonWidget;
+    },
+    setFirstButtonFocus: function() {
+        // TODO: Move to public method section, if it is going to remain public
+        // TODO: Move focus to first button, if there is not button then next widget if it is in edit mode else on edit button
+        var firstButtonWidget = this.getFirstButton();
         if (firstButtonWidget) {
             firstButtonWidget.activate();
         }
