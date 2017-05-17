@@ -22,6 +22,8 @@ from pprint import pformat
 
 import requests
 
+from odoo.tools import pycompat
+
 try:
     from xmlrpc import client as xmlrpclib
 except ImportError:
@@ -136,6 +138,10 @@ class BaseCase(unittest.TestCase):
         doc = self._testMethodDoc
         return doc and ' '.join(l.strip() for l in doc.splitlines() if not l.isspace()) or None
 
+    if not pycompat.PY2:
+        # turns out this thing may not be quite as useful as we thought...
+        def assertItemsEqual(self, a, b, msg=None):
+            self.assertCountEqual(a, b, msg=None)
 
 class TransactionCase(BaseCase):
     """ TestCase in which each test method is run in its own transaction,
