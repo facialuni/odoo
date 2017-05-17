@@ -45,7 +45,7 @@ def format_tz(env, dt, tz=False, format=False):
         return format_datetime(ts, format or 'medium', locale=env.context.get("lang") or 'en_US')
 
     if format:
-        return ts.strftime(format)
+        return pycompat.text_type(ts.strftime(format))
     else:
         lang = env.context.get("lang")
         langs = env['res.lang']
@@ -54,9 +54,9 @@ def format_tz(env, dt, tz=False, format=False):
         format_date = langs.date_format or '%B-%d-%Y'
         format_time = langs.time_format or '%I-%M %p'
 
-        fdate = ts.strftime(format_date).decode('utf-8')
-        ftime = ts.strftime(format_time).decode('utf-8')
-        return "%s %s%s" % (fdate, ftime, (' (%s)' % tz) if tz else '')
+        fdate = pycompat.text_type(ts.strftime(format_date))
+        ftime = pycompat.text_type(ts.strftime(format_time))
+        return u"%s %s%s" % (fdate, ftime, (u' (%s)' % tz) if tz else u'')
 
 try:
     # We use a jinja2 sandboxed environment to render mako templates.
