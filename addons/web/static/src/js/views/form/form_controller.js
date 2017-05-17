@@ -75,6 +75,7 @@ var FormController = BasicController.extend({
      */
     createRecord: function (parentID) {
         var self = this;
+        this.lastTabindex = 0;
         var record = this.model.get(this.handle, {raw: true});
         return this.model.load({
             context: record.getContext(),
@@ -597,7 +598,7 @@ var FormController = BasicController.extend({
         var self = this;
         if (this.$buttons && this.$buttons.find(".o_form_button_save").length) {
             this._onSave(ev).then(function() {
-                var FirstButton = self.renderer.getFirstButton(); // Need to get FirstButton in if..else both because reload will re-render
+                var FirstButton = self.renderer.getFirstButtonWidget(); // Need to get FirstButton in if..else both because reload will re-render
                 if (FirstButton) {
                     FirstButton.activate();
                 } else {
@@ -605,7 +606,7 @@ var FormController = BasicController.extend({
                 }
             });
         } else {
-            var FirstButton = this.renderer.getFirstButton();
+            var FirstButton = this.renderer.getFirstButtonWidget();
             if (FirstButton) {
                 FirstButton.$el.trigger("click");
             }

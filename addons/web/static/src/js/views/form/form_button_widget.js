@@ -37,15 +37,26 @@ var ButtonWidget = ViewWidget.extend({
 	start: function() {
 		var self = this;
         this._super.apply(this, arguments);
-        this.$el.click(function () {
+        var enterPressed = false;
+        this.$el.click(function (e) {
+			if (enterPressed) {
+				self.trigger_up('set_last_tabindex', {target: self});
+            }
             self.trigger_up('button_clicked', {
                 attrs: self.node.attrs,
                 record: self.record,
                 callback: function() {
-                    self.trigger_up('move_next');
+					self.trigger_up('navigation_move', {direction: 'next'});
                 }
             });
         });
+		this.$el.on("keydown", function(e) {
+			// Note: For setting enterPressed variable which will be helpful to set next widget or not, if mouse is used then do not set next widget focus
+			e.stopPropagation();
+			if (e.which === $.ui.keyCode.ENTER) {
+				enterPressed = true;
+			}
+		});
         // TODO: To implement
         // if (this.node.attrs.help || core.debug) {
         //     this._addTooltip();
@@ -92,6 +103,48 @@ var ButtonWidget = ViewWidget.extend({
             }
         });
     },
+
+    // TODO: Try to remove this whole method re-writing
+
+    // Note: We added _onKeydowm on ViewWidget and as soon as Enter key is pressed on button it goes for next widget
+    // Next button should be focused once reload is done and once lastTabindex variable is set
+    // Otherwise _onNavigationMove is called before new buttons are displayed and we will not have focus on next widget properly
+    _onKeydown: function (ev) {
+        switch (ev.which) {
+            case $.ui.keyCode.TAB:
+                ev.preventDefault();
+                ev.stopPropagation();
+                this.trigger_up('navigation_move', {
+                    direction: ev.shiftKey ? 'previous' : 'next',
+                });
+                break;
+            case $.ui.keyCode.ENTER:
+				// Do nothing, as we bind Enter key explicitly
+                break;
+            case $.ui.keyCode.UP:
+                ev.stopPropagation();
+                this.trigger_up('navigation_move', {direction: 'up'});
+                break;
+            case $.ui.keyCode.RIGHT:
+                ev.stopPropagation();
+                this.trigger_up('navigation_move', {direction: 'right'});
+                break;
+            case $.ui.keyCode.DOWN:
+                ev.stopPropagation();
+                this.trigger_up('navigation_move', {direction: 'down'});
+                break;
+            case $.ui.keyCode.LEFT:
+                ev.stopPropagation();
+                this.trigger_up('navigation_move', {direction: 'left'});
+                break;
+        }
+        if (event.which === $.ui.keyCode.ESCAPE) {
+            this.trigger_up('discard_record');
+        }
+    },
+    getFocusableElement: function() {
+		return this.$el;
+    }
 });
 
 return ButtonWidget;

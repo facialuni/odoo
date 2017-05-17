@@ -17,6 +17,7 @@ var qweb = core.qweb;
 var BasicRenderer = AbstractRenderer.extend({
     custom_events: {
         navigation_move: '_onNavigationMove',
+        set_last_tabindex: '_setLastTabindex'
     },
     /**
      * Basic renderers implements the concept of "mode", they can either be in
@@ -29,6 +30,7 @@ var BasicRenderer = AbstractRenderer.extend({
         this.activeActions = params.activeActions;
         this.viewType = params.viewType;
         this.mode = params.mode || 'readonly';
+        this.lastTabindex = 0;
     },
     /**
      * This method has two responsabilities: find every invalid fields in the
@@ -429,6 +431,7 @@ var BasicRenderer = AbstractRenderer.extend({
      * @returns {Deferred}
      */
     _render: function () {
+        console.log("Inside _render :::: ");
         var oldAllFieldWidgets = this.allFieldWidgets;
         this.allFieldWidgets = {}; // TODO maybe merging allFieldWidgets and allModifiersData into "nodesData" in some way could be great
         this.allModifiersData = [];
@@ -623,6 +626,10 @@ var BasicRenderer = AbstractRenderer.extend({
      * @param {OdooEvent} ev
      */
     _onNavigationMove: function (ev) {},
+    _setLastTabindex: function(ev) {
+        console.log("Inside _setLastTabindex ::: ", ev.data.target);
+        this.lastTabindex = this.tabindexWidgets[this.state.id].indexOf(ev.data.target);
+    }
 });
 
 return BasicRenderer;

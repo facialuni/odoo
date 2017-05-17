@@ -875,22 +875,25 @@ var FormRenderer = BasicRenderer.extend({
      */
     _onNavigationMove: function (ev) {
         ev.stopPropagation();
-
-        var index;
+        var index = this.tabindexWidgets[this.state.id].indexOf(ev.data.target);
+        if (index == -1) {
+            // Get widget based on last saved tabindex
+            index = this.lastTabindex;
+        }
         if (ev.data.direction === "next") {
-            index = this.tabindexWidgets[this.state.id].indexOf(ev.data.target);
             var recordWidgets = this.tabindexWidgets[this.state.id] || [];
             var nextWidget = this._getNextTabindexWidget(index+1, recordWidgets);
-            if (nextWidget instanceof ButtonWidget) {
+            var lastFieldWidget = this.getLastFieldWidget();
+            // Note: If user presses TAB on last field and next widget is button then first move user to Save button
+            if (nextWidget instanceof ButtonWidget && lastFieldWidget && _.isEqual(ev.data.target, lastFieldWidget)) {
                 return this.trigger_up('focus_control_button');
             }
-            if (nextWidget && this.mode !== 'readonly') {
+            if (nextWidget) { // && this.mode !== 'readonly' //Do not add this condition, it will not work with buttons
                 return this._activateNextFieldWidget(this.state, index);
             } else {
                 return this.trigger_up('focus_control_button');
             }
         } else if (ev.data.direction === "previous") {
-            index = this.tabindexWidgets[this.state.id].indexOf(ev.data.target);
             this._activatePreviousFieldWidget(this.state, index);
         }
     },
@@ -915,7 +918,13 @@ var FormRenderer = BasicRenderer.extend({
             }
         }
     },
-    getFirstButton: function() {
+    getLastFieldWidget: function() {
+        var tabindexFields = _.chain(this.tabindexWidgets[this.state.id]).filter(function(w) {
+            return !(w.$el.is(":hidden") || w.$el.hasClass("o_readonly_modifier")) && w.__node.tag != "button";
+        }).value();
+        return _(tabindexFields).last();
+    },
+    getFirstButtonWidget: function() {
         // TODO: Move to public method section, if it is going to remain public
         var recordWidgets = this.tabindexWidgets[this.state.id] || [];
         var firstButtonWidget = _.find(recordWidgets, function(widget) {
@@ -931,7 +940,7 @@ var FormRenderer = BasicRenderer.extend({
     setFirstButtonFocus: function() {
         // TODO: Move to public method section, if it is going to remain public
         // TODO: Move focus to first button, if there is not button then next widget if it is in edit mode else on edit button
-        var firstButtonWidget = this.getFirstButton();
+        var firstButtonWidget = this.getFirstButtonWidget();
         if (firstButtonWidget) {
             firstButtonWidget.activate();
         }
