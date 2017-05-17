@@ -625,7 +625,13 @@ ListRenderer.include({
                 }
                 break;
             case 'previous':
-                if (this.currentCol > 0) {
+                var column = this.columns[this.currentCol];
+                var result = this._getFirstWidget();
+                if (column.attrs.name === result.name) {
+                    this._unselectRow();
+                    var parent = this.getParent();
+                    parent.trigger_up('navigation_move', {direction: 'previous'});
+                } else if (this.currentCol > 0) {
                     this._selectCell(this.currentRow, this.currentCol - 1, {wrap: false})
                         .fail(this._moveToPreviousLine.bind(this));
                 } else {
@@ -633,7 +639,13 @@ ListRenderer.include({
                 }
                 break;
             case 'next':
-                if (this.currentCol + 1 < this.columns.length) {
+                var column = this.columns[this.currentCol];
+                var result = this._getFirstWidget();
+                if (column.attrs.name === result.name && !result.isSet()) {
+                    this._unselectRow();
+                    var parent = this.getParent();
+                    parent.trigger_up('navigation_move', {direction: 'next'});
+                } else if (this.currentCol + 1 < this.columns.length) {
                     this._selectCell(this.currentRow, this.currentCol + 1, {wrap: false})
                         .fail(this._moveToNextLine.bind(this));
                 } else {
@@ -654,6 +666,16 @@ ListRenderer.include({
     _onCancelLine: function(ev) {
         ev.stopPropagation();
         this._unselectRow();
+    },
+    _getFirstWidget: function () {
+        var row = this.state.data[this.currentRow];
+        var column = this.columns[this.currentCol];
+        var recordWidgets = this.tabindexFieldWidgets && this.tabindexFieldWidgets[row.id] || this.allFieldWidgets[record.id];
+        var widget = _.findWhere(recordWidgets, {name: column.attrs.name});
+        var first_widget = _.find(recordWidgets, function(widget) {
+            return widget.$el.is(":visible") && !widget.$el.hasClass("o_readonly_modifier");
+        });
+        return first_widget;
     },
     /**
      * If the list view editable, just let the event bubble. We don't want to
