@@ -57,7 +57,7 @@ class WebsiteCustomer(http.Controller):
                         'country_id_count': 0,
                         'country_id': (curr_country.id, curr_country.name)
                     })
-                countries.sort(key=lambda d: d['country_id'] and d['country_id'][1])
+                    countries.sort(key=lambda d: (d['country_id'] or (0, ""))[1])
 
         countries.insert(0, {
             'country_id_count': country_count,
