@@ -121,6 +121,10 @@ class SaleAdvancePaymentInv(models.TransientModel):
                     subtype_id=self.env.ref('mail.mt_note').id)
         return invoice
 
+    @api.model
+    def reconciliation_create_invoices(self, order_ids):
+        return self.with_context({'get_move_line_id': True, 'active_ids': order_ids}).create({'advance_payment_method': 'delivered'}).create_invoices()
+
     @api.multi
     def create_invoices(self):
         sale_orders = self.env['sale.order'].browse(self._context.get('active_ids', []))
@@ -163,6 +167,16 @@ class SaleAdvancePaymentInv(models.TransientModel):
                     'is_downpayment': True,
                 })
                 self._create_invoice(order, so_line, amount)
+
+        if self._context.get('get_move_line_id', False): # used by the reconciliation widget
+            invoice_ids = []
+            for order in sale_orders:
+                invoice_ids.append(sale_orders.invoice_ids[-1].id)
+            invoices = self.env['account.invoice'].browse(invoice_ids)
+            invoices.invoice_validate()
+            invoices.action_move_create()
+            move_lines = self.env['account.bank.statement.line'].get_move_lines_for_reconciliation(additional_domain=[('invoice_id', 'in', invoice_ids)])
+            return move_lines.prepare_move_lines_for_reconciliation_widget(target_currency=sale_orders[0].currency_id)
         if self._context.get('open_invoices', False):
             return sale_orders.action_view_invoice()
         return {'type': 'ir.actions.act_window_close'}

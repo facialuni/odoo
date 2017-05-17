@@ -65,6 +65,9 @@ The Dashboard for the Sales Manager will include
         'data/sale_demo.xml',
         'data/product_product_demo.xml',
     ],
+    'qweb': [
+        "static/src/xml/account_reconciliation.xml",
+    ],
     'css': ['static/src/css/sale.css'],
     'installable': True,
     'auto_install': False,

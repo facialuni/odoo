@@ -104,7 +104,9 @@ var FormViewDialog = ViewDialog.extend({
         var multi_select = !_.isNumber(options.res_id) && !options.disable_multiple_selection;
         var readonly = _.isNumber(options.res_id) && options.readonly;
 
-        if (!options || !options.buttons) {
+        if (options && options.buttons) {
+            options.useModalButtons = true;
+        } else {
             options = options || {};
             options.buttons = [{
                 text: (readonly ? _t("Close") : _t("Discard")),
@@ -191,7 +193,7 @@ var FormViewDialog = ViewDialog.extend({
                 .then(function () {
                     var $buttons = $('<div>');
                     self.form_view.renderButtons($buttons);
-                    if ($buttons.children().length) {
+                    if (!self.options.useModalButtons && $buttons.children().length) {
                         self.$footer.empty().append($buttons.contents());
                     }
                     _super().$el.append(fragment);
@@ -224,7 +226,7 @@ var FormViewDialog = ViewDialog.extend({
         return $.when(def).then(function () {
             // record might have been changed by the save (e.g. if this was a new record, it has an
             // id now), so don't re-use the copy obtained before the save
-            self.on_saved(self.form_view.model.get(self.form_view.handle));
+            return self.on_saved(self.form_view.model.get(self.form_view.handle));
         });
     },
 });
@@ -295,7 +297,8 @@ var SelectCreateDialog = ViewDialog.extend({
                 search_defaults[match[1]] = value_;
             }
         });
-        this.loadViews(this.dataset.model, this.dataset.get_context(), [[false, 'list'], [false, 'search']], {})
+        this.loadViews(this.dataset.model, this.dataset.get_context(),
+                [[this.options.listViewId || false, 'list'], [this.options.searchViewId || false, 'search']], {})
             .then(this.setup.bind(this, search_defaults))
             .then(function (fragment) {
                 _super().$el.append(fragment);
@@ -341,28 +344,31 @@ var SelectCreateDialog = ViewDialog.extend({
         }).then(function (controller) {
             self.list_controller = controller;
             // Set the dialog's buttons
-            var buttons = [{
-                text: _t("Cancel"),
-                classes: "btn-default o_form_button_cancel",
-                close: true,
-            }];
-            if (!self.options.no_create) {
-                buttons.unshift({
-                    text: _t("Create"),
-                    classes: "btn-primary",
-                    click: self.create_edit_record.bind(self)
-                });
-            }
-            if (!self.options.disable_multiple_selection) {
-                buttons.unshift({
-                    text: _t("Select"),
-                    classes: "btn-primary o_select_button",
-                    disabled: true,
+            var buttons = self.options.buttons;
+            if (!buttons) {
+                buttons = [{
+                    text: _t("Cancel"),
+                    classes: "btn-default o_form_button_cancel",
                     close: true,
-                    click: function () {
-                        self.on_selected(self.list_controller.getSelectedIds());
-                    },
-                });
+                }];
+                if (!self.options.no_create) {
+                    buttons.unshift({
+                        text: _t("Create"),
+                        classes: "btn-primary",
+                        click: self.create_edit_record.bind(self)
+                    });
+                }
+                if (!self.options.disable_multiple_selection) {
+                    buttons.unshift({
+                        text: _t("Select"),
+                        classes: "btn-primary o_select_button",
+                        disabled: true,
+                        close: true,
+                        click: function () {
+                            this.on_selected(this.list_controller.getSelectedIds());
+                        },
+                    });
+                }
             }
             self.set_buttons(buttons);
             return self.list_controller.appendTo(fragment);
