@@ -249,6 +249,15 @@ var SearchView = Widget.extend({
                     break;
             }
         },
+        'keyup .o_searchview_input': function(e) {
+            if(this.autocomplete && !this.autocomplete.$el.is(":visible")) {
+                switch(e.which) {
+                    case $.ui.keyCode.DOWN:
+                        this.trigger('search_widget_down', e);
+                        break;
+                }
+            }
+        },
     },
     defaults: _.extend({}, Widget.prototype.defaults, {
         hidden: false,

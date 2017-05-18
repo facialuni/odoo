@@ -34,8 +34,10 @@ var ListRenderer = BasicRenderer.extend({
     events: {
         'click tbody tr': '_onRowClicked',
         'click tbody .o_list_record_selector': '_onSelectRecord',
+        'focus tbody .o_list_record_selector': '_onFocusRecord',
         'click thead th.o_column_sortable': '_onSortColumn',
         'click .o_group_header': '_onToggleGroup',
+        'blur tbody .o_list_record_selector': '_onFocusLost',
         'click thead .o_list_record_selector input': '_onToggleSelection',
     },
     /**
@@ -620,6 +622,26 @@ var ListRenderer = BasicRenderer.extend({
             });
             $checked_rows.find('.o_list_record_selector input').prop('checked', true);
         }
+        var searchView = this.getParent().getParent().searchview;
+        if (searchView) {
+            searchView.off('search_widget_down').on('search_widget_down', this, function (event) {
+                self._keydownDownSelect(event);
+            });
+            this.$('.o_list_view').off('keydown').on('keydown', function (event) {
+                switch (event.which) {
+                    case $.ui.keyCode.DOWN:
+                        self._keydownDownSelect(event);
+                        break;
+                    case $.ui.keyCode.UP:
+                        self._keydownUpSelect(event);
+                        break;
+                    case $.ui.keyCode.ENTER:
+                        var id = self.selected_row.data('id');
+                        self.trigger_up('open_record', {id:id, target: self.selected_row});
+                        break;
+                }
+            });
+        }
         return this._super();
     },
     /**
@@ -639,6 +661,60 @@ var ListRenderer = BasicRenderer.extend({
             var cssClass = decoration.replace('decoration', 'text');
             $tr.toggleClass(cssClass, py.PY_isTrue(py.evaluate(expr, record.evalContext)));
         });
+    },
+    /**
+     * Whenever user press UP/DOWN key then selection of records are managed by this method.
+     * It also manage shift and control key support for selecting records.
+     *
+     * @private
+     * @param {KeyboardEvent} event
+     * @param {Object} direction Contain the selection direction('up'/'down')
+     */
+    _keyNavigation: function (event, direction) {
+        if (this.state.count === 0) {
+            return false;
+        }
+        if ($(event.currentTarget).hasClass('o_searchview_input')) {
+            if (!this.$('.o_data_row input:first').prop('checked')) {
+                this.$('.o_data_row input:first').trigger('click');
+            }
+            this.$('.o_data_row input:first').focus();
+        } else {
+            var $row = direction == 'down' ? this.selected_row.next() : this.selected_row.prev();
+            if (!event.shiftKey && !event.ctrlKey) {
+                _.each(this.$('tr.o_row_selected'), function (row) {
+                    if ($(row).find('.o_list_record_selector input').prop('checked')) {
+                        $(row).find('.o_list_record_selector input').trigger('click');
+                        $(row).removeClass('o_row_selected');
+                    }
+                });
+                $row.find('.o_list_record_selector input').focus().trigger('click');
+            } else if (event.shiftKey && !event.ctrlKey) {
+                $row.find('.o_list_record_selector input').focus().trigger('click');
+            }  else if (event.ctrlKey && !event.shiftKey) {
+                $row.find('.o_list_record_selector input').focus();
+            }
+        }
+    },
+    /**
+     * During selection of records using keyboard this method called when 'UP' key is pressed
+     *
+     * @private
+     * @param {KeyboardEvent} event
+     */
+    _keydownDownSelect: function (event) {
+        event.preventDefault();
+        this._keyNavigation(event, 'down');
+    },
+    /**
+     * During selection of records using keyboard this method called when 'DOWN' key is pressed
+     *
+     * @private
+     * @param {KeyboardEvent} event
+     */
+    _keydownUpSelect: function (event) {
+        event.preventDefault();
+        this._keyNavigation(event, 'up');
     },
     /**
      * Whenever we change the state of the selected rows, we need to call this
@@ -678,12 +754,31 @@ var ListRenderer = BasicRenderer.extend({
     },
     /**
      * @private
+     * @param {MouseEvent / KeyboardEvent} event
+     */
+    _onFocusLost: function (event) {
+        var $previous_row = $(event.currentTarget).parent();
+        $previous_row.removeClass('o_row_focused');
+    },
+    /**
+     * @private
+     * @param {MouseEvent / KeyboardEvent} event
+     */
+    _onFocusRecord: function (event) {
+        this.selected_row = $(event.currentTarget).parent();
+        this.selected_row.addClass('o_row_focused');
+    },
+    /**
+     * @private
      * @param {MouseEvent} event
      */
     _onSelectRecord: function (event) {
         event.stopPropagation();
         this._updateSelection();
+        var $current_row = $(event.currentTarget).parent();
+        $current_row.addClass('o_row_selected');
         if (!$(event.currentTarget).find('input').prop('checked')) {
+            $current_row.removeClass('o_row_selected');
             this.$('thead .o_list_record_selector input').prop('checked', false);
         }
     },
@@ -715,6 +810,7 @@ var ListRenderer = BasicRenderer.extend({
     _onToggleSelection: function (event) {
         var checked = $(event.currentTarget).prop('checked') || false;
         this.$('tbody .o_list_record_selector input').prop('checked', checked);
+        this.$('.o_data_row').toggleClass('o_row_selected', checked);
         this._updateSelection();
     },
 });
