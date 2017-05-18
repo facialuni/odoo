@@ -632,4 +632,249 @@
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('st_tag_in_27'), ref('st_tag_in_59')])]"/>
     </record>
+
+    <!-- GST TAXES-->
+
+    <record id="input_sgst_5" model="account.tax.template">
+        <field name="name">Input SGST Tax @ 5%</field>
+        <field name="description">Input SGST Tax @ 5%</field>
+        <field name="type_tax_use">sale</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">5</field>
+        <field name="account_id" ref="sgst_payable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
+    <record id="input_sgst_12" model="account.tax.template">
+        <field name="name">Input SGST Tax @ 12%</field>
+        <field name="description">Input SGST Tax @ 12%</field>
+        <field name="type_tax_use">sale</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">12</field>
+        <field name="account_id" ref="sgst_payable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
+    <record id="input_sgst_18" model="account.tax.template">
+        <field name="name">Input SGST Tax @ 18%</field>
+        <field name="description">Input SGST Tax @ 18%</field>
+        <field name="type_tax_use">sale</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">18</field>
+        <field name="account_id" ref="sgst_payable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
+    <record id="input_sgst_28" model="account.tax.template">
+        <field name="name">Input SGST Tax @ 28%</field>
+        <field name="description">Input SGST Tax @ 28%</field>
+        <field name="type_tax_use">sale</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">28</field>
+        <field name="account_id" ref="sgst_payable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
+    <record id="input_cgst_5" model="account.tax.template">
+        <field name="name">Input CGST Tax @ 5%</field>
+        <field name="description">Input CGST Tax @ 5%</field>
+        <field name="type_tax_use">sale</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">5</field>
+        <field name="account_id" ref="cgst_payable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
+    <record id="input_cgst_12" model="account.tax.template">
+        <field name="name">Input CGST Tax @ 12%</field>
+        <field name="description">Input CGST Tax @ 12%</field>
+        <field name="type_tax_use">sale</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">12</field>
+        <field name="account_id" ref="cgst_payable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
+    <record id="input_cgst_18" model="account.tax.template">
+        <field name="name">Input CGST Tax @ 18%</field>
+        <field name="description">Input CGST Tax @ 18%</field>
+        <field name="type_tax_use">sale</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">18</field>
+        <field name="account_id" ref="cgst_payable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
+    <record id="input_cgst_28" model="account.tax.template">
+        <field name="name">Input CGST Tax @ 28%</field>
+        <field name="description">Input CGST Tax @ 28%</field>
+        <field name="type_tax_use">sale</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">28</field>
+        <field name="account_id" ref="cgst_payable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
+        <record id="input_igst_5" model="account.tax.template">
+        <field name="name">Input IGST Tax @ 5%</field>
+        <field name="description">Input IGST Tax @ 5%</field>
+        <field name="type_tax_use">sale</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">5</field>
+        <field name="account_id" ref="igst_payable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
+    <record id="input_igst_12" model="account.tax.template">
+        <field name="name">Input IGST Tax @ 12%</field>
+        <field name="description">Input IGST Tax @ 12%</field>
+        <field name="type_tax_use">sale</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">12</field>
+        <field name="account_id" ref="igst_payable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
+    <record id="input_igst_18" model="account.tax.template">
+        <field name="name">Input IGST Tax @ 18%</field>
+        <field name="description">Input IGST Tax @ 18%</field>
+        <field name="type_tax_use">sale</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">18</field>
+        <field name="account_id" ref="igst_payable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
+    <record id="input_igst_28" model="account.tax.template">
+        <field name="name">Input IGST Tax @ 28%</field>
+        <field name="description">Input IGST Tax @ 28%</field>
+        <field name="type_tax_use">sale</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">28</field>
+        <field name="account_id" ref="igst_payable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
+    <!--output purchase tax-->
+
+    <record id="output_sgst_5" model="account.tax.template">
+        <field name="name">Output SGST Tax @ 5%</field>
+        <field name="description">Output SGST Tax @ 5%</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">5</field>
+        <field name="account_id" ref="sgst_receivable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
+    <record id="output_sgst_12" model="account.tax.template">
+        <field name="name">Output SGST Tax @ 12%</field>
+        <field name="description">Output SGST Tax @ 12%</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">12</field>
+        <field name="account_id" ref="sgst_receivable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
+    <record id="output_sgst_18" model="account.tax.template">
+        <field name="name">Output SGST Tax @ 18%</field>
+        <field name="description">Output SGST Tax @ 18%</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">18</field>
+        <field name="account_id" ref="sgst_receivable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
+    <record id="output_sgst_28" model="account.tax.template">
+        <field name="name">Output SGST Tax @ 28%</field>
+        <field name="description">Output SGST Tax @ 28%</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">28</field>
+        <field name="account_id" ref="sgst_receivable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
+    <record id="output_cgst_5" model="account.tax.template">
+        <field name="name">Output CGST Tax @ 5%</field>
+        <field name="description">Output CGST Tax @ 5%</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">5</field>
+        <field name="account_id" ref="cgst_receivable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
+    <record id="output_cgst_12" model="account.tax.template">
+        <field name="name">Output CGST Tax @ 12%</field>
+        <field name="description">Output CGST Tax @ 12%</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">12</field>
+        <field name="account_id" ref="cgst_receivable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
+    <record id="output_cgst_18" model="account.tax.template">
+        <field name="name">Output CGST Tax @ 18%</field>
+        <field name="description">Output CGST Tax @ 18%</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">18</field>
+        <field name="account_id" ref="cgst_receivable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
+    <record id="output_cgst_28" model="account.tax.template">
+        <field name="name">Output CGST Tax @ 28%</field>
+        <field name="description">Output CGST Tax @ 28%</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">28</field>
+        <field name="account_id" ref="cgst_receivable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
+    <record id="output_igst_5" model="account.tax.template">
+        <field name="name">Output IGST Tax @ 5%</field>
+        <field name="description">Output IGST Tax @ 5%</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">5</field>
+        <field name="account_id" ref="igst_receivable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
+    <record id="output_igst_12" model="account.tax.template">
+        <field name="name">Output IGST Tax @ 12%</field>
+        <field name="description">Output IGST Tax @ 12%</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">12</field>
+        <field name="account_id" ref="igst_receivable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
+    <record id="output_igst_18" model="account.tax.template">
+        <field name="name">Output IGST Tax @ 18%</field>
+        <field name="description">Output IGST Tax @ 18%</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">18</field>
+        <field name="account_id" ref="igst_receivable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
+    <record id="output_igst_28" model="account.tax.template">
+        <field name="name">Output IGST Tax @ 28%</field>
+        <field name="description">Output IGST Tax @ 28%</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">28</field>
+        <field name="account_id" ref="igst_receivable"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+    </record>
+
 </odoo>
