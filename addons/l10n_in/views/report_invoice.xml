@@ -12,9 +12,8 @@
                 </div>
             </div>
         </xpath>
-
         <xpath expr="//div[@name='invoice_address']//div[@t-if='o.partner_id.vat']" position="replace">
-            <div t-if="o.partner_id.vat" class="mt16">GSTIN: <span t-field="o.partner_id.vat"/></div>
+            <div t-if="o.partner_id.vat">GSTIN: <span t-field="o.partner_id.vat"/></div>
         </xpath>
     </template>
 
