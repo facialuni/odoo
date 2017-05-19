@@ -130,7 +130,6 @@
         <link rel="stylesheet" type="text/less" href="/web/static/src/less/data_export.less"/>
 
         <script type="text/javascript" src="/web/static/lib/jquery.scrollTo/jquery.scrollTo.js"></script>
-        <script type="text/javascript" src="/web/static/lib/jquery.touchSwipe/jquery.touchSwipe.js"></script>
         <script type="text/javascript" src="/web/static/lib/nvd3/d3.v3.js"></script>
         <script type="text/javascript" src="/web/static/lib/nvd3/nv.d3.js"></script>
         <script type="text/javascript" src="/web/static/lib/backbone/backbone.js"></script>

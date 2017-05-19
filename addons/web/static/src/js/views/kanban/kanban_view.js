@@ -3,6 +3,7 @@ odoo.define('web.KanbanView', function (require) {
 
 var BasicView = require('web.BasicView');
 var core = require('web.core');
+var config = require('web.config');
 var KanbanModel = require('web.KanbanModel');
 var KanbanRenderer = require('web.KanbanRenderer');
 var KanbanController = require('web.KanbanController');
@@ -19,6 +20,7 @@ var KanbanView = BasicView.extend({
         Model: KanbanModel,
         Controller: KanbanController,
         Renderer: KanbanRenderer,
+        js_libs: []
     },
     viewType: 'kanban',
     init: function (viewInfo, params) {
@@ -69,9 +71,19 @@ var KanbanView = BasicView.extend({
             return JSON.parse(viewInfo.arch.attrs.quick_create);
         }
         return true;
-    }
-
-
+    },
+    /**
+     * Adding touch swipe library for mobile
+     *
+     * @override
+     * @private
+     */
+    _loadLibs: function () {
+        if (config.isMobile) {
+            this.config.js_libs.push("/web/static/lib/jquery.touchSwipe/jquery.touchSwipe.js");
+        }
+        return this._super.apply(this, arguments);
+    },
 });
 
 return KanbanView;
