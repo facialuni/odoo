@@ -10,9 +10,16 @@
 }
 
 .o_composer {
-    .o_composer_input > textarea {
-        width: 100%;
-        resize: none;
+    .o_composer_input {
+        display: inline-block;
+        height: 100%;
+        white-space: pre-wrap;
+        img {
+            height: 17px;
+        }
+        span {
+            display: none;
+        }
     }
     .o_composer_mention_dropdown .o_mention_proposition > a {
         .o-text-overflow();
