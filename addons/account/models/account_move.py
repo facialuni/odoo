@@ -149,7 +149,7 @@ class AccountMove(models.Model):
                             if not journal.refund_sequence_id:
                                 raise UserError(_('Please define a sequence for the credit notes'))
                             sequence = journal.refund_sequence_id
-                                                            
+
                         new_name = sequence.with_context(ir_sequence_date=move.date).next_by_id()
                     else:
                         raise UserError(_('Please define a sequence on the journal.'))
