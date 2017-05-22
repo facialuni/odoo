@@ -633,6 +633,167 @@
         <field name="tag_ids" eval="[(6,0,[ref('st_tag_in_27'), ref('st_tag_in_59')])]"/>
     </record>
 
+    <!-- Account Tag-->
+
+    <record id="sgst_tag_in_01" model="account.account.tag">
+        <field name="name">SGST</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="sgst_5_tag" model="account.account.tag">
+        <field name="name">SGST 5%</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="sgst_5_tag_sale" model="account.account.tag">
+        <field name="name">SGST 5% Collected on Sale</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="sgst_5_tag_purchase" model="account.account.tag">
+        <field name="name">SGST 5% Paid on Purchase</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="sgst_12_tag" model="account.account.tag">
+        <field name="name">SGST 12%</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="sgst_12_tag_sale" model="account.account.tag">
+        <field name="name">SGST 12% Collected on Sale</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="sgst_12_tag_purchase" model="account.account.tag">
+        <field name="name">SGST 12% Paid on Purchase</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="sgst_18_tag" model="account.account.tag">
+        <field name="name">SGST 18%</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="sgst_18_tag_sale" model="account.account.tag">
+        <field name="name">SGST 18% Collected on Sale</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="sgst_18_tag_purchase" model="account.account.tag">
+        <field name="name">SGST 18% Paid on Purchase</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="sgst_28_tag" model="account.account.tag">
+        <field name="name">SGST 28%</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="sgst_28_tag_sale" model="account.account.tag">
+        <field name="name">SGST 28% Collected on Sale</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="sgst_28_tag_purchase" model="account.account.tag">
+        <field name="name">SGST 28% Paid on Purchase</field>
+        <field name="applicability">taxes</field>
+    </record>
+
+    <record id="cgst_tag_in_02" model="account.account.tag">
+        <field name="name">CGST</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="cgst_5_tag" model="account.account.tag">
+        <field name="name">CGST 5%</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="cgst_5_tag_sale" model="account.account.tag">
+        <field name="name">CGST 5% Collected on Sale</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="cgst_5_tag_purchase" model="account.account.tag">
+        <field name="name">CGST 5% Paid on Purchase</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="cgst_12_tag" model="account.account.tag">
+        <field name="name">CGST 12%</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="cgst_12_tag_sale" model="account.account.tag">
+        <field name="name">CGST 12% Collected on Sale</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="cgst_12_tag_purchase" model="account.account.tag">
+        <field name="name">CGST 12% Paid on Purchase</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="cgst_18_tag" model="account.account.tag">
+        <field name="name">CGST 18%</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="cgst_18_tag_sale" model="account.account.tag">
+        <field name="name">CGST 18% Collected on Sale</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="cgst_18_tag_purchase" model="account.account.tag">
+        <field name="name">CGST 18% Paid on Purchase</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="cgst_28_tag" model="account.account.tag">
+        <field name="name">CGST 28%</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="cgst_28_tag_sale" model="account.account.tag">
+        <field name="name">CGST 28% Collected on Sale</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="cgst_28_tag_purchase" model="account.account.tag">
+        <field name="name">CGST 28% Paid on Purchase</field>
+        <field name="applicability">taxes</field>
+    </record>
+
+    <record id="igst_tag_in_03" model="account.account.tag">
+        <field name="name">IGST</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="igst_5_tag" model="account.account.tag">
+        <field name="name">IGST 5%</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="igst_5_tag_sale" model="account.account.tag">
+        <field name="name">IGST 5% Collected on Sale</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="igst_5_tag_purchase" model="account.account.tag">
+        <field name="name">IGST 5% Paid on Purchase</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="igst_12_tag" model="account.account.tag">
+        <field name="name">IGST 12%</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="igst_12_tag_sale" model="account.account.tag">
+        <field name="name">IGST 12% Collected on Sale</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="igst_12_tag_purchase" model="account.account.tag">
+        <field name="name">IGST 12% Paid on Purchase</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="igst_18_tag" model="account.account.tag">
+        <field name="name">IGST 18%</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="igst_18_tag_sale" model="account.account.tag">
+        <field name="name">IGST 18% Collected on Sale</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="igst_18_tag_purchase" model="account.account.tag">
+        <field name="name">IGST 18% Paid on Purchase</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="igst_28_tag" model="account.account.tag">
+        <field name="name">IGST 28%</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="igst_28_tag_sale" model="account.account.tag">
+        <field name="name">IGST 28% Collected on Sale</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="igst_28_tag_purchase" model="account.account.tag">
+        <field name="name">IGST 28% Paid on Purchase</field>
+        <field name="applicability">taxes</field>
+    </record>
+
     <!-- GST TAXES-->
 
     <record id="input_sgst_5" model="account.tax.template">
@@ -643,6 +804,7 @@
         <field name="amount">5</field>
         <field name="account_id" ref="sgst_payable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('sgst_5_tag_sale')])]"/>
     </record>
 
     <record id="input_sgst_12" model="account.tax.template">
@@ -653,6 +815,7 @@
         <field name="amount">12</field>
         <field name="account_id" ref="sgst_payable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('sgst_12_tag_sale')])]"/>
     </record>
 
     <record id="input_sgst_18" model="account.tax.template">
@@ -663,6 +826,7 @@
         <field name="amount">18</field>
         <field name="account_id" ref="sgst_payable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('sgst_18_tag_sale')])]"/>
     </record>
 
     <record id="input_sgst_28" model="account.tax.template">
@@ -673,6 +837,7 @@
         <field name="amount">28</field>
         <field name="account_id" ref="sgst_payable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('sgst_28_tag_sale')])]"/>
     </record>
 
     <record id="input_cgst_5" model="account.tax.template">
@@ -683,6 +848,7 @@
         <field name="amount">5</field>
         <field name="account_id" ref="cgst_payable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cgst_5_tag_sale')])]"/>
     </record>
 
     <record id="input_cgst_12" model="account.tax.template">
@@ -693,6 +859,7 @@
         <field name="amount">12</field>
         <field name="account_id" ref="cgst_payable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cgst_12_tag_sale')])]"/>
     </record>
 
     <record id="input_cgst_18" model="account.tax.template">
@@ -703,6 +870,7 @@
         <field name="amount">18</field>
         <field name="account_id" ref="cgst_payable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cgst_18_tag_sale')])]"/>
     </record>
 
     <record id="input_cgst_28" model="account.tax.template">
@@ -713,9 +881,10 @@
         <field name="amount">28</field>
         <field name="account_id" ref="cgst_payable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cgst_28_tag_sale')])]"/>
     </record>
 
-        <record id="input_igst_5" model="account.tax.template">
+    <record id="input_igst_5" model="account.tax.template">
         <field name="name">Input IGST Tax @ 5%</field>
         <field name="description">Input IGST Tax @ 5%</field>
         <field name="type_tax_use">sale</field>
@@ -723,6 +892,7 @@
         <field name="amount">5</field>
         <field name="account_id" ref="igst_payable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('igst_5_tag_sale')])]"/>
     </record>
 
     <record id="input_igst_12" model="account.tax.template">
@@ -733,6 +903,7 @@
         <field name="amount">12</field>
         <field name="account_id" ref="igst_payable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('igst_12_tag_sale')])]"/>
     </record>
 
     <record id="input_igst_18" model="account.tax.template">
@@ -743,6 +914,7 @@
         <field name="amount">18</field>
         <field name="account_id" ref="igst_payable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('igst_18_tag_sale')])]"/>
     </record>
 
     <record id="input_igst_28" model="account.tax.template">
@@ -753,6 +925,7 @@
         <field name="amount">28</field>
         <field name="account_id" ref="igst_payable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('igst_28_tag_sale')])]"/>
     </record>
 
     <!--output purchase tax-->
@@ -765,6 +938,7 @@
         <field name="amount">5</field>
         <field name="account_id" ref="sgst_receivable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('sgst_5_tag_purchase')])]"/>
     </record>
 
     <record id="output_sgst_12" model="account.tax.template">
@@ -775,6 +949,7 @@
         <field name="amount">12</field>
         <field name="account_id" ref="sgst_receivable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('sgst_12_tag_purchase')])]"/>
     </record>
 
     <record id="output_sgst_18" model="account.tax.template">
@@ -785,6 +960,7 @@
         <field name="amount">18</field>
         <field name="account_id" ref="sgst_receivable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('sgst_18_tag_purchase')])]"/>
     </record>
 
     <record id="output_sgst_28" model="account.tax.template">
@@ -795,6 +971,7 @@
         <field name="amount">28</field>
         <field name="account_id" ref="sgst_receivable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('sgst_28_tag_purchase')])]"/>
     </record>
 
     <record id="output_cgst_5" model="account.tax.template">
@@ -805,6 +982,7 @@
         <field name="amount">5</field>
         <field name="account_id" ref="cgst_receivable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cgst_5_tag_purchase')])]"/>
     </record>
 
     <record id="output_cgst_12" model="account.tax.template">
@@ -815,6 +993,7 @@
         <field name="amount">12</field>
         <field name="account_id" ref="cgst_receivable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cgst_12_tag_purchase')])]"/>
     </record>
 
     <record id="output_cgst_18" model="account.tax.template">
@@ -825,6 +1004,7 @@
         <field name="amount">18</field>
         <field name="account_id" ref="cgst_receivable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cgst_18_tag_purchase')])]"/>
     </record>
 
     <record id="output_cgst_28" model="account.tax.template">
@@ -835,6 +1015,7 @@
         <field name="amount">28</field>
         <field name="account_id" ref="cgst_receivable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cgst_28_tag_purchase')])]"/>
     </record>
 
     <record id="output_igst_5" model="account.tax.template">
@@ -845,6 +1026,7 @@
         <field name="amount">5</field>
         <field name="account_id" ref="igst_receivable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('igst_5_tag_purchase')])]"/>
     </record>
 
     <record id="output_igst_12" model="account.tax.template">
@@ -855,6 +1037,7 @@
         <field name="amount">12</field>
         <field name="account_id" ref="igst_receivable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('igst_12_tag_purchase')])]"/>
     </record>
 
     <record id="output_igst_18" model="account.tax.template">
@@ -865,6 +1048,7 @@
         <field name="amount">18</field>
         <field name="account_id" ref="igst_receivable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('igst_18_tag_purchase')])]"/>
     </record>
 
     <record id="output_igst_28" model="account.tax.template">
@@ -875,6 +1059,7 @@
         <field name="amount">28</field>
         <field name="account_id" ref="igst_receivable"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('igst_28_tag_purchase')])]"/>
     </record>
 
 </odoo>
