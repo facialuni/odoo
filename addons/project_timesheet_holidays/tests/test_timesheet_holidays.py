@@ -4,8 +4,6 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
-from odoo import fields
-
 from odoo.addons.hr_timesheet.tests.test_timesheet import TestTimesheet
 
 
@@ -26,14 +24,14 @@ class TestTimesheetHolidays(TestTimesheet):
 
         self.leave_type_with_ts = self.env['hr.holidays.status'].create({
             'name': 'Leave Type with timesheet generation',
-            'limit': True,
+            'limit': False,
             'timesheet_generate': True,
             'timesheet_project_id': self.internal_project.id,
             'timesheet_task_id': self.internal_task_leaves.id,
         })
         self.leave_type_no_ts = self.env['hr.holidays.status'].create({
             'name': 'Leave Type without timesheet generation',
-            'limit': True,
+            'limit': False,
             'timesheet_generate': False,
             'timesheet_project_id': False,
             'timesheet_task_id': False,
