@@ -15,6 +15,12 @@
         <xpath expr="//div[@name='invoice_address']//div[@t-if='o.partner_id.vat']" position="replace">
             <div t-if="o.partner_id.vat">GSTIN: <span t-field="o.partner_id.vat"/></div>
         </xpath>
+        <xpath expr="//table//thead/tr/th[6]" position="attributes">
+            <attribute name="t-if">len(o.tax_line_ids) > 0</attribute>
+        </xpath>
+        <xpath expr="//tbody[contains(@class, 'invoice_tbody')]/tr/td[6]" position="attributes">
+            <attribute name="t-if">len(o.tax_line_ids) > 0</attribute>
+        </xpath>
     </template>
 
 </odoo>
