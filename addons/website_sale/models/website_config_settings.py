@@ -12,6 +12,7 @@ class WebsiteConfigSettings(models.TransientModel):
         else:
             return self.env.ref('sale.email_template_edi_sale').id
 
+    company_id = fields.Many2one('res.company', string='Company', required=True, default=lambda self: self.env.user.company_id)
     salesperson_id = fields.Many2one('res.users', related='website_id.salesperson_id', string='Salesperson')
     salesteam_id = fields.Many2one('crm.team', related='website_id.salesteam_id', string='Sales Channel', domain=[('team_type', '!=', 'pos')])
     module_delivery = fields.Boolean("Manage shipping internally")
@@ -28,24 +29,22 @@ class WebsiteConfigSettings(models.TransientModel):
     module_delivery_usps = fields.Boolean("USPS integration")
     module_delivery_bpost = fields.Boolean("bpost integration")
 
-    module_sale_ebay = fields.Boolean("eBay connector")
     module_sale_coupon = fields.Boolean("Discount Programs")
 
     group_website_multiimage = fields.Boolean(string='Multi-Images', implied_group='website_sale.group_website_multi_image', group='base.group_portal,base.group_user,base.group_public')
     group_discount_per_so_line = fields.Boolean(string="Discounted Prices", implied_group='sale.group_discount_per_so_line')
     group_delivery_invoice_address = fields.Boolean(string="Shipping Address", implied_group='sale.group_delivery_invoice_address')
 
-    module_website_sale_options = fields.Boolean("Optional Products", help='Installs *e-Commerce Optional Products*')
+    module_website_sale_options = fields.Boolean("Optional Products")
     module_website_sale_digital = fields.Boolean("Digital Content")
-    module_website_sale_wishlist = fields.Boolean("Wishlists ", help='Installs *e-Commerce Wishlist*')
-    module_website_sale_comparison = fields.Boolean("Product Comparator", help='Installs *e-Commerce Comparator*')
+    module_website_sale_wishlist = fields.Boolean("Wishlists ")
+    module_website_sale_comparison = fields.Boolean("Product Comparator")
 
     module_account_invoicing = fields.Boolean("Invoicing")
-    module_sale_stock = fields.Boolean("Delivery Orders")
 
     # sale_pricelist_settings splitted in several entries for usability purpose
     multi_sales_price = fields.Boolean(
-        string="Multiple sales price per product",
+        string="Multiple Sales Prices per Product",
         oldname='sale_pricelist_setting_split_1')
     multi_sales_price_method = fields.Selection([
         (0, 'Multiple prices per product (e.g. customer segments, currencies)'),
@@ -81,7 +80,7 @@ class WebsiteConfigSettings(models.TransientModel):
     default_invoice_policy = fields.Selection([
         ('order', 'Invoice what is ordered'),
         ('delivery', 'Invoice what is delivered')
-        ], 'Invoicing Policy', default='order')
+        ], 'Invoicing Policy', default='order', default_model='product.template')
     automatic_invoice = fields.Boolean("Automatic Invoice")
 
     group_multi_currency = fields.Boolean(string='Multi-Currencies', implied_group='base.group_multi_currency')
@@ -90,6 +89,13 @@ class WebsiteConfigSettings(models.TransientModel):
         ('total', 'Tax-Included Prices'),
         ('subtotal', 'Tax-Excluded Prices')],
         "Product Prices", default='total')
+
+    default_sale_tax_id = fields.Many2one('account.tax', string="Default Sale Tax", company_dependent=True, help="This tax is applied to any new product created in the catalog.")
+    tax_calculation_rounding_method = fields.Selection([
+        ('round_per_line', 'Round calculation of taxes per line'),
+        ('round_globally', 'Round globally calculation of taxes '),
+        ], related='company_id.tax_calculation_rounding_method', string='Tax calculation rounding method')
+    module_l10n_eu_service = fields.Boolean(string="EU Digital Goods VAT")
 
     @api.model
     def get_values(self):
@@ -102,7 +108,8 @@ class WebsiteConfigSettings(models.TransientModel):
             if self.env['ir.module.module'].search([('name', '=', 'website_sale_delivery')], limit=1).state in ('installed', 'to install', 'to upgrade'):
                 sale_delivery_settings = 'website'
 
-        sale_pricelist_setting = self.env['ir.config_parameter'].sudo().get_param('sale.sale_pricelist_setting')
+        sale_pricelist_setting = params.get_param('sale.sale_pricelist_setting')
+        default_sale_tax_id = params.get_param('account.default_sale_tax_id')
 
         res.update(
             automatic_invoice=params.get_param('website_sale.automatic_invoice', default=False),
@@ -110,7 +117,8 @@ class WebsiteConfigSettings(models.TransientModel):
             multi_sales_price=sale_pricelist_setting in ['percentage', 'formula'],
             multi_sales_price_method=sale_pricelist_setting in ['formula'] and 1 or False,
             sale_pricelist_setting=sale_pricelist_setting,
-            sale_show_tax=self.env['ir.config_parameter'].sudo().get_param('website.sale_show_tax')
+            sale_show_tax=params.get_param('website.sale_show_tax'),
+            default_sale_tax_id=int(default_sale_tax_id)
         )
         return res
 
@@ -120,6 +128,9 @@ class WebsiteConfigSettings(models.TransientModel):
         self.env['ir.config_parameter'].sudo().set_param('website_sale.automatic_invoice', value)
         self.env['ir.config_parameter'].sudo().set_param('sale.sale_pricelist_setting', self.sale_pricelist_setting)
         self.env['ir.config_parameter'].sudo().set_param('website.sale_show_tax', self.sale_show_tax)
+        self.env['ir.config_parameter'].sudo().set_param("account.default_sale_tax_id", self.default_sale_tax_id.id)
+        if self.default_sale_tax_id:
+            self.env['ir.values'].sudo().set_default('product.template', "taxes_id", [self.default_sale_tax_id.id], company_id=self.company_id.id)
 
     @api.onchange('multi_sales_price', 'multi_sales_price_method')
     def _onchange_sale_price(self):
@@ -152,7 +163,6 @@ class WebsiteConfigSettings(models.TransientModel):
                 'group_pricelist_item': False,
             })
 
-
     @api.onchange('sale_delivery_settings')
     def _onchange_sale_delivery_settings(self):
         if self.sale_delivery_settings == 'none':
@@ -175,7 +185,14 @@ class WebsiteConfigSettings(models.TransientModel):
     def _onchange_group_discount_per_so_line(self):
         if self.group_discount_per_so_line:
             self.update({
-                'sale_pricelist_setting_split_1': True,
+                'multi_sales_price': True,
+            })
+
+    @api.onchange('group_multi_currency')
+    def _onchange_group_multi_currency(self):
+        if self.group_multi_currency:
+            self.update({
+                'multi_sales_price': True,
             })
 
     @api.onchange('sale_show_tax')
