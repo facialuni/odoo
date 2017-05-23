@@ -3678,18 +3678,10 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
 
         limit_str = limit and ' limit %d' % limit or ''
         offset_str = offset and ' offset %d' % offset or ''
-        query_str = 'SELECT "%s".id FROM ' % self._table + from_clause + where_str + order_by + limit_str + offset_str
+        query_str = 'SELECT DISTINCT "%s".id FROM ' % self._table + from_clause + where_str + order_by + limit_str + offset_str
         self._cr.execute(query_str, where_clause_params)
-        res = self._cr.fetchall()
 
-        # TDE note: with auto_join, we could have several lines about the same result
-        # i.e. a lead with several unread messages; we uniquify the result using
-        # a fast way to do it while preserving order (http://www.peterbe.com/plog/uniqifiers-benchmark)
-        def _uniquify_list(seq):
-            seen = set()
-            return [x for x in seq if x not in seen and not seen.add(x)]
-
-        return _uniquify_list([x[0] for x in res])
+        return [x[0] for x in self._cr.fetchall()]
 
     @api.multi
     @api.returns(None, lambda value: value[0])
