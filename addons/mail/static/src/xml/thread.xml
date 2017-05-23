@@ -32,12 +32,11 @@
                             <t t-if="attachment.type == 'image'">
                                 <img class="img" t-attf-src="/web/image/#{attachment.id}" t-att-alt="attachment.alt"/>
                             </t>
-                            <div class="carousel-caption hidden">
-                                <h2>
-                                    <a t-att-href='attachment.url' target="_blank" t-att-data-mimetype="attachment.mimetype" t-attf-data-src="/web/image/#{attachment.id}/100x80">
-                                        <i class='fa fa-download'/> <t t-esc='attachment.name'/>
-                                    </a>
-                                </h2>
+                            <div class="carousel-caption hidden col-xs-11 col-md-11">
+                                <t t-esc='attachment.name' class="pull-left"/>
+                                <a t-att-href='attachment.url' target="_blank" t-att-data-mimetype="attachment.mimetype" t-attf-data-src="/web/image/#{attachment.id}/100x80">
+                                   <i class='fa fa-download pull-right'/>
+                                </a>
                             </div>
                         </div>
                     </t>
@@ -53,20 +52,19 @@
                 </t>
             </div>
         </div>
-        <div class="text-center o_attachment_download">
-            <h2>
-                <a t-att-href='widget.active_attachment.url' target="_blank" t-att-data-mimetype="widget.active_attachment.mimetype" t-attf-data-src="/web/image/#{widget.active_attachment.id}/100x80">
-                    <i class='fa fa-download'/> <t t-esc='widget.active_attachment.name'/>
-                </a>
-            </h2>
-        </div>
     </t>
 
     <t t-name="Attachment.Popup.Modal">
         <t t-if="widget.attachment_ids">
             <div class="modal fade o_attachment_carousel" aria-hidden="true">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
+                    <div class="o_attachment_download col-xs-11 col-md-11">
+                        <t t-esc='widget.active_attachment.name' class="pull-left"/>
+                        <a t-att-href='widget.active_attachment.url' target="_blank" t-att-data-mimetype="widget.active_attachment.mimetype" t-attf-data-src="/web/image/#{widget.active_attachment.id}/100x80">
+                            <i class='fa fa-download pull-right'/>
+                        </a>
+                    </div>
+                    <button type="button" class="close col-md-1 col-xs-1" data-dismiss="modal">
                         <span class="close_button" aria-hidden="true">&amp;times;</span>
                         <span class="sr-only">Close</span>
                     </button>
