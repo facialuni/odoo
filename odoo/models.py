@@ -3671,14 +3671,16 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
         if count:
             # Ignore order, limit and offset when just counting, they don't make sense and could
             # hurt performance
-            query_str = 'SELECT count(1) FROM ' + from_clause + where_str
+            query_str = 'SELECT COUNT(DISTINCT "%s".id) FROM %s%s' % (self._table, from_clause, where_str)
             self._cr.execute(query_str, where_clause_params)
             res = self._cr.fetchone()
             return res[0]
 
         limit_str = limit and ' limit %d' % limit or ''
         offset_str = offset and ' offset %d' % offset or ''
-        query_str = 'SELECT DISTINCT "%s".id FROM ' % self._table + from_clause + where_str + order_by + limit_str + offset_str
+        query_str = 'SELECT DISTINCT t.id FROM (SELECT "%s".id FROM %s%s%s) t%s%s' % (
+            self._table, from_clause, where_str, order_by, limit_str, offset_str,
+        )
         self._cr.execute(query_str, where_clause_params)
 
         return [x[0] for x in self._cr.fetchall()]
