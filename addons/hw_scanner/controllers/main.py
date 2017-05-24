@@ -35,7 +35,7 @@ class Scanner(Thread):
         Thread.__init__(self)
         self.lock = Lock()
         self.status = {'status':'connecting', 'messages':[]}
-        self.input_dir = '/dev/input/by-id/'
+        self.input_dir = '/dev/serial/by-path/'
         self.open_devices = []
         self.barcodes = Queue()
         self.keymap = {
