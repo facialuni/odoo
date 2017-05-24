@@ -449,7 +449,7 @@
 
         <record model="account.account.template" id="sgst_receivable">
             <field name="name">SGST receivable</field>
-            <field name="code">SGST1</field>
+            <field name="code">SGST01</field>
             <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="reconcile" eval="False"/>
             <field name="chart_template_id" ref="indian_chart_template_standard"/>
@@ -457,7 +457,7 @@
 
         <record model="account.account.template" id="cgst_receivable">
             <field name="name">CGST receivable</field>
-            <field name="code">CGST1</field>
+            <field name="code">CGST01</field>
             <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="reconcile" eval="False"/>
             <field name="chart_template_id" ref="indian_chart_template_standard"/>
@@ -465,7 +465,7 @@
 
         <record model="account.account.template" id="igst_receivable">
             <field name="name">IGST receivable</field>
-            <field name="code">IGST1</field>
+            <field name="code">IGST01</field>
             <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="reconcile" eval="False"/>
             <field name="chart_template_id" ref="indian_chart_template_standard"/>
@@ -473,7 +473,7 @@
 
         <record model="account.account.template" id="sgst_payable">
             <field name="name">SGST payable</field>
-            <field name="code">SGST2</field>
+            <field name="code">SGST02</field>
             <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="reconcile" eval="False"/>
             <field name="chart_template_id" ref="indian_chart_template_standard"/>
@@ -481,7 +481,7 @@
 
         <record model="account.account.template" id="cgst_payable">
             <field name="name">CGST payable</field>
-            <field name="code">CGST2</field>
+            <field name="code">CGST02</field>
             <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="reconcile" eval="False"/>
             <field name="chart_template_id" ref="indian_chart_template_standard"/>
@@ -489,7 +489,7 @@
 
         <record model="account.account.template" id="igst_payable">
             <field name="name">IGST payable</field>
-            <field name="code">IGST2</field>
+            <field name="code">IGST02</field>
             <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="reconcile" eval="False"/>
             <field name="chart_template_id" ref="indian_chart_template_standard"/>
