@@ -3678,8 +3678,20 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
 
         limit_str = limit and ' limit %d' % limit or ''
         offset_str = offset and ' offset %d' % offset or ''
-        query_str = 'SELECT DISTINCT t.id FROM (SELECT "%s".id FROM %s%s%s) t%s%s' % (
-            self._table, from_clause, where_str, order_by, limit_str, offset_str,
+
+        selected = OrderedSet(['"%s".id' % self._table])
+        if order_by:
+            for spec in order_by.strip()[8:].split(','):
+                spec = spec.strip()
+                if spec.lower().endswith(' asc'):
+                    spec = spec[:-4]
+                elif spec.lower().endswith(' desc'):
+                    spec = spec[:-5]
+                selected.add(spec)
+
+        query_str = 'SELECT DISTINCT %s FROM %s%s%s%s%s' % (
+            ",".join(selected), from_clause, where_str,
+            order_by, limit_str, offset_str,
         )
         self._cr.execute(query_str, where_clause_params)
 
