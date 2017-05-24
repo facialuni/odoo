@@ -60,7 +60,6 @@ var FieldPdfViewer = FieldBinaryFile.extend({
         var $pdfViewer = this.$('.o_form_pdf_controls').children().add(this.$('.o_pdfview_iframe'));
         var $selectUpload = this.$('.o_select_file_button').first();
         var $iFrame = this.$('.o_pdfview_iframe');
-
         $iFrame.on('load', function () {
             self.PDFViewerApplication = this.contentWindow.window.PDFViewerApplication;
             self._disableButtons(this);
@@ -78,6 +77,8 @@ var FieldPdfViewer = FieldBinaryFile.extend({
             } else {
                 $pdfViewer.addClass('o_hidden');
                 $selectUpload.removeClass('o_hidden');
+                // Should use it in order to generate the PDFViewerApplication.
+                $iFrame.attr('src', this._getURI());
             }
         }
     },
