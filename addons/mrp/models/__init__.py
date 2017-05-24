@@ -13,6 +13,7 @@ from . import mrp_workorder
 from . import procurement
 from . import product
 from . import res_company
+from . import mrp_step
 from . import stock_move
 from . import stock_picking
 from . import stock_quant

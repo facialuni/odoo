@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Complete operation views -->
+        <record id="mrp_routing_workcenter_form_view_inherit_step" model="ir.ui.view">
+            <field name="name">mrp.routing.workcenter.form.inherit.step</field>
+            <field name="model">mrp.routing.workcenter</field>
+            <field name="inherit_id" ref="mrp.mrp_routing_workcenter_form_view"/>
+            <field name="arch" type="xml">
+              <xpath expr="//notebook/page[@name='description']" position="before">
+                  <page string="Steps">
+                    <field name="step_ids"/>
+                  </page>
+                </xpath>
+            </field>
+        </record>
+        
+        <!-- Step views -->
+        <record id="mrp_step_form_view" model="ir.ui.view">
+            <field name="name">mrp.step.form</field>
+            <field name="model">mrp.step</field>
+            <field name="arch" type="xml">
+                <form string="Step">
+                    <sheet>
+                        <div class="oe_title">
+                            <h2>
+                                <field name="name"/>
+                            </h2>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="type"/>
+                                <field name="product_id" attrs="{'invisible': [('type', '=', 'dummy')]}"/>
+                                <field name="operation_type" attrs="{'invisible': [('type', 'in', ('dummy', 'record_component', 'record_product'))]}"/>
+                                <label for="norm" attrs="{'invisible': [('type', '!=', 'measure')]}"/>
+                                <div class="o_row" attrs="{'invisible': [('type', '!=', 'measure')]}">
+                                    <field name="norm" attrs="{'required': [('type', '=', 'measure')]}"/>
+                                    <field name="norm_unit" attrs="{'required': [('type', '=', 'measure')]}"/>
+                                </div>
+                                <label for="tolerance_min" string="Tolerance" attrs="{'invisible': [('type', '!=', 'measure')]}"/>
+                                <div attrs="{'invisible': [('type', '!=', 'measure')]}" class="o_row">
+                                    <span>from </span> <field name="tolerance_min"/>
+                                    <span>to </span> <field name="tolerance_max"/>
+                                </div>
+                            </group>
+                            <group>
+                                <field name="worksheet_aftereffect" widget="radio"/>
+                                <field name="worksheet_scroll_to_page" attrs="{'invisible': [('worksheet_aftereffect', '=', 'no_update')]}"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Instruction" attrs="{'invisible': [('type', '!=', ('measure', 'pass_fail'))]}">
+                                <field name="instruction"/>
+                            </page>
+                            <page string="Notes">
+                                <field name="note"/>
+                            </page>
+                            <page string="Message if failure" attrs="{'invisible': [('type', '!=', ('measure', 'pass_fail'))]}">
+                                <field name="failure_message"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>
