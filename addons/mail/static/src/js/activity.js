@@ -127,6 +127,11 @@ var Activity = AbstractActivityField.extend({
                     activity.note = utils.parse_and_transform(activity.note, utils.add_link);
                 }
             });
+            if (self.filter && self.filter.length) {
+                self.activities = _.filter(self.activities, function(activity) {
+                    return _.contains(self.filter, 'activities') ? true : false;
+                });
+            }
             self.$el.html(QWeb.render('mail.activity_items', {
                 activities: setDelayLabel(self.activities),
             }));
