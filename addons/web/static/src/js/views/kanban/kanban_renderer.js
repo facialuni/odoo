@@ -223,6 +223,22 @@ var KanbanRenderer = BasicRenderer.extend({
             }
         });
     },
+     /**
+     * Enables swipe on kanban columns
+     *
+     * @private
+     */
+    _enableSwipeOnRecordGroups: function() {
+        var self = this;
+        this.$el.find(".o_kanban_group").swipe({
+            swipeLeft: function() {
+                self._moveToGroup(++self.lastActiveMobileTab);
+            },
+            swipeRight: function() {
+                self._moveToGroup(--self.lastActiveMobileTab);
+            }
+        });
+    },
     /**
      * Moving to kanan column group when swiping kanban column in mobile
      *
@@ -384,11 +400,10 @@ var KanbanRenderer = BasicRenderer.extend({
                 this._renderUngrouped(fragment);
             }
             this.$el.append(fragment);
-
             if (this.widgets && config.isMobile && isGrouped) {
                 core.bus.on("DOM_updated", this, function() {
-                    this._enableSwipeOnRecordGroup();
-                    this._moveToGroup(this.last_active_mobile_tab);
+                    this._enableSwipeOnRecordGroups();
+                    this._moveToGroup(this.lastActiveMobileTab);
                 });
                 // Required to allow mobile kanban stage tabs to enable swipe and move to active tab
                 core.bus.trigger('DOM_updated');
@@ -430,70 +445,6 @@ var KanbanRenderer = BasicRenderer.extend({
         });
         this.createColumnEnabled = this.groupedByM2O && this.columnOptions.group_creatable;
     },
-    /**
-     * Enables swipe on kanban columns
-     *
-     * @private
-     */
-    _enableSwipeOnRecordGroup: function() {
-        var self = this;
-        this.$el.find(".o_kanban_group").swipe({
-            swipeLeft: function() {
-                self._moveToGroup(++self.last_active_mobile_tab);
-            },
-            swipeRight: function() {
-                self._moveToGroup(--self.last_active_mobile_tab);
-            }
-        });
-    },
-    /**
-     * Move to kanban group when tap on tab or swipe 
-     *
-     * @private
-     * @param {integer} group index
-     */
-    _moveToGroup: function(move_to_index) {
-        var self = this;
-        if (this.widgets.length - 1 < move_to_index) {
-            this.last_active_mobile_tab = this.widgets.length - 1;
-            return;
-        } else if (move_to_index < 0) {
-            this.last_active_mobile_tab = 0;
-            return;
-        }
-        this.last_active_mobile_tab = move_to_index;
-        var moveTo = move_to_index;
-        var next = move_to_index + 1;
-        var previous = move_to_index - 1;
-        this.$el.find(".o_kanban_group").removeClass("previous next current before after");
-        this.$el.find(".o_kanban_mobile_tab").removeClass("previous next current before after");
-        _.each(this.widgets, function(column, index) {
-            var recordPane = self.$el.find(".o_kanban_group[data-id=" + column.id + "]");
-            var tab = self.$el.find(".o_kanban_mobile_tab[data-id=" + column.id + "]");
-            if (index == previous) {
-                tab.addClass("previous");
-                tab.css("margin-left", "-" + (tab.outerWidth() / 2) + "px");
-                recordPane.addClass("previous");
-            } else if (index == next) {
-                tab.addClass("next");
-                tab.css("margin-left", "-" + (tab.outerWidth() / 2) + "px");
-                recordPane.addClass("next");
-            } else if (index < moveTo) {
-                tab.addClass("before");
-                tab.css("margin-left", "-" + tab.outerWidth() + "px");
-                recordPane.addClass("before");
-            } else if (index == moveTo) {
-                var marginLeft = tab.outerWidth() / 2;
-                tab.css("margin-left", "-" + marginLeft + "px");
-                tab.addClass("current");
-                recordPane.addClass("current");
-            } else if (index > moveTo) {
-                tab.addClass("after");
-                tab.css("margin-left", "0");
-                recordPane.addClass("after");
-            }
-        });
-    }
 });
 
 return KanbanRenderer;
