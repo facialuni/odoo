@@ -355,9 +355,9 @@ var BasicComposer = Widget.extend(chat_mixin, {
         "click .o_composer_button_send": "send_message",
         "click .o_composer_button_add_attachment": "on_click_add_attachment",
         "click .o_attachment_delete": "on_attachment_delete",
-        "click .o_attachment_popup": function(event) {
+        "click .o_attachment_view": function(event) {
             event.preventDefault();
-            var attachment_id = $(event.target).data('id');
+            var attachment_id = $(event.currentTarget).data('id');
             this.document_viewer.on_attachment_popup(attachment_id);
         },
     },

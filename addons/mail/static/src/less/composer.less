@@ -8,9 +8,6 @@
         margin-right: 30px;
     }
 }
-.o_attachment_popup {
-    cursor: pointer;
-}
 
 .modal-backdrop.in {
     opacity: 0.80;
@@ -166,25 +163,44 @@
     100% { background: @odoo-brand-optional }
 }
 
-@o-mail-attachment-image-size: 60px;
+@o-mail-attachment-image-size: 100px;
 .o_attachment {
     position: relative;
-    width: 2*@o-mail-attachment-image-size;
+    width: @o-mail-attachment-image-size;
     display: inline-block;
     height: @o-mail-attachment-image-size;
     text-align: center;
-    margin-bottom: 15px;
-
+    margin: 5px;
+    > a {
+        width: 100%
+    }
     .o_image {
-        .o-position-absolute(@top: 0, @left: @o-mail-attachment-image-size/2);
+        .o-position-absolute(@top: 0, @left: 0);
         width: @o-mail-attachment-image-size;
         height: @o-mail-attachment-image-size;
     }
-
+    .o_attachment_overlay{
+        display: none;
+    }
+    &:hover .o_attachment_overlay {
+        display: block;
+        .o-position-absolute(@top: 0, @left: 0, @right:0, @bottom:0);
+        z-index: 20;
+        background: rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+        .o_attachment_download {
+            .o-position-absolute(@top: 65px, @left: 10px);
+            color: #FFFFFF
+        }
+        .o_attachment_view {
+            .o-position-absolute(@top: 65px, @right: 10px);
+            color: #FFFFFF
+        }
+    }
     .o_attachment_name {
         display: inline-block;
         max-width: 100%;
-        margin-top: @o-mail-attachment-image-size;
+        margin-top: @o-mail-attachment-image-size + 5;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -195,7 +211,7 @@
         display: none;
     }
     .o_attachment_delete {
-        .o-position-absolute(@top: 0, @right: 0);
+        .o-position-absolute(@top: -10px, @right: -8px);
         color: @odoo-main-text-color;
         cursor: pointer;
         opacity: 0;
@@ -217,7 +233,6 @@
             display: none;
         }
     }
-
     &:hover .o_attachment_delete {
         opacity: 1;
         .o-transition(opacity, 0.2s, linear);

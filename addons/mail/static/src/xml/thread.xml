@@ -34,7 +34,7 @@
                             </t>
                             <div class="carousel-caption hidden col-xs-11 col-md-11">
                                 <t t-esc='attachment.name' class="pull-left"/>
-                                <a t-att-href='attachment.url' target="_blank" t-att-data-mimetype="attachment.mimetype" t-attf-data-src="/web/image/#{attachment.id}/100x80">
+                                <a t-att-href='attachment.url' target="_blank" t-att-data-mimetype="attachment.mimetype" t-attf-data-src="/web/image/#{attachment.id}/100x100">
                                    <i class='fa fa-download pull-right'/>
                                 </a>
                             </div>
@@ -235,17 +235,21 @@
     <t t-name="mail.Attachment">
         <t t-set="type" t-value="attachment.mimetype.split('/').shift()"/>
         <div t-attf-class="o_attachment #{attachment.upload ? 'o_attachment_uploading' : ''}" t-att-title="attachment.name">
-            <t t-if="type == 'image'">
-                <img t-att-data-id="attachment.id" class="o_image o_attachment_popup" t-attf-src="/web/image/#{attachment.id}" t-attf-alt="#{attachment.name}">
-                    <span class='o_attachment_name'><t t-esc='attachment.name'/></span>
-                </img>
-            </t>
-
             <t t-if="type != 'image'">
-                <a t-att-data-id="attachment.id" t-attf-class="o_image #{type == 'video' ? 'o_attachment_popup' : ''}"  t-att-href='attachment.url' target="_blank" t-att-data-mimetype="attachment.mimetype" t-attf-data-src="/web/image/#{attachment.id}/100x80" t-attf-title="#{attachment.name}">
-                    <span class='o_attachment_name'><t t-esc='attachment.name'/></span>
+                <img class="o_image" t-att-data-mimetype="attachment.mimetype"/>
+            </t>
+            <t t-if="type == 'image'">
+                <img class="o_image" t-attf-src="/web/image/#{attachment.id}"/>
+            </t>
+            <a t-att-href='attachment.url' target="_blank"><span class='o_attachment_name'><t t-esc='attachment.name'/></span></a>
+            <div class="o_attachment_overlay">
+                <a class="o_attachment_download" t-att-href='attachment.url' target="_blank">
+                    <i class="fa fa-2x fa-arrow-circle-o-down" title="Downlad this attachment" aria-hidden="true"></i>
                 </a>
-           </t>
+                <a t-if="type == 'image'" class="o_attachment_view" href="#" t-att-data-id="attachment.id">
+                    <i class="fa fa-2x fa-search-plus"  title="View this attachment" aria-hidden="true"></i>
+                </a>
+            </div>
             <t t-if="editable">
                 <div class="o_attachment_delete">
                     <i class='fa fa-times-circle' title="Delete this attachment" t-att-data-id="attachment.id"/>

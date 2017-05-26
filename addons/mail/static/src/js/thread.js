@@ -31,9 +31,9 @@ var Thread = Widget.extend({
         "click img": "on_click_redirect",
         "click strong": "on_click_redirect",
         "click .o_thread_show_more": "on_click_show_more",
-        "click .o_attachment_popup": function(event) {
+        "click .o_attachment_view": function(event) {
             event.preventDefault();
-            var attachment_id = $(event.target).data('id');
+            var attachment_id = $(event.currentTarget).data('id');
             this.document_viewer.on_attachment_popup(attachment_id);
         },
         "click .o_thread_message_needaction": function (event) {
