@@ -338,14 +338,17 @@
                         <div t-attf-class="oe_kanban_card oe_kanban_global_click">
                             <div class="oe_kanban_content">
                                 <div>
-                                    <span><strong><t t-esc="record.product_id.value"/></strong></span>
+                                    <span><strong><t t-esc="record.production_id.value"/> - <t t-esc="record.name.value"/></strong></span>
                                 </div>
                                 <div class="row">
-                                    <div class="col-xs-7 o_kanban_primary_left">
+                                    <div t-if="record.is_user_working == True" class="col-xs-5 o_kanban_primary_right">
+                                        <span><t t-esc="record.product_id.value"/></span>
+                                    </div>
+                                    <div class="col-xs-4 o_kanban_primary_left">
                                         <span><t t-esc="record.qty_production.value"/> <t t-esc="record.product_uom_id.value"/></span>
                                     </div>
-                                    <div class="col-xs-5 o_kanban_primary_right">
-                                        <span><t t-esc="record.production_id.value"/></span>
+                                    <div class="col-xs-2 o_kanban_primary_left">
+                                        <span><t t-esc="record.state"/></span>
                                     </div>
                                 </div>
                             </div>
