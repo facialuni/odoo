@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
+import json
 import os
 import random
 
@@ -11,7 +11,6 @@ from operator import itemgetter
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from odoo.release import version_info
-from odoo.tools import pickle
 from odoo.tools.safe_eval import safe_eval
 from odoo.addons.anonymization.models.anonymization import group
 
@@ -25,7 +24,7 @@ class IrModelFieldsAnonymizeWizard(models.TransientModel):
     summary = fields.Text(compute='_compute_summary')
     file_export = fields.Binary('Export')
     file_import = fields.Binary('Import',
-        help="This is the file created by the anonymization process. It should have the '.pickle' extention.")
+        help="This is the file created by the anonymization process. It should have the '.json' extention.")
     state = fields.Selection(compute='_compute_state', string='Status', selection=WIZARD_ANONYMIZATION_STATES)
     msg = fields.Text('Message')
 
@@ -64,7 +63,7 @@ class IrModelFieldsAnonymizeWizard(models.TransientModel):
     @api.model
     def default_get(self, fields_list):
         res = {}
-        res['name'] = '.pickle'
+        res['name'] = '.json'
         res['summary'] = self._get_summary_value()
         res['state'] = self._get_state_value()
         res['msg'] = _("Before executing the anonymization process, you should make a backup of your database.")
@@ -146,7 +145,7 @@ class IrModelFieldsAnonymizeWizard(models.TransientModel):
 
         # do the anonymization:
         dirpath = os.environ.get('HOME') or os.getcwd()
-        rel_filepath = 'field_anonymization_%s_%s.pickle' % (self.env.cr.dbname, history.id)
+        rel_filepath = 'field_anonymization_%s_%s.json' % (self.env.cr.dbname, history.id)
         abs_filepath = os.path.abspath(os.path.join(dirpath, rel_filepath))
 
         ano_fields = self.env['ir.model.fields.anonymization'].search([('state', '!=', 'not_existing')])
@@ -203,9 +202,9 @@ class IrModelFieldsAnonymizeWizard(models.TransientModel):
                     'id': record['id']
                 })
 
-        # save pickle:
-        fn = open(abs_filepath, 'w')
-        pickle.dump(data, fn, protocol=-1)
+        # save json file:
+        with open(abs_filepath, 'w') as fn:
+            json.dump(data, fn)
 
         # update the anonymization fields:
         ano_fields.write({'state': 'anonymized'})
@@ -219,13 +218,11 @@ class IrModelFieldsAnonymizeWizard(models.TransientModel):
                ]
         msg = '\n'.join(msgs) % (dirpath, abs_filepath)
 
-        fn = open(abs_filepath, 'r')
-
-        self.write({
-            'msg': msg,
-            'file_export': base64.encodestring(fn.read()),
-        })
-        fn.close()
+        with open(abs_filepath, 'r') as fn:
+            self.write({
+                'msg': msg,
+                'file_export': fn.read(),
+            })
 
         # update the history record:
         history.write({
@@ -264,8 +261,8 @@ class IrModelFieldsAnonymizeWizard(models.TransientModel):
             raise UserError('%s: %s' % (_('Error !'), _("It is not possible to reverse the anonymization process without supplying the anonymization export file.")))
 
         # reverse the anonymization:
-        # load the pickle file content into a data structure:
-        data = pickle.loads(base64.decodestring(self.file_import))
+        # load the json file content into a data structure:
+        data = json.loads(self.file_import)
 
         fixes = self.env['ir.model.fields.anonymization.migration.fix'].search_read([
             ('target_version', '=', '.'.join(str(v) for v in version_info[:2]))
