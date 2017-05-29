@@ -16,7 +16,7 @@
                             <t t-value="JSON.parse(record.kanban_dashboard.raw_value)" t-set="dashboard"/>
                             <t t-value="record.type.raw_value" t-set="journal_type"/>
                             <t t-call="JournalTop"/>
-                            <div class="container o_kanban_card_content o_visible">
+                            <div t-attf-class="container o_kanban_card_content o_visible o_journal_#{journal_type}" >
                                 <div class="row">
                                     <t t-if="(journal_type == 'bank' || journal_type == 'cash')" t-call="JournalBodyBankCash"/>
                                     <t t-if="journal_type == 'sale' || journal_type == 'purchase'" t-call="JournalBodySalePurchase"/>

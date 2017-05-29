@@ -19,7 +19,9 @@ class account_journal(models.Model):
     def _kanban_dashboard_graph(self):
         if (self.type in ['sale', 'purchase']):
             self.kanban_dashboard_graph = json.dumps(self.get_bar_graph_datas())
-        elif (self.type in ['cash', 'bank']):
+        elif (self.type == 'bank'):
+            self.kanban_dashboard_graph = json.dumps(self.get_bank_stmt_line_graph_datas())
+        elif (self.type == 'cash'):
             self.kanban_dashboard_graph = json.dumps(self.get_line_graph_datas())
 
     kanban_dashboard = fields.Text(compute='_kanban_dashboard')
@@ -100,6 +102,33 @@ class account_journal(models.Model):
 
         [graph_title, graph_key] = self._graph_title_and_key()
         color = '#875A7B' if '+e' in version else '#7c7bad'
+        return [{'values': data, 'title': graph_title, 'key': graph_key, 'area': True, 'color': color}]
+
+    # Below method is used to get data of bank statemens
+    @api.multi
+    def get_bank_stmt_line_graph_datas(self):
+        data = []
+        Statement = self.env['account.bank.statement']
+        StatementLine = self.env['account.bank.statement.line']
+        today = datetime.today()
+        locale = self._context.get('lang') or 'en_US'
+        show_date = today + timedelta(days=-30)
+        start_balance = 0.0
+        for date_range in range(0, 7):
+            if show_date <= today:
+                statement = Statement.search([('journal_id', 'in', self.ids), ('date', '<', show_date.strftime(DF))], order="date desc", limit=1)
+                if not statement:
+                    lines = StatementLine.search([('journal_id', 'in', self.ids), ('date', '<=', show_date.strftime(DF))])
+                else:
+                    start_balance = statement.balance_end_real or 0
+                    lines = StatementLine.search([('journal_id', 'in', self.ids), ('date', '<=', show_date.strftime(DF)), ('date', '>', statement.date)])
+                last_balance = start_balance + sum(lines.mapped('amount'))
+                name = format_date(show_date, 'd LLLL Y', locale=locale)
+                short_name = format_date(show_date, 'd MMM', locale=locale)
+                data.append({'x': short_name, 'y': last_balance, 'name': name})
+                show_date = show_date + timedelta(days=5)
+        [graph_title, graph_key] = self._graph_title_and_key()
+        color = '#875A7B' if 'e' in version else '#7c7bad'
         return [{'values': data, 'title': graph_title, 'key': graph_key, 'area': True, 'color': color}]
 
     @api.multi
