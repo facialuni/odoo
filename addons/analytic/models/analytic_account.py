@@ -10,6 +10,11 @@ class AccountAnalyticTag(models.Model):
     name = fields.Char(string='Analytic Tag', index=True, required=True)
     color = fields.Integer('Color Index', default=10)
 
+class AccountAnalyticCategory(models.Model):
+    _name = 'account.analytic.category'
+    _description = 'Analytic Categories'
+    name = fields.Char(string='Category', required=True)
+    description = fields.Text(string='Description')
 
 class AccountAnalyticAccount(models.Model):
     _name = 'account.analytic.account'
@@ -46,6 +51,8 @@ class AccountAnalyticAccount(models.Model):
     active = fields.Boolean('Active', help="If the active field is set to False, it will allow you to hide the account without removing it.", default=True)
 
     tag_ids = fields.Many2many('account.analytic.tag', 'account_analytic_account_tag_rel', 'account_id', 'tag_id', string='Tags', copy=True)
+    category_id = fields.Many2one('account.analytic.category', string="Category")
+
     line_ids = fields.One2many('account.analytic.line', 'account_id', string="Analytic Lines")
 
     company_id = fields.Many2one('res.company', string='Company', required=True, default=lambda self: self.env.user.company_id)
