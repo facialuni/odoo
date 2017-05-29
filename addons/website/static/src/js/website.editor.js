@@ -40,6 +40,10 @@ website.TopBar.include({
         editor.editor_bar = new editor.Class(this);
         editor.editor_bar.prependTo(document.body);
         $('.o_homepage_editor_welcome_message').remove();
+        // Unbind attached zoom events of images , if any
+        _.each($('img[data-zoom]'), function(img) {
+            $(img).data('zoomOdoo').unbind();
+        });
 
         this.delayed_hide();
     },
