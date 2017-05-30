@@ -18,62 +18,53 @@
         </div>
     </t>
 
-    <t t-name="Attachment.Slideshow">
-        <div class="container">
-            <div t-attf-id="Slideshow_#{widget.active_attachment.id}" class="carousel slide" data-ride="carousel" data-interval="false">
-                <div class="carousel-inner" role="listbox">
-                    <t t-foreach="widget.attachment_ids" t-as="attachment">
-                        <div t-attf-class="item #{attachment.id == widget.active_attachment.id and 'active' or ''}">
-                            <t t-if="attachment.type == 'video'">
-                                <video  controls="controls">
-                                    <source t-attf-src="/web/image/#{attachment.id}" t-att-data-type="attachment.mimetype"/>
-                                </video>
-                            </t>
-                            <t t-if="attachment.type == 'image'">
-                                <img class="img" t-attf-src="/web/image/#{attachment.id}" t-att-alt="attachment.alt"/>
-                            </t>
-                            <div class="carousel-caption hidden col-xs-11 col-md-11">
-                                <t t-esc='attachment.name' class="pull-left"/>
-                                <a t-att-href='attachment.url' target="_blank" t-att-data-mimetype="attachment.mimetype" t-attf-data-src="/web/image/#{attachment.id}/100x100">
-                                   <i class='fa fa-download pull-right'/>
-                                </a>
-                            </div>
-                        </div>
-                    </t>
-                </div>
 
-                <t t-if="widget.attachment_ids.length > 1">
-                    <a class="carousel-control left" t-attf-href="#Slideshow_#{widget.active_attachment.id}" data-slide="prev">
-                        <span class="fa fa-chevron-left"/>
-                    </a>
-                    <a class="carousel-control right" t-attf-href="#Slideshow_#{widget.active_attachment.id}" data-slide="next">
-                        <span class="fa fa-chevron-right"/>
-                    </a>
-                </t>
+    <t t-name="DocumentViewer.Content">
+        <div class="o_viewer_content">
+            <div class="o_viewer-header">
+                <h2 class="o_image_caption"><t t-esc="widget.active_attachment.name"/></h2>
+                <ul class="list-inline o_header_buttons">
+                    <li>
+                        <a class="o_zoom_out" href="#">
+                            <i class="fa fa-2x fa-search-minus"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="o_zoom_in" href="#">
+                            <i class="fa fa-2x fa-search-plus"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="o_download_btn" href="#">
+                            <i class="fa fa-2x fa-download"/>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="o_close_btn" href="#">
+                            <i class="fa fa-2x fa-times"/>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="o_viewer_img_wrapper">
+                <img t-if="widget.active_attachment.type == 'image'" class="o_viewer_img"  t-attf-src="/web/image/#{widget.active_attachment.id}?unique=1"/>
+                <video t-if="widget.active_attachment.type == 'video'" class="o_viewer_video" controls="controls">
+                    <source t-attf-src="/web/image/#{widget.active_attachment.id}" t-att-data-type="widget.active_attachment.mimetype"/>
+                </video>
             </div>
         </div>
     </t>
 
-    <t t-name="Attachment.Popup.Modal">
-        <t t-if="widget.attachment_ids">
-            <div class="modal fade o_attachment_carousel" aria-hidden="true">
-                <div class="modal-header">
-                    <div class="o_attachment_download col-xs-11 col-md-11">
-                        <t t-esc='widget.active_attachment.name' class="pull-left"/>
-                        <a t-att-href='widget.active_attachment.url' target="_blank" t-att-data-mimetype="widget.active_attachment.mimetype" t-attf-data-src="/web/image/#{widget.active_attachment.id}/100x80">
-                            <i class='fa fa-download pull-right'/>
-                        </a>
-                    </div>
-                    <button type="button" class="close col-md-1 col-xs-1" data-dismiss="modal">
-                        <span class="close_button" aria-hidden="true">&amp;times;</span>
-                        <span class="sr-only">Close</span>
-                    </button>
-                </div>
-                <div class="modal-body o_attachment_popup_content">
-                    <t t-call="Attachment.Slideshow"/>
-                </div>
-            </div>
-        </t>
+    <t t-name="DocumentViewer">
+        <div class="modal o_modal_fullscreen" tabindex="-1" role="dialog" aria-hidden="true">
+            <t t-call="DocumentViewer.Content"/>
+            <a class="arrow arrow-left move_previous" href="#">
+                <span class="fa fa-3x fa-chevron-left"/>
+            </a>
+            <a class="arrow arrow-right move_next" href="#">
+                <span class="fa fa-3x fa-chevron-right"/>
+            </a>
+        </div>
     </t>
 
     <!-- When a channel is empty-->
@@ -239,14 +230,16 @@
                 <img class="o_image" t-att-data-mimetype="attachment.mimetype"/>
             </t>
             <t t-if="type == 'image'">
-                <img class="o_image" t-attf-src="/web/image/#{attachment.id}"/>
+                <!--TODO: get thumbnail image with resize by center of image
+                if we use 200x200 it will make the edge of image transparent for image which has height > width-->
+                <img class="o_image" t-attf-src="/web/image/#{attachment.id}/?unique=1"/>
             </t>
             <a t-att-href='attachment.url' target="_blank"><span class='o_attachment_name'><t t-esc='attachment.name'/></span></a>
             <div class="o_attachment_overlay">
                 <a class="o_attachment_download" t-att-href='attachment.url' target="_blank">
                     <i class="fa fa-2x fa-arrow-circle-o-down" title="Downlad this attachment" aria-hidden="true"></i>
                 </a>
-                <a t-if="type == 'image'" class="o_attachment_view" href="#" t-att-data-id="attachment.id">
+                <a t-if="type == 'image' || type == 'video'" class="o_attachment_view" href="#" t-att-data-id="attachment.id">
                     <i class="fa fa-2x fa-search-plus"  title="View this attachment" aria-hidden="true"></i>
                 </a>
             </div>

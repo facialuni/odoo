@@ -3,7 +3,7 @@ odoo.define('mail.ChatThread', function (require) {
 
 var core = require('web.core');
 var Widget = require('web.Widget');
-var document_viewer = require('mail.attachment.popup');
+var DocumentViewer = require('mail.DocumentViewer');
 
 var QWeb = core.qweb;
 var _t = core._t;
@@ -34,7 +34,7 @@ var Thread = Widget.extend({
         "click .o_attachment_view": function(event) {
             event.preventDefault();
             var attachment_id = $(event.currentTarget).data('id');
-            this.document_viewer.on_attachment_popup(attachment_id);
+            this.DocumentViewer.on_attachment_popup(attachment_id);
         },
         "click .o_thread_message_needaction": function (event) {
             var message_id = $(event.currentTarget).data('message-id');
@@ -120,7 +120,7 @@ var Thread = Widget.extend({
             return msg.attachment_ids
         }));
         this.set('attachment_ids', attachments);
-        this.document_viewer = new document_viewer(this);
+        this.DocumentViewer = new DocumentViewer(this);
 
         _.each(msgs, function(msg) {
             var $msg = self.$('.o_thread_message[data-message-id="'+ msg.id +'"]');

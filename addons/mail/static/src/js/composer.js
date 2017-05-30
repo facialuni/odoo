@@ -9,7 +9,7 @@ var data = require('web.data');
 var dom = require('web.dom');
 var session = require('web.session');
 var Widget = require('web.Widget');
-var document_viewer = require('mail.attachment.popup');
+var DocumentViewer = require('mail.DocumentViewer');
 
 var QWeb = core.qweb;
 var _t = core._t;
@@ -358,7 +358,7 @@ var BasicComposer = Widget.extend(chat_mixin, {
         "click .o_attachment_view": function(event) {
             event.preventDefault();
             var attachment_id = $(event.currentTarget).data('id');
-            this.document_viewer.on_attachment_popup(attachment_id);
+            this.DocumentViewer.on_attachment_popup(attachment_id);
         },
     },
     // RPCs done to fetch the mention suggestions are throttled with the following value
@@ -668,7 +668,7 @@ var BasicComposer = Widget.extend(chat_mixin, {
         this.$attachments_list.html(QWeb.render('mail.ChatComposer.Attachments', {
             attachments: this.get('attachment_ids'),
         }));
-        this.document_viewer = new document_viewer(this);
+        this.DocumentViewer = new DocumentViewer(this);
     },
 
     // Mention
