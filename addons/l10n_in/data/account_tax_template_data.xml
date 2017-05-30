@@ -245,178 +245,194 @@
 
     <record id="sgst_good_5" model="account.tax.template">
         <field name="name">SGST Tax @ 5% (Goods)</field>
-        <field name="description">SGST Tax @ 5%</field>
+        <field name="description">SGST Tax @ 5% (Goods)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">5</field>
-        <field name="account_id" ref="sgst_payable"/>
+        <field name="account_id" ref="p11232"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('sgst_goods_5_tag_sale'), ref('sgst_goods_tag')])]"/>
     </record>
 
     <record id="sgst_good_12" model="account.tax.template">
         <field name="name">SGST Tax @ 12% (Goods)</field>
-        <field name="description">SGST Tax @ 12%</field>
+        <field name="description">SGST Tax @ 12% (Goods)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">12</field>
-        <field name="account_id" ref="sgst_payable"/>
+        <field name="account_id" ref="p11232"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('sgst_goods_12_tag_sale'), ref('sgst_goods_tag')])]"/>
     </record>
 
     <record id="sgst_good_18" model="account.tax.template">
         <field name="name">SGST Tax @ 18% (Goods)</field>
-        <field name="description">SGST Tax @ 18%</field>
+        <field name="description">SGST Tax @ 18% (Goods)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">18</field>
-        <field name="account_id" ref="sgst_payable"/>
+        <field name="account_id" ref="p11232"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('sgst_goods_18_tag_sale'), ref('sgst_goods_tag')])]"/>
     </record>
 
     <record id="sgst_good_28" model="account.tax.template">
         <field name="name">SGST Tax @ 28% (Goods)</field>
-        <field name="description">SGST Tax @ 28%</field>
+        <field name="description">SGST Tax @ 28% (Goods)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">28</field>
-        <field name="account_id" ref="sgst_payable"/>
+        <field name="account_id" ref="p11232"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('sgst_goods_28_tag_sale'), ref('sgst_goods_tag')])]"/>
     </record>
 
     <record id="sgst_service_5" model="account.tax.template">
         <field name="name">SGST Tax @ 5% (Services)</field>
-        <field name="description">SGST Tax @ 5%</field>
+        <field name="description">SGST Tax @ 5% (Services)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">5</field>
-        <field name="account_id" ref="sgst_payable"/>
+        <field name="account_id" ref="p11232"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('sgst_services_5_tag_sale'), ref('sgst_services_tag')])]"/>
     </record>
 
     <record id="sgst_service_12" model="account.tax.template">
         <field name="name">SGST Tax @ 12% (Services)</field>
-        <field name="description">SGST Tax @ 12%</field>
+        <field name="description">SGST Tax @ 12% (Services)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">12</field>
-        <field name="account_id" ref="sgst_payable"/>
+        <field name="account_id" ref="p11232"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('sgst_services_12_tag_sale'), ref('sgst_services_tag')])]"/>
     </record>
 
     <record id="sgst_service_18" model="account.tax.template">
         <field name="name">SGST Tax @ 18% (Services)</field>
-        <field name="description">SGST Tax @ 18%</field>
+        <field name="description">SGST Tax @ 18% (Services)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">18</field>
-        <field name="account_id" ref="sgst_payable"/>
+        <field name="account_id" ref="p11232"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('sgst_services_18_tag_sale'), ref('sgst_services_tag')])]"/>
     </record>
 
     <record id="sgst_service_28" model="account.tax.template">
         <field name="name">SGST Tax @ 28% (Services)</field>
-        <field name="description">SGST Tax @ 28%</field>
+        <field name="description">SGST Tax @ 28% (Services)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">28</field>
-        <field name="account_id" ref="sgst_payable"/>
+        <field name="account_id" ref="p11232"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('sgst_services_28_tag_sale'), ref('sgst_services_tag')])]"/>
     </record>
 
-    <!-- SGST -->
+    <!-- CGST -->
 
     <record id="cgst_good_5" model="account.tax.template">
         <field name="name">CGST Tax @ 5% (Goods)</field>
-        <field name="description">CGST Tax @ 5%</field>
+        <field name="description">CGST Tax @ 5% (Goods)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">5</field>
-        <field name="account_id" ref="cgst_payable"/>
+        <field name="account_id" ref="p11233"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('cgst_goods_5_tag_sale'), ref('cgst_goods_tag')])]"/>
     </record>
 
     <record id="cgst_good_12" model="account.tax.template">
         <field name="name">CGST Tax @ 12% (Goods)</field>
-        <field name="description">CGST Tax @ 12%</field>
+        <field name="description">CGST Tax @ 12% (Goods)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">12</field>
-        <field name="account_id" ref="cgst_payable"/>
+        <field name="account_id" ref="p11233"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('cgst_goods_12_tag_sale'), ref('cgst_goods_tag')])]"/>
     </record>
 
     <record id="cgst_good_18" model="account.tax.template">
         <field name="name">CGST Tax @ 18% (Goods)</field>
-        <field name="description">CGST Tax @ 18%</field>
+        <field name="description">CGST Tax @ 18% (Goods)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">18</field>
-        <field name="account_id" ref="cgst_payable"/>
+        <field name="account_id" ref="p11233"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('cgst_goods_18_tag_sale'), ref('cgst_goods_tag')])]"/>
     </record>
 
     <record id="cgst_good_28" model="account.tax.template">
         <field name="name">CGST Tax @ 28% (Goods)</field>
-        <field name="description">CGST Tax @ 28%</field>
+        <field name="description">CGST Tax @ 28% (Goods)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">28</field>
-        <field name="account_id" ref="cgst_payable"/>
+        <field name="account_id" ref="p11233"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('cgst_goods_28_tag_sale'), ref('cgst_goods_tag')])]"/>
     </record>
 
     <record id="cgst_service_5" model="account.tax.template">
         <field name="name">CGST Tax @ 5% (Services)</field>
-        <field name="description">CGST Tax @ 5%</field>
+        <field name="description">CGST Tax @ 5% (Services)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">5</field>
-        <field name="account_id" ref="cgst_payable"/>
+        <field name="account_id" ref="p11233"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('cgst_services_5_tag_sale'), ref('cgst_services_tag')])]"/>
     </record>
 
     <record id="cgst_service_12" model="account.tax.template">
         <field name="name">CGST Tax @ 12% (Services)</field>
-        <field name="description">CGST Tax @ 12%</field>
+        <field name="description">CGST Tax @ 12% (Services)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">12</field>
-        <field name="account_id" ref="cgst_payable"/>
+        <field name="account_id" ref="p11233"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('cgst_services_12_tag_sale'), ref('cgst_services_tag')])]"/>
     </record>
 
     <record id="cgst_service_18" model="account.tax.template">
         <field name="name">CGST Tax @ 18% (Services)</field>
-        <field name="description">CGST Tax @ 18%</field>
+        <field name="description">CGST Tax @ 18% (Services)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">18</field>
-        <field name="account_id" ref="cgst_payable"/>
+        <field name="account_id" ref="p11233"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('cgst_services_18_tag_sale'), ref('cgst_services_tag')])]"/>
     </record>
 
     <record id="cgst_service_28" model="account.tax.template">
         <field name="name">CGST Tax @ 28% (Services)</field>
-        <field name="description">CGST Tax @ 28%</field>
+        <field name="description">CGST Tax @ 28% (Services)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">28</field>
-        <field name="account_id" ref="cgst_payable"/>
+        <field name="account_id" ref="p11233"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('cgst_services_28_tag_sale'), ref('cgst_services_tag')])]"/>
     </record>
@@ -425,88 +441,96 @@
 
     <record id="igst_good_5" model="account.tax.template">
         <field name="name">IGST Tax @ 5% (Goods)</field>
-        <field name="description">IGST Tax @ 5%</field>
+        <field name="description">IGST Tax @ 5% (Goods)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">5</field>
-        <field name="account_id" ref="igst_payable"/>
+        <field name="account_id" ref="p11234"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('igst_goods_5_tag_sale'), ref('igst_goods_tag')])]"/>
     </record>
 
     <record id="igst_good_12" model="account.tax.template">
         <field name="name">IGST Tax @ 12% (Goods)</field>
-        <field name="description">IGST Tax @ 12%</field>
+        <field name="description">IGST Tax @ 12% (Goods)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">12</field>
-        <field name="account_id" ref="igst_payable"/>
+        <field name="account_id" ref="p11234"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('igst_goods_12_tag_sale'), ref('igst_goods_tag')])]"/>
     </record>
 
     <record id="igst_good_18" model="account.tax.template">
         <field name="name">IGST Tax @ 18% (Goods)</field>
-        <field name="description">IGST Tax @ 18%</field>
+        <field name="description">IGST Tax @ 18% (Goods)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">18</field>
-        <field name="account_id" ref="igst_payable"/>
+        <field name="account_id" ref="p11234"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('igst_goods_18_tag_sale'), ref('igst_goods_tag')])]"/>
     </record>
 
     <record id="igst_good_28" model="account.tax.template">
         <field name="name">IGST Tax @ 28% (Goods)</field>
-        <field name="description">IGST Tax @ 28%</field>
+        <field name="description">IGST Tax @ 28% (Goods)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">28</field>
-        <field name="account_id" ref="igst_payable"/>
+        <field name="account_id" ref="p11234"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('igst_goods_28_tag_sale'), ref('igst_goods_tag')])]"/>
     </record>
 
     <record id="igst_service_5" model="account.tax.template">
         <field name="name">IGST Tax @ 5% (Services)</field>
-        <field name="description">IGST Tax @ 5%</field>
+        <field name="description">IGST Tax @ 5% (Services)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">5</field>
-        <field name="account_id" ref="igst_payable"/>
+        <field name="account_id" ref="p11234"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('igst_services_5_tag_sale'), ref('igst_services_tag')])]"/>
     </record>
 
     <record id="igst_service_12" model="account.tax.template">
         <field name="name">IGST Tax @ 12% (Services)</field>
-        <field name="description">IGST Tax @ 12%</field>
+        <field name="description">IGST Tax @ 12% (Services)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">12</field>
-        <field name="account_id" ref="igst_payable"/>
+        <field name="account_id" ref="p11234"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('igst_services_12_tag_sale'), ref('igst_services_tag')])]"/>
     </record>
 
     <record id="igst_service_18" model="account.tax.template">
         <field name="name">IGST Tax @ 18% (Services)</field>
-        <field name="description">IGST Tax @ 18%</field>
+        <field name="description">IGST Tax @ 18% (Services)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">18</field>
-        <field name="account_id" ref="igst_payable"/>
+        <field name="account_id" ref="p11234"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('igst_services_18_tag_sale'), ref('igst_services_tag')])]"/>
     </record>
 
     <record id="igst_service_28" model="account.tax.template">
         <field name="name">IGST Tax @ 28% (Services)</field>
-        <field name="description">IGST Tax @ 28%</field>
+        <field name="description">IGST Tax @ 28% (Services)</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">percent</field>
         <field name="amount">28</field>
-        <field name="account_id" ref="igst_payable"/>
+        <field name="account_id" ref="p11234"/>
+        <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('igst_services_28_tag_sale'), ref('sgst_services_tag')])]"/>
     </record>
@@ -516,88 +540,96 @@
 
     <record id="sgst_goods_5" model="account.tax.template">
         <field name="name">SGST Tax @ 5% (Goods)</field>
-        <field name="description">SGST Tax @ 5%</field>
+        <field name="description">SGST Tax @ 5% (Goods)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">5</field>
-        <field name="account_id" ref="sgst_receivable"/>
+        <field name="account_id" ref="p10051"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('sgst_goods_5_tag_purchase'), ref('sgst_goods_tag')])]"/>
     </record>
 
     <record id="sgst_goods_12" model="account.tax.template">
         <field name="name">SGST Tax @ 12% (Goods)</field>
-        <field name="description">SGST Tax @ 12%</field>
+        <field name="description">SGST Tax @ 12% (Goods)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">12</field>
-        <field name="account_id" ref="sgst_receivable"/>
+        <field name="account_id" ref="p10051"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('sgst_goods_12_tag_purchase'), ref('sgst_goods_tag')])]"/>
     </record>
 
     <record id="sgst_goods_18" model="account.tax.template">
         <field name="name">SGST Tax @ 18% (Goods)</field>
-        <field name="description">SGST Tax @ 18%</field>
+        <field name="description">SGST Tax @ 18% (Goods)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">18</field>
-        <field name="account_id" ref="sgst_receivable"/>
+        <field name="account_id" ref="p10051"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('sgst_goods_18_tag_purchase'), ref('sgst_goods_tag')])]"/>
     </record>
 
     <record id="sgst_goods_28" model="account.tax.template">
         <field name="name">SGST Tax @ 28% (Goods)</field>
-        <field name="description">SGST Tax @ 28%</field>
+        <field name="description">SGST Tax @ 28% (Goods)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">28</field>
-        <field name="account_id" ref="sgst_receivable"/>
+        <field name="account_id" ref="p10051"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('sgst_goods_28_tag_purchase'), ref('sgst_goods_tag')])]"/>
     </record>
 
     <record id="sgst_services_5" model="account.tax.template">
-        <field name="name">SGST Tax @ 5% (SERVICES)</field>
-        <field name="description">SGST Tax @ 5%</field>
+        <field name="name">SGST Tax @ 5% (Services)</field>
+        <field name="description">SGST Tax @ 5% (Services)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">5</field>
-        <field name="account_id" ref="sgst_receivable"/>
+        <field name="account_id" ref="p10051"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('sgst_services_5_tag_purchase'), ref('sgst_services_tag')])]"/>
     </record>
 
     <record id="sgst_services_12" model="account.tax.template">
-        <field name="name">SGST Tax @ 12% (SERVICES)</field>
-        <field name="description">SGST Tax @ 12%</field>
+        <field name="name">SGST Tax @ 12% (Services)</field>
+        <field name="description">SGST Tax @ 12% (Services)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">12</field>
-        <field name="account_id" ref="sgst_receivable"/>
+        <field name="account_id" ref="p10051"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('sgst_services_12_tag_purchase'), ref('sgst_services_tag')])]"/>
     </record>
 
     <record id="sgst_services_18" model="account.tax.template">
-        <field name="name">SGST Tax @ 18% (SERVICES)</field>
-        <field name="description">SGST Tax @ 18%</field>
+        <field name="name">SGST Tax @ 18% (Services)</field>
+        <field name="description">SGST Tax @ 18% (Services)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">18</field>
-        <field name="account_id" ref="sgst_receivable"/>
+        <field name="account_id" ref="p10051"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('sgst_services_18_tag_purchase'), ref('sgst_services_tag')])]"/>
     </record>
 
     <record id="sgst_services_28" model="account.tax.template">
-        <field name="name">SGST Tax @ 28% (SERVICES)</field>
-        <field name="description">SGST Tax @ 28%</field>
+        <field name="name">SGST Tax @ 28% (Services)</field>
+        <field name="description">SGST Tax @ 28% (Services)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">28</field>
-        <field name="account_id" ref="sgst_receivable"/>
+        <field name="account_id" ref="p10051"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('sgst_services_28_tag_purchase'), ref('sgst_services_tag')])]"/>
     </record>
@@ -606,88 +638,96 @@
 
     <record id="cgst_goods_5" model="account.tax.template">
         <field name="name">CGST Tax @ 5% (Goods)</field>
-        <field name="description">CGST Tax @ 5%</field>
+        <field name="description">CGST Tax @ 5% (Goods)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">5</field>
-        <field name="account_id" ref="cgst_receivable"/>
+        <field name="account_id" ref="p10052"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('cgst_goods_5_tag_purchase'), ref('cgst_goods_tag')])]"/>
     </record>
 
     <record id="cgst_goods_12" model="account.tax.template">
         <field name="name">CGST Tax @ 12% (Goods)</field>
-        <field name="description">CGST Tax @ 12%</field>
+        <field name="description">CGST Tax @ 12% (Goods)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">12</field>
-        <field name="account_id" ref="cgst_receivable"/>
+        <field name="account_id" ref="p10052"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('cgst_goods_12_tag_purchase'), ref('cgst_goods_tag')])]"/>
     </record>
 
     <record id="cgst_goods_18" model="account.tax.template">
         <field name="name">CGST Tax @ 18% (Goods)</field>
-        <field name="description">CGST Tax @ 18%</field>
+        <field name="description">CGST Tax @ 18% (Goods)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">18</field>
-        <field name="account_id" ref="cgst_receivable"/>
+        <field name="account_id" ref="p10052"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('cgst_goods_18_tag_purchase'), ref('cgst_goods_tag')])]"/>
     </record>
 
     <record id="cgst_goods_28" model="account.tax.template">
         <field name="name">CGST Tax @ 28% (Goods)</field>
-        <field name="description">CGST Tax @ 28%</field>
+        <field name="description">CGST Tax @ 28% (Goods)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">28</field>
-        <field name="account_id" ref="cgst_receivable"/>
+        <field name="account_id" ref="p10052"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('cgst_goods_28_tag_purchase'), ref('cgst_goods_tag')])]"/>
     </record>
 
     <record id="cgst_services_5" model="account.tax.template">
-        <field name="name">CGST Tax @ 5% (SERVICES)</field>
-        <field name="description">CGST Tax @ 5%</field>
+        <field name="name">CGST Tax @ 5% (Services)</field>
+        <field name="description">CGST Tax @ 5% (Services)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">5</field>
-        <field name="account_id" ref="cgst_receivable"/>
+        <field name="account_id" ref="p10052"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('cgst_services_5_tag_purchase'), ref('cgst_services_tag')])]"/>
     </record>
 
     <record id="cgst_services_12" model="account.tax.template">
-        <field name="name">CGST Tax @ 12% (SERVICES)</field>
-        <field name="description">CGST Tax @ 12%</field>
+        <field name="name">CGST Tax @ 12% (Services)</field>
+        <field name="description">CGST Tax @ 12% (Services)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">12</field>
-        <field name="account_id" ref="cgst_receivable"/>
+        <field name="account_id" ref="p10052"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('cgst_services_12_tag_purchase'), ref('cgst_services_tag')])]"/>
     </record>
 
     <record id="cgst_services_18" model="account.tax.template">
-        <field name="name">CGST Tax @ 18% (SERVICES)</field>
-        <field name="description">CGST Tax @ 18%</field>
+        <field name="name">CGST Tax @ 18% (Services)</field>
+        <field name="description">CGST Tax @ 18% (Services)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">18</field>
-        <field name="account_id" ref="cgst_receivable"/>
+        <field name="account_id" ref="p10052"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('cgst_services_18_tag_purchase'), ref('cgst_services_tag')])]"/>
     </record>
 
     <record id="cgst_services_28" model="account.tax.template">
-        <field name="name">CGST Tax @ 28% (SERVICES)</field>
-        <field name="description">CGST Tax @ 28%</field>
+        <field name="name">CGST Tax @ 28% (Services)</field>
+        <field name="description">CGST Tax @ 28% (Services)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">28</field>
-        <field name="account_id" ref="cgst_receivable"/>
+        <field name="account_id" ref="p10052"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('cgst_services_28_tag_purchase'), ref('cgst_services_tag')])]"/>
     </record>
@@ -696,88 +736,96 @@
 
     <record id="igst_goods_5" model="account.tax.template">
         <field name="name">IGST Tax @ 5% (Goods)</field>
-        <field name="description">IGST Tax @ 5%</field>
+        <field name="description">IGST Tax @ 5% (Goods)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">5</field>
-        <field name="account_id" ref="igst_receivable"/>
+        <field name="account_id" ref="p10053"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('igst_goods_5_tag_purchase'), ref('igst_goods_tag')])]"/>
     </record>
 
     <record id="igst_goods_12" model="account.tax.template">
         <field name="name">IGST Tax @ 12% (Goods)</field>
-        <field name="description">IGST Tax @ 12%</field>
+        <field name="description">IGST Tax @ 12% (Goods)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">12</field>
-        <field name="account_id" ref="igst_receivable"/>
+        <field name="account_id" ref="p10053"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('igst_goods_12_tag_purchase'), ref('igst_goods_tag')])]"/>
     </record>
 
     <record id="igst_goods_18" model="account.tax.template">
         <field name="name">IGST Tax @ 18% (Goods)</field>
-        <field name="description">IGST Tax @ 18%</field>
+        <field name="description">IGST Tax @ 18% (Goods)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">18</field>
-        <field name="account_id" ref="igst_receivable"/>
+        <field name="account_id" ref="p10053"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('igst_goods_18_tag_purchase'), ref('igst_goods_tag')])]"/>
     </record>
 
     <record id="igst_goods_28" model="account.tax.template">
         <field name="name">IGST Tax @ 28% (Goods)</field>
-        <field name="description">IGST Tax @ 28%</field>
+        <field name="description">IGST Tax @ 28% (Goods)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">28</field>
-        <field name="account_id" ref="igst_receivable"/>
+        <field name="account_id" ref="p10053"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('igst_goods_28_tag_purchase'), ref('igst_goods_tag')])]"/>
     </record>
 
     <record id="igst_services_5" model="account.tax.template">
-        <field name="name">IGST Tax @ 5% (SERVICES)</field>
-        <field name="description">IGST Tax @ 5%</field>
+        <field name="name">IGST Tax @ 5% (Services)</field>
+        <field name="description">IGST Tax @ 5% (Services)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">5</field>
-        <field name="account_id" ref="igst_receivable"/>
+        <field name="account_id" ref="p10053"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('igst_services_5_tag_purchase'), ref('igst_services_tag')])]"/>
     </record>
 
     <record id="igst_services_12" model="account.tax.template">
-        <field name="name">IGST Tax @ 12% (SERVICES)</field>
-        <field name="description">IGST Tax @ 12%</field>
+        <field name="name">IGST Tax @ 12% (Services)</field>
+        <field name="description">IGST Tax @ 12% (Services)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">12</field>
-        <field name="account_id" ref="igst_receivable"/>
+        <field name="account_id" ref="p10053"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('igst_services_12_tag_purchase'), ref('igst_services_tag')])]"/>
     </record>
 
     <record id="igst_services_18" model="account.tax.template">
-        <field name="name">IGST Tax @ 18% (SERVICES)</field>
-        <field name="description">IGST Tax @ 18%</field>
+        <field name="name">IGST Tax @ 18% (Services)</field>
+        <field name="description">IGST Tax @ 18% (Services)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">18</field>
-        <field name="account_id" ref="igst_receivable"/>
+        <field name="account_id" ref="p10053"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('igst_services_18_tag_purchase'), ref('igst_services_tag')])]"/>
     </record>
 
     <record id="igst_services_28" model="account.tax.template">
-        <field name="name">IGST Tax @ 28% (SERVICES)</field>
-        <field name="description">IGST Tax @ 28%</field>
+        <field name="name">IGST Tax @ 28% (Services)</field>
+        <field name="description">IGST Tax @ 28% (Services)</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">percent</field>
         <field name="amount">28</field>
-        <field name="account_id" ref="igst_receivable"/>
+        <field name="account_id" ref="p10053"/>
+        <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('igst_services_28_tag_purchase'), ref('igst_services_tag')])]"/>
     </record>
