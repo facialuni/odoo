@@ -316,7 +316,7 @@
 
         <menuitem
             id="menu_hr_holidays_approvals"
-            name="Leaves to Approve"
+            name="Leaves Management"
             parent="menu_hr_holidays_root"
             sequence="3"
             groups="hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user"/>
@@ -557,7 +557,7 @@
 
         <menuitem
             id="menu_open_department_leave_approve"
-            name="Leaves"
+            name="Leaves to Approve"
             parent="menu_hr_holidays_approvals"
             groups="hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user"
             action="open_department_holidays_approve"
