@@ -559,7 +559,7 @@
             id="menu_open_department_leave_approve"
             name="Leaves to Approve"
             parent="menu_hr_holidays_approvals"
-            groups="hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user"
+            groups="hr_holidays.group_hr_holidays_user"
             action="open_department_holidays_approve"
             sequence="1"/>
 
@@ -579,7 +579,7 @@
         </record>
 
         <menuitem
-            id="menu_open_department_leave_allocation_approve" groups="hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user"
+            id="menu_open_department_leave_allocation_approve" groups="hr_holidays.group_hr_holidays_manager"
             name="Leaves Allocation"
             parent="menu_hr_holidays_approvals"
             action="open_department_holidays_allocation_approve"
@@ -589,7 +589,7 @@
             id="menu_open_employee_leave"
             name="Leave Details"
             parent="menu_hr_holidays_approvals"
-            groups="hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user"
+            groups="hr_holidays.group_hr_holidays_manager"
             action="open_employee_leaves"
             sequence="4"/>
 
