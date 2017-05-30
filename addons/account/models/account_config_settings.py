@@ -34,6 +34,7 @@ class AccountConfigSettings(models.TransientModel):
         implied_group='base.group_multi_currency')
     group_analytic_accounting = fields.Boolean(string='Analytic Accounting',
         implied_group='analytic.group_analytic_accounting')
+    group_analytic_tags = fields.Boolean(string='Analytic Tags', implied_group='analytic.group_analytic_tags')
     group_warning_account = fields.Boolean(string="Warnings", implied_group='account.group_warning_account')
     module_account_asset = fields.Boolean(string='Assets Management')
     module_account_deferred_revenue = fields.Boolean(string="Revenue Recognition")
