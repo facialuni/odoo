@@ -1419,6 +1419,51 @@
             <field name="chart_template_id" ref="indian_chart_template_schedule6"/>
         </record>
 
+        <!-- GST Chart Of Account-->
+
+        <record model="account.account.template" id="schedule6_sgst_receivable">
+            <field name="name">SGST receivable</field>
+            <field name="code">SGST01</field>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="reconcile" eval="False"/>
+            <field name="chart_template_id" ref="indian_chart_template_schedule6"/>
+        </record>
+        <record model="account.account.template" id="schedule6_cgst_receivable">
+            <field name="name">CGST receivable</field>
+            <field name="code">CGST01</field>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="reconcile" eval="False"/>
+            <field name="chart_template_id" ref="indian_chart_template_schedule6"/>
+        </record>
+        <record model="account.account.template" id="schedule6_igst_receivable">
+            <field name="name">IGST receivable</field>
+            <field name="code">IGST01</field>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="reconcile" eval="False"/>
+            <field name="chart_template_id" ref="indian_chart_template_schedule6"/>
+        </record>
+        <record model="account.account.template" id="schedule6_sgst_payable">
+            <field name="name">SGST payable</field>
+            <field name="code">SGST02</field>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
+            <field name="reconcile" eval="False"/>
+            <field name="chart_template_id" ref="indian_chart_template_schedule6"/>
+        </record>
+        <record model="account.account.template" id="schedule6_cgst_payable">
+            <field name="name">CGST payable</field>
+            <field name="code">CGST02</field>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
+            <field name="reconcile" eval="False"/>
+            <field name="chart_template_id" ref="indian_chart_template_schedule6"/>
+        </record>
+        <record model="account.account.template" id="schedule6_igst_payable">
+            <field name="name">IGST payable</field>
+            <field name="code">IGST02</field>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
+            <field name="reconcile" eval="False"/>
+            <field name="chart_template_id" ref="indian_chart_template_schedule6"/>
+        </record>
+
         <!-- Account Chart Template -->
         <record id="indian_chart_template_schedule6" model="account.chart.template">
             <field name="property_account_receivable_id" ref="c12133"/>
