@@ -588,7 +588,7 @@
         <menuitem
             id="menu_open_employee_leave"
             name="Leave Details"
-            parent="menu_hr_holidays_report"
+            parent="menu_hr_holidays_approvals"
             groups="hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user"
             action="open_employee_leaves"
             sequence="4"/>
