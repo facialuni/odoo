@@ -119,7 +119,7 @@ class IrModelFieldsAnonymizeWizard(models.TransientModel):
             else:
                 raise UserError(_("The database anonymization is currently in an unstable state. Some fields are anonymized,"
                                   " while some fields are not anonymized. You should try to solve this problem before trying to do anything else."))
-            res['arch'] = etree.tostring(eview)
+            res['arch'] = etree.tostring(eview, encoding='unicode')
         return res
 
     @api.multi

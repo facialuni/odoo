@@ -61,7 +61,7 @@ class FormatAddressMixin(models.AbstractModel):
                     except ValueError:
                         return arch
                 address_node.getparent().replace(address_node, sub_view_node)
-            arch = etree.tostring(doc)
+            arch = etree.tostring(doc, encoding='unicode')
         return arch
 
 class PartnerCategory(models.Model):
@@ -287,7 +287,7 @@ class Partner(models.Model):
 
         if partner_type in ['other'] and parent_id:
             parent_image = self.browse(parent_id).image
-            image = parent_image and parent_image.decode('base64') or None
+            image = parent_image and base64.b64decode(parent_image) or None
 
         if not image and partner_type == 'invoice':
             img_path = get_module_resource('base', 'static/src/img', 'money.png')
@@ -305,7 +305,7 @@ class Partner(models.Model):
         if image and colorize:
             image = tools.image_colorize(image)
 
-        return tools.image_resize_image_big(image.encode('base64'))
+        return tools.image_resize_image_big(base64.b64encode(image))
 
     @api.model
     def _fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
@@ -367,7 +367,7 @@ class Partner(models.Model):
     @api.depends('name', 'email')
     def _compute_email_formatted(self):
         for partner in self:
-            partner.email_formatted = formataddr((partner.name, partner.email))
+            partner.email_formatted = formataddr((partner.name or u"False", partner.email or u"False"))
 
     @api.depends('is_company')
     def _compute_company_type(self):
@@ -699,7 +699,7 @@ class Partner(models.Model):
         return partners.id or self.name_create(email)[0]
 
     def _get_gravatar_image(self, email):
-        email_hash = hashlib.md5(email.lower()).hexdigest()
+        email_hash = hashlib.md5(email.lower().encode('utf-8')).hexdigest()
         url = "https://www.gravatar.com/avatar/" + email_hash
         res = requests.get(url, params={'d': '404', 's': '128'}, timeout=5)
         if res.status_code != requests.codes.ok:

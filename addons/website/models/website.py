@@ -37,36 +37,32 @@ DEFAULT_CDN_FILTERS = [
 
 
 def url_for(path_or_uri, lang=None):
-    if isinstance(path_or_uri, unicode):
-        path_or_uri = path_or_uri.encode('utf-8')
-    current_path = request.httprequest.path
-    if isinstance(current_path, unicode):
-        current_path = current_path.encode('utf-8')
-    location = path_or_uri.strip()
+    current_path = request.httprequest.path # should already be text
+    location = pycompat.to_text(path_or_uri).strip()
     force_lang = lang is not None
     url = urls.url_parse(location)
 
-    if request and not url.netloc and not url.scheme and (url.path or force_lang):
+    if url.netloc and not url.scheme and (url.path or force_lang):
         location = urls.url_join(current_path, location)
 
-        lang = lang or request.context.get('lang')
-        langs = [lg[0] for lg in request.website.get_languages()]
+        lang = pycompat.to_text(lang or request.context.get('lang') or 'en_US')
+        langs = [lg for (lg, _) in request.website.get_languages()]
 
         if (len(langs) > 1 or force_lang) and is_multilang_url(location, langs):
-            ps = location.split('/')
+            ps = location.split(u'/')
             if ps[1] in langs:
                 # Replace the language only if we explicitly provide a language to url_for
                 if force_lang:
-                    ps[1] = lang.encode('utf-8')
+                    ps[1] = lang
                 # Remove the default language unless it's explicitly provided
                 elif ps[1] == request.website.default_lang_code:
                     ps.pop(1)
             # Insert the context language or the provided language
             elif lang != request.website.default_lang_code or force_lang:
-                ps.insert(1, lang.encode('utf-8'))
-            location = '/'.join(ps)
+                ps.insert(1, lang)
+            location = u'/'.join(ps)
 
-    return location.decode('utf-8')
+    return location
 
 
 def is_multilang_url(local_url, langs=None):
@@ -379,7 +375,7 @@ class Website(models.Model):
             shorts.append(lg_codes[0])
             uri = get_url_localized(router, code) if request.endpoint else request.httprequest.path
             if req.query_string:
-                uri += '?' + req.query_string
+                uri += u'?' + req.query_string.decode('utf-8')
             lang = {
                 'hreflang': ('-'.join(lg_codes)).lower(),
                 'short': lg_codes[0],
@@ -586,7 +582,7 @@ class Website(models.Model):
     def image_url(self, record, field, size=None):
         """ Returns a local url that points to the image field of a given browse record. """
         sudo_record = record.sudo()
-        sha = hashlib.sha1(getattr(sudo_record, '__last_update')).hexdigest()[0:7]
+        sha = hashlib.sha1(getattr(sudo_record, '__last_update').encode('utf-8')).hexdigest()[0:7]
         size = '' if size is None else '/%s' % size
         return '/web/image/%s/%s/%s%s?unique=%s' % (record._name, record.id, field, size, sha)
 
@@ -666,7 +662,7 @@ class Menu(models.Model):
             self.browse(to_delete).unlink()
         for menu in data['data']:
             mid = menu['id']
-            if isinstance(mid, basestring):
+            if isinstance(mid, pycompat.string_types):
                 new_menu = self.create({'name': menu['name']})
                 replace_id(mid, new_menu.id)
         for menu in data['data']:
