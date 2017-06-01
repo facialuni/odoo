@@ -567,7 +567,7 @@ var ListRenderer = BasicRenderer.extend({
      * @returns {jQueryElement}
      */
     _renderSelector: function (tag) {
-        var $content = dom.renderCheckbox();
+        var $content = dom.renderCheckbox({attr: {tabindex: "-1"}});
         return $('<' + tag + ' width="1">')
                     .addClass('o_list_record_selector')
                     .append($content);

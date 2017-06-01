@@ -243,6 +243,9 @@ return {
         if (options && options.prop) {
             $container.children('input').prop(options.prop);
         }
+        if (options && options.attr) {
+            $container.children('input').attr(options.prop);
+        }
         if (options && options.text) {
             $container = $('<label/>').append(
                 $container,
