@@ -808,4 +808,74 @@
             <field name="search_view_id" ref="view_hr_holidays_filter"/>
         </record>
 
+        <!-- Add entry action in the 'More' Menu for hr.holidays.info -->
+        <record id="hr_holidays_info_action_multi" model="ir.actions.act_window">
+            <field name="name">Approve/Refuse</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.holidays.info</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="hr_holidays_info_view_form"/>
+            <field name="target">new</field>
+            <field name="multi">True</field>
+        </record>
+
+        <record id="hr_holidays_client_action_multi"  model="ir.values">
+            <field name="model">hr.holidays</field>
+            <field name="model_id" ref="hr_holidays.model_hr_holidays" />
+            <field name="name">Approve/Refuse</field>
+            <field name="key">action</field>
+            <field name="key2">client_action_multi</field>
+            <field name="value" eval="'ir.actions.act_window,' + str(ref('hr_holidays_info_action_multi'))" />
+        </record>
+
+        <record id="hr_holiday_view_tree_allocation_to_approve" model="ir.ui.view">
+            <field name="name">hr.holidays.tree</field>
+            <field name="model">hr.holidays</field>
+            <field name="arch" type="xml">
+                <tree string="Allocation to Approve" editable="top">
+                    <field name="employee_id"/>
+                    <field name="holiday_type" invisible="1"/>
+                    <field name="department_id" invisible="1"/>
+                    <field name="holiday_status_id"/>
+                    <field name="name"/>
+                    <field name="number_of_days_temp"/>
+                    <field name="manager_id" invisible="1"/>
+                    <field name="user_id" invisible="1"/>
+                    <field name="message_needaction" invisible="1"/>
+                    <field name="state"/>
+                    <button string="Approve"
+                        name="action_approve"
+                        icon="fa-check text-success"
+                        type="object" attrs="{'invisible': [('state', 'not in', 'confirm')]}"/>
+                    <button string="Refuse"
+                        name="action_refuse"
+                        icon="fa-close text-danger"
+                        type="object" attrs="{'invisible': [('state', 'not in', ('confirm', 'validate', 'validate1'))]}"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="hr_holidays_action_allocation_to_approve" model="ir.actions.act_window">
+            <field name="name">Allocations to Approve</field>
+            <field name="res_model">hr.holidays</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="domain">[('state','not in',('draft', 'cancel', 'refuse'))]</field>
+            <field name="context">{'default_type':'add'}</field>
+            <field name="view_id" ref="hr_holiday_view_tree_allocation_to_approve"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click here to create a new leave request.
+                </p>
+            </field>
+        </record>
+
+        <menuitem
+            id="hr_holidays_menu_action_allocation_to_approve_"
+            name="Allocations to Approve"
+            parent="menu_hr_holidays_approvals"
+            groups="hr_holidays.group_hr_holidays_user"
+            action="hr_holidays_action_allocation_to_approve"
+            sequence="4"/>
 </odoo>

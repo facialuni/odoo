@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_holidays_info_view_form" model="ir.ui.view">
+        <field name="name">hr.holidays.info.form</field>
+        <field name="model">hr.holidays.info</field>
+        <field name="arch" type="xml">
+            <form>
+                <p>
+                    You can approve and refuse the holidays by clicking on Approve and Refuse button.
+                </p>
+                <footer>
+                    <button name="action_approve" string="Approve" type="object" class="btn-primary"/>
+                    <button name="action_refuse" string="Refuse" type="object"/>
+                    <button string="Cancel" class="btn-default" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
