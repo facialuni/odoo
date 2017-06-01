@@ -43,6 +43,10 @@ var ListController = BasicController.extend({
         this.editable = params.editable;
         this.noLeaf = params.noLeaf;
         this.selectedRecords = []; // there is no selected record by default
+        var searchView = this.getParent().searchview;
+        searchView.off('search_widget_down').on('search_widget_down', this, _.bind(function (event) {
+            this.renderer._keydownDownSelect(event);
+        }, this));
     },
 
     //--------------------------------------------------------------------------

@@ -622,26 +622,22 @@ var ListRenderer = BasicRenderer.extend({
             });
             $checked_rows.find('.o_list_record_selector input').prop('checked', true);
         }
-        var searchView = this.getParent().getParent().searchview;
-        if (searchView) {
-            searchView.off('search_widget_down').on('search_widget_down', this, function (event) {
-                self._keydownDownSelect(event);
-            });
-            this.$('.o_list_view').off('keydown').on('keydown', function (event) {
-                switch (event.which) {
-                    case $.ui.keyCode.DOWN:
-                        self._keydownDownSelect(event);
-                        break;
-                    case $.ui.keyCode.UP:
-                        self._keydownUpSelect(event);
-                        break;
-                    case $.ui.keyCode.ENTER:
-                        var id = self.selected_row.data('id');
-                        self.trigger_up('open_record', {id:id, target: self.selected_row});
-                        break;
-                }
-            });
-        }
+
+        // Bind key up/down to navigate on listview records
+        this.$('.o_list_view').off('keydown').on('keydown', function (event) {
+            switch (event.which) {
+                case $.ui.keyCode.DOWN:
+                    self._keydownDownSelect(event);
+                    break;
+                case $.ui.keyCode.UP:
+                    self._keydownUpSelect(event);
+                    break;
+                case $.ui.keyCode.ENTER:
+                    var id = self.selected_row.data('id');
+                    self.trigger_up('open_record', {id:id, target: self.selected_row});
+                    break;
+            }
+        });
         return this._super();
     },
     /**
@@ -671,23 +667,27 @@ var ListRenderer = BasicRenderer.extend({
      * @param {Object} direction Contain the selection direction('up'/'down')
      */
     _keyNavigation: function (event, direction) {
+        var self = this;
         if (this.state.count === 0) {
             return false;
         }
-        if ($(event.currentTarget).hasClass('o_searchview_input')) {
-            if (!this.$('.o_data_row input:first').prop('checked')) {
-                this.$('.o_data_row input:first').trigger('click');
-            }
+        var clearPreviousRows = function() {
+            _.each(self.$('tr.o_row_selected'), function (row) {
+                if ($(row).find('.o_list_record_selector input').prop('checked')) {
+                    $(row).find('.o_list_record_selector input').trigger('click');
+                    $(row).removeClass('o_row_selected');
+                }
+            });
+        };
+        if (!this.selected_row) {
+            // First remove all previous selected rows when down key pressed from search view
+            clearPreviousRows();
+            this.$('.o_data_row input:first').trigger('click');
             this.$('.o_data_row input:first').focus();
         } else {
             var $row = direction == 'down' ? this.selected_row.next() : this.selected_row.prev();
             if (!event.shiftKey && !event.ctrlKey) {
-                _.each(this.$('tr.o_row_selected'), function (row) {
-                    if ($(row).find('.o_list_record_selector input').prop('checked')) {
-                        $(row).find('.o_list_record_selector input').trigger('click');
-                        $(row).removeClass('o_row_selected');
-                    }
-                });
+                clearPreviousRows();
                 $row.find('.o_list_record_selector input').focus().trigger('click');
             } else if (event.shiftKey && !event.ctrlKey) {
                 $row.find('.o_list_record_selector input').focus().trigger('click');
@@ -759,6 +759,7 @@ var ListRenderer = BasicRenderer.extend({
     _onFocusLost: function (event) {
         var $previous_row = $(event.currentTarget).parent();
         $previous_row.removeClass('o_row_focused');
+        this.selected_row = null;
     },
     /**
      * @private
