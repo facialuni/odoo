@@ -600,6 +600,7 @@ var ListRenderer = BasicRenderer.extend({
         var $table = $('<table>').addClass('o_list_view table table-condensed table-striped');
         this.$el
             .addClass('table-responsive')
+            .attr('tabindex', '0');
             .append($table);
         var is_grouped = !!this.state.groupedBy.length;
         this._computeAggregates();
@@ -668,9 +669,11 @@ var ListRenderer = BasicRenderer.extend({
      */
     _keyNavigation: function (event, direction) {
         var self = this;
+        var $current_row = null;
         if (this.state.count === 0) {
             return false;
         }
+
         var clearPreviousRows = function() {
             _.each(self.$('tr.o_row_selected'), function (row) {
                 if ($(row).find('.o_list_record_selector input').prop('checked')) {
@@ -679,21 +682,33 @@ var ListRenderer = BasicRenderer.extend({
                 }
             });
         };
+
         if (!this.selected_row) {
             // First remove all previous selected rows when down key pressed from search view
             clearPreviousRows();
-            this.$('.o_data_row input:first').trigger('click');
-            this.$('.o_data_row input:first').focus();
+            $current_row = direction == 'down' ? this.$('.o_data_row:first') : this.$('.o_data_row:last');
         } else {
             var $row = direction == 'down' ? this.selected_row.next() : this.selected_row.prev();
+            if (!$row.length) {
+                return;
+            }
+            $current_row = $row;
+        }
+
+        if (this.hasSelectors) {
             if (!event.shiftKey && !event.ctrlKey) {
                 clearPreviousRows();
-                $row.find('.o_list_record_selector input').focus().trigger('click');
+                $current_row.find('.o_list_record_selector input').focus().trigger('click');
             } else if (event.shiftKey && !event.ctrlKey) {
-                $row.find('.o_list_record_selector input').focus().trigger('click');
+                $current_row.find('.o_list_record_selector input').focus().trigger('click');
             }  else if (event.ctrlKey && !event.shiftKey) {
-                $row.find('.o_list_record_selector input').focus();
+                $current_row.find('.o_list_record_selector input').focus();
             }
+        } else {
+            this.$(".o_list_view").focus(); // Set focus to listview table
+            _.each(this.$(".o_row_selected"), function(row) { $(row).removeClass("o_row_selected"); });
+            $current_row.addClass("o_row_selected");
+            this.selected_row = $current_row;
         }
     },
     /**
