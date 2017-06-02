@@ -1752,10 +1752,21 @@ var FieldMany2ManyCheckBoxes = AbstractField.extend({
         var direction = e.which == $.ui.keyCode.UP ? 'previous' : 'next';
         var $inputs = this.$("input");
         var index = $inputs.index(this.$("input:focus"));
-        if (this.$("input") && index == $inputs.length-1) {
-            $inputs.first().focus();
-        } else {
-            $inputs[index+1] && $inputs[index+1].focus();
+        switch (direction) {
+            case 'next':
+                if (index == $inputs.length-1) {
+                    $inputs.first().focus();
+                } else {
+                    $inputs[index+1].focus();
+                }
+                break;
+            case 'previous':
+                if (index === 0) {
+                    $inputs.last().focus();
+                } else {
+                    $inputs[index-1].focus();
+                }
+                break;
         }
     }
 });
