@@ -628,7 +628,7 @@ ListRenderer.include({
                 var column = this.columns[this.currentCol];
                 var result = this._getFirstWidget();
                 if (column.attrs.name === result.name) {
-                    this._unselectRow();
+                    this.unselectRow();
                     var parent = this.getParent();
                     parent.trigger_up('navigation_move', {direction: 'previous'});
                 } else if (this.currentCol > 0) {
@@ -642,7 +642,7 @@ ListRenderer.include({
                 var column = this.columns[this.currentCol];
                 var result = this._getFirstWidget();
                 if (column.attrs.name === result.name && !result.isSet()) {
-                    this._unselectRow();
+                    this.unselectRow();
                     var parent = this.getParent();
                     parent.trigger_up('navigation_move', {direction: 'next'});
                 } else if (this.currentCol + 1 < this.columns.length) {
@@ -665,7 +665,7 @@ ListRenderer.include({
     },
     _onCancelLine: function(ev) {
         ev.stopPropagation();
-        this._unselectRow();
+        this.unselectRow();
     },
     _getFirstWidget: function () {
         var row = this.state.data[this.currentRow];

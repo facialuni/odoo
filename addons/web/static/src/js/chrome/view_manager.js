@@ -491,6 +491,7 @@ var ViewManager = Widget.extend(ControlPanelMixin, {
         this.searchview = new SearchView(this, this.dataset, this.search_fields_view, options);
 
         return $.when(this.searchview.appendTo($("<div>"))).done(function() {
+            _.delay(function() { self.searchview.set_input_focus(); }, 100);
             self.searchview_elements = {};
             self.searchview_elements.$searchview = self.searchview.$el;
             self.searchview_elements.$searchview_buttons = self.searchview.$buttons.contents();

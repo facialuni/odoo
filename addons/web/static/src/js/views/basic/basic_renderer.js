@@ -431,7 +431,6 @@ var BasicRenderer = AbstractRenderer.extend({
      * @returns {Deferred}
      */
     _render: function () {
-        console.log("Inside _render :::: ");
         var oldAllFieldWidgets = this.allFieldWidgets;
         this.allFieldWidgets = {}; // TODO maybe merging allFieldWidgets and allModifiersData into "nodesData" in some way could be great
         this.allModifiersData = [];
@@ -627,7 +626,6 @@ var BasicRenderer = AbstractRenderer.extend({
      */
     _onNavigationMove: function (ev) {},
     _setLastTabindex: function(ev) {
-        console.log("Inside _setLastTabindex ::: ", ev.data.target);
         this.lastTabindex = this.tabindexWidgets[this.state.id].indexOf(ev.data.target);
     }
 });

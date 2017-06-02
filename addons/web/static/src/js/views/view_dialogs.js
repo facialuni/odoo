@@ -430,7 +430,7 @@ var SelectCreateDialog = ViewDialog.extend({
                 self.on_selected([record.res_id]);
             },
         })).open();
-        dialog.on('closed', this, this.close);
+        return dialog.on('closed', this, this.close);
     },
 });
 
