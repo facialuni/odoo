@@ -25,7 +25,7 @@ class KarmaError(Forbidden):
 class Forum(models.Model):
     _name = 'forum.forum'
     _description = 'Forum'
-    _inherit = ['mail.thread', 'website.seo.metadata']
+    _inherit = ['mail.thread', 'website.seo.metadata', 'website.published.mixin']
 
     @api.model_cr
     def init(self):

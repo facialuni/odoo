@@ -313,7 +313,7 @@ class WebsiteForum(http.Controller):
             return werkzeug.utils.redirect('/forum/%s' % slug(forum))
         if not user.email or not tools.single_email_re.match(user.email):
             return werkzeug.utils.redirect("/forum/%s/user/%s/edit?email_required=1" % (slug(forum), request.session.uid))
-        values = self._prepare_forum_values(forum=forum, searches={}, header={'ask_hide': True})
+        values = self._prepare_forum_values(forum=forum, searches={}, header={'ask_hide': not forum.active})
         return request.render("website_forum.new_%s" % post_type, values)
 
     @http.route(['/forum/<model("forum.forum"):forum>/new',

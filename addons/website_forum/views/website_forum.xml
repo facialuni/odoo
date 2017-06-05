@@ -49,9 +49,17 @@
 
 <!-- Page Index -->
 <template id="header" name="Forum Index">
-    <t t-call="website_forum.layout">
+    <t t-call="website_forum.layout" t-if="not header.get('ask_hide')">
         <div t-if="is_public_user and not forum_welcome_message" class="forum_intro">
             <div t-field="forum.welcome_message"/>
+        </div>
+
+        <div class="container mt16" groups="website.group_website_designer">
+            <t t-call="website.publish_management">
+                <t t-set="object" t-value="forum"/>
+                <t t-set="publish_edit" t-value="True"/>
+                <t t-set="action" t-value="'website_forum.action_forum_forum'"/>
+            </t>
         </div>
 
         <div class="container mt16 website_forum">
@@ -135,7 +143,7 @@
                     <t t-raw="0"/>
                 </div>
                 <div class="col-sm-3" id="right-column">
-                    <div t-if="not header.get('ask_hide')" t-attf-class="btn-group btn-block mb16 #{(user.karma &lt; forum.karma_ask) and not is_public_user and 'karma_required' or ''}" t-attf-data-karma="#{forum.karma_ask}">
+                    <div t-attf-class="btn-group btn-block mb16 #{(user.karma &lt; forum.karma_ask) and not is_public_user and 'karma_required' or ''}" t-attf-data-karma="#{forum.karma_ask}">
                         <t t-set="multi_type" t-value="(forum.allow_link and forum.allow_question) or (forum.allow_link and forum.allow_discussion) or (forum.allow_question and forum.allow_discussion)"/>
                         <a type="button"  t-attf-class="btn btn-primary btn-lg #{'col-sm-10' if multi_type else 'col-sm-12'}" t-attf-href="/forum/#{slug(forum)}/ask?post_type=#{forum.default_post_type}">
                             <t t-if="forum.default_post_type == 'question'">Ask a Question</t>
@@ -216,6 +224,20 @@
         </div>
         <div class="oe_structure"/>
     </t>
+    <t t-call="website_forum.layout" t-if="header.get('ask_hide')">
+        <t t-call="website_forum.403"/>
+    </t>
+</template>
+
+<template id="403">
+    <div class="text-center text-muted">
+        <p class="css_editable_hidden">
+            <h1>No forum post yet.</h1>
+        </p>
+        <p groups="website.group_website_designer">
+            Click <i>'New'</i> in the top-right corner to create your first forum.
+        </p>
+    </div>
 </template>
 
 <!-- Template use to edit the welcome_message -->
@@ -388,8 +410,10 @@
                         <div class="fa fa-5x fa-comment mb16"/>
                         <div t-field="forum.name"/>
                     </a>
+                    <span t-if="not forum.website_published" class="label label-danger">unpublished</span>
                 </div>
             </div>
+            <t t-if="not forums" t-call="website_forum.403"/>
         </div>
     </t>
 </template>
