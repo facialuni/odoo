@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
     <!-- Account Tags -->
     <record id="st_tag_in_01" model="account.account.tag">
         <field name="name">Tax to Pay</field>
