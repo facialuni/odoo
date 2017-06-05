@@ -495,7 +495,7 @@ var FieldMany2One = AbstractField.extend({
     /**
      * @private
      */
-    _onInputFocusout: function () {
+    _onInputFocusout: function (event) {
         if (this.can_create && this.floating) {
             new M2ODialog(this, this.string, this.$input.val()).open();
         }

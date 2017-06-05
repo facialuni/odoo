@@ -875,6 +875,14 @@ var FormRenderer = BasicRenderer.extend({
      */
     _onNavigationMove: function (ev) {
         ev.stopPropagation();
+        // If we are on last tabindex widget then set focus on first widget again
+        // note: If it is last field then set focus on save/edit buttons
+        var lastWidget = this.getLastWidget();
+        var lastFieldWidget = this.getLastFieldWidget();
+        if (_.isEqual(ev.data.target, lastWidget) && !_.isEqual(ev.data.target, lastFieldWidget)) {
+            return this._activateNextFieldWidget(this.state, 0);
+        }
+
         var index = this.tabindexWidgets[this.state.id].indexOf(ev.data.target);
         if (index == -1) {
             // Get widget based on last saved tabindex
@@ -883,7 +891,6 @@ var FormRenderer = BasicRenderer.extend({
         if (ev.data.direction === "next") {
             var recordWidgets = this.tabindexWidgets[this.state.id] || [];
             var nextWidget = this._getNextTabindexWidget(index+1, recordWidgets);
-            var lastFieldWidget = this.getLastFieldWidget();
             // Note: If user presses TAB on last field and next widget is button then first move user to Save button
             if (nextWidget instanceof ButtonWidget && lastFieldWidget && _.isEqual(ev.data.target, lastFieldWidget)) {
                 return this.trigger_up('focus_control_button');
@@ -924,6 +931,12 @@ var FormRenderer = BasicRenderer.extend({
             return !(w.$el.is(":hidden") || w.$el.hasClass("o_readonly_modifier")) && w.__node.tag != "button";
         }).value();
         return _(tabindexFields).last();
+    },
+    getLastWidget: function() {
+        var tabindexWidgets = _.chain(this.tabindexWidgets[this.state.id]).filter(function(w) {
+            return !(w.$el.is(":hidden") || w.$el.hasClass("o_readonly_modifier"));
+        }).value();
+        return _(tabindexWidgets).last();
     },
     getFirstButtonWidget: function() {
         var recordWidgets = this.tabindexWidgets[this.state.id] || [];

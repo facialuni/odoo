@@ -8,8 +8,8 @@ var _t = core._t;
 var qweb = core.qweb;
 
 var ButtonWidget = ViewWidget.extend({
-	template: 'WidgetButton',
-	/**
+    template: 'WidgetButton',
+    /**
      * Button Widget  class
      *
      * @constructor
@@ -19,13 +19,13 @@ var ButtonWidget = ViewWidget.extend({
      * @param {Object} [options]
      * @param {string} [options.mode=readonly] should be 'readonly' or 'edit'
      */
-	init: function (parent, node, record, options) {
-		this._super(parent);
+    init: function (parent, node, record, options) {
+        this._super(parent);
 
-		this.node = node;
-		this.__node = node // To get rid of this, added because we are finding first button based on this
+        this.node = node;
+        this.__node = node // To get rid of this, added because we are finding first button based on this
 
-		// the datapoint fetched from the model
+        // the datapoint fetched from the model
         this.record = record;
 
         this.string = this.node.attrs.string; // Should be on ViewWidget
@@ -33,43 +33,43 @@ var ButtonWidget = ViewWidget.extend({
         if (node.attrs.icon) {
             this.fa_icon = node.attrs.icon.indexOf('fa-') === 0;
         }
-	},
-	start: function() {
-		var self = this;
+    },
+    start: function() {
+        var self = this;
         this._super.apply(this, arguments);
         var enterPressed = false;
         this.$el.click(function (e) {
-			if (enterPressed) {
-				self.trigger_up('set_last_tabindex', {target: self});
+            if (enterPressed) {
+                self.trigger_up('set_last_tabindex', {target: self});
             }
             self.trigger_up('button_clicked', {
                 attrs: self.node.attrs,
                 record: self.record,
                 callback: function() {
-					self.trigger_up('navigation_move', {direction: 'next'});
+                    self.trigger_up('navigation_move', {direction: 'next'});
                 }
             });
         });
-		this.$el.on("keydown", function(e) {
-			// Note: For setting enterPressed variable which will be helpful to set next widget or not, if mouse is used then do not set next widget focus
-			e.stopPropagation();
-			if (e.which === $.ui.keyCode.ENTER) {
-				enterPressed = true;
-			}
-		});
+        this.$el.on("keydown", function(e) {
+            // Note: For setting enterPressed variable which will be helpful to set next widget or not, if mouse is used then do not set next widget focus
+            e.stopPropagation();
+            if (e.which === $.ui.keyCode.ENTER) {
+                enterPressed = true;
+            }
+        });
         // TODO: To implement
         // if (this.node.attrs.help || core.debug) {
         //     this._addTooltip();
         // }
         this._addOnFocusAction();
     },
-	/**
-	 * @override
-	 * @returns {jQuery} the focusable checkbox input
-	 */
-	getFocusableElement: function() {
-		return this.$el || $();
-	},
+    /**
+     * @override
+     * @returns {jQuery} the focusable checkbox input
+     */
+    getFocusableElement: function() {
+        return this.$el || $();
+    },
 
     _getFocusTip: function(node) {
         var show_focus_tip = function() {
@@ -92,7 +92,7 @@ var ButtonWidget = ViewWidget.extend({
         this.$el.tooltip(options);
     },
     _addTooltip: function(widget, $node) {
-    	var self = this;
+        var self = this;
         this.$el.tooltip({
             delay: { show: 1000, hide: 0 },
             title: function () {
@@ -119,7 +119,7 @@ var ButtonWidget = ViewWidget.extend({
                 });
                 break;
             case $.ui.keyCode.ENTER:
-				// Do nothing, as we bind Enter key explicitly
+                // Do nothing, as we bind Enter key explicitly
                 break;
             case $.ui.keyCode.UP:
                 ev.stopPropagation();
@@ -143,7 +143,7 @@ var ButtonWidget = ViewWidget.extend({
         }
     },
     getFocusableElement: function() {
-		return this.$el;
+        return this.$el;
     }
 });
 
