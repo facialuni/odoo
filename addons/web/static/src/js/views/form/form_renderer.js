@@ -21,6 +21,12 @@ var FormRenderer = BasicRenderer.extend({
     init: function (parent, state, params) {
         this._super.apply(this, arguments);
         this.idsForLabels = {};
+        core.bus.on('dialog_closed', this, function() {
+            // Hacky Fix: Note: This is going to be bind on each formview, this will create issue when dialog is closed, it will be trigerred for all formviews
+            if (this.$el.is(":visible")) {
+                this.trigger_up('navigation_move', {direction: 'current'});
+            }
+        });
     },
 
     //--------------------------------------------------------------------------
@@ -880,7 +886,11 @@ var FormRenderer = BasicRenderer.extend({
         var lastWidget = this.getLastWidget();
         var lastFieldWidget = this.getLastFieldWidget();
         if (_.isEqual(ev.data.target, lastWidget) && !_.isEqual(ev.data.target, lastFieldWidget)) {
-            return this._activateNextFieldWidget(this.state, 0);
+            if (this.mode != "readonly") {
+                return this._activateNextFieldWidget(this.state, 0);
+            } else {
+                return this.trigger_up('focus_control_button');
+            }
         }
 
         var index = this.tabindexWidgets[this.state.id].indexOf(ev.data.target);
@@ -902,6 +912,8 @@ var FormRenderer = BasicRenderer.extend({
             }
         } else if (ev.data.direction === "previous") {
             this._activatePreviousFieldWidget(this.state, index);
+        } else if (ev.data.direction === "current") {
+            this._activateFieldWidget(this.state, index, {inc: 1});
         }
     },
     /**
@@ -944,9 +956,9 @@ var FormRenderer = BasicRenderer.extend({
             // FIXME: widget.__node, we may remove __node in future
             return widget.__node.tag === 'button'
                 && (widget.__node.attrs.class.indexOf('oe_highlight') != -1
-                || widget.__node.attrs.class.indexOf('btn-primary') != -1
+                || widget.__node.attrs.class.indexOf('btn-primary') != -1)
                 && widget.$el.is(':visible')
-                && !widget.$el.hasClass("o_readonly_modifier"));
+                && !widget.$el.hasClass("o_readonly_modifier");
         });
         return firstButtonWidget;
     },

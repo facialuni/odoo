@@ -223,9 +223,10 @@ var BasicController = AbstractController.extend(FieldManagerMixin, {
      * @private
      * @param {Object} attrs the attrs of the button clicked
      * @param {Object} [record] the current state of the view
+     * @param {Function} callback to execute when button action is performed
      * @returns {Deferred}
      */
-    _callButtonAction: function (attrs, record) {
+    _callButtonAction: function (attrs, record, callback) {
         var self = this;
         var def = $.Deferred();
         var reload = function () {
@@ -245,7 +246,11 @@ var BasicController = AbstractController.extend(FieldManagerMixin, {
             },
             on_closed: function (reason) {
                 if (!_.isObject(reason)) {
-                    reload(reason);
+                    reload(reason).then(function() {
+                        if (callback) {
+                            callback.call();
+                        }
+                    });
                 }
             },
             on_fail: function (reason) {

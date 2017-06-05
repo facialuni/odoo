@@ -433,13 +433,13 @@ var FormController = BasicController.extend({
         if (attrs.confirm) {
             var d = $.Deferred();
             Dialog.confirm(this, attrs.confirm, { confirm_callback: function () {
-                self._callButtonAction(attrs, event.data.record);
+                self._callButtonAction(attrs, event.data.record, event.data.callback);
             }}).on("closed", null, function () {
                 d.resolve();
             });
             def = d.promise();
         } else if (attrs.special === 'cancel') {
-            def = this._callButtonAction(attrs, event.data.record);
+            def = this._callButtonAction(attrs, event.data.record, event.data.callback);
         } else if (!attrs.special || attrs.special === 'save') {
             // save the record but don't switch to readonly mode
             def = this.saveRecord(this.handle, {
@@ -449,7 +449,7 @@ var FormController = BasicController.extend({
                 // by the basic model, such as the new res_id, if the record is
                 // new.
                 var record = self.model.get(event.data.record.id);
-                return self._callButtonAction(attrs, record);
+                return self._callButtonAction(attrs, record, event.data.callback);
             });
         }
 
