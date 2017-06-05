@@ -626,6 +626,7 @@ var FormController = BasicController.extend({
         this.renderer.confirmChange(state, state.id, [field]);
     },
     _focusControlButton: function(event) {
+        event.stopPropagation();
         if (this.mode != "readonly" && this.$buttons && this.$buttons.find(".o_form_button_save").length) {
             return this.$buttons.find(".o_form_button_save").focus();
         } else if (this.mode == "readonly" && this.$buttons && this.$buttons.find(".o_form_button_edit")) {

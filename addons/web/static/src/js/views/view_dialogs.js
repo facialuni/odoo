@@ -119,17 +119,6 @@ var FormViewDialog = ViewDialog.extend({
                         });
                     }
                 },
-                // Note: Add support for keydown TAB and set next tabindex widget on Save button
-                keydown: function(e) {
-                    if (e.which == $.ui.keyCode.TAB) {
-                        var is_shiftkey = e.shiftKey ? true : false;
-                        if (!is_shiftkey) {
-                            // TODO: Test this code, goto save button and press shift + tab, it should moved to last widget
-                            var is_shiftkey = e.shiftKey ? true : false;
-                            self.form_view.renderer.setFirstButtonFocus({focus_first_button: !is_shiftkey, reverse: is_shiftkey, keep_focus_on_current: is_shiftkey});
-                        }
-                    }
-                }
             }];
 
             if (!readonly) {
@@ -138,21 +127,23 @@ var FormViewDialog = ViewDialog.extend({
                     classes: "btn-primary o_form_button_save",
                     click: function () {
                         this._save().then(self.close.bind(self));
-                    }
+                    },
                 });
 
                 if (multi_select) {
                     options.buttons.splice(1, 0, {
                         text: _t("Save & New"),
-                        classes: "btn-primary o_form_button_save",
+                        classes: "btn-primary",
                         click: function () {
                             this._save().then(self.form_view.createRecord.bind(self.form_view, self.parentID));
                         },
+                        // Note: Add support for keydown TAB and set next tabindex widget on Save button
                         keydown: function(e) {
                             if (e.which == $.ui.keyCode.TAB) {
-                                // TODO: Test this code, goto save button and press shift + tab, it should moved to last widget
                                 var is_shiftkey = e.shiftKey ? true : false;
-                                self.form_view.renderer.setFirstButtonFocus({focus_first_button: !is_shiftkey, reverse: is_shiftkey, keep_focus_on_current: is_shiftkey});
+                                if (!is_shiftkey) {
+                                    self.form_view.renderer.setFirstButtonFocus();
+                                }
                             }
                         }
                     });
@@ -216,6 +207,7 @@ var FormViewDialog = ViewDialog.extend({
                         if ($buttons.children().length) {
                             self.$footer.empty().append($buttons.contents());
                         }
+                        self.form_view.$buttons = self.$footer; // Set form buttons else form_view.$buttons will be undefined
                         dom.append(self.$el, fragment, {
                             callbacks: [{widget: self.form_view}],
                             in_DOM: true,

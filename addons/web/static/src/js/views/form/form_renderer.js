@@ -888,7 +888,7 @@ var FormRenderer = BasicRenderer.extend({
             if (nextWidget instanceof ButtonWidget && lastFieldWidget && _.isEqual(ev.data.target, lastFieldWidget)) {
                 return this.trigger_up('focus_control_button');
             }
-            if (nextWidget) { // && this.mode !== 'readonly' //Do not add this condition, it will not work with buttons
+            if (nextWidget) {
                 return this._activateNextFieldWidget(this.state, index);
             } else {
                 return this.trigger_up('focus_control_button');
@@ -918,6 +918,7 @@ var FormRenderer = BasicRenderer.extend({
             }
         }
     },
+    // TODO: Move to public method section, if it is going to remain public
     getLastFieldWidget: function() {
         var tabindexFields = _.chain(this.tabindexWidgets[this.state.id]).filter(function(w) {
             return !(w.$el.is(":hidden") || w.$el.hasClass("o_readonly_modifier")) && w.__node.tag != "button";
@@ -925,7 +926,6 @@ var FormRenderer = BasicRenderer.extend({
         return _(tabindexFields).last();
     },
     getFirstButtonWidget: function() {
-        // TODO: Move to public method section, if it is going to remain public
         var recordWidgets = this.tabindexWidgets[this.state.id] || [];
         var firstButtonWidget = _.find(recordWidgets, function(widget) {
             // FIXME: widget.__node, we may remove __node in future
@@ -938,12 +938,13 @@ var FormRenderer = BasicRenderer.extend({
         return firstButtonWidget;
     },
     setFirstButtonFocus: function() {
-        // TODO: Move to public method section, if it is going to remain public
-        // TODO: Move focus to first button, if there is not button then next widget if it is in edit mode else on edit button
         var firstButtonWidget = this.getFirstButtonWidget();
         if (firstButtonWidget) {
-            firstButtonWidget.activate();
+            return firstButtonWidget.activate();
+        } else if (this.mode != "readonly") {
+            return this._activateNextFieldWidget(this.state, 0);
         }
+        return false;
     }
 });
 
