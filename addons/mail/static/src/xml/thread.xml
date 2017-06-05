@@ -237,7 +237,7 @@
             <a t-att-href='attachment.url' target="_blank"><span class='o_attachment_name'><t t-esc='attachment.name'/></span></a>
             <div class="o_attachment_overlay">
                 <a class="o_attachment_download" t-att-href='attachment.url' target="_blank">
-                    <i class="fa fa-2x fa-arrow-circle-o-down" title="Downlad this attachment" aria-hidden="true"></i>
+                    <i class="fa fa-2x fa-arrow-circle-o-down" title="Download this attachment" aria-hidden="true"></i>
                 </a>
                 <a t-if="type == 'image' || type == 'video'" class="o_attachment_view" href="#" t-att-data-id="attachment.id">
                     <i class="fa fa-2x fa-search-plus"  title="View this attachment" aria-hidden="true"></i>

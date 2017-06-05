@@ -555,26 +555,21 @@ QUnit.test('chatter: Attachement viewer', function (assert) {
     });
     assert.strictEqual(form.$('.o_thread_message .o_attachment').length, 3,
         "there should be three attachment on message");
+    assert.strictEqual(form.$('.o_thread_message .o_attachment .o_attachment_overlay .o_attachment_download').attr('href'), '/web/content/1?download=true',
+        "Modal popup should have correct download link");
     // click on first image attachement
-    form.$('.o_thread_message .o_attachment img').first().click();
-    // wait for modal transition finish, it should be open with first image
-    return concurrency.delay(200).then(function () {
-        assert.strictEqual($('.modal.o_attachment_carousel .item.active img').attr('src'), '/web/image/1',
-            "Modal popup should open with first image src");
-        assert.strictEqual($('.modal .o_attachment_download a').attr('href'), '/web/content/1?download=true',
-            "Modal popup should correct download link");
-        // remove slide class for stop animation and every next get currect url without waiting for animation
-        $('.modal .carousel').removeClass('slide');
-        //  click on next carousel control
-        $('.modal .carousel-control.right').click();
-        assert.strictEqual($('.modal.o_attachment_carousel .item.active img').attr('src'), '/web/image/2',
-            "Modal popup shoud have now second image src");
-        assert.strictEqual($('.modal .o_attachment_download a').attr('href'), '/web/content/2?download=true',
-            "Modal popup should correct download link");
-        // close attachment carousel
-        $('.modal .close').click();
-        form.destroy();
-    });
+    form.$('.o_thread_message .o_attachment .o_attachment_overlay .o_attachment_view').first().click();
+    assert.strictEqual($('.o_attachment img').attr('src'), '#test:/web/image/1/?unique=1',
+        "Modal popup should open with first image src");
+    //  click on next button
+    $('.modal .arrow.arrow-right.move_next span').click();
+    assert.strictEqual($('.modal .o_viewer_img_wrapper img').attr('src'), '#test:/web/image/2?unique=1',
+        "Modal popup should have now second image src");
+    assert.strictEqual($('.modal .o_viewer-header .o_header_buttons .o_download_btn').length, 1,
+        "Modal popup should have download button");
+    // close attachment popup
+    $('.modal .o_viewer-header .o_header_buttons .o_close_btn').click();
+    form.destroy();
 });
 
 QUnit.test('form activity widget: schedule next activity', function (assert) {
