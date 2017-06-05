@@ -47,7 +47,10 @@
                 </ul>
             </div>
             <div class="o_viewer_img_wrapper">
-                <img t-if="widget.active_attachment.type == 'image'" class="o_viewer_img"  t-attf-src="/web/image/#{widget.active_attachment.id}?unique=1"/>
+                <div t-if="widget.active_attachment.type == 'image'" class="o_loading_img">
+                    <i class="fa fa-spinner fa-spin fa-3x fa-fw" aria-hidden="true"/>
+                </div>
+                <img t-if="widget.active_attachment.type == 'image'" class="o_viewer_img" t-attf-src="/web/image/#{widget.active_attachment.id}?unique=1"/>
                 <video t-if="widget.active_attachment.type == 'video'" class="o_viewer_video" controls="controls">
                     <source t-attf-src="/web/image/#{widget.active_attachment.id}" t-att-data-type="widget.active_attachment.mimetype"/>
                 </video>

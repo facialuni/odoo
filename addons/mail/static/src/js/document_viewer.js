@@ -35,6 +35,7 @@ odoo.define('mail.DocumentViewer', function(require) {
             this.$('.o_viewer_content').html(QWeb.render('DocumentViewer.Content', {
                 widget: this
             }));
+            this.$('.o_viewer_img').load(_.bind(this._onImageLoaded, this));
             this.scale = 1;
         },
         on_attachment_popup: function(attachment_id) {
@@ -44,6 +45,7 @@ odoo.define('mail.DocumentViewer', function(require) {
             this.renderElement();
             this.$el.modal('show');
             this.$el.on('hidden.bs.modal', _.bind(this._onDestroy, this));
+            this.$('.o_viewer_img').load(_.bind(this._onImageLoaded, this));
         },
         _onClose: function(e) {
             e.preventDefault();
@@ -52,6 +54,9 @@ odoo.define('mail.DocumentViewer', function(require) {
         _onDownload: function(e) {
             e.preventDefault();
             window.location = '/web/content/' + this.active_attachment.id + '?download=true';
+        },
+        _onImageLoaded: function(ev){
+            this.$('.o_loading_img').hide();
         },
         _onImageClick: function(e) {
             e.stopPropagation();
