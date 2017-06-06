@@ -17,7 +17,7 @@ ReconciliationRenderer.LineRenderer.include({
      */
     update: function (state) {
         this._super(state);
-        this.$('caption .o_buttons button.o_reconcile_so').toggleClass('hidden', state.balance.amount <= 0 || state.balance.type > 0);
+        this.$('caption .o_buttons button.o_reconcile_so').toggleClass('hidden', state.balance.amount <= 0 || state.balance.type > 0 || !state.order_ids.length);
         this.$('.o_reconciliation_blockui').toggleClass('hidden', !state.blockUI);
     },
 
@@ -43,7 +43,7 @@ ReconciliationRenderer.ManualLineRenderer.include({
      */
     update: function (state) {
         this._super(state);
-        this.$('caption .o_buttons button.o_reconcile_so').toggleClass('hidden', state.balance.amount <= 0 || _.filter(state.reconciliation_proposition, {'display': true}).length !== 1 || state.balance.type > 0);
+        this.$('caption .o_buttons button.o_reconcile_so').toggleClass('hidden', state.balance.amount <= 0 || state.balance.type > 0 || !state.order_ids.length || _.filter(state.reconciliation_proposition, {'display': true}).length !== 1);
     },
 });
 

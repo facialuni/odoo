@@ -202,6 +202,23 @@ ReconciliationClientAction.StatementAction.include({
                 }).then(function () {
                     line.blockUI = false;
                     self._getWidget(handle).update(line);
+                }).then(function () {
+                    var order_ids = _.uniq(_.flatten(_.pluck(self.model.lines, 'order_ids')));
+                    self._rpc({
+                        model: 'sale.order',
+                        method: 'search',
+                        args: [[['id', 'in', order_ids], ['invoice_status', '!=', 'invoiced']]],
+                    }).then(function (ids) {
+                        _.each(self.model.lines, function (line, handle) {
+                            if (line.order_ids.length) {
+                                return;
+                            }
+                            line.order_ids = _.intersection(line.order_ids, ids);
+                            if (!line.order_ids.length) {
+                                self._getWidget(handle).update(line);
+                            }
+                        });
+                    });
                 });
         });
     },

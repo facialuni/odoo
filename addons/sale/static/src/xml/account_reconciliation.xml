@@ -13,7 +13,7 @@
         </div>
     </t>
     <t t-jquery=".o_buttons" t-operation="prepend">
-        <button t-attf-class="o_reconcile_so btn btn-default btn-sm {{state.balance.amount &lt;= 0 || state.balance.type &gt; 0 ? 'hidden' : ''}}">Reconcile with a sale order</button>
+        <button t-attf-class="o_reconcile_so btn btn-default btn-sm {{state.balance.amount &lt;= 0 || state.balance.type &gt; 0 || !state.order_ids.length ? 'hidden' : ''}}">Reconcile with a sale order</button>
     </t>
 </t>
 <t t-extend="reconciliation.manual.line">
@@ -27,7 +27,7 @@
         </div>
     </t>
     <t t-jquery=".o_buttons" t-operation="prepend">
-        <button t-attf-class="o_reconcile_so btn btn-default btn-sm {{state.balance.amount &lt;= 0 || _.filter(state.reconciliation_proposition, {'display': true}).length !== 1 || state.balance.type &gt; 0 ? 'hidden' : ''}}">Reconcile with a sale order</button>
+        <button t-attf-class="o_reconcile_so btn btn-default btn-sm {{state.balance.amount &lt;= 0 || _.filter(state.reconciliation_proposition, {'display': true}).length !== 1 || state.balance.type &gt; 0 || !state.order_ids.length ? 'hidden' : ''}}">Reconcile with a sale order</button>
     </t>
 </t>
 
