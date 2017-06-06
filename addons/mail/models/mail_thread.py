@@ -255,6 +255,9 @@ class MailThread(models.AbstractModel):
 
     @api.multi
     def write(self, values):
+        if not self:
+            return True
+
         if self._context.get('tracking_disable'):
             return super(MailThread, self).write(values)
 
