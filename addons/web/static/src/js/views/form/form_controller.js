@@ -546,10 +546,7 @@ var FormController = BasicController.extend({
             title: (record ? _t("Open: ") : _t("Create ")) + (event.target.string || data.field.string),
         }).open();
         FormViewDialog.on('closed', this, function(e) {
-            console.log("data.field ::: ", data, data.field);
-            _.delay(function () {
-                data.widget.$el.focus();
-            }, 100);
+            _.delay(function () { data.widget.$el.focus(); }, 100);
         });
     },
     /**

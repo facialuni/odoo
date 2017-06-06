@@ -1165,7 +1165,7 @@ var FieldMany2Many = FieldX2Many.extend({
 
         var domain = this.record.getDomain({fieldName: this.name});
 
-        new dialogs.SelectCreateDialog(this, {
+        var selectCreateDialog = new dialogs.SelectCreateDialog(this, {
             res_model: this.field.relation,
             domain: domain.concat(["!", ["id", "in", this.value.res_ids]]),
             context: this.record.getContext(this.recordParams),
@@ -1185,6 +1185,9 @@ var FieldMany2Many = FieldX2Many.extend({
                 }
             }
         }).open();
+        selectCreateDialog.on('closed', this, function(e) {
+            _.delay(function() { self.$el.focus(); }, 100);
+        });
     },
     /**
      * Intercepts the 'open_record' event to edit its data and lets it bubble up

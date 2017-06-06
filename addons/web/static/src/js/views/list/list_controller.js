@@ -7,6 +7,7 @@ odoo.define('web.ListController', function (require) {
  * and bind all extra buttons/pager in the control panel.
  */
 
+var Framework = require('web.framework');
 var core = require('web.core');
 var BasicController = require('web.BasicController');
 var DataExport = require('web.DataExport');
@@ -107,9 +108,22 @@ var ListController = BasicController.extend({
      * @param {jQuery} $node
      */
     renderButtons: function ($node) {
+        var self = this;
         if (!this.noLeaf && this.hasButtons) {
             this.$buttons = $(qweb.render('ListView.buttons', {widget: this}));
-            this.$buttons.on('click', '.o_list_button_add', this._onCreateRecord.bind(this));
+            this.$buttons.find('.o_list_button_add')
+            .on('click', this._onCreateRecord.bind(this))
+            .on('focus', function(e) {
+                Framework.showFocusTip({attachTo: this, message: _t("Press ENTER to Create")})
+            })
+            .on('keydown', function(event) {
+                if (event.which === $.ui.keyCode.ENTER) {
+                    $(this).tooltip('hide'); //forcefully hide tooltip as firefox doesn't hide it when element get hidden
+                } else if (event.which == $.ui.keyCode.ESCAPE) {
+                    $(this).tooltip('hide');
+                    self.history_back();
+                }
+            });
             this.$buttons.on('click', '.o_list_button_discard', this._onDiscard.bind(this));
             this.$buttons.appendTo($node);
         }
@@ -155,6 +169,9 @@ var ListController = BasicController.extend({
 
             this._toggleSidebar();
         }
+    },
+    history_back: function() {
+        this.trigger_up('history_back');
     },
 
     //--------------------------------------------------------------------------

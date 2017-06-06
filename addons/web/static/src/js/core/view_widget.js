@@ -127,10 +127,6 @@ var ViewWidget = Widget.extend({
                 this.trigger_up('navigation_move', {direction: 'left'});
                 break;
         }
-        // TODO: We having direction cancel now, do we need explicity handling of escape key?
-        if (event.which === $.ui.keyCode.ESCAPE) {
-            this.trigger_up('discard_record');
-        }
     },
     /**
      * Updates the target data value with the current AbstractField instance.

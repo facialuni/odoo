@@ -45,8 +45,8 @@ var ButtonWidget = ViewWidget.extend({
             self.trigger_up('button_clicked', {
                 attrs: self.node.attrs,
                 record: self.record,
-                callback: function() {
-                    self.trigger_up('navigation_move', {direction: 'next'});
+                callback: function(direction) {
+                    self.trigger_up('navigation_move', {direction: direction || 'next'});
                 }
             });
         });
@@ -121,6 +121,9 @@ var ButtonWidget = ViewWidget.extend({
             case $.ui.keyCode.ENTER:
                 // Do nothing, as we bind Enter key explicitly
                 break;
+            case $.ui.keyCode.ESCAPE:
+                this.do_action('history_back');
+                break;
             case $.ui.keyCode.UP:
                 ev.stopPropagation();
                 this.trigger_up('navigation_move', {direction: 'up'});
@@ -137,9 +140,6 @@ var ButtonWidget = ViewWidget.extend({
                 ev.stopPropagation();
                 this.trigger_up('navigation_move', {direction: 'left'});
                 break;
-        }
-        if (event.which === $.ui.keyCode.ESCAPE) {
-            this.trigger_up('discard_record');
         }
     },
     getFocusableElement: function() {
