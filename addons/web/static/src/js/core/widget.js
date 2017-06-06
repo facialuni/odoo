@@ -306,7 +306,6 @@ var Widget = core.Class.extend(mixins.PropertiesMixin, ServicesMixin, {
             var selector = match[3];
 
             event += '.widget_events';
-            console.log('selector', selector);
             if (!selector) {
                 this.$el.on(event, method);
             } else {
