@@ -34,12 +34,7 @@ This module manages:
         'security/account_voucher_security.xml',
         'data/account_voucher_data.xml',
     ],
-    'test' : [
-        'test/account_voucher_users.yml',
-        'test/account_voucher_chart.yml',
-        'test/account_voucher.yml',
-        'test/sales_receipt.yml',
-    ],
+    'test': [],
     'auto_install': False,
     'installable': True,
 }
