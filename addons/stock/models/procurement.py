@@ -158,7 +158,7 @@ class ProcurementOrder(models.Model):
             'product_id': self.product_id.id,
             'product_uom': self.product_uom.id,
             'product_uom_qty': qty_left,
-            'partner_id': self.rule_id.partner_address_id.id or (self.group_id and self.group_id.partner_id.id) or False,
+            'partner_id': self.partner_dest_id.id or self.rule_id.partner_address_id.id or (self.group_id and self.group_id.partner_id.id) or False,
             'location_id': self.rule_id.location_src_id.id,
             'location_dest_id': self.location_id.id,
             'move_dest_ids': self.move_dest_id and [(4, self.move_dest_id.id)] or False,
