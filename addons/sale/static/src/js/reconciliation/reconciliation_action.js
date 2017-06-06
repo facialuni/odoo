@@ -143,7 +143,7 @@ ReconciliationClientAction.StatementAction.include({
                             var def = $.Deferred();
                             var amount = fieldUtils.format.monetary(order.amount_total, {}, {currency_id: order.currency_id[0]});
                             var dialog = new Dialog.FormViewDialog(self, {
-                                title: _.str.sprintf(core._t('Invoice Order: %s (%s) to be reconciled with: %s (%s)'), order.client_order_ref || order.name, amount, record.ref || record.name, record.amount_str),
+                                title: _.str.sprintf(core._t('Invoice Orders: %s (%s) to be reconciled with: %s (%s)'), order.client_order_ref || order.name, amount, record.ref || record.name, record.amount_str),
                                 type: 'ir.actions.act_window',
                                 res_model: 'sale.advance.payment.inv',
                                 view_type: 'form',
