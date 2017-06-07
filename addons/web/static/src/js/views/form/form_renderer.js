@@ -914,7 +914,11 @@ var FormRenderer = BasicRenderer.extend({
         } else if (ev.data.direction === "current") {
             this._activateWidget(this.state, index, {inc: 1});
         } else if (ev.data.direction === "cancel") {
-            this.trigger_up('discard_changes');
+            this.trigger_up('discard_changes', {
+                onSuccess: _.bind(function() {
+                    this.trigger_up('focus_control_button');
+                }, this)
+            });
         }
     },
     /**

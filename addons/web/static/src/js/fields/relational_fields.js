@@ -995,7 +995,7 @@ var FieldX2Many = AbstractField.extend({
     },
     _onNavigationMove: function(ev) {
         if (ev.data.direction === 'cancel') {
-            ev.stopPropagation(); // do nothing
+            ev.stopPropagation();
         }
         return this._super.apply(this, arguments);
     },
@@ -1756,9 +1756,11 @@ var FieldMany2ManyCheckBoxes = AbstractField.extend({
         var $inputs = this.$("input");
         if ($inputs) {
             $inputs.filter(":checked").length ? $inputs.filter(":checked").first().focus() : $inputs.first().focus();
+            return true;
+        } else {
+            return false
         }
     },
-    // TODO: To test
     selectCheckbox: function(e) {
         e.preventDefault();
         var direction = e.which == $.ui.keyCode.UP ? 'previous' : 'next';
@@ -1766,18 +1768,10 @@ var FieldMany2ManyCheckBoxes = AbstractField.extend({
         var index = $inputs.index(this.$("input:focus"));
         switch (direction) {
             case 'next':
-                if (index == $inputs.length-1) {
-                    $inputs.first().focus();
-                } else {
-                    $inputs[index+1].focus();
-                }
+                index == $inputs.length-1 ? $inputs.first().focus() : $inputs[index+1].focus();
                 break;
             case 'previous':
-                if (index === 0) {
-                    $inputs.last().focus();
-                } else {
-                    $inputs[index-1].focus();
-                }
+                index === 0 ? $inputs.last().focus() : $inputs[index-1].focus();
                 break;
         }
     }

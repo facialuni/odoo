@@ -634,8 +634,10 @@ var ListRenderer = BasicRenderer.extend({
                     self._keydownUpSelect(event);
                     break;
                 case $.ui.keyCode.ENTER:
-                    var id = self.selected_row.data('id');
-                    self.trigger_up('open_record', {id:id, target: self.selected_row});
+                    var id = self.selected_row && self.selected_row.data('id');
+                    if (id) {
+                        self.trigger_up('open_record', {id:id, target: self.selected_row});
+                    }
                     break;
             }
         });

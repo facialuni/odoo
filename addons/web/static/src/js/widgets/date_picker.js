@@ -60,6 +60,9 @@ var DateWidget = Widget.extend({
             if (e.which == $.ui.keyCode.DOWN && !self.$el.find(".bootstrap-datetimepicker-widget.dropdown-menu").length) {
                 self.picker.toggle.bind(self.picker);
             }
+            if (e.which === $.ui.keyCode.ENTER) {
+                _.delay(function() { self.$input.focus()}, 100);
+            }
         });
         this._setReadonly(false);
     },
