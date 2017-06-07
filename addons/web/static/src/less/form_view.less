@@ -656,8 +656,18 @@ label.o_light_label, .o_light_label label {
 @media (max-width: @screen-xs-max) {
     .o_form_view {
         .o_notebook {
-            .nav-tabs {
+            position: relative;
+            padding-top:30px;
+            ul.nav-tabs {
+                min-width: 100%;
+                max-width:  calc(~"100% + "@odoo-horizontal-padding);
+                position: absolute;
+                z-index:1;
+                top: 0;
                 overflow-x : auto;
+                &::-webkit-scrollbar {
+                    display: none;
+                }
                 li {
                     display: table-cell;
                     float : none;
@@ -667,7 +677,7 @@ label.o_light_label, .o_light_label label {
         }
         .o_cp_buttons {
             width: 100%;
-            div, .o-kanban-button-new{
+            div, .o-kanban-button-new {
                 width: 100%;
             }
         }
