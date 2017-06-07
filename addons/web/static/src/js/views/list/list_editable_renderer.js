@@ -641,7 +641,7 @@ ListRenderer.include({
             case 'next':
                 var column = this.columns[this.currentCol];
                 var result = this._getFirstWidget();
-                if (column.attrs.name === result.name && !ev.target.$el.find('input').val()) {
+                if (column.attrs.name === result.name && result.isBlank()) {
                     this.unselectRow();
                     var parent = this.getParent();
                     parent.trigger_up('navigation_move', {direction: 'next'});
