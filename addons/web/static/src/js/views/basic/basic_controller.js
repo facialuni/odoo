@@ -67,6 +67,7 @@ var BasicController = AbstractController.extend(FieldManagerMixin, {
      *          rejected otherwise
      */
     canBeDiscarded: function (recordID) {
+        console.log("ev ::::::::: ");
         if (!this.model.isDirty(recordID || this.handle)) {
             return $.when(false);
         }
@@ -79,9 +80,11 @@ var BasicController = AbstractController.extend(FieldManagerMixin, {
             cancel_callback: def.reject.bind(def),
         });
         dialog.on('closed', def, function() {
+            console.log("Before dialog closed :::: ");
             core.bus.trigger("dialog_closed");
             def.reject();
         });
+        // dialog.on('closed', def, def.reject);
         return def;
     },
     /**
@@ -512,6 +515,7 @@ var BasicController = AbstractController.extend(FieldManagerMixin, {
      * @param {OdooEvent} ev
      */
     _onDiscardChanges: function (ev) {
+        console.log("evvvvvvvvvvvvvv ", ev);
         var self = this;
         ev.stopPropagation();
         var recordID = ev.data.recordID;

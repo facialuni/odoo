@@ -20,7 +20,7 @@ var _t = core._t;
 ListRenderer.include({
     custom_events: _.extend({}, ListRenderer.prototype.custom_events, {
         navigation_move: '_onNavigationMove',
-        discard_record: '_onCancelLine' // TODO: Convert it in to _onNavigationMove direction
+        discard_changes: '_onDiscardChanges',
     }),
     events: _.extend({}, ListRenderer.prototype.events, {
         'click tbody td.o_data_cell': '_onCellClick',
@@ -663,8 +663,8 @@ ListRenderer.include({
                 break;
         }
     },
-    _onCancelLine: function(ev) {
-        ev.stopPropagation();
+    _onDiscardChanges: function(ev) {
+        // ev.stopPropagation();
         this.unselectRow();
     },
     _getFirstWidget: function () {

@@ -914,7 +914,7 @@ var FormRenderer = BasicRenderer.extend({
         } else if (ev.data.direction === "current") {
             this._activateWidget(this.state, index, {inc: 1});
         } else if (ev.data.direction === "cancel") {
-            this.trigger_up('discard_record');
+            this.trigger_up('discard_changes');
         }
     },
     /**

@@ -609,7 +609,6 @@ var FieldX2Many = AbstractField.extend({
         save_line: '_onSaveLine',
         resequence: '_onResequence',
         toggle_column_order: '_onToggleColumnOrder',
-        discard_record: '_onCancelLine',
     }),
 
     /**
@@ -875,6 +874,10 @@ var FieldX2Many = AbstractField.extend({
      */
     _onDiscardChanges: function (ev) {
         ev.data.fieldName = this.name;
+        // Note: On First Escape set focus on o2m and on second escape discard parent records
+        if (!this.$el.is(":focus")) {
+            this.$el.focus();
+        }
     },
     /**
      * Called when the renderer asks to edit a line, in that case simply tells
@@ -962,13 +965,6 @@ var FieldX2Many = AbstractField.extend({
             },
         });
     },
-    _onCancelLine: function(ev) {
-        // Note: On First Escape set focus on o2m and on second escape discard parent records
-        if (!this.$el.is(":focus")) {
-            ev.stopPropagation();
-            return this.$el.focus();
-        }
-    },
     /**
      * Forces a resequencing of the records.
      *
@@ -996,6 +992,12 @@ var FieldX2Many = AbstractField.extend({
      */
     _onToggleColumnOrder: function (ev) {
         ev.data.field = this.name;
+    },
+    _onNavigationMove: function(ev) {
+        if (ev.data.direction === 'cancel') {
+            ev.stopPropagation(); // do nothing
+        }
+        return this._super.apply(this, arguments);
     },
     activate: function() {
         if (!this.activeActions.create || this.isReadonly) {
@@ -1137,6 +1139,7 @@ var FieldOne2Many = FieldX2Many.extend({
             readonly: this.mode === 'readonly',
         });
     },
+
 });
 
 var FieldMany2Many = FieldX2Many.extend({
