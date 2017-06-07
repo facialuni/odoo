@@ -899,10 +899,10 @@ var FormRenderer = BasicRenderer.extend({
                 return this.trigger_up('focus_control_button');
             }
             if (nextWidget) {
-                return this._activateNextFieldWidget(this.state, index);
+                return this._activateNextWidget(this.state, index);
             } else if (_.isEqual(ev.data.target, lastWidget) && !_.isEqual(ev.data.target, lastFieldWidget)) {
                 if (this.mode != "readonly") {
-                    return this._activateNextFieldWidget(this.state, 0);
+                    return this._activateNextWidget(this.state, 0);
                 } else {
                     return this.trigger_up('focus_control_button');
                 }
@@ -910,9 +910,9 @@ var FormRenderer = BasicRenderer.extend({
                 return this.trigger_up('focus_control_button');
             }
         } else if (ev.data.direction === "previous") {
-            this._activatePreviousFieldWidget(this.state, index);
+            this._activatePreviousWidget(this.state, index);
         } else if (ev.data.direction === "current") {
-            this._activateFieldWidget(this.state, index, {inc: 1});
+            this._activateWidget(this.state, index, {inc: 1});
         } else if (ev.data.direction === "cancel") {
             this.trigger_up('discard_record');
         }
@@ -968,7 +968,7 @@ var FormRenderer = BasicRenderer.extend({
         if (firstButtonWidget) {
             return firstButtonWidget.activate();
         } else if (this.mode != "readonly") {
-            return this._activateNextFieldWidget(this.state, 0);
+            return this._activateNextWidget(this.state, 0);
         } else {
             return this.trigger_up('focus_control_button');
         }

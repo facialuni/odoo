@@ -122,7 +122,7 @@ var ButtonWidget = ViewWidget.extend({
                 // Do nothing, as we bind Enter key explicitly
                 break;
             case $.ui.keyCode.ESCAPE:
-                this.do_action('history_back');
+                this.trigger_up('navigation_move', {direction: 'cancel'});
                 break;
             case $.ui.keyCode.UP:
                 ev.stopPropagation();

@@ -475,7 +475,7 @@ ListRenderer.include({
         return this._selectRow(rowIndex).then(function () {
             var record = self.state.data[rowIndex];
             var correctedIndex = colIndex - getNbButtonBefore(colIndex);
-            var fieldIndex = self._activateFieldWidget(record, correctedIndex, {
+            var fieldIndex = self._activateWidget(record, correctedIndex, {
                 inc: 1,
                 wrap: wrap,
                 event: options && options.event,

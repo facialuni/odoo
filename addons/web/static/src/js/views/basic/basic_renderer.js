@@ -160,7 +160,7 @@ var BasicRenderer = AbstractRenderer.extend({
      * @returns {integer} the index of the widget that was activated or -1 if
      *   none was possible to activate
      */
-    _activateFieldWidget: function (record, currentIndex, options) {
+    _activateWidget: function (record, currentIndex, options) {
         var tabindex_widgets = !_.isEmpty(this.tabindexWidgets) ? this.tabindexWidgets : this.allFieldWidgets;
         options = options || {};
         _.defaults(options, {inc: 1, wrap: true});
@@ -190,7 +190,7 @@ var BasicRenderer = AbstractRenderer.extend({
         return -1;
     },
     /**
-     * This is a wrapper of the {@see _activateFieldWidget} function to select
+     * This is a wrapper of the {@see _activateWidget} function to select
      * the next possible widget instead of the given one.
      *
      * @private
@@ -198,13 +198,13 @@ var BasicRenderer = AbstractRenderer.extend({
      * @param {integer} currentIndex
      * @return {integer}
      */
-    _activateNextFieldWidget: function (record, currentIndex) {
+    _activateNextWidget: function (record, currentIndex) {
         var tabindex_widgets = !_.isEmpty(this.tabindexWidgets) ? this.tabindexWidgets : this.allFieldWidgets;
         currentIndex = (currentIndex + 1) % (tabindex_widgets[record.id] || []).length;
-        return this._activateFieldWidget(record, currentIndex, {inc: 1});
+        return this._activateWidget(record, currentIndex, {inc: 1});
     },
     /**
-     * This is a wrapper of the {@see _activateFieldWidget} function to select
+     * This is a wrapper of the {@see _activateWidget} function to select
      * the previous possible widget instead of the given one.
      *
      * @private
@@ -212,10 +212,10 @@ var BasicRenderer = AbstractRenderer.extend({
      * @param {integer} currentIndex
      * @return {integer}
      */
-    _activatePreviousFieldWidget: function (record, currentIndex) {
+    _activatePreviousWidget: function (record, currentIndex) {
         var tabindex_widgets = !_.isEmpty(this.tabindexWidgets) ? this.tabindexWidgets : this.allFieldWidgets;
         currentIndex = currentIndex ? (currentIndex - 1) : ((tabindex_widgets[record.id] || []).length - 1);
-        return this._activateFieldWidget(record, currentIndex, {inc:-1});
+        return this._activateWidget(record, currentIndex, {inc:-1});
     },
     /**
      * Does the necessary DOM updates to match the given modifiers data. The

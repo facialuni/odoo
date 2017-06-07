@@ -133,6 +133,9 @@ var FieldMany2One = AbstractField.extend({
         this.floating = false;
         this._setValue(value);
     },
+    isBlank: function() {
+        return !this.isValid() || !this.isSet();
+    },
 
     //--------------------------------------------------------------------------
     // Private

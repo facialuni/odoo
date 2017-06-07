@@ -212,6 +212,9 @@ var InputField = DebouncedField.extend({
             return this._render();
         }
     },
+    isBlank: function() {
+        return !this.isValid() || (!this._getValue());
+    },
 
     //--------------------------------------------------------------------------
     // Private

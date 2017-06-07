@@ -207,7 +207,9 @@ var AbstractField = ViewWidget.extend({
     isValid: function () {
         return this._isValid;
     },
-    isBlank: function() {},
+    isBlank: function() {
+        return false;
+    },
     /**
      * this method is supposed to be called from the outside of field widgets.
      * The typical use case is when an onchange has changed the widget value.
@@ -362,6 +364,13 @@ var AbstractField = ViewWidget.extend({
         });
         return def;
     },
+    _onNavigationMove: function(ev) {
+        if (this.isBlank() && this.$el.hasClass("o_required_modifier")) {
+            this.$el.toggleClass('o_field_invalid', true);
+            ev.data.direction = 'current';
+        }
+        return this._super.apply(this, arguments);
+    }
 });
 
 return AbstractField;
