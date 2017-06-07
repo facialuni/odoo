@@ -1474,6 +1474,9 @@ var FieldMany2ManyTags = AbstractField.extend({
             this.activate();
         }
     },
+    isBlank: function () {
+        return !this.isValid() || this.value.count ?  false : true;
+    },
 
     //--------------------------------------------------------------------------
     // Private
@@ -1904,6 +1907,9 @@ var FieldSelection = AbstractField.extend({
      */
     isSet: function () {
         return this.value !== false;
+    },
+    isBlank: function () {
+        return !this.isValid() || !this.isSet();
     },
 
     //--------------------------------------------------------------------------
