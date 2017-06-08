@@ -19,26 +19,47 @@ odoo.define('mail.DocumentViewer', function(require) {
             'click .o_zoom_out': '_onZoomOut',
             'keydown': '_onKeydown',
         },
-        init: function(thread) {
+        /**
+         * When initialize document viewer get image and video type attachment from thread
+         * and store it in instance so we can traversal attachment on next previous
+         *
+         * keep track of currently loaded attachment by 'active_attachment'
+         *
+         * @param {OdooWidget} thread
+         */
+        init: function (thread) {
             var attachment_ids = thread.get('attachment_ids');
             this.active_attachment = false;
             this.scale = 1;
             this.attachment_ids = _.filter(attachment_ids, function(attachment) {
                 var type = attachment.mimetype.split('/').shift();
-                if (type == 'image' || type == 'video') {
+                if (type === 'image' || type === 'video') {
                     attachment.type = type;
                     return true;
                 }
             });
         },
-        renderContent: function() {
+        //--------------------------------------------------------------------------
+        // Public
+        //--------------------------------------------------------------------------
+
+        /**
+         * renderContent call after set 'active_attachment' to reflect change on DOM.
+         * used after next, previous to display new content(image/video)
+         */
+        renderContent: function () {
             this.$('.o_viewer_content').html(QWeb.render('DocumentViewer.Content', {
                 widget: this
             }));
             this.$('.o_viewer_img').load(_.bind(this._onImageLoaded, this));
             this.scale = 1;
         },
-        on_attachment_popup: function(attachment_id) {
+
+        /**
+         * Open popup/modal with given attachment_id
+         * @param  {integer} attachment_id
+         */
+        on_attachment_popup: function (attachment_id) {
             this.active_attachment = _.findWhere(this.attachment_ids, {
                 id: attachment_id
             });
@@ -47,36 +68,115 @@ odoo.define('mail.DocumentViewer', function(require) {
             this.$el.on('hidden.bs.modal', _.bind(this._onDestroy, this));
             this.$('.o_viewer_img').load(_.bind(this._onImageLoaded, this));
         },
-        _onClose: function(e) {
-            e.preventDefault();
-            this.$el.modal('hide');
-        },
-        _onDownload: function(e) {
-            e.preventDefault();
-            window.location = '/web/content/' + this.active_attachment.id + '?download=true';
-        },
-        _onImageLoaded: function(ev){
+
+        //--------------------------------------------------------------------------
+        // Private
+        //--------------------------------------------------------------------------
+
+        /**
+         * Remove loading indicator when image loaded
+         * @private
+         */
+        _onImageLoaded: function (){
             this.$('.o_loading_img').hide();
         },
-        _onImageClick: function(e) {
-            e.stopPropagation();
-        },
-        _onZoom: function(scale) {
+        /**
+         * Zoom in/out image by provided scale
+         * @private
+         * @param  {integer} scale
+         */
+        _onZoom: function (scale) {
             if (scale > 0){
                 this.$('.o_viewer_img').css('transform', 'scale3d(' + scale + ', ' + scale + ', 1)');
             }
         },
-        _onZoomIn: function(e) {
+        /**
+         * When popup close complete destroyed modal even DOM footprint too
+         * @private
+         */
+        _onDestroy: function () {
+            if (this.isDestroyed()) {
+                return;
+            }
+            this.$el.modal('hide');
+            this.$el.remove();
+        },
+
+        //--------------------------------------------------------------------------
+        // Handlers
+        //--------------------------------------------------------------------------
+
+        /**
+         * @private
+         * @param {MouseEvent} e
+         */
+        _onClose: function (e) {
+            e.preventDefault();
+            this.$el.modal('hide');
+        },
+        /**
+         * @private
+         * @param {MouseEvent} e
+         */
+        _onDownload: function (e) {
+            e.preventDefault();
+            window.location = '/web/content/' + this.active_attachment.id + '?download=true';
+        },
+        /**
+         * On click of image do not close modal so stop event propagation
+         * @private
+         * @param {MouseEvent} e
+         */
+        _onImageClick: function (e) {
+            e.stopPropagation();
+        },
+        /**
+         * @private
+         * @param {MouseEvent} e
+         */
+        _onNext: function (e) {
+            e.preventDefault();
+            var index = _.findIndex(this.attachment_ids, this.active_attachment);
+            index = index + 1;
+            index = index % this.attachment_ids.length;
+            this.active_attachment = this.attachment_ids[index];
+            this.renderContent();
+        },
+        /**
+         * @private
+         * @param {MouseEvent} e
+         */
+        _onPrevious: function (e) {
+            e.preventDefault();
+            var index = _.findIndex(this.attachment_ids, this.active_attachment);
+            index = index === 0 ? this.attachment_ids.length - 1 : index - 1;
+            this.active_attachment = this.attachment_ids[index];
+            this.renderContent();
+        },
+        /**
+         * @private
+         * @param {MouseEvent} e
+         */
+        _onZoomIn: function (e) {
             e.preventDefault();
             this.scale += ZOOM_STEP;
             this._onZoom(this.scale);
         },
-        _onZoomOut: function(e) {
+        /**
+         * @private
+         * @param {MouseEvent} e
+         */
+        _onZoomOut: function (e) {
             e.preventDefault();
             this.scale -= ZOOM_STEP;
             this._onZoom(this.scale);
         },
-        _onKeydown: function(e){
+        /**
+         * Move next previous attachment on keyboard right left key
+         * @private
+         * @param {KeyEvent} e
+         */
+        _onKeydown: function (e){
             switch (e.which) {
                 case $.ui.keyCode.RIGHT:
                     this._onNext(e);
@@ -85,28 +185,6 @@ odoo.define('mail.DocumentViewer', function(require) {
                     this._onPrevious(e);
                     break;
             }
-        },
-        _onNext: function(e) {
-            e.preventDefault();
-            var index = _.findIndex(this.attachment_ids, this.active_attachment);
-            index = index + 1;
-            index = index % this.attachment_ids.length;
-            this.active_attachment = this.attachment_ids[index];
-            this.renderContent();
-        },
-        _onPrevious: function(e) {
-            e.preventDefault();
-            var index = _.findIndex(this.attachment_ids, this.active_attachment);
-            index = index === 0 ? this.attachment_ids.length - 1 : index - 1;
-            this.active_attachment = this.attachment_ids[index];
-            this.renderContent();
-        },
-        _onDestroy: function() {
-            if (this.isDestroyed()) {
-                return;
-            }
-            this.$el.modal('hide');
-            this.$el.remove();
         },
     });
     return DocumentViewer;
