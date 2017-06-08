@@ -32,9 +32,10 @@ var Thread = Widget.extend({
         "click strong": "on_click_redirect",
         "click .o_thread_show_more": "on_click_show_more",
         "click .o_attachment_view": function(event) {
-            event.preventDefault();
-            var attachment_id = $(event.currentTarget).data('id');
-            this.DocumentViewer.on_attachment_popup(attachment_id);
+            var attachment_id = $(event.target).data('id');
+            if (attachment_id){
+                this.DocumentViewer.on_attachment_popup(attachment_id);
+            }
         },
         "click .o_thread_message_needaction": function (event) {
             var message_id = $(event.currentTarget).data('message-id');

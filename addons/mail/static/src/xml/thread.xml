@@ -23,22 +23,7 @@
         <div class="o_viewer_content">
             <div class="o_viewer-header">
                 <h2 class="o_image_caption"><t t-esc="widget.active_attachment.name"/></h2>
-                <ul class="list-inline o_header_buttons">
-                    <li>
-                        <a class="o_zoom_out" href="#">
-                            <i class="fa fa-2x fa-search-minus"></i>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="o_zoom_in" href="#">
-                            <i class="fa fa-2x fa-search-plus"></i>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="o_download_btn" href="#">
-                            <i class="fa fa-2x fa-download"/>
-                        </a>
-                    </li>
+                <ul class="list-inline pull-right">
                     <li>
                         <a class="o_close_btn" href="#">
                             <i class="fa fa-2x fa-times"/>
@@ -54,6 +39,25 @@
                 <video t-if="widget.active_attachment.type == 'video'" class="o_viewer_video" controls="controls">
                     <source t-attf-src="/web/image/#{widget.active_attachment.id}" t-att-data-type="widget.active_attachment.mimetype"/>
                 </video>
+            </div>
+            <div t-if="widget.active_attachment.type == 'image'" class="o_viewer_toolbar">
+                <ul class="list-inline">
+                    <li>
+                        <a class="o_zoom_out" href="#">
+                            <i class="fa fa-2x fa-search-minus"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="o_zoom_in" href="#">
+                            <i class="fa fa-2x fa-search-plus"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="o_download_btn" href="#">
+                            <i class="fa fa-2x fa-download"/>
+                        </a>
+                    </li>
+                </ul>
             </div>
         </div>
     </t>
@@ -238,12 +242,9 @@
                 <img class="o_image" t-attf-src="/web/image/#{attachment.id}/?unique=1"/>
             </t>
             <a t-att-href='attachment.url' target="_blank"><span class='o_attachment_name'><t t-esc='attachment.name'/></span></a>
-            <div class="o_attachment_overlay">
+            <div t-attf-class="o_attachment_overlay #{(type == 'image' || type == 'video') ? 'o_attachment_view' : ''}" t-att-data-id="attachment.id">
                 <a class="o_attachment_download" t-att-href='attachment.url' target="_blank">
                     <i class="fa fa-2x fa-arrow-circle-o-down" title="Download this attachment" aria-hidden="true"></i>
-                </a>
-                <a t-if="type == 'image' || type == 'video'" class="o_attachment_view" href="#" t-att-data-id="attachment.id">
-                    <i class="fa fa-2x fa-search-plus"  title="View this attachment" aria-hidden="true"></i>
                 </a>
             </div>
             <t t-if="editable">

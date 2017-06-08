@@ -6,6 +6,7 @@ odoo.define('mail.DocumentViewer', function(require) {
     var QWeb = core.qweb;
 
     var ZOOM_STEP = 0.5;
+    var SCROLL_ZOOM_STEP = 0.1;
 
     var DocumentViewer = Widget.extend({
         template: "DocumentViewer",
@@ -17,6 +18,8 @@ odoo.define('mail.DocumentViewer', function(require) {
             'click .move_previous': '_onPrevious',
             'click .o_zoom_in': '_onZoomIn',
             'click .o_zoom_out': '_onZoomOut',
+            'DOMMouseScroll .o_viewer_content': '_onScroll',    // Firefox
+            'mousewheel .o_viewer_content': '_onScroll',        // Chrome, Safari, IE
             'keydown': '_onKeydown',
         },
         /**
@@ -67,6 +70,7 @@ odoo.define('mail.DocumentViewer', function(require) {
             this.$el.modal('show');
             this.$el.on('hidden.bs.modal', _.bind(this._onDestroy, this));
             this.$('.o_viewer_img').load(_.bind(this._onImageLoaded, this));
+            this.scale = 1;
         },
 
         //--------------------------------------------------------------------------
@@ -86,8 +90,9 @@ odoo.define('mail.DocumentViewer', function(require) {
          * @param  {integer} scale
          */
         _onZoom: function (scale) {
-            if (scale > 0){
+            if (scale > 0.5){
                 this.$('.o_viewer_img').css('transform', 'scale3d(' + scale + ', ' + scale + ', 1)');
+                this.scale = scale;
             }
         },
         /**
@@ -159,8 +164,8 @@ odoo.define('mail.DocumentViewer', function(require) {
          */
         _onZoomIn: function (e) {
             e.preventDefault();
-            this.scale += ZOOM_STEP;
-            this._onZoom(this.scale);
+            var scale = this.scale + ZOOM_STEP;
+            this._onZoom(scale);
         },
         /**
          * @private
@@ -168,8 +173,22 @@ odoo.define('mail.DocumentViewer', function(require) {
          */
         _onZoomOut: function (e) {
             e.preventDefault();
-            this.scale -= ZOOM_STEP;
-            this._onZoom(this.scale);
+            var scale = this.scale - ZOOM_STEP;
+            this._onZoom(scale);
+        },
+        /**
+         * Zoom image on scroll
+         * @private
+         * @param {MouseEvent} e
+         */
+        _onScroll: function (e) {
+            if (e.originalEvent.wheelDelta > 0 || e.originalEvent.detail < 0) {
+                var scale = this.scale + SCROLL_ZOOM_STEP;
+                this._onZoom(scale);
+            } else {
+                var scale = this.scale - SCROLL_ZOOM_STEP;
+                this._onZoom(scale);
+            }
         },
         /**
          * Move next previous attachment on keyboard right left key

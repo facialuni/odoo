@@ -25,10 +25,6 @@
             background-color: rgba(0, 0, 0, 0.45);
             cursor: auto;
             z-index: 1;
-            .o_header_buttons {
-                float: right;
-                margin-right: 20px;
-            }
             .o_image_caption {
                 display: inline;
             }
@@ -64,6 +60,15 @@
             .o_viewer_video {
                 height: 80%;
             }
+        }
+        .o_viewer_toolbar {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 8px 10px 0px 10px;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 4px;
         }
     }
     .arrow {
@@ -168,12 +173,11 @@
         z-index: 20;
         background: rgba(0, 0, 0, 0.5);
         overflow: hidden;
-        .o_attachment_download {
-            .o-position-absolute(@top: 65px, @left: 10px);
-            color: #FFFFFF
+        &.o_attachment_view {
+            cursor: pointer;
         }
-        .o_attachment_view {
-            .o-position-absolute(@top: 65px, @right: 10px);
+        .o_attachment_download {
+            .o-position-absolute(@top: 40px, @left: 40px);
             color: #FFFFFF
         }
     }

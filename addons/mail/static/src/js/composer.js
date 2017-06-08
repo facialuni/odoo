@@ -356,9 +356,10 @@ var BasicComposer = Widget.extend(chat_mixin, {
         "click .o_composer_button_add_attachment": "on_click_add_attachment",
         "click .o_attachment_delete": "on_attachment_delete",
         "click .o_attachment_view": function(event) {
-            event.preventDefault();
-            var attachment_id = $(event.currentTarget).data('id');
-            this.DocumentViewer.on_attachment_popup(attachment_id);
+            var attachment_id = $(event.target).data('id');
+            if (attachment_id){
+                this.DocumentViewer.on_attachment_popup(attachment_id);
+            }
         },
     },
     // RPCs done to fetch the mention suggestions are throttled with the following value
