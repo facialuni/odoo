@@ -138,11 +138,21 @@ var FormController = BasicController.extend({
         if (mustRenderFooterButtons) {
             this.$buttons.append($footer);
         } else {
+            var mouse_clicked = false;
+            var on_button_focus = function(bind_elem, message) {
+                if (mouse_clicked) {
+                    mouse_clicked = false;
+                    return;
+                }
+                Framework.showFocusTip({attachTo: bind_elem, message: message})
+            };
+
             this.$buttons.append(qweb.render("FormView.buttons", {widget: this}));
+            this.$buttons.on('mousedown', 'button', function() {mouse_clicked = true;});
             this.$buttons.find(".o_form_button_edit")
                 .on('click', this._onEdit.bind(this))
                 .on('focus', function() {
-                    Framework.showFocusTip({attachTo: this, message: _t("Press ENTER to Edit or ESC to Cancel")})
+                    on_button_focus(this, _t("Press ENTER to Edit or ESC to Cancel"));
                 })
                 .on('keydown', function(e) {
                     if (e.which == $.ui.keyCode.ESCAPE) {
@@ -154,7 +164,7 @@ var FormController = BasicController.extend({
             this.$buttons.find(".o_form_button_create")
                 .on('click', this._onCreate.bind(this))
                 .on('focus', function() {
-                    Framework.showFocusTip({attachTo: this, message: _t("Press ENTER to <b>Create</b> and ESC to go back to the list view")})
+                    on_button_focus(this, _t("Press ENTER to <b>Create</b> and ESC to go back to the list view"));
                 })
                 .on('keydown', function(e) {
                     if (e.which == $.ui.keyCode.TAB) {
@@ -170,7 +180,7 @@ var FormController = BasicController.extend({
             this.$buttons.find(".o_form_button_save")
                 .on('click', this._onSave.bind(this))
                 .on('focus', function() {
-                    Framework.showFocusTip({attachTo: this, message: _t("Press ENTER to Save or ESC to Discard")})
+                    on_button_focus(this, _t("Press ENTER to Save or ESC to Discard"));
                 })
                 .on('keydown', function(event) {
                     event.preventDefault();

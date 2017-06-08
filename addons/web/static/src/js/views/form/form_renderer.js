@@ -892,6 +892,9 @@ var FormRenderer = BasicRenderer.extend({
             index = this.lastTabindex;
         }
         if (ev.data.direction === "next") {
+            if (ev.data.required_error) {
+                return this._activateWidget(this.state, index, {inc: 1});
+            }
             var recordWidgets = this.tabindexWidgets[this.state.id] || [];
             var nextWidget = this._getNextTabindexWidget(index+1, recordWidgets);
             // Note: If user presses TAB on last field and next widget is button then first move user to Save button

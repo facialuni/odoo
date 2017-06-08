@@ -1694,11 +1694,6 @@ var FieldMany2ManyCheckBoxes = AbstractField.extend({
     template: 'FieldMany2ManyCheckBoxes',
     events: _.extend({}, AbstractField.prototype.events, {
         change: '_onChange',
-        keydown: function(e) {
-            if (_.contains([$.ui.keyCode.UP, $.ui.keyCode.DOWN], e.which)) {
-                this.selectCheckbox(e);
-            }
-        }
     }),
     specialData: "_fetchSpecialRelation",
     supportedFieldTypes: ['many2many'],
@@ -1713,6 +1708,25 @@ var FieldMany2ManyCheckBoxes = AbstractField.extend({
 
     isSet: function () {
         return true;
+    },
+    activate: function() {
+        var $inputs = this.$("input");
+        if ($inputs) {
+            $inputs.filter(":checked").length ? $inputs.filter(":checked").first().focus() : $inputs.first().focus();
+            return true;
+        } else {
+            return false
+        }
+    },
+    selectCheckbox: function($inputs, index, direction) {
+        switch (direction) {
+            case 'next':
+                index == $inputs.length-1 ? $inputs.first().focus() : $inputs[index+1].focus();
+                break;
+            case 'previous':
+                index === 0 ? $inputs.last().focus() : $inputs[index-1].focus();
+                break;
+        }
     },
 
     //--------------------------------------------------------------------------
@@ -1752,29 +1766,22 @@ var FieldMany2ManyCheckBoxes = AbstractField.extend({
             ids: ids,
         });
     },
-    activate: function() {
-        var $inputs = this.$("input");
-        if ($inputs) {
-            $inputs.filter(":checked").length ? $inputs.filter(":checked").first().focus() : $inputs.first().focus();
-            return true;
-        } else {
-            return false
-        }
-    },
-    selectCheckbox: function(e) {
-        e.preventDefault();
-        var direction = e.which == $.ui.keyCode.UP ? 'previous' : 'next';
+    _onNavigationMove: function(ev) {
         var $inputs = this.$("input");
         var index = $inputs.index(this.$("input:focus"));
-        switch (direction) {
-            case 'next':
-                index == $inputs.length-1 ? $inputs.first().focus() : $inputs[index+1].focus();
-                break;
-            case 'previous':
-                index === 0 ? $inputs.last().focus() : $inputs[index-1].focus();
-                break;
+        var navigate_checkbox = '';
+        if (ev.data.direction == 'next' && index !== $inputs.length-1) {
+            ev.stopPropagation();
+            navigate_checkbox = 'next';
+        } else if (ev.data.direction == 'previous' && index !== 0) {
+            ev.stopPropagation();
+            navigate_checkbox = 'previous';
         }
-    }
+        if (navigate_checkbox) {
+            return this.selectCheckbox($inputs, index, navigate_checkbox);
+        }
+        return this._super.apply(this, arguments);
+    },
 });
 
 //------------------------------------------------------------------------------

@@ -367,7 +367,7 @@ var AbstractField = ViewWidget.extend({
     _onNavigationMove: function(ev) {
         if (ev.data.direction == "next" && this.isBlank() && this.$el.hasClass("o_required_modifier")) {
             this.$el.toggleClass('o_field_invalid', true);
-            ev.data.direction = 'current';
+            ev.data.required_error = true;
         }
         return this._super.apply(this, arguments);
     }
