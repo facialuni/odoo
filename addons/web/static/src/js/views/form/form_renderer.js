@@ -913,7 +913,13 @@ var FormRenderer = BasicRenderer.extend({
                 return this.trigger_up('focus_control_button');
             }
         } else if (ev.data.direction === "previous") {
-            this._activatePreviousWidget(this.state, index);
+            if (ev.target.hasOwnProperty('node')) {
+                if (this.getFirstButtonWidget().node.attrs.name === ev.target.node.attrs.name) {
+                this.trigger_up('focus_control_button')
+                }
+            } else {
+                this._activatePreviousWidget(this.state, index);
+            }
         } else if (ev.data.direction === "current") {
             this._activateWidget(this.state, index, {inc: 1});
         } else if (ev.data.direction === "cancel") {
