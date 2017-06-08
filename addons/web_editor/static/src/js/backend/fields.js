@@ -66,6 +66,20 @@ var FieldTextHtmlSimple = basic_fields.DebouncedField.extend(TranslatableFieldMi
         }
         return $.when();
     },
+    activate: function() {
+        if (!this.$textarea) {
+            return false;
+        }
+        // on IE an error may occur when creating range on not displayed element
+        try {
+            return this.$textarea.focusInEnd();
+        } catch (e) {
+            return this.$textarea.focus();
+        } finally {
+            this.$content.trigger('mouseup');
+        }
+        return true;
+    },
 
     //--------------------------------------------------------------------------
     // Private
@@ -116,6 +130,7 @@ var FieldTextHtmlSimple = basic_fields.DebouncedField.extend(TranslatableFieldMi
      * @private
      */
     _renderEdit: function () {
+        var self = this;
         this.$textarea = $('<textarea>');
         this.$textarea.appendTo(this.$el);
         this.$textarea.summernote(this._getSummernoteConfig());
@@ -131,7 +146,7 @@ var FieldTextHtmlSimple = basic_fields.DebouncedField.extend(TranslatableFieldMi
 
         // Note: fix: Forcefully call autofocus as mouseup of this.$content will set focus on current widget
         setTimeout(function() {
-            // self.autofocus(); // TODO: Call form renderer's autofocus
+            self.getParent().autofocus();
         }, 0);
 
         if (this.nodeOptions['style-inline']) {
