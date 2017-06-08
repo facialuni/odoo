@@ -488,16 +488,7 @@ var FormController = BasicController.extend({
      * @private
      */
     _onDiscard: function () {
-        var self = this;
-        // TODO: To check whether this code is required or not?
-        // Note: formview_in_popup option will decide whether form view is in popup, if it is in popup then we will not do history back
-        if (!this.formview_in_popup && !this.model.isDirty(this.handle) && this.mode != 'readonly') {
-            this.do_action('history_back');
-        } else {
-            this._discardChanges().then(function() {
-                self.$buttons && self.$buttons.find(".o_form_button_edit").focus();
-            });
-        }
+        this._discardChanges();
     },
     /**
      * Called when the user clicks on 'Duplicate Record' in the sidebar

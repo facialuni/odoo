@@ -79,7 +79,6 @@ var BasicController = AbstractController.extend(FieldManagerMixin, {
             cancel_callback: def.reject.bind(def),
         });
         dialog.on('closed', def, function() {
-            console.log("Before dialog closed :::: ");
             core.bus.trigger("dialog_closed");
             def.reject();
         });
