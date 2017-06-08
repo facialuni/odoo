@@ -12,6 +12,7 @@ odoo.define('web.EditableListRenderer', function (require) {
  * view. It uses the same widgets, but the code is totally stand alone.
  */
 var core = require('web.core');
+var BasicRenderer = require('web.BasicRenderer');
 var ListRenderer = require('web.ListRenderer');
 var utils = require('web.utils');
 
@@ -663,6 +664,7 @@ ListRenderer.include({
                 break;
         }
     },
+    _scrollTo: BasicRenderer.prototype._scrollTo,
     _onDiscardChanges: function(ev) {
         // ev.stopPropagation();
         this.unselectRow();

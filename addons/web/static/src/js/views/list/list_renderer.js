@@ -712,6 +712,17 @@ var ListRenderer = BasicRenderer.extend({
             $current_row.addClass("o_row_selected");
             this.selected_row = $current_row;
         }
+        if ($current_row && $current_row.length) {
+            // Manually scroll instead of standard scrolling
+            var $row = $current_row.next();
+            var table_offset = this.$('.o_list_view').offset().top;
+            var row_offset = $current_row.offset().top;
+            var scroll_amount = direction == 'down' ? $current_row.height() : -$current_row.height();
+            if ((row_offset - table_offset) > (this.$el.parent().height()/2) ) {
+                var offset = (row_offset - table_offset - (this.$el.parent().height()/2) + scroll_amount)
+                this._scrollTo(offset);
+            }
+        }
     },
     /**
      * During selection of records using keyboard this method called when 'UP' key is pressed
@@ -732,6 +743,10 @@ var ListRenderer = BasicRenderer.extend({
     _keydownUpSelect: function (event) {
         event.preventDefault();
         this._keyNavigation(event, 'up');
+    },
+    _scrollTo: function(offset) {
+        var $scrollable_element = this.$el.scrollParent();
+        $scrollable_element.scrollTop(offset);
     },
     /**
      * Whenever we change the state of the selected rows, we need to call this

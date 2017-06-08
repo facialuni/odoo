@@ -169,6 +169,8 @@ var BasicRenderer = AbstractRenderer.extend({
         for (var i = 0 ; i < recordWidgets.length ; i++) {
             var activated = recordWidgets[currentIndex] && recordWidgets[currentIndex].activate({event: options.event});
             if (activated) {
+                var reverse = true && options.inc < 0; // If options.inc is in negative it means reverse navigation
+                this._scrollTo(recordWidgets[currentIndex], reverse);
                 return currentIndex;
             }
 
@@ -216,6 +218,16 @@ var BasicRenderer = AbstractRenderer.extend({
         var tabindex_widgets = !_.isEmpty(this.tabindexWidgets) ? this.tabindexWidgets : this.allFieldWidgets;
         currentIndex = currentIndex ? (currentIndex - 1) : ((tabindex_widgets[record.id] || []).length - 1);
         return this._activateWidget(record, currentIndex, {inc:-1});
+    },
+    _scrollTo: function(widget, reverse) {
+        var $scrollable_element = this.$el.scrollParent();
+        var offset_top = widget.$el.offset().top;
+        offset_top = (offset_top - $scrollable_element.offset().top);
+        if (reverse && offset_top < 0) {
+            $scrollable_element.animate({ scrollTop: offset_top - ($scrollable_element.height()*0.05)}, 1000);
+        } else if (offset_top > $scrollable_element.height() - ($scrollable_element.height()*0.10)) {
+            $scrollable_element.animate({ scrollTop: offset_top - ($scrollable_element.height()*0.05)}, 1000);
+        }
     },
     /**
      * Does the necessary DOM updates to match the given modifiers data. The
