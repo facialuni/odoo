@@ -82,3 +82,9 @@ def valid_type_in_col(arch):
         attrib.isdigit()
         for attrib in arch.xpath('//@col')
     )
+
+
+@validate('search')
+def valid_att_in_filter(arch):
+    """ ``filter`` nodes must all have a ``@name`` """
+    return not arch.xpath('//filter[not(@name)]')
