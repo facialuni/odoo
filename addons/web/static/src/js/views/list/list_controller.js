@@ -120,7 +120,7 @@ var ListController = BasicController.extend({
                     mouse_clicked = false;
                     return;
                 }
-                Framework.showFocusTip({attachTo: this, message: _t("Press ENTER to Create")})
+                Framework.showFocusTip({attachTo: this, message: _t("Press ENTER to Create"), trigger: 'focus'})
             })
             .on('keydown', function(event) {
                 if (event.which === $.ui.keyCode.ENTER) {

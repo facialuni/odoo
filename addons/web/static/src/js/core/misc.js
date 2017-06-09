@@ -181,8 +181,9 @@ function showFocusTip(options) {
     var $attachTo = $(options.attachTo);
     var $template = core.qweb.render('FocusTooltip', { title: options.message });
     var options = _.extend({
-            delay: { show: 1000, hide: 0 },
-            trigger: 'manual',
+            delay: { show: 200, hide: 0 },
+            trigger: options.trigger || 'manual',
+            placement: options.placement || 'bottom',
             title: function() {
                 return $template;
             }

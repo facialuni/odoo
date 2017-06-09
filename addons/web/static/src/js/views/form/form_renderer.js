@@ -925,7 +925,9 @@ var FormRenderer = BasicRenderer.extend({
         } else if (ev.data.direction === "cancel") {
             this.trigger_up('discard_changes', {
                 onSuccess: _.bind(function() {
-                    this.trigger_up('focus_control_button');
+                    if (this.state.res_id) { // Set focus to Edit button, in new record we will do history_back
+                        this.trigger_up('focus_control_button');
+                    }
                 }, this)
             });
         }

@@ -664,7 +664,12 @@ ListRenderer.include({
                 break;
         }
     },
-    _scrollTo: BasicRenderer.prototype._scrollTo,
+    _scrollTo: function(offset) {
+        if (!this._isEditable()) {
+            return this._super.apply(this, arguments);
+        }
+        return BasicRenderer.prototype._scrollTo.apply(this, arguments);
+    },
     _onDiscardChanges: function(ev) {
         // ev.stopPropagation();
         this.unselectRow();
