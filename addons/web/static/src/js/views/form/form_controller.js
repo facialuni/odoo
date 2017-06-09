@@ -184,8 +184,7 @@ var FormController = BasicController.extend({
                 .on('keydown', function(event) {
                     event.preventDefault();
                     if (event.which == $.ui.keyCode.TAB) {
-                        var is_shiftkey = event.shiftKey ? true : false;
-                        self.renderer.setFirstButtonFocus();
+                        event.shiftKey ? self.renderer.getLastFieldWidget().activate() : self.renderer.setFirstButtonFocus();
                     } else if (event.which == $.ui.keyCode.ENTER) {
                         self._onSave(event).then(function() {
                             self.renderer.setFirstButtonFocus();
