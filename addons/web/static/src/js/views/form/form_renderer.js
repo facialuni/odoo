@@ -913,10 +913,8 @@ var FormRenderer = BasicRenderer.extend({
                 return this.trigger_up('focus_control_button');
             }
         } else if (ev.data.direction === "previous") {
-            if (ev.target.hasOwnProperty('node')) {
-                if (this.getFirstButtonWidget().node.attrs.name === ev.target.node.attrs.name) {
-                this.trigger_up('focus_control_button')
-                }
+            if (_.isEqual(this.getFirstButtonWidget(), ev.data.target)) {
+                this.trigger_up('focus_control_button');
             } else {
                 this._activatePreviousWidget(this.state, index);
             }
