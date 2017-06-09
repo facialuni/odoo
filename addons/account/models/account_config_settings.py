@@ -81,11 +81,11 @@ class AccountConfigSettings(models.TransientModel):
         if self.group_multi_currency:
             self.env.ref('base.group_user').write({'implied_ids': [(4, self.env.ref('product.group_sale_pricelist').id)]})
         """ Set the product taxes if they have changed """
-        ir_values_obj = self.env['ir.values']
+        IrDefault = self.env['ir.default']
         if self.default_sale_tax_id:
-            ir_values_obj.sudo().set_default('product.template', "taxes_id", [self.default_sale_tax_id.id], for_all_users=True, company_id=self.company_id.id)
+            IrDefault.sudo().set('product.template', "taxes_id", [self.default_sale_tax_id.id], company_id=self.company_id.id)
         if self.default_purchase_tax_id:
-            ir_values_obj.sudo().set_default('product.template', "supplier_taxes_id", [self.default_purchase_tax_id.id], for_all_users=True, company_id=self.company_id.id)
+            IrDefault.sudo().set('product.template', "supplier_taxes_id", [self.default_purchase_tax_id.id], company_id=self.company_id.id)
         """ install a chart of accounts for the given company (if required) """
         if self.chart_template_id and self.chart_template_id != self.company_id.chart_template_id:
             wizard = self.env['wizard.multi.charts.accounts'].create({

@@ -974,6 +974,7 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
 
         defaults = {}
         parent_fields = defaultdict(list)
+        ir_defaults = self.env['ir.default'].get_all(self._name)
 
         for name in fields_list:
             # 1. look up context
@@ -982,11 +983,9 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
                 defaults[name] = self._context[key]
                 continue
 
-            # 2. look up ir_values
-            #    Note: performance is good, because get_defaults_dict is cached!
-            ir_values_dict = self.env['ir.values'].get_defaults_dict(self._name)
-            if name in ir_values_dict:
-                defaults[name] = ir_values_dict[name]
+            # 2. look up ir.default
+            if name in ir_defaults:
+                defaults[name] = ir_defaults[name]
                 continue
 
             field = self._fields.get(name)
@@ -2044,7 +2043,7 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
     def _init_column(self, column_name):
         """ Initialize the value of the given column for existing rows. """
         # get the default value; ideally, we should use default_get(), but it
-        # fails due to ir.values not being ready
+        # fails due to ir.default not being ready
         field = self._fields[column_name]
         if field.default:
             value = field.default(self)

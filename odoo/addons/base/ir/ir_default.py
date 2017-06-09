@@ -143,3 +143,11 @@ class IrDefault(models.Model):
             if row[0] not in result:
                 result[row[0]] = json.loads(row[1])
         return result
+
+    @api.model
+    def discard_values(self, model_name, field_name, values):
+        """ Discard all the defaults for any of the given values. """
+        field = self.env['ir.model.fields']._get(model_name, field_name)
+        json_vals = [json.dumps(value, ensure_ascii=False) for value in values]
+        domain = [('field_id', '=', field.id), ('json_value', 'in', json_vals)]
+        return self.search(domain).unlink()
