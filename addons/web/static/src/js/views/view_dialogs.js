@@ -128,6 +128,14 @@ var FormViewDialog = ViewDialog.extend({
                     click: function () {
                         this._save().then(self.close.bind(self));
                     },
+                    keydown: function(e) {
+                        if (e.which == $.ui.keyCode.TAB) {
+                            var is_shiftkey = e.shiftKey ? true : false;
+                            if (!is_shiftkey) {
+                                self.form_view.renderer.setFirstButtonFocus();
+                            }
+                        }
+                    }
                 });
 
                 if (multi_select) {
