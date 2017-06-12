@@ -190,7 +190,7 @@ var FormViewDialog = ViewDialog.extend({
                 model: self.model,
                 parentID: self.parentID,
                 recordID: self.recordID,
-                formview_in_popup: true, // TODO: Is it still needed, check with multiple popup and escape
+                formview_in_popup: true,
             });
             return formview.getController(self);
         }).then(function (formView) {

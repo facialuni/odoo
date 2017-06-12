@@ -20,6 +20,7 @@ var FormRenderer = BasicRenderer.extend({
      */
     init: function (parent, state, params) {
         this._super.apply(this, arguments);
+        this.formview_in_popup = params.formview_in_popup;
         this.idsForLabels = {};
         core.bus.on('dialog_closed', this, function() {
             // Hacky Fix: Note: This is going to be bind on each formview, this will create issue when dialog is closed, it will be trigerred for all formviews
@@ -928,6 +929,9 @@ var FormRenderer = BasicRenderer.extend({
                     }
                 }, this)
             });
+        } else if (ev.data.direction === "next_line" && ev.data.shift_key && !this.formview_in_popup) {
+            ev.stopPropagation();
+            this.trigger_up('shift_enter_pressed');
         }
     },
     /**
