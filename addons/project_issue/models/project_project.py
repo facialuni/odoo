@@ -7,11 +7,11 @@ from odoo import api, fields, models
 class Project(models.Model):
     _inherit = 'project.project'
 
-    issue_count = fields.Integer(compute='_compute_issue_count', string="Issues")
+    issue_count = fields.Integer(compute='_compute_issue_count', string="# of Issues")
     issue_ids = fields.One2many('project.issue', 'project_id', string="Issues", domain=['|', ('stage_id.fold', '=', False), ('stage_id', '=', False)])
     label_issues = fields.Char(string='Use Issues as', help="Customize the issues label, for example to call them cases.", default='Issues')
     use_issues = fields.Boolean(related="analytic_account_id.use_issues", default=True)
-    issue_needaction_count = fields.Integer(compute="_issue_needaction_count", string="Issues")
+    issue_needaction_count = fields.Integer(compute="_issue_needaction_count", string="# of Issues need action")
 
     @api.model
     def _get_alias_models(self):

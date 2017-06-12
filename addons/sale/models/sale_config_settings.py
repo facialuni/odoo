@@ -36,7 +36,7 @@ class SaleConfigSettings(models.TransientModel):
     multi_sales_price_method = fields.Selection([
         ('percentage', 'Multiple prices per product (e.g. customer segments, currencies)'),
         ('formula', 'Price computed from formulas (discounts, margins, roundings)')
-        ], default='percentage', string="Pricelists")
+        ], default='percentage', string="Pricelists Method")
     sale_pricelist_setting = fields.Selection([
         ('fixed', 'A single sales price per product'),
         ('percentage', 'Multiple prices per product (e.g. customer segments, currencies)'),

@@ -34,7 +34,7 @@ class PackOperation(models.Model):
     product_qty = fields.Float('To Do', default=0.0, digits=dp.get_precision('Product Unit of Measure'), required=True)
     ordered_qty = fields.Float('Ordered Quantity', digits=dp.get_precision('Product Unit of Measure'))
     qty_done = fields.Float('Done', default=0.0, digits=dp.get_precision('Product Unit of Measure'))
-    is_done = fields.Boolean(compute='_compute_is_done', string='Done', readonly=False, oldname='processed_boolean')
+    is_done = fields.Boolean(compute='_compute_is_done', string='Is Done', readonly=False, oldname='processed_boolean')
     package_id = fields.Many2one('stock.quant.package', 'Source Package')
     pack_lot_ids = fields.One2many('stock.pack.operation.lot', 'operation_id', 'Lots/Serial Numbers Used')
     result_package_id = fields.Many2one(
@@ -257,7 +257,7 @@ class PackOperationLot(models.Model):
     operation_id = fields.Many2one('stock.pack.operation')
     qty = fields.Float('Done', default=1.0)
     lot_id = fields.Many2one('stock.production.lot', 'Lot/Serial Number')
-    lot_name = fields.Char('Lot/Serial Number')
+    lot_name = fields.Char('Lot Name')
     qty_todo = fields.Float('To Do', default=0.0)
     plus_visible = fields.Boolean(compute='_compute_plus_visible', default=True)
 
