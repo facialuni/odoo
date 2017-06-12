@@ -198,7 +198,7 @@ class Holidays(models.Model):
     parent_id = fields.Many2one('hr.holidays', string='Parent')
     linked_request_ids = fields.One2many('hr.holidays', 'parent_id', string='Linked Requests')
     department_id = fields.Many2one('hr.department', related='employee_id.department_id', string='Department', readonly=True, store=True)
-    category_id = fields.Many2one('hr.employee.category', string='Employee Tag', readonly=True,
+    category_ids = fields.Many2many('hr.employee.category', string='Employee Tags', readonly=True,
         states={'draft': [('readonly', False)], 'confirm': [('readonly', False)]}, help='Category of Employee')
     holiday_type = fields.Selection([
         ('employee', 'By Employee'),
@@ -259,9 +259,15 @@ class Holidays(models.Model):
                 raise ValidationError(_('The number of remaining leaves is not sufficient for this leave type.\n'
                                         'Please verify also the leaves waiting for validation.'))
 
+    @api.constrains('holiday_type')
+    def _check_holiday_type(self):
+        for holiday in self:
+            if (holiday.holiday_type == 'employee' and not holiday.employee_id) or (holiday.holiday_type == 'category' and not holiday.category_ids):
+                raise ValidationError(_('The employee or employee category of this request is missing.\n'
+                                        'Please make sure that your user login is linked to an employee.'))
+
+
     _sql_constraints = [
-        ('type_value', "CHECK( (holiday_type='employee' AND employee_id IS NOT NULL) or (holiday_type='category' AND category_id IS NOT NULL))",
-         "The employee or employee category of this request is missing. Please make sure that your user login is linked to an employee."),
         ('date_check2', "CHECK ( (type='add') OR (date_from <= date_to))", "The start date must be anterior to the end date."),
         ('date_check', "CHECK ( number_of_days_temp >= 0 )", "The number of days must be greater than 0."),
     ]
@@ -332,7 +338,7 @@ class Holidays(models.Model):
                 if self.env.context.get('short_name'):
                     res.append((leave.id, _("%s : %.2f day(s)") % (leave.name or leave.holiday_status_id.name, leave.number_of_days_temp)))
                 else:
-                    res.append((leave.id, _("%s on %s : %.2f day(s)") % (leave.employee_id.name or leave.category_id.name, leave.holiday_status_id.name, leave.number_of_days_temp)))
+                    res.append((leave.id, _("%s on %s : %.2f day(s)") % (leave.employee_id.name, leave.holiday_status_id.name, leave.number_of_days_temp)))
             else:
                 res.append((leave.id, _("Allocation of %s : %.2f day(s) To %s") % (leave.holiday_status_id.name, leave.number_of_days_temp, leave.employee_id.name)))
         return res
@@ -485,9 +491,10 @@ class Holidays(models.Model):
                 holiday._validate_leave_request()
             elif holiday.holiday_type == 'category':
                 leaves = self.env['hr.holidays']
-                for employee in holiday.category_id.employee_ids:
-                    values = holiday._prepare_create_by_category(employee)
-                    leaves += self.with_context(mail_notify_force_send=False).create(values)
+                for category in holiday.category_ids:
+                    for employee in category.employee_ids:
+                        values = holiday._prepare_create_by_category(employee)
+                        leaves += self.with_context(mail_notify_force_send=False).create(values)
                 # TODO is it necessary to interleave the calls?
                 leaves.action_approve()
                 if leaves and leaves[0].double_validation:
