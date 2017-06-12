@@ -140,6 +140,7 @@ var ViewWidget = Widget.extend({
     _onNavigationMove: function (ev) {
         ev.data.target = this;
     },
+    // TODO: Check is this methods needed else remove it
     _onKeyup: function(event) {
         if (event.which === $.ui.keyCode.ESCAPE) {
             this._onKeyupEscape();

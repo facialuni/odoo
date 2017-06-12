@@ -79,10 +79,11 @@ var BasicController = AbstractController.extend(FieldManagerMixin, {
             cancel_callback: def.reject.bind(def),
         });
         dialog.on('closed', def, function() {
-            core.bus.trigger("dialog_closed");
+            _.delay(function() {
+                core.bus.trigger("dialog_closed");
+            }, 100);
             def.reject();
         });
-        // dialog.on('closed', def, def.reject);
         return def;
     },
     /**

@@ -994,7 +994,8 @@ var FieldX2Many = AbstractField.extend({
         ev.data.field = this.name;
     },
     _onNavigationMove: function(ev) {
-        if (ev.data.direction === 'cancel') {
+        if (ev.data.direction === 'cancel' && this.renderer.viewType === "list" && this.renderer.cancelling) {
+            this.renderer.cancelling = false;
             ev.stopPropagation();
         }
         return this._super.apply(this, arguments);

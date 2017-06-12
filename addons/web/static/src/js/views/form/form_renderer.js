@@ -902,7 +902,7 @@ var FormRenderer = BasicRenderer.extend({
             if (nextWidget instanceof ButtonWidget && lastFieldWidget && _.isEqual(ev.data.target, lastFieldWidget)) {
                 return this.trigger_up('focus_control_button');
             }
-            if (nextWidget) {
+            if (nextWidget && !_.isEqual(nextWidget, ev.data.target)) {
                 return this._activateNextWidget(this.state, index);
             } else if (_.isEqual(ev.data.target, lastWidget) && !_.isEqual(ev.data.target, lastFieldWidget)) {
                 if (this.mode != "readonly") {
@@ -946,7 +946,7 @@ var FormRenderer = BasicRenderer.extend({
     },
     _getNextTabindexWidget: function(currentIndex, recordWidgets) {
         if (recordWidgets.length-1 == currentIndex) {
-            currentIndex -= recordWidgets.length; // If we are on last widget index then move user back to first widget
+            currentIndex -= recordWidgets.length-1; // If we are on last widget index then move user back to first widget
         }
         for (var i = currentIndex ; i < recordWidgets.length ; i++) {
             var widget = recordWidgets[i];

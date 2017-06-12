@@ -140,6 +140,7 @@ var FormController = BasicController.extend({
             var mouse_clicked = false;
             var on_button_focus = function(bind_elem, message) {
                 if (mouse_clicked) {
+                    $(bind_elem).tooltip('hide');
                     mouse_clicked = false;
                     return;
                 }

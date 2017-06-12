@@ -313,6 +313,9 @@ var InputField = DebouncedField.extend({
      * @param {OdooEvent} ev
      */
     _onNavigationMove: function (ev) {
+        if (this.mode === 'readonly') {
+            return;
+        }
         this._super.apply(this, arguments);
 
         // the following code only makes sense in edit mode, with an input

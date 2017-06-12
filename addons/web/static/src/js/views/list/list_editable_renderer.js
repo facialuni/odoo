@@ -49,6 +49,7 @@ ListRenderer.include({
 
         this.currentRow = null;
         this.currentCol = null;
+        this.cancelling = false;
     },
     /**
      * @override
@@ -658,6 +659,7 @@ ListRenderer.include({
                 this._moveToNextLine();
                 break;
             case 'cancel':
+                this.cancelling = true;
                 this.trigger_up('discard_changes', {
                     recordID: ev.target.dataPointID,
                 });

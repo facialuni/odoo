@@ -637,6 +637,7 @@ var ListRenderer = BasicRenderer.extend({
                     var id = self.selected_row && self.selected_row.data('id');
                     if (id) {
                         self.trigger_up('open_record', {id:id, target: self.selected_row});
+                        self.selected_row = null;
                     }
                     break;
             }
