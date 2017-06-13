@@ -702,6 +702,7 @@ var FieldBoolean = AbstractField.extend({
             case $.ui.keyCode.DOWN:
             case $.ui.keyCode.LEFT:
                 ev.preventDefault();
+                break;
         }
         this._super.apply(this, arguments);
     },
