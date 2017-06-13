@@ -1,57 +1,10 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import tools
-from odoo.exceptions import ValidationError
 from odoo.tests.common import TransactionCase
 
 
 class TestIrValues(TransactionCase):
-
-    def test_defaults(self):
-        # Create some default value for some model, for all users.
-        ir_values = self.env['ir.values']
-        ir_values.set_default('res.partner', 'ref', 'X11')
-        ir_values.set_default('res.partner.title', 'shortcut', 'Mr', condition='name=Mister')
-
-        # Retrieve them: ds is a list of triplets (id, name, value)
-        ds = ir_values.get_defaults('res.partner')
-        d = next((d for d in ds if d[1] == 'ref'), None)
-        self.assertTrue(d, "At least one value should be retrieved for this model.")
-        self.assertEqual(d[2], 'X11', "Can't retrieve the created default value.")
-
-        ds = ir_values.get_defaults('res.partner.title')
-        d = next((d for d in ds if d[1] == 'shortcut'), None)
-        self.assertFalse(d, "No value should be retrieved, the condition is not met.")
-
-        ds = ir_values.get_defaults('res.partner.title', condition="name=Miss")
-        d = next((d for d in ds if d[1] == 'shortcut'), None)
-        self.assertFalse(d, "No value should be retrieved, the condition is not met.")
-
-        ds = ir_values.get_defaults('res.partner.title', condition="name=Mister")
-        d = next((d for d in ds if d[1] == 'shortcut'), None)
-        self.assertTrue(d, "At least one value should be retrieved.")
-        self.assertEqual(d[2], 'Mr', "Can't retrieve the created default value.")
-
-        # Do it again but for a specific user.
-        ir_values.set_default('res.partner', 'ref', '007', for_all_users=False)
-
-        # Retrieve it and check it is the one for the current user.
-        ds = ir_values.get_defaults('res.partner')
-        d = next((d for d in ds if d[1] == 'ref'), None)
-        self.assertTrue(d, "At least one value should be retrieved for this model.")
-        self.assertEqual(d[2], '007', "Can't retrieve the created default value.")
-
-        # create valid but unusable defaults, a ValidationError should not be thrown
-        with tools.mute_logger('odoo.addons.base.ir.ir_values'):
-            ir_values.set_default('unknown_model', 'unknown_field', 42)
-            ir_values.set_default('res.partner', 'unknown_field', 42)
-
-        # create invalid defaults
-        with self.assertRaises(ValidationError):
-            ir_values.set_default('res.partner', 'lang', 'some_LANG')
-        with self.assertRaises(ValidationError):
-            ir_values.set_default('res.partner', 'credit_limit', 'foo')
 
     def test_actions(self):
         # Create some action bindings for a model.
@@ -97,33 +50,3 @@ class TestIrValues(TransactionCase):
         self.assertEqual(actions[0][1], 'Nice Report', 'Bound action does not match definition')
         self.assertTrue(isinstance(actions[0][2], dict) and actions[0][2]['id'] == report_id,
                         'Bound action does not match definition')
-
-    def test_orders(self):
-        ir_values = self.env['ir.values']
-
-        # create a global rule for all
-        ir_values.set_default(
-            'res.partner', 'ref', 'value_global',
-            for_all_users=True, company_id=False, condition=False)
-        self.assertEqual(
-            ir_values.get_defaults_dict('res.partner')['ref'],
-            'value_global',
-            "Can't retrieve the created default value for all.")
-
-        # set a default value for current company (behavior of 'set default' from debug mode)
-        ir_values.set_default(
-            'res.partner', 'ref', 'value_company',
-            for_all_users=True, company_id=True, condition=False)
-        self.assertEqual(
-            ir_values.get_defaults_dict('res.partner')['ref'],
-            'value_company',
-            "Can't retrieve the created default value for company.")
-
-        # set a default value for current user (behavior of 'set default' from debug mode)
-        ir_values.set_default(
-            'res.partner', 'ref', 'value_user',
-            for_all_users=False, company_id=True, condition=False)
-        self.assertEqual(
-            ir_values.get_defaults_dict('res.partner')['ref'],
-            'value_user',
-            "Can't retrieve the created default value for user.")

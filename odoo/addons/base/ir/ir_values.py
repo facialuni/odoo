@@ -4,7 +4,7 @@
 from ast import literal_eval
 
 from odoo import api, fields, models, tools, _
-from odoo.exceptions import AccessError, MissingError, ValidationError
+from odoo.exceptions import AccessError, MissingError
 from odoo.tools import pickle, pycompat
 
 import logging
@@ -99,10 +99,9 @@ class IrValues(models.Model):
     value = fields.Text(help="Default value (pickled) or reference to an action")
     value_unpickle = fields.Text(string='Default value or action reference',
                                  compute='_value_unpickle', inverse='_value_pickle')
-    key = fields.Selection([('action', 'Action'), ('default', 'Default')],
+    key = fields.Selection([('action', 'Action')],
                            string='Type', index=True, required=True, default='action',
-                           help="- Action: an action attached to one slot of the given model\n"
-                                "- Default: a default value for a model field")
+                           help="- Action: an action attached to one slot of the given model")
     key2 = fields.Char(string='Qualifier', index=True, default='tree_but_open',
                        help="For actions, one of the possible action slots: \n"
                             "  - client_action_multi\n"
@@ -178,154 +177,33 @@ class IrValues(models.Model):
     @api.model
     @api.returns('self', lambda value: value.id)
     def set_default(self, model, field_name, value, for_all_users=True, company_id=False, condition=False):
-        """Defines a default value for the given model and field_name. Any previous
-           default for the same scope (model, field_name, value, for_all_users, company_id, condition)
-           will be replaced and lost in the process.
-
-           Defaults can be later retrieved via :meth:`~.get_defaults`, which will return
-           the highest priority default for any given field. Defaults that are more specific
-           have a higher priority, in the following order (highest to lowest):
-
-               * specific to user and company
-               * specific to user only
-               * specific to company only
-               * global to everyone
-
-           :param string model: model name
-           :param string field_name: field name to which the default applies
-           :param value: the default field value to set
-           :type value: any serializable Python value
-           :param bool for_all_users: whether the default should apply to everybody or only
-                                      the user calling the method
-           :param int company_id: optional ID of the company to which the default should
-                                  apply. If omitted, the default will be global. If True
-                                  is passed, the current user's company will be used.
-           :param string condition: optional condition specification that can be used to
-                                    restrict the applicability of the default values
-                                    (e.g. based on another field's value). This is an
-                                    opaque string as far as the API is concerned, but client
-                                    stacks typically use single-field conditions in the
-                                    form ``'key=stringified_value'``.
-                                    (Currently, the condition is trimmed to 200 characters,
-                                    so values that share the same first 200 characters always
-                                    match)
-           :return: the newly created ir.values entry
-        """
-        if isinstance(value, unicode):
-            value = value.encode('utf8')
-        if company_id is True:
-            # should be company-specific, need to get company id
-            company_id = self.env.user.company_id.id
-
-        # check consistency of model, field_name and value
-        try:
-            field = self.env[model]._fields[field_name]
-            field.convert_to_cache(value, self.browse())
-        except KeyError:
-            _logger.warning("Invalid field %s.%s", model, field_name)
-        except Exception:
-            raise ValidationError(_("Invalid value for %s.%s: %s") % (model, field_name, value))
-
-        # remove existing defaults for the same scope
-        search_criteria = [
-            ('key', '=', 'default'),
-            ('key2', '=', condition and condition[:200]),
-            ('model', '=', model),
-            ('name', '=', field_name),
-            ('user_id', '=', False if for_all_users else self._uid),
-            ('company_id', '=', company_id)
-        ]
-        self.search(search_criteria).unlink()
-
-        return self.create({
-            'name': field_name,
-            'value': pickle.dumps(value),
-            'model': model,
-            'key': 'default',
-            'key2': condition and condition[:200],
-            'user_id': False if for_all_users else self._uid,
-            'company_id': company_id,
-        })
+        """ Deprecated, use the model 'ir.default' instead. """
+        assert condition is False
+        _logger.warning("Deprecated use of ir_values.set_default()")
+        self.env['ir.default'].set(model, field_name, value, user_id=not for_all_users, company_id=company_id)
+        return self
 
     @api.model
     def get_default(self, model, field_name, for_all_users=True, company_id=False, condition=False):
-        """ Return the default value defined for model, field_name, users, company and condition.
-            Return ``None`` if no such default exists.
-        """
-        search_criteria = [
-            ('key', '=', 'default'),
-            ('key2', '=', condition and condition[:200]),
-            ('model', '=', model),
-            ('name', '=', field_name),
-            ('user_id', '=', False if for_all_users else self._uid),
-            ('company_id', '=', company_id)
-        ]
-        defaults = self.search(search_criteria)
-        return pickle.loads(defaults.value.encode('utf-8')) if defaults else None
+        """ Deprecated, use the model 'ir.default' instead. """
+        assert condition is False
+        _logger.warning("Deprecated use of ir_values.get_default()")
+        return self.env['ir.default']._get(model, field_name, user_id=not for_all_users, company_id=company_id)
 
     @api.model
     def get_defaults(self, model, condition=False):
-        """Returns any default values that are defined for the current model and user,
-           (and match ``condition``, if specified), previously registered via
-           :meth:`~.set_default`.
+        """ Deprecated, use the model 'ir.default' instead. """
+        assert condition is False
+        _logger.warning("Deprecated use of ir_values.get_defaults()")
+        defaults = self.env['ir.default'].get_all(model)
+        return [(False, fname, value) for fname, value in defaults.values()]
 
-           Defaults are global to a model, not field-specific, but an optional
-           ``condition`` can be provided to restrict matching default values
-           to those that were defined for the same condition (usually based
-           on another field's value).
-
-           Default values also have priorities depending on whom they apply
-           to: only the highest priority value will be returned for any
-           field. See :meth:`~.set_default` for more details.
-
-           :param string model: model name
-           :param string condition: optional condition specification that can be used to
-                                    restrict the applicability of the default values
-                                    (e.g. based on another field's value). This is an
-                                    opaque string as far as the API is concerned, but client
-                                    stacks typically use single-field conditions in the
-                                    form ``'key=stringified_value'``.
-                                    (Currently, the condition is trimmed to 200 characters,
-                                    so values that share the same first 200 characters always
-                                    match)
-           :return: list of default values tuples of the form ``(id, field_name, value)``
-                    (``id`` is the ID of the default entry, usually irrelevant)
-        """
-        # use a direct SQL query for performance reasons,
-        # this is called very often
-        query = """ SELECT v.id, v.name, v.value FROM ir_values v
-                    LEFT JOIN res_users u ON (v.user_id = u.id)
-                    WHERE v.key = %%s AND v.model = %%s
-                        AND (v.user_id = %%s OR v.user_id IS NULL)
-                        AND (v.company_id IS NULL OR
-                             v.company_id = (SELECT company_id FROM res_users WHERE id = %%s)
-                            )
-                    %s
-                    ORDER BY v.user_id, v.company_id, v.id"""
-        params = ('default', model, self._uid, self._uid)
-        if condition:
-            query = query % 'AND v.key2 = %s'
-            params += (condition[:200],)
-        else:
-            query = query % 'AND v.key2 IS NULL'
-        self._cr.execute(query, params)
-
-        # keep only the highest priority default for each field
-        defaults = {}
-        for row in self._cr.dictfetchall():
-            value = pickle.loads(row['value'].encode('utf-8'))
-            defaults.setdefault(row['name'], (row['id'], row['name'], value))
-        return list(pycompat.values(defaults))
-
-    # use ormcache: this is called a lot by BaseModel.default_get()!
     @api.model
-    @tools.ormcache('self._uid', 'model', 'condition')
     def get_defaults_dict(self, model, condition=False):
-        """ Returns a dictionary mapping field names with their corresponding
-            default value. This method simply improves the returned value of
-            :meth:`~.get_defaults`.
-        """
-        return dict((f, v) for i, f, v in self.get_defaults(model, condition))
+        """ Deprecated, use the model 'ir.default' instead. """
+        assert condition is False
+        _logger.warning("Deprecated use of ir_values.get_defaults_dict()")
+        return self.env['ir.default'].get_all(model)
 
     @api.model
     @api.returns('self', lambda value: value.id)
