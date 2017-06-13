@@ -147,6 +147,7 @@ var FormViewDialog = ViewDialog.extend({
                         },
                         // Note: Add support for keydown TAB and set next tabindex widget on Save button
                         keydown: function(e) {
+                            e.preventDefault();
                             if (e.which == $.ui.keyCode.TAB) {
                                 var is_shiftkey = e.shiftKey ? true : false;
                                 if (!is_shiftkey) {

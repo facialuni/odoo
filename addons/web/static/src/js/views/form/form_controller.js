@@ -595,9 +595,9 @@ var FormController = BasicController.extend({
         var self = this;
         if (this.$buttons && this.$buttons.find(".o_form_button_save").length) {
             this._onSave(ev).then(function() {
-                var FirstButton = self.renderer.getFirstButtonWidget(); // Need to get FirstButton in if..else both because reload will re-render
+                var FirstButton = self.renderer.getFirstButtonWidget(); // Need to get FirstButton in if..else both because reload will re-render buttons
                 if (FirstButton) {
-                    FirstButton.activate();
+                    _.delay(function() { FirstButton.activate(); }, 0);
                 } else {
                     self.$buttons && self.$buttons.find(".o_form_button_edit").focus();
                 }

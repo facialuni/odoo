@@ -906,7 +906,7 @@ var FormRenderer = BasicRenderer.extend({
                 return this._activateNextWidget(this.state, index);
             } else if (_.isEqual(ev.data.target, lastWidget) && !_.isEqual(ev.data.target, lastFieldWidget)) {
                 if (this.mode != "readonly") {
-                    return this._activateNextWidget(this.state, 0);
+                    return this._activateNextWidget(this.state, -1);
                 } else {
                     return this.trigger_up('focus_control_button');
                 }
@@ -985,7 +985,7 @@ var FormRenderer = BasicRenderer.extend({
         if (firstButtonWidget) {
             return firstButtonWidget.activate();
         } else if (this.mode != "readonly") {
-            return this._activateNextWidget(this.state, 0);
+            return this._activateNextWidget(this.state, -1);
         } else {
             return this.trigger_up('focus_control_button');
         }
