@@ -20,7 +20,7 @@
             <field name="inherit_id" ref="rating.rating_rating_view_search" />
             <field name="arch" type="xml">
                 <xpath expr="//filter[@name='rating_tasks']" position="after">
-                    <filter string="Rating for issues" domain="[('res_model', '=', 'project.issue')]" />
+                    <filter string="Rating for issues" name="rating_issues" domain="[('res_model', '=', 'project.issue')]" />
                 </xpath>
             </field>
         </record>
@@ -65,7 +65,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//group" position="before">
                     <separator/>
-                    <filter string="Rated issues" domain="[('rating_last_value', '!=', 0.0)]" />
+                    <filter string="Rated issues" name="rated_issues" domain="[('rating_last_value', '!=', 0.0)]" />
                 </xpath>
             </field>
         </record>
