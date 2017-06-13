@@ -68,8 +68,8 @@
                         filter_domain="['|', '|', ('name','ilike',self), ('model','ilike',self), ('key2','ilike',self)]"
                         string="Client Action"/>
                     <group expand="0" string="Group By">
-                        <filter string="Model" domain="[]" context="{'group_by':'model'}"/>
-                        <filter string="Type" domain="[]" context="{'group_by':'key2'}"/>
+                        <filter string="Model" name="group_by_model" domain="[]" context="{'group_by':'model'}"/>
+                        <filter string="Type" name="group_by_type" domain="[]" context="{'group_by':'key2'}"/>
                     </group>
                 </search>
             </field>
