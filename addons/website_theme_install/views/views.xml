@@ -34,8 +34,8 @@
             <search>
                 <field name="name" filter_domain="['|', '|', ('summary', 'ilike', self), ('shortdesc', 'ilike', self), ('name', 'ilike', self)]" string="Theme"/>
                 <group>
-                    <filter string="Author" domain="[]" context="{'group_by':'author'}"/>
-                    <filter string="Category" domain="[]" context="{'group_by':'category_id'}"/>
+                    <filter string="Author" name="author" domain="[]" context="{'group_by':'author'}"/>
+                    <filter string="Category" name="category" domain="[]" context="{'group_by':'category_id'}"/>
                 </group>
             </search>
         </field>
