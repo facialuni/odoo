@@ -63,11 +63,11 @@ class SaleOrder(models.Model):
     amount_undiscounted = fields.Float(
         'Amount Before Discount', compute='_compute_amount_undiscounted', digits=0)
     quote_viewed = fields.Boolean('Quotation Viewed')
-    require_payment = fields.Selection([
+    require_payment = fields.Selection(selection_add=[
         (0, 'Not mandatory on website quote validation'),
         (1, 'Immediate after website order validation'),
         (2, 'Immediate after website order validation and save a token'),
-    ], 'Payment', default=0, help="Require immediate payment by the customer when validating the order from the website quote")
+    ], string='Payment', default=0, help="Require immediate payment by the customer when validating the order from the website quote")
 
     @api.multi
     def copy(self, default=None):
@@ -180,31 +180,12 @@ class SaleOrder(models.Model):
         }
 
     @api.multi
-    def _confirm_online_quote(self, transaction):
-        """ Payment callback: validate the order and write transaction details in chatter """
-        # create draft invoice if transaction is ok
-        if transaction and transaction.state == 'done':
-            transaction._confirm_so()
-            message = _('Order paid by %s. Transaction: %s. Amount: %s.') % (transaction.partner_id.name, transaction.acquirer_reference, transaction.amount)
-            self.message_post(body=message)
-            return True
-        return False
-
-    @api.multi
     def action_confirm(self):
         res = super(SaleOrder, self).action_confirm()
         for order in self:
             if order.template_id and order.template_id.mail_template_id:
                 self.template_id.mail_template_id.send_mail(order.id)
         return res
-
-    @api.multi
-    def _get_payment_type(self):
-        self.ensure_one()
-        if self.require_payment == 2:
-            return 'form_save'
-        else:
-            return 'form'
 
 
 class SaleOrderOption(models.Model):

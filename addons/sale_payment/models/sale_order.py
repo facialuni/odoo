@@ -9,6 +9,14 @@ class SaleOrder(models.Model):
 
     payment_tx_id = fields.Many2one('payment.transaction', string='Last Transaction', copy=False)
     payment_acquirer_id = fields.Many2one('payment.acquirer', string='Payment Acquirer', related='payment_tx_id.acquirer_id', store=True)
+    sale_payment_mode = fields.Selection([
+        ('signature', 'Signature'),
+        ('payment', 'Payment'),
+    ], string="Quotation Signature & Payment", default='signature', compute='_get_sale_payment_mode')
+    require_payment = fields.Selection([
+        (0, 'Not mandatory on online quote validation'),
+        (1, 'Immediate after online order validation'),
+    ], string="Payment", help="Require immediate payment by the customer when validating the order from the online quote")
 
     def _force_lines_to_invoice_policy_order(self):
         for line in self.order_line:
@@ -17,9 +25,57 @@ class SaleOrder(models.Model):
             else:
                 line.qty_to_invoice = 0
 
+    @api.multi
+    def _get_sale_payment_mode(self):
+        """ Get sale payment mode, which is define in sale config.
+            that configuration use for set payment require option in quotation
+            and also update frontend view(if we choose payment then
+            show all published payment method for payment process else just
+            open modal for confirmation process with sign option for quotation.
+        """
+        sale_payment_mode = self.env['ir.values'].sudo().get_default('sale.config.settings', 'sale_payment_mode')
+        for order in self:
+            if sale_payment_mode == 'signature':
+                order.sale_payment_mode = sale_payment_mode
+                order.require_payment = False
+            else:
+                order.sale_payment_mode = sale_payment_mode or 'signature'
+
+    @api.multi
+    def get_access_action(self):
+        """ Instead of the classic form view, redirect to the online quote if it exists. """
+        self.ensure_one()
+        if not self.env.user.share and not self.env.context.get('force_website'):
+            return super(SaleOrder, self).get_access_action()
+        return {
+            'type': 'ir.actions.act_url',
+            'url': '/quote/%s/%s' % (self.id, self.access_token),
+            'target': 'self',
+            'res_id': self.id,
+        }
+
     # ==============
     # Payment #
     # ==============
+
+    @api.multi
+    def _get_payment_type(self):
+        self.ensure_one()
+        if self.require_payment == 2:
+            return 'form_save'
+        else:
+            return 'form'
+
+    @api.multi
+    def _confirm_online_quote(self, transaction):
+        """ Payment callback: validate the order and write transaction details in chatter """
+        # create draft invoice if transaction is ok
+        if transaction and transaction.state == 'done':
+            transaction._confirm_so()
+            message = _('Order paid by %s. Transaction: %s. Amount: %s.') % (transaction.partner_id.name, transaction.acquirer_reference, transaction.amount)
+            self.message_post(body=message)
+            return True
+        return False
 
     @api.multi
     def _prepare_payment_acquirer(self, values=None):

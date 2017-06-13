@@ -28,7 +28,8 @@ class SaleConfiguration(models.TransientModel):
     module_sale_margin = fields.Boolean("Margins")
     group_sale_layout = fields.Boolean("Sections on Sales Orders", implied_group='sale.group_sale_layout')
     group_warning_sale = fields.Boolean("Warnings", implied_group='sale.group_warning_sale')
-    module_website_quote = fields.Boolean("Online Quotations & Templates")
+    module_website_quote = fields.Boolean("Quotation Templates")
+    module_sale_payment = fields.Boolean("Online Signature & Payment")
     group_sale_delivery_address = fields.Boolean("Customer Addresses", implied_group='sale.group_delivery_invoice_address')
     multi_sales_price = fields.Boolean("Multiple sales price per product", default_model='sale.config.settings')
     multi_sales_price_method = fields.Selection([
@@ -104,6 +105,11 @@ class SaleConfiguration(models.TransientModel):
             'multi_sales_price': multi_sales_price,
             'multi_sales_price_method': multi_sales_price and sale_pricelist_setting or False
         }
+
+    @api.onchange("module_website_quote")
+    def _onchange_module_website_quote(self):
+        if self.module_website_quote:
+            self.module_sale_payment = True
 
     @api.onchange('multi_sales_price', 'multi_sales_price_method')
     def _onchange_sale_price(self):
