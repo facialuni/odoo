@@ -47,10 +47,7 @@ var FormRenderer = BasicRenderer.extend({
             var widgets = (!_.isEmpty(this.tabindexWidgets) &&  this.tabindexWidgets[this.state.id]) || this.allFieldWidgets[this.state.id];
             for (var i = 0; i < (widgets ? widgets.length : 0); i++) {
                 var widget = widgets[i];
-                // TODO: Use isFocusable method instead of following condition and check why we need to check label
-                var idForLabel = this.idsForLabels[widget.name];
-                var $label = idForLabel ? self.$('label[for=' + idForLabel + ']') : $();
-                if (!widget.$el.is('.o_form_invisible') && !widget.$el.is('.o_readonly') && $label && $label.length  && !widget.$el.is(":hidden")) {
+                if (widget.isFocusable()) {
                     focusWidget = widget;
                     break;
                 }

@@ -129,7 +129,8 @@ var FormViewDialog = ViewDialog.extend({
                         this._save().then(self.close.bind(self));
                     },
                     keydown: function(e) {
-                        if (e.which == $.ui.keyCode.TAB) {
+                        if (!multi_select && e.which == $.ui.keyCode.TAB) {
+                            e.preventDefault();
                             var is_shiftkey = e.shiftKey ? true : false;
                             if (!is_shiftkey) {
                                 self.form_view.renderer.setFirstButtonFocus();
@@ -337,7 +338,7 @@ var SelectCreateDialog = ViewDialog.extend({
                 _super();
             })
             .then(function() {
-                this.searchview.$('.o_searchview_input').focus(); //Set focus to search input  by default when dialog is opened
+                self.searchview.$('.o_searchview_input').focus(); //Set focus to search input  by default when dialog is opened
             });
         return this;
     },
