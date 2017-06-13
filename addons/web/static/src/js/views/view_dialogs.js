@@ -384,13 +384,20 @@ var SelectCreateDialog = ViewDialog.extend({
             self.__buttons = [{
                 text: _t("Cancel"),
                 classes: "btn-default o_form_button_cancel",
+                tabindex: '-1',
                 close: true,
             }];
             if (!self.options.no_create) {
                 self.__buttons.unshift({
                     text: _t("Create"),
                     classes: "btn-primary",
-                    click: self.create_edit_record.bind(self)
+                    click: self.create_edit_record.bind(self),
+                    keydown: function(e) {
+                        if (e.which == $.ui.keyCode.TAB) {
+                            e.preventDefault();
+                            self.searchview.set_input_focus();
+                        }
+                    }
                 });
             }
             if (!self.options.disable_multiple_selection) {
