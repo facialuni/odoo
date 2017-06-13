@@ -21,6 +21,9 @@ odoo.define('mail.DocumentViewer', function(require) {
             'DOMMouseScroll .o_viewer_content': '_onScroll',    // Firefox
             'mousewheel .o_viewer_content': '_onScroll',        // Chrome, Safari, IE
             'keydown': '_onKeydown',
+            'mousedown .o_viewer_img': '_startDrag',
+            'mousemove .o_viewer_content': '_doDrag',
+            'mouseup .o_viewer_content': '_endDrag'
         },
         /**
          * When initialize document viewer get image and video type attachment from thread
@@ -55,7 +58,7 @@ odoo.define('mail.DocumentViewer', function(require) {
                 widget: this
             }));
             this.$('.o_viewer_img').load(_.bind(this._onImageLoaded, this));
-            this.scale = 1;
+            this._reset();
         },
 
         /**
@@ -70,12 +73,12 @@ odoo.define('mail.DocumentViewer', function(require) {
             this.$el.modal('show');
             this.$el.on('hidden.bs.modal', _.bind(this._onDestroy, this));
             this.$('.o_viewer_img').load(_.bind(this._onImageLoaded, this));
-            this.scale = 1;
+            this._reset();
         },
 
         //--------------------------------------------------------------------------
         // Private
-        //--------------------------------------------------------------------------
+        //---------------------------------------------------------------------------
 
         /**
          * Remove loading indicator when image loaded
@@ -105,6 +108,15 @@ odoo.define('mail.DocumentViewer', function(require) {
             }
             this.$el.modal('hide');
             this.$el.remove();
+        },
+        /**
+         * reset widget param used to reset widget on next previous move
+         * @private
+         */
+        _reset: function(){
+            this.scale = 1;
+            this.dragStartX = this.dragstopX = 0;
+            this.dragStartY = this.dragstopY = 0;
         },
 
         //--------------------------------------------------------------------------
@@ -175,6 +187,43 @@ odoo.define('mail.DocumentViewer', function(require) {
             e.preventDefault();
             var scale = this.scale - ZOOM_STEP;
             this._onZoom(scale);
+        },
+        /**
+         * @private
+         * @param {MouseEvent} e
+         */
+        _startDrag: function (e) {
+            e.preventDefault();
+            this.enableDrag = true;
+            this.dragStartX = e.clientX - (this.dragstopX || 0);
+            this.dragStartY = e.clientY - (this.dragstopY || 0);
+        },
+        /**
+         * @private
+         * @param {MouseEvent} e
+         */
+        _doDrag: function (e) {
+            e.preventDefault();
+            if (this.enableDrag) {
+                var $img = $('.o_viewer_img');
+                var imgOffset = $img.offset();
+                var left = imgOffset.left < 0 ? e.clientX - this.dragStartX : 0;
+                var top = imgOffset.top < 0 ? e.clientY - this.dragStartY : 0;
+                this.$('.o_viewer_img_wrapper')
+                    .css("transform", "translate3d("+ left +"px, " + top + "px, 0)");
+            }
+        },
+        /**
+         * @private
+         * @param {MouseEvent} e
+         */
+        _endDrag: function (e) {
+            e.preventDefault();
+            if (this.enableDrag) {
+                this.enableDrag = false;
+                this.dragstopX = e.clientX - this.dragStartX;
+                this.dragstopY = e.clientY - this.dragStartY;
+            }
         },
         /**
          * Zoom image on scroll
