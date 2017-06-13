@@ -51,9 +51,9 @@
         <field name="arch" type="xml">
             <search string="Campaign Analysis">
                 <field name="date"/>
-                <filter string="To Do" domain="[('state','=','todo')]"/>
-                <filter string="Done" domain="[('state','=','done')]"/>
-                <filter string="Exceptions" domain="[('state','=','exception')]"/>
+                <filter string="To Do" name="todo" domain="[('state','=','todo')]"/>
+                <filter string="Done" name="done" domain="[('state','=','done')]"/>
+                <filter string="Exceptions" name="exceptions" domain="[('state','=','exception')]"/>
                 <field name="campaign_id"/>
                 <field name="activity_id"/>
                 <field name="segment_id"/>
@@ -63,9 +63,9 @@
                     <filter string="Campaign" name="Campaign" context="{'group_by':'campaign_id'}" />
                     <filter string="Segment" name="Segment" context="{'group_by':'segment_id'}"/>
                     <filter string="Activity" name="activity" context="{'group_by':'activity_id'}"/>
-                    <filter string="Status" context="{'group_by':'state'}"/>
+                    <filter string="Status" name="status" context="{'group_by':'state'}"/>
                     <separator/>
-                    <filter string="Execution Month" context="{'group_by':'month'}"/>
+                    <filter string="Execution Month" name="execution_month" context="{'group_by':'month'}"/>
                 </group>
             </search>
         </field>

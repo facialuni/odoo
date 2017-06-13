@@ -132,10 +132,10 @@
             <search string="Campaigns">
                 <field name="name" string="Campaign"/>
                 <filter string="Draft" name="draft" domain="[('state','=','draft')]"/>
-                <filter string="Running" domain="[('state','=','running')]"/>
+                <filter string="Running" name="running" domain="[('state','=','running')]"/>
                 <separator/>
                 <filter string="Test Mode" name="test" domain="[('mode','=','test')]"/>
-                <filter string="Manual Mode" domain="[('mode','=','manual')]"/>
+                <filter string="Manual Mode" name="manual_mode" domain="[('mode','=','manual')]"/>
                 <field name="object_id" string="Resource"/>
                 <group expand="0" string="Group By">
                     <filter string="Resource" name="Object" context="{'group_by':'object_id'}"/>
@@ -302,11 +302,11 @@
                 <field name="name" string="Segment"/>
                 <field name="date_run"/>
                 <filter string="Running" name="running" domain="[('state','=','running')]"/>
-                <filter string="Draft" domain="[('state','=','draft')]"/>
+                <filter string="Draft" name="draft" domain="[('state','=','draft')]"/>
                 <separator/>
-                <filter string="Newly Created" help="Sync mode: only records created after last sync" domain="[('sync_mode','=','create_date')]"/>
-                <filter string="Newly Modified" help="Sync mode: only records updated after last sync" domain="[('sync_mode','=','write_date')]"/>
-                <filter string="All" help="Sync mode: all records" domain="[('sync_mode','=','all')]"/>
+                <filter string="Newly Created" name="newly_created" help="Sync mode: only records created after last sync" domain="[('sync_mode','=','create_date')]"/>
+                <filter string="Newly Modified" name="newly_modified" help="Sync mode: only records updated after last sync" domain="[('sync_mode','=','write_date')]"/>
+                <filter string="All" name="all" help="Sync mode: all records" domain="[('sync_mode','=','all')]"/>
                 <field name="campaign_id"/>
                 <field name="object_id"/>
                 <group expand="0" string="Group By">
@@ -483,7 +483,7 @@
                 <field name="res_name" string="Marketing Campaign Activity"/>
                 <field name="date"/>
                 <filter string="To Do" name="todo" domain="[('state','=','todo')]"/>
-                <filter string="Exception" domain="[('state','=','exception')]"/>
+                <filter string="Exception" name="exception" domain="[('state','=','exception')]"/>
                 <field name="campaign_id"/>
                 <field name="segment_id"/>
                 <field name="object_id"/>
