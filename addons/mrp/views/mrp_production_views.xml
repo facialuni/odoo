@@ -282,10 +282,10 @@
                         domain="[('activity_ids.date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]"
                         help="Show all records which has next action date is before today"/>
                     <group expand="0" string="Group By...">
-                        <filter string="Product" domain="[]" context="{'group_by':'product_id'}"/>
-                        <filter string="Routing" domain="[]" context="{'group_by':'routing_id'}"/>
-                        <filter string="Status" domain="[]" context="{'group_by':'state'}"/>
-                        <filter string="Scheduled Month" domain="[]" context="{'group_by':'date_planned_start'}" help="Scheduled Date by Month"/>
+                        <filter string="Product" name="product" domain="[]" context="{'group_by':'product_id'}"/>
+                        <filter string="Routing" name="routing" domain="[]" context="{'group_by':'routing_id'}"/>
+                        <filter string="Status" name="status" domain="[]" context="{'group_by':'state'}"/>
+                        <filter string="Scheduled Month" name="scheduled_month" domain="[]" context="{'group_by':'date_planned_start'}" help="Scheduled Date by Month"/>
                     </group>
                </search>
             </field>
