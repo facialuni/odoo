@@ -95,7 +95,7 @@
                         <group>
                             <field name="name" attrs="{'readonly':[('state','!=','draft'),('state','!=','confirm')]}"/>
                             <field name="holiday_status_id" context="{'employee_id':employee_id}"/>
-                            <label for="number_of_days_temp" string="Duration"/>
+                            <label for="number_of_days_temp" string="Number of Days"/>
                             <div>
                                 <div attrs="{'invisible': [('type', '=', 'add')]}">
                                     <field name="date_from" attrs="{'required':[('type', '=', 'remove')]}" class="oe_inline"/>
