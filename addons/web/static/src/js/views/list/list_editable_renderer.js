@@ -673,6 +673,12 @@ ListRenderer.include({
     _onDiscardChanges: function(ev) {
         this.unselectRow();
     },
+    /**
+     * It will returns the first visible widget.
+     *
+     * @private
+     * @param {Class} Widget returns first widget
+     */
     _getFirstWidget: function () {
         var record = this.state.data[this.currentRow];
         var recordWidgets = this.tabindexFieldWidgets && this.tabindexFieldWidgets[record.id] || this.allFieldWidgets[record.id];
