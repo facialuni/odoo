@@ -363,6 +363,10 @@ class Holidays(models.Model):
             values.update({'department_id': self.env['hr.employee'].browse(employee_id).department_id.id})
         holiday = super(Holidays, self.with_context(mail_create_nolog=True, mail_create_nosubscribe=True)).create(values)
         holiday.add_follower(employee_id)
+        for category in holiday.category_ids:
+            for employee in category.employee_ids:
+                values = holiday._prepare_create_by_category(employee)
+                self.with_context(mail_notify_force_send=False).create(values)
         return holiday
 
     @api.multi
@@ -490,10 +494,6 @@ class Holidays(models.Model):
                 holiday._validate_leave_request()
             elif holiday.holiday_type == 'category':
                 leaves = self.env['hr.holidays']
-                for category in holiday.category_ids:
-                    for employee in category.employee_ids:
-                        values = holiday._prepare_create_by_category(employee)
-                        leaves += self.with_context(mail_notify_force_send=False).create(values)
                 # TODO is it necessary to interleave the calls?
                 leaves.action_approve()
                 if leaves and leaves[0].double_validation:
