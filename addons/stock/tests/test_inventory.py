@@ -74,6 +74,7 @@ class TestInventory(TransactionCase):
         # check
         self.assertEqual(self.env['stock.quant'].get_available_quantity(self.product2, self.stock_location, lot_id=lot1), 1.0)
         self.assertEqual(len(self.env['stock.quant']._gather(self.product2, self.stock_location, lot_id=lot1)), 1.0)
+        self.assertEqual(lot1.product_qty, 1.0)
 
     def test_inventory_3(self):
         """ Check that it's not posisble to have multiple products with a serial number through an
