@@ -133,7 +133,7 @@ var StatementModel = BasicModel.extend({
         var self = this;
         var ids = _.pluck(_.filter(this.lines, {'reconciled': false}), 'id');
         return this._rpc({
-                model: 'account.bank.statement.line',
+                model: 'account.widget.reconciliation',
                 method: 'reconciliation_widget_auto_reconcile',
                 args: [ids, self.valuenow],
             })
@@ -283,7 +283,7 @@ var StatementModel = BasicModel.extend({
             return $.when();
         }
         var def_statement = this._rpc({
-                model: 'account.bank.statement',
+                model: 'account.widget.reconciliation',
                 method: 'reconciliation_widget_preprocess',
                 args: [statement_ids],
             })
@@ -326,7 +326,7 @@ var StatementModel = BasicModel.extend({
             });
             var ids = _.pluck(self.lines, 'id');
             return self._rpc({
-                    model: 'account.bank.statement.line',
+                    model: 'account.widget.reconciliation',
                     method: 'get_data_for_reconciliation_widget',
                     args: [ids],
                 })
@@ -502,8 +502,8 @@ var StatementModel = BasicModel.extend({
         });
 
         return this._rpc({
-                model: 'account.bank.statement.line',
-                method: 'process_reconciliations',
+                model: 'account.widget.reconciliation',
+                method: 'process_statement_line_reconciliations',
                 args: [ids, values],
             })
             .then(function () {
@@ -828,7 +828,7 @@ var StatementModel = BasicModel.extend({
         var offset = line.offset;
         var limit = 6;
         return this._rpc({
-                model: 'account.bank.statement.line',
+                model: 'account.widget.reconciliation',
                 method: 'get_move_lines_for_reconciliation_widget',
                 args: [line.id, line.st_line.partner_id, excluded_ids, filter, offset, limit],
             })
@@ -914,7 +914,7 @@ var ManualModel = StatementModel.extend({
                     var mode = context.mode === 'customers' ? 'receivable' : 'payable';
                     var args = ['partner', context.partner_ids || null, mode];
                     return self._rpc({
-                            model: 'account.move.line',
+                            model: 'account.widget.reconciliation',
                             method: 'get_data_for_manual_reconciliation',
                             args: args,
                         })
@@ -926,7 +926,7 @@ var ManualModel = StatementModel.extend({
                         });
                 case 'accounts':
                     return self._rpc({
-                            model: 'account.move.line',
+                            model: 'account.widget.reconciliation',
                             method: 'get_data_for_manual_reconciliation',
                             args: ['account', self.account_ids],
                         })
@@ -944,7 +944,7 @@ var ManualModel = StatementModel.extend({
                     account_ids = null; // TOFIX: REMOVE ME
                     partner_ids = null; // TOFIX: REMOVE ME
                     return self._rpc({
-                            model: 'account.move.line',
+                            model: 'account.widget.reconciliation',
                             method: 'get_data_for_manual_reconciliation_widget',
                             args: [partner_ids, account_ids],
                         })
@@ -1012,8 +1012,8 @@ var ManualModel = StatementModel.extend({
 
         if (process_reconciliations.length) {
             def = self._rpc({
-                    model: 'account.move.line',
-                    method: 'process_reconciliations',
+                    model: 'account.widget.reconciliation',
+                    method: 'process_move_line_reconciliations',
                     args: [process_reconciliations],
                 });
         }
@@ -1166,7 +1166,7 @@ var ManualModel = StatementModel.extend({
         var limit = 6;
         var args = [line.account_id.id, line.partner_id, excluded_ids, filter, offset, limit];
         return this._rpc({
-                model: 'account.move.line',
+                model: 'account.widget.reconciliation',
                 method: 'get_move_lines_for_manual_reconciliation',
                 args: args,
             })
