@@ -123,10 +123,10 @@ var ListController = BasicController.extend({
                 Framework.showFocusTip({attachTo: this, message: _t("Press ENTER to Create"), trigger: 'focus'})
             })
             .on('keydown', function(event) {
-                if (event.which === $.ui.keyCode.ENTER) {
+                if (event.which === $.ui.keyCode.ENTER || event.which == $.ui.keyCode.ESCAPE) {
                     $(this).tooltip('hide'); //forcefully hide tooltip as firefox doesn't hide it when element get hidden
-                } else if (event.which == $.ui.keyCode.ESCAPE) {
-                    $(this).tooltip('hide');
+                }
+                if (event.which == $.ui.keyCode.ESCAPE) {
                     self.history_back();
                 }
             });

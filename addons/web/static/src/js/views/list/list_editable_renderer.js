@@ -352,7 +352,6 @@ ListRenderer.include({
      * @returns {Deferred}
      */
     _render: function () {
-        var self = this;
         this.currentRow = null;
         this.currentCol = null;
         return this._super.apply(this, arguments);
@@ -422,7 +421,6 @@ ListRenderer.include({
      * @returns {Deferred} this deferred is resolved immediately
      */
     _renderView: function () {
-        var self = this;
         this.currentRow = null;
         return this._super.apply(this, arguments);
     },

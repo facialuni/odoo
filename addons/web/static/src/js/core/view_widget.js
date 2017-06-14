@@ -16,13 +16,17 @@ var Widget = require('web.Widget');
 var ViewWidget = Widget.extend({
     events: {
         'keydown': '_onKeydown',
-        'keyup': '_onKeyup'
     },
     custom_events: {
         navigation_move: '_onNavigationMove',
     },
 
-    // TODO: override init here and move commong stuff here, like attrs, string, name etc. etc.
+    init: function(parent, record) {
+        this._super(parent);
+
+        // the datapoint fetched from the model
+        this.record = record;
+    },
 
     //--------------------------------------------------------------------------
     // Public
@@ -135,14 +139,7 @@ var ViewWidget = Widget.extend({
      */
     _onNavigationMove: function (ev) {
         ev.data.target = this;
-    },
-    // TODO: Check is this methods needed else remove it
-    _onKeyup: function(event) {
-        if (event.which === $.ui.keyCode.ESCAPE) {
-            this._onKeyupEscape();
-        }
-    },
-    _onKeyupEscape: function() {}
+    }
 });
 
 return ViewWidget;

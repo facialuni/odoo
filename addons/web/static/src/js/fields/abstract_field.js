@@ -65,14 +65,11 @@ var AbstractField = ViewWidget.extend({
      * @param {string} [options.mode=readonly] should be 'readonly' or 'edit'
      */
     init: function (parent, name, record, options) {
-        this._super(parent);
+        this._super(parent, record);
         options = options || {};
 
         // 'name' is the field name displayed by this widget
         this.name = name;
-
-        // the datapoint fetched from the model
-        this.record = record;
 
         // the 'field' property is a description of all the various field properties,
         // such as the type, the comodel (relation), ...

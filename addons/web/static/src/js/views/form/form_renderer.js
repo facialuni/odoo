@@ -67,6 +67,34 @@ var FormRenderer = BasicRenderer.extend({
             self.tabindexWidgets[self.state.id].push(widget);
         });
     },
+    getLastFieldWidget: function() {
+        var tabindexFields = _.chain(this.tabindexWidgets[this.state.id]).filter(function(w) {
+            return !(w.$el.is(":hidden") || w.$el.hasClass("o_readonly_modifier")) && w.__node.tag != "button";
+        }).value();
+        return _(tabindexFields).last();
+    },
+    getFirstButtonWidget: function() {
+        var recordWidgets = this.tabindexWidgets[this.state.id] || [];
+        var firstButtonWidget = _.find(recordWidgets, function(widget) {
+            // FIXME: widget.__node, we may remove __node in future
+            return widget.__node.tag === 'button'
+                && (widget.__node.attrs.class.indexOf('oe_highlight') != -1
+                || widget.__node.attrs.class.indexOf('btn-primary') != -1)
+                && widget.$el.is(':visible')
+                && !widget.$el.hasClass("o_readonly_modifier");
+        });
+        return firstButtonWidget;
+    },
+    focusFirstButton: function() {
+        var firstButtonWidget = this.getFirstButtonWidget();
+        if (firstButtonWidget) {
+            return firstButtonWidget.activate();
+        } else if (this.mode != "readonly") {
+            return this._activateNextWidget(this.state, -1);
+        } else {
+            return this.trigger_up('focus_control_button');
+        }
+    },
     /**
      * Extend the method so that labels also receive the 'o_field_invalid' class
      * if necessary.
@@ -545,12 +573,6 @@ var FormRenderer = BasicRenderer.extend({
         this._handleAttributes(widget.$el, node);
         this._registerModifiers(node, this.state, widget.$el);
 
-        if (node.attrs.class && (node.attrs.class.indexOf('btn-primary') != -1
-            || node.attrs.class.indexOf('oe_highlight') != -1
-            || node.attrs.class.indexOf('oe_stat_button') != -1)) {
-            // TODO: Add into tabindexWidgets but mainatain separate object and push inside tabindexWidgets in last so that stat buttons get focus in last
-            // this.tabindexButtons[this.state.id].push(widget);
-        }
         return widget.$el;
     },
     /**
@@ -881,7 +903,7 @@ var FormRenderer = BasicRenderer.extend({
         ev.stopPropagation();
         // If we are on last tabindex widget then set focus on first widget again
         // note: If it is last field then set focus on save/edit buttons
-        var lastWidget = this.getLastWidget();
+        var lastWidget = this._getLastWidget();
         var lastFieldWidget = this.getLastFieldWidget();
 
         var index = this.tabindexWidgets[this.state.id].indexOf(ev.data.target);
@@ -952,40 +974,11 @@ var FormRenderer = BasicRenderer.extend({
             }
         }
     },
-    // TODO: Move to public method section, if it is going to remain public
-    getLastFieldWidget: function() {
-        var tabindexFields = _.chain(this.tabindexWidgets[this.state.id]).filter(function(w) {
-            return !(w.$el.is(":hidden") || w.$el.hasClass("o_readonly_modifier")) && w.__node.tag != "button";
-        }).value();
-        return _(tabindexFields).last();
-    },
-    getLastWidget: function() {
+    _getLastWidget: function() {
         var tabindexWidgets = _.chain(this.tabindexWidgets[this.state.id]).filter(function(w) {
             return !(w.$el.is(":hidden") || w.$el.hasClass("o_readonly_modifier"));
         }).value();
         return _(tabindexWidgets).last();
-    },
-    getFirstButtonWidget: function() {
-        var recordWidgets = this.tabindexWidgets[this.state.id] || [];
-        var firstButtonWidget = _.find(recordWidgets, function(widget) {
-            // FIXME: widget.__node, we may remove __node in future
-            return widget.__node.tag === 'button'
-                && (widget.__node.attrs.class.indexOf('oe_highlight') != -1
-                || widget.__node.attrs.class.indexOf('btn-primary') != -1)
-                && widget.$el.is(':visible')
-                && !widget.$el.hasClass("o_readonly_modifier");
-        });
-        return firstButtonWidget;
-    },
-    setFirstButtonFocus: function() {
-        var firstButtonWidget = this.getFirstButtonWidget();
-        if (firstButtonWidget) {
-            return firstButtonWidget.activate();
-        } else if (this.mode != "readonly") {
-            return this._activateNextWidget(this.state, -1);
-        } else {
-            return this.trigger_up('focus_control_button');
-        }
     }
 });
 

@@ -271,6 +271,7 @@ var ListRenderer = BasicRenderer.extend({
      * @returns {jQuery} a <button> element
      */
     _renderButton: function (record, node) {
+        // TODO Check & Create ButtonWidget instance
         var $button = $('<button>', {
             type: 'button',
             title: node.attrs.string,
@@ -673,8 +674,8 @@ var ListRenderer = BasicRenderer.extend({
     _keyNavigation: function (event, direction) {
         var self = this;
         var $current_row = null;
-        if (this.state.count === 0) {
-            return false;
+        if (!this.state.count) {
+            return;
         }
 
         var clearPreviousRows = function() {

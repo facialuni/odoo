@@ -161,11 +161,11 @@ var BasicRenderer = AbstractRenderer.extend({
      *   none was possible to activate
      */
     _activateWidget: function (record, currentIndex, options) {
-        var tabindex_widgets = !_.isEmpty(this.tabindexWidgets) ? this.tabindexWidgets : this.allFieldWidgets;
+        var tabindexWidgets = !_.isEmpty(this.tabindexWidgets) ? this.tabindexWidgets : this.allFieldWidgets;
         options = options || {};
         _.defaults(options, {inc: 1, wrap: true});
 
-        var recordWidgets = tabindex_widgets[record.id] || [];
+        var recordWidgets = tabindexWidgets[record.id] || [];
         for (var i = 0 ; i < recordWidgets.length ; i++) {
             var activated = recordWidgets[currentIndex] && recordWidgets[currentIndex].activate({event: options.event});
             if (activated) {
@@ -201,8 +201,8 @@ var BasicRenderer = AbstractRenderer.extend({
      * @return {integer}
      */
     _activateNextWidget: function (record, currentIndex) {
-        var tabindex_widgets = !_.isEmpty(this.tabindexWidgets) ? this.tabindexWidgets : this.allFieldWidgets;
-        currentIndex = (currentIndex + 1) % (tabindex_widgets[record.id] || []).length;
+        var tabindexWidgets = !_.isEmpty(this.tabindexWidgets) ? this.tabindexWidgets : this.allFieldWidgets;
+        currentIndex = (currentIndex + 1) % (tabindexWidgets[record.id] || []).length;
         return this._activateWidget(record, currentIndex, {inc: 1});
     },
     /**
@@ -215,18 +215,18 @@ var BasicRenderer = AbstractRenderer.extend({
      * @return {integer}
      */
     _activatePreviousWidget: function (record, currentIndex) {
-        var tabindex_widgets = !_.isEmpty(this.tabindexWidgets) ? this.tabindexWidgets : this.allFieldWidgets;
-        currentIndex = currentIndex ? (currentIndex - 1) : ((tabindex_widgets[record.id] || []).length - 1);
+        var tabindexWidgets = !_.isEmpty(this.tabindexWidgets) ? this.tabindexWidgets : this.allFieldWidgets;
+        currentIndex = currentIndex ? (currentIndex - 1) : ((tabindexWidgets[record.id] || []).length - 1);
         return this._activateWidget(record, currentIndex, {inc:-1});
     },
     _scrollTo: function(widget, reverse) {
-        var $scrollable_element = this.$el.scrollParent();
-        var offset_top = widget.$el.offset().top;
-        offset_top = (offset_top - $scrollable_element.offset().top);
-        if (reverse && offset_top < 0) {
-            $scrollable_element.animate({ scrollTop: offset_top - ($scrollable_element.height()*0.05)}, 1000);
-        } else if (offset_top > $scrollable_element.height() - ($scrollable_element.height()*0.10)) {
-            $scrollable_element.animate({ scrollTop: offset_top - ($scrollable_element.height()*0.05)}, 1000);
+        var $scrollableElement = this.$el.scrollParent();
+        var offsetTop = widget.$el.offset().top;
+        offsetTop = (offsetTop - $scrollableElement.offset().top);
+        if (reverse && offsetTop < 0) {
+            $scrollableElement.animate({ scrollTop: offsetTop - ($scrollableElement.height()*0.05)}, 1000);
+        } else if (offsetTop > $scrollableElement.height() - ($scrollableElement.height()*0.10)) {
+            $scrollableElement.animate({ scrollTop: offsetTop - ($scrollableElement.height()*0.05)}, 1000);
         }
     },
     /**

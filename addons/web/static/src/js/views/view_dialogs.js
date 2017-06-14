@@ -133,7 +133,7 @@ var FormViewDialog = ViewDialog.extend({
                             e.preventDefault();
                             var is_shiftkey = e.shiftKey ? true : false;
                             if (!is_shiftkey) {
-                                self.form_view.renderer.setFirstButtonFocus();
+                                self.form_view.renderer.focusFirstButton();
                             }
                         }
                     }
@@ -148,11 +148,11 @@ var FormViewDialog = ViewDialog.extend({
                         },
                         // Note: Add support for keydown TAB and set next tabindex widget on Save button
                         keydown: function(e) {
-                            e.preventDefault();
                             if (e.which == $.ui.keyCode.TAB) {
+                                e.preventDefault();
                                 var is_shiftkey = e.shiftKey ? true : false;
                                 if (!is_shiftkey) {
-                                    self.form_view.renderer.setFirstButtonFocus();
+                                    self.form_view.renderer.focusFirstButton();
                                 }
                             }
                         }

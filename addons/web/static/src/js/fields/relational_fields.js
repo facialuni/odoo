@@ -701,6 +701,15 @@ var FieldX2Many = AbstractField.extend({
         }
         return this._super.apply(this, arguments);
     },
+    activate: function() {
+        if (!this.activeActions.create || this.isReadonly) {
+            return false;
+        }
+        if (!this.isReadonly) {
+            this.trigger_up('add_record');
+            return true;
+        }
+    },
 
 
     //--------------------------------------------------------------------------
@@ -999,16 +1008,7 @@ var FieldX2Many = AbstractField.extend({
             ev.stopPropagation();
         }
         return this._super.apply(this, arguments);
-    },
-    activate: function() {
-        if (!this.activeActions.create || this.isReadonly) {
-            return false;
-        }
-        if (!this.isReadonly) {
-            this.trigger_up('add_record');
-            return true;
-        }
-    },
+    }
 });
 
 var FieldOne2Many = FieldX2Many.extend({

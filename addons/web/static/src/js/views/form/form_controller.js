@@ -169,8 +169,7 @@ var FormController = BasicController.extend({
                 .on('keydown', function(e) {
                     if (e.which == $.ui.keyCode.TAB) {
                         e.preventDefault();
-                        var is_shiftkey = e.shiftKey ? true : false;
-                        self.renderer.setFirstButtonFocus();
+                        self.renderer.focusFirstButton();
                     } else if (e.which == $.ui.keyCode.ESCAPE) {
                         $(this).tooltip('hide'); //forcefully hide tooltip as firefox doesn't hide it when element get hidden
                         self.trigger_up('history_back');
@@ -185,10 +184,10 @@ var FormController = BasicController.extend({
                 .on('keydown', function(event) {
                     event.preventDefault();
                     if (event.which == $.ui.keyCode.TAB) {
-                        event.shiftKey ? self.renderer.getLastFieldWidget().activate() : self.renderer.setFirstButtonFocus();
+                        event.shiftKey ? self.renderer.getLastFieldWidget().activate() : self.renderer.focusFirstButton();
                     } else if (event.which == $.ui.keyCode.ENTER) {
                         self._onSave(event).then(function() {
-                            self.renderer.setFirstButtonFocus();
+                            self.renderer.focusFirstButton();
                         });
                     } else if (event.which == $.ui.keyCode.ESCAPE) {
                         self._onDiscard();
@@ -629,7 +628,7 @@ var FormController = BasicController.extend({
         } else if (this.mode == "readonly" && this.$buttons && this.$buttons.find(".o_form_button_edit")) {
             return this.$buttons.find(".o_form_button_edit").focus();
         } else {
-            return this.renderer.setFirstButtonFocus(); // TODO: Change name: focusFirstButton
+            return this.renderer.focusFirstButton();
         }
     }
 });

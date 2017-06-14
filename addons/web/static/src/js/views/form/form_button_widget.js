@@ -20,15 +20,14 @@ var ButtonWidget = ViewWidget.extend({
      * @param {string} [options.mode=readonly] should be 'readonly' or 'edit'
      */
     init: function (parent, node, record, options) {
-        this._super(parent);
+        this._super(parent, record);
 
         this.node = node;
-        this.__node = node // To get rid of this, added because we are finding first button based on this
+        this.__node = node // TODO: To get rid of this, added because we are finding first button based on this
 
-        // the datapoint fetched from the model
-        this.record = record;
-
-        this.string = this.node.attrs.string; // Should be on ViewWidget
+        // the 'string' property is a human readable (and translated) description
+        // of the button.
+        this.string = this.node.attrs.string;
 
         if (node.attrs.icon) {
             this.fa_icon = node.attrs.icon.indexOf('fa-') === 0;
@@ -57,20 +56,23 @@ var ButtonWidget = ViewWidget.extend({
                 enterPressed = true;
             }
         });
-        // TODO: To implement
-        // if (this.node.attrs.help || core.debug) {
-        //     this._addTooltip();
-        // }
         this._addOnFocusAction();
     },
     /**
      * @override
-     * @returns {jQuery} the focusable checkbox input
+     * @returns {jQuery} the focusable element
      */
     getFocusableElement: function() {
         return this.$el || $();
     },
 
+    //--------------------------------------------------------------------------
+    // Private
+    //--------------------------------------------------------------------------
+
+    /**
+    * Return on_focus_tip attribute if available else will remove current button string
+    */
     _getFocusTip: function(node) {
         var show_focus_tip = function() {
             var content = node.attrs.on_focus_tip ? node.attrs.on_focus_tip : _.str.sprintf(_t("Press ENTER to %s"), node.attrs.string);
@@ -91,59 +93,15 @@ var ButtonWidget = ViewWidget.extend({
         }, {});
         this.$el.tooltip(options);
     },
-    _addTooltip: function(widget, $node) {
-        var self = this;
-        this.$el.tooltip({
-            delay: { show: 1000, hide: 0 },
-            title: function () {
-                return qweb.render('WidgetLabel.tooltip', {
-                    debug: core.debug,
-                    widget: self,
-                });
-            }
-        });
-    },
 
-    // TODO: Try to remove this whole method re-writing
-
-    // Note: We added _onKeydowm on ViewWidget and as soon as Enter key is pressed on button it goes for next widget
+    // Note: We added _onKeydown on ViewWidget and as soon as Enter key is pressed on button it goes for next widget
     // Next button should be focused once reload is done and once lastTabindex variable is set
     // Otherwise _onNavigationMove is called before new buttons are displayed and we will not have focus on next widget properly
     _onKeydown: function (ev) {
-        switch (ev.which) {
-            case $.ui.keyCode.TAB:
-                ev.preventDefault();
-                ev.stopPropagation();
-                this.trigger_up('navigation_move', {
-                    direction: ev.shiftKey ? 'previous' : 'next',
-                });
-                break;
-            case $.ui.keyCode.ENTER:
-                // Do nothing, as we bind Enter key explicitly
-                break;
-            case $.ui.keyCode.ESCAPE:
-                this.trigger_up('navigation_move', {direction: 'cancel'});
-                break;
-            case $.ui.keyCode.UP:
-                ev.stopPropagation();
-                this.trigger_up('navigation_move', {direction: 'up'});
-                break;
-            case $.ui.keyCode.RIGHT:
-                ev.stopPropagation();
-                this.trigger_up('navigation_move', {direction: 'right'});
-                break;
-            case $.ui.keyCode.DOWN:
-                ev.stopPropagation();
-                this.trigger_up('navigation_move', {direction: 'down'});
-                break;
-            case $.ui.keyCode.LEFT:
-                ev.stopPropagation();
-                this.trigger_up('navigation_move', {direction: 'left'});
-                break;
+        if (ev.which === $.ui.keyCode.ENTER) {
+            return; // Do nothing, as we bind Enter key explicitly
         }
-    },
-    getFocusableElement: function() {
-        return this.$el;
+        return this._super.apply(this, arguments);
     }
 });
 
