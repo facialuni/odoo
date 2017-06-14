@@ -5,10 +5,11 @@ from odoo import api, models
 from odoo.tools import float_round
 from odoo.tools.misc import formatLang
 from odoo.osv import expression
+from odoo.tools import pycompat
 
 
 class Reconciliation(models.AbstractModel):
-    _name = 'account.widget.reconciliation'
+    _name = 'account.reconciliation'
 
     ####################################################
     # account.bank.statement
@@ -309,7 +310,12 @@ class Reconciliation(models.AbstractModel):
                 del aml_dict['counterpart_aml_id']
             if datum.get('partner_id') is not None:
                 st_line.write({'partner_id': datum['partner_id']})
-            st_line.process_reconciliation(datum.get('counterpart_aml_dicts', []), payment_aml_rec, datum.get('new_aml_dicts', []))
+            self.process_statement_line_reconciliation(st_line.id, datum.get('counterpart_aml_dicts', []), payment_aml_rec, datum.get('new_aml_dicts', []))
+
+    @api.multi
+    def process_statement_line_reconciliation(self, statement_line_id, counterpart_aml_dicts=None, payment_aml_rec=None, new_aml_dicts=None):
+        return self.env['account.bank.statement.line'].process_reconciliation(statement_line_id,
+            counterpart_aml_dicts=counterpart_aml_dicts, payment_aml_rec=payment_aml_rec, new_aml_dicts=new_aml_dicts)
 
     ####################################################
     # account.move.line
@@ -620,3 +626,7 @@ class Reconciliation(models.AbstractModel):
             self.env['res.partner'].mark_as_reconciled(partner_ids)
         if partner_ids:
             self.env['account.account'].mark_as_reconciled(account_ids)
+
+    @api.model
+    def process_move_line_reconciliation(self, mv_line_ids, new_mv_line_dicts):
+        return self.env['account.move.line'].process_reconciliation(mv_line_ids, new_mv_line_dicts)
