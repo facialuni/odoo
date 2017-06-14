@@ -314,8 +314,8 @@ class Reconciliation(models.AbstractModel):
 
     @api.multi
     def process_statement_line_reconciliation(self, statement_line_id, counterpart_aml_dicts=None, payment_aml_rec=None, new_aml_dicts=None):
-        return self.env['account.bank.statement.line'].process_reconciliation(statement_line_id,
-            counterpart_aml_dicts=counterpart_aml_dicts, payment_aml_rec=payment_aml_rec, new_aml_dicts=new_aml_dicts)
+        statement_lines = self.env['account.bank.statement.line'].browse(statement_line_id)
+        return statement_lines.process_reconciliation(counterpart_aml_dicts=counterpart_aml_dicts, payment_aml_rec=payment_aml_rec, new_aml_dicts=new_aml_dicts)
 
     ####################################################
     # account.move.line
@@ -629,4 +629,5 @@ class Reconciliation(models.AbstractModel):
 
     @api.model
     def process_move_line_reconciliation(self, mv_line_ids, new_mv_line_dicts):
-        return self.env['account.move.line'].process_reconciliation(mv_line_ids, new_mv_line_dicts)
+        lines = self.env['account.move.line'].browse(mv_line_ids)
+        return lines.process_reconciliation(new_mv_line_dicts)
