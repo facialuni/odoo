@@ -965,6 +965,15 @@ var FormRenderer = BasicRenderer.extend({
         event.preventDefault();
         this.trigger_up('translate', {fieldName: event.target.name, id: this.state.id});
     },
+    /**
+     * This method called every time when navigation move next is performed and
+     * it returns the widget that is next too current active widget.
+     *
+     * @private
+     * @param {Integer} currentIndex current widget index
+     * @param {Array} recordWidgets Array of all record widgets
+     * @returns {Class} Widget returns widget
+     */
     _getNextTabindexWidget: function(currentIndex, recordWidgets) {
         if (recordWidgets.length-1 == currentIndex) {
             currentIndex -= recordWidgets.length-1; // If we are on last widget index then move user back to first widget
@@ -976,6 +985,12 @@ var FormRenderer = BasicRenderer.extend({
             }
         }
     },
+    /**
+     * It will returns the last visible widget.
+     *
+     * @private
+     * @returns {Class} Widget returns last widget
+     */
     _getLastWidget: function() {
         var lastTabindexWidget = _.chain(this.tabindexWidgets[this.state.id]).filter(function(w) {
             return !(w.$el.is(":hidden") || w.$el.hasClass("o_readonly_modifier"));

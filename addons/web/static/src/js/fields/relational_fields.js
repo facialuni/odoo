@@ -1002,6 +1002,11 @@ var FieldX2Many = AbstractField.extend({
     _onToggleColumnOrder: function (ev) {
         ev.data.field = this.name;
     },
+    /**
+     * @override
+     * @private
+     * @param {OdooEvent} ev
+     */
     _onNavigationMove: function(ev) {
         if (ev.data.direction === 'cancel' && this.renderer.viewType === "list" && this.renderer.cancelling) {
             this.renderer.cancelling = false;
@@ -1767,6 +1772,11 @@ var FieldMany2ManyCheckBoxes = AbstractField.extend({
             ids: ids,
         });
     },
+    /**
+     * @override
+     * @private
+     * @param {OdooEvent} ev
+     */
     _onNavigationMove: function(ev) {
         var $inputs = this.$("input");
         var index = $inputs.index(this.$("input:focus"));
