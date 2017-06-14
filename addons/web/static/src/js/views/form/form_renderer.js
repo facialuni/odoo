@@ -68,10 +68,12 @@ var FormRenderer = BasicRenderer.extend({
         });
     },
     getLastFieldWidget: function() {
-        var tabindexFields = _.chain(this.tabindexWidgets[this.state.id]).filter(function(w) {
-            return !(w.$el.is(":hidden") || w.$el.hasClass("o_readonly_modifier")) && w.__node.tag != "button";
-        }).value();
-        return _(tabindexFields).last();
+        var lastTabindexField = _.chain(this.tabindexWidgets[this.state.id]).filter(function(w) {
+            return !(w.$el.is(":hidden") || w.$el.hasClass("o_readonly_modifier")) && w.__node.tag === "field";
+        })
+        .last()
+        .value();
+        return lastTabindexField;
     },
     getFirstButtonWidget: function() {
         var recordWidgets = this.tabindexWidgets[this.state.id] || [];
@@ -975,10 +977,12 @@ var FormRenderer = BasicRenderer.extend({
         }
     },
     _getLastWidget: function() {
-        var tabindexWidgets = _.chain(this.tabindexWidgets[this.state.id]).filter(function(w) {
+        var lastTabindexWidget = _.chain(this.tabindexWidgets[this.state.id]).filter(function(w) {
             return !(w.$el.is(":hidden") || w.$el.hasClass("o_readonly_modifier"));
-        }).value();
-        return _(tabindexWidgets).last();
+        })
+        .last()
+        .value();
+        return lastTabindexWidget;
     }
 });
 

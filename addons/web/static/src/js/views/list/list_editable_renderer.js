@@ -671,14 +671,11 @@ ListRenderer.include({
         return BasicRenderer.prototype._scrollTo.apply(this, arguments);
     },
     _onDiscardChanges: function(ev) {
-        // ev.stopPropagation();
         this.unselectRow();
     },
     _getFirstWidget: function () {
-        var row = this.state.data[this.currentRow];
-        var column = this.columns[this.currentCol];
-        var recordWidgets = this.tabindexFieldWidgets && this.tabindexFieldWidgets[row.id] || this.allFieldWidgets[record.id];
-        var widget = _.findWhere(recordWidgets, {name: column.attrs.name});
+        var record = this.state.data[this.currentRow];
+        var recordWidgets = this.tabindexFieldWidgets && this.tabindexFieldWidgets[record.id] || this.allFieldWidgets[record.id];
         var first_widget = _.find(recordWidgets, function(widget) {
             return widget.$el.is(":visible") && !widget.$el.hasClass("o_readonly_modifier");
         });

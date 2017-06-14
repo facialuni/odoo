@@ -635,10 +635,10 @@ var ListRenderer = BasicRenderer.extend({
                     self._keydownUpSelect(event);
                     break;
                 case $.ui.keyCode.ENTER:
-                    var id = self.selected_row && self.selected_row.data('id');
+                    var id = self.selectedRow && self.selectedRow.data('id');
                     if (id) {
-                        self.trigger_up('open_record', {id:id, target: self.selected_row});
-                        self.selected_row = null;
+                        self.trigger_up('open_record', {id:id, target: self.selectedRow});
+                        self.selectedRow = null;
                     }
                     break;
             }
@@ -673,55 +673,54 @@ var ListRenderer = BasicRenderer.extend({
      */
     _keyNavigation: function (event, direction) {
         var self = this;
-        var $current_row = null;
+        var $currentRow = null;
         if (!this.state.count) {
             return;
         }
 
         var clearPreviousRows = function() {
-            _.each(self.$('tr.o_row_selected'), function (row) {
-                if ($(row).find('.o_list_record_selector input').prop('checked')) {
-                    $(row).find('.o_list_record_selector input').trigger('click');
-                    $(row).removeClass('o_row_selected');
+            self.$('tr.o_row_selected').each(function () {
+                if ($(this).find('.o_list_record_selector input').prop('checked')) {
+                    $(this).find('.o_list_record_selector input').trigger('click');
+                    $(this).removeClass('o_row_selected');
                 }
             });
         };
 
-        if (!this.selected_row) {
+        if (!this.selectedRow) {
             // First remove all previous selected rows when down key pressed from search view
             clearPreviousRows();
-            $current_row = direction == 'down' ? this.$('.o_data_row:first') : this.$('.o_data_row:last');
+            $currentRow = direction == 'down' ? this.$('.o_data_row:first') : this.$('.o_data_row:last');
         } else {
-            var $row = direction == 'down' ? this.selected_row.next() : this.selected_row.prev();
-            if (!$row.length) {
+            var $currentRow = direction == 'down' ? this.selectedRow.next() : this.selectedRow.prev();
+            if (!$currentRow.length) {
                 return;
             }
-            $current_row = $row;
         }
 
         if (this.hasSelectors) {
             if (!event.shiftKey && !event.ctrlKey) {
                 clearPreviousRows();
-                $current_row.find('.o_list_record_selector input').focus().trigger('click');
+                $currentRow.find('.o_list_record_selector input').focus().trigger('click');
             } else if (event.shiftKey && !event.ctrlKey) {
-                $current_row.find('.o_list_record_selector input').focus().trigger('click');
+                $currentRow.find('.o_list_record_selector input').focus().trigger('click');
             }  else if (event.ctrlKey && !event.shiftKey) {
-                $current_row.find('.o_list_record_selector input').focus();
+                $currentRow.find('.o_list_record_selector input').focus();
             }
         } else {
             this.$(".o_list_view").focus(); // Set focus to listview table
             _.each(this.$(".o_row_selected"), function(row) { $(row).removeClass("o_row_selected"); });
-            $current_row.addClass("o_row_selected");
-            this.selected_row = $current_row;
+            $currentRow.addClass("o_row_selected");
+            this.selectedRow = $currentRow;
         }
-        if ($current_row && $current_row.length) {
+        if ($currentRow && $currentRow.length) {
             // Manually scroll instead of standard scrolling
-            var $row = $current_row.next();
-            var table_offset = this.$('.o_list_view').offset().top;
-            var row_offset = $current_row.offset().top;
-            var scroll_amount = direction == 'down' ? $current_row.height() : -$current_row.height();
-            if ((row_offset - table_offset) > (this.$el.parent().height()/2) ) {
-                var offset = (row_offset - table_offset - (this.$el.parent().height()/2) + scroll_amount)
+            var $row = $currentRow.next();
+            var tableOffset = this.$('.o_list_view').offset().top;
+            var rowOffset = $currentRow.offset().top;
+            var scrollAmount = direction == 'down' ? $currentRow.height() : -$currentRow.height();
+            if ((rowOffset - tableOffset) > (this.$el.parent().height()/2) ) {
+                var offset = (rowOffset - tableOffset - (this.$el.parent().height()/2) + scrollAmount)
                 this._scrollTo(offset);
             }
         }
@@ -747,8 +746,8 @@ var ListRenderer = BasicRenderer.extend({
         this._keyNavigation(event, 'up');
     },
     _scrollTo: function(offset) {
-        var $scrollable_element = this.$el.scrollParent();
-        $scrollable_element.scrollTop(offset);
+        var $scrollableElement = this.$el.scrollParent();
+        $scrollableElement.scrollTop(offset);
     },
     /**
      * Whenever we change the state of the selected rows, we need to call this
@@ -791,17 +790,17 @@ var ListRenderer = BasicRenderer.extend({
      * @param {MouseEvent / KeyboardEvent} event
      */
     _onFocusLost: function (event) {
-        var $previous_row = $(event.currentTarget).parent();
-        $previous_row.removeClass('o_row_focused');
-        this.selected_row = null;
+        var $previousRow = $(event.currentTarget).parent();
+        $previousRow.removeClass('o_row_focused');
+        this.selectedRow = null;
     },
     /**
      * @private
      * @param {MouseEvent / KeyboardEvent} event
      */
     _onFocusRecord: function (event) {
-        this.selected_row = $(event.currentTarget).parent();
-        this.selected_row.addClass('o_row_focused');
+        this.selectedRow = $(event.currentTarget).parent();
+        this.selectedRow.addClass('o_row_focused');
     },
     /**
      * @private
@@ -810,10 +809,10 @@ var ListRenderer = BasicRenderer.extend({
     _onSelectRecord: function (event) {
         event.stopPropagation();
         this._updateSelection();
-        var $current_row = $(event.currentTarget).parent();
-        $current_row.addClass('o_row_selected');
+        var $currentRow = $(event.currentTarget).closest("tr");
+        $currentRow.addClass('o_row_selected');
         if (!$(event.currentTarget).find('input').prop('checked')) {
-            $current_row.removeClass('o_row_selected');
+            $currentRow.removeClass('o_row_selected');
             this.$('thead .o_list_record_selector input').prop('checked', false);
         }
     },

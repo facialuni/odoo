@@ -496,7 +496,7 @@ var BasicRenderer = AbstractRenderer.extend({
         this.allFieldWidgets[record.id].push(widget);
 
         // Note: Can be moved to _render method in then callback to find tabindex widgets from allFieldWidgets
-        if (widget.tabindex != -1 && !widget.no_tabindex) {
+        if (widget.tabindex != -1 && !widget.noTabindex) {
             this.tabindexFieldWidgets[record.id].push(widget);
         }
 
