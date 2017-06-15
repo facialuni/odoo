@@ -204,6 +204,17 @@ var AbstractField = ViewWidget.extend({
     isValid: function () {
         return this._isValid;
     },
+    /**
+     * A field widget element is blank or not.
+     *
+     * This function should override by widgets and return true/false
+     * after checking widget element is blank or not
+     *
+     * Note: Checking element value is blank varies by widgets
+     * InputField will check input is blank or not while date field will check datepicker.$input
+     *
+     * @returns {boolean}
+     */
     isBlank: function () {
         return false;
     },
@@ -361,6 +372,14 @@ var AbstractField = ViewWidget.extend({
         });
         return def;
     },
+    /**
+     * Stops to navigate further if required field is blank,
+     * isBlank method will check whether field is blank or not.
+     *
+     * @override
+     * @private
+     * @param {OdooEvent} ev
+     */
     _onNavigationMove: function (ev) {
         if (ev.data.direction == "next" && this.isBlank() && this.$el.hasClass("o_required_modifier")) {
             this.$el.toggleClass('o_field_invalid', true);

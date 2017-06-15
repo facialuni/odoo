@@ -21,7 +21,6 @@ var _t = core._t;
 ListRenderer.include({
     custom_events: _.extend({}, ListRenderer.prototype.custom_events, {
         navigation_move: '_onNavigationMove',
-        discard_changes: '_onDiscardChanges',
     }),
     events: _.extend({}, ListRenderer.prototype.events, {
         'click tbody td.o_data_cell': '_onCellClick',
@@ -684,8 +683,13 @@ ListRenderer.include({
         }
         return BasicRenderer.prototype._scrollTo.apply(this, arguments);
     },
-    _onDiscardChanges: function (ev) {
-        this.unselectRow();
+    _getFirstWidget: function () {
+        var record = this.state.data[this.currentRow];
+        var recordWidgets = this.tabindexFieldWidgets && this.tabindexFieldWidgets[record.id] || this.allFieldWidgets[record.id];
+        var first_widget = _.find(recordWidgets, function(widget) {
+            return widget.$el.is(":visible") && !widget.$el.hasClass("o_readonly_modifier");
+        });
+        return first_widget;
     },
     /**
      * If the list view editable, just let the event bubble. We don't want to

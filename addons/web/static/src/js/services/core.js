@@ -22,6 +22,14 @@ _.each('resize,scroll'.split(','), function(evtype) {
     });
 });
 
+function hide_accesskey_overlay () {
+    var accesskey_elements = $(document).find("[accesskey]").filter(":visible");
+    var overlays = accesskey_elements.find(".accesskey_overlay")
+    if (overlays.length) {
+        return overlays.remove();
+    }
+};
+
 // We can remove usage of jquery hotkey by checking altkey=true and e.which == 191
 $(document).on("keyup", function (e) {
     if (e.which == 191 && e.altKey) {
@@ -45,14 +53,12 @@ $(document).on("keyup", function (e) {
                 "align-items": "center"
             }).appendTo($(elem).css("position", "relative"));
         });
+    } else {
+        hide_accesskey_overlay();
     }
 });
 $(document).on("click", function () {
-    var accesskey_elements = $(document).find("[accesskey]").filter(":visible");
-    var overlays = accesskey_elements.find(".accesskey_overlay")
-    if (overlays.length) {
-        return overlays.remove();
-    }
+    hide_accesskey_overlay();
 });
 
 return {

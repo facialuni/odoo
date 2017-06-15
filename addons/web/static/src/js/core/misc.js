@@ -175,9 +175,13 @@ function ReloadContext (parent, action) {
 }
 core.action_registry.add("reload_context", ReloadContext);
 
-
+/**
+ * Will display tip on widget to describe to next action
+ * Will show tip on options.attachTo
+ * If options.trigger is passed then will trigger on that else trigger will be manual
+ * If options.placement is given then will show tip accordingly else tip will be displayed on bottom
+ */
 function showFocusTip(options) {
-    // Keep here so in future we can create dynamic position tip
     var $attachTo = $(options.attachTo);
     var $template = core.qweb.render('FocusTooltip', { title: options.message });
     var options = _.extend({

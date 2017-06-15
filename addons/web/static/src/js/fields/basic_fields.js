@@ -212,6 +212,10 @@ var InputField = DebouncedField.extend({
             return this._render();
         }
     },
+    /**
+     * @override
+     * Will Check whether value is set and it is not invalid
+     */
     isBlank: function () {
         return !this.isValid() || (!this._getValue());
     },
@@ -686,6 +690,7 @@ var FieldBoolean = AbstractField.extend({
     /**
      * Implement keyboard movements.  Mostly useful for its environment, such
      * as a list view.
+     * Handle UP,RIGHT,DOWN,LEFT keys to prevent default scrolling when focus is on checkbox
      *
      * @override
      * @private

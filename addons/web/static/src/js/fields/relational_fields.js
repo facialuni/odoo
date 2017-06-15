@@ -133,6 +133,10 @@ var FieldMany2One = AbstractField.extend({
         this.floating = false;
         this._setValue(value);
     },
+    /**
+     * @override
+     * Will check whether value is set and is valid
+     */
     isBlank: function () {
         return !this.isValid() || !this.isSet();
     },
@@ -167,10 +171,14 @@ var FieldMany2One = AbstractField.extend({
                 }
                 return false;
             },
-            focus: function (event) {
+            focus: function (event, ui) {
                 event.preventDefault(); // don't automatically select values on focus
             },
+            open: function() {
+                self.is_autocomplete_open = true;
+            },
             close: function (event) {
+                self.is_autocomplete_open = false;
                 // it is necessary to prevent ESC key from propagating to field
                 // root, to prevent unwanted discard operations.
                 if (event.which === $.ui.keyCode.ESCAPE) {
@@ -497,6 +505,7 @@ var FieldMany2One = AbstractField.extend({
     },
     /**
      * @private
+     * @param {OdooEvent} ev
      */
     _onInputFocusout: function (event) {
         if (this.can_create && this.floating) {
@@ -542,7 +551,12 @@ var FieldMany2One = AbstractField.extend({
      * @private
      * @param {OdooEvent} ev
      */
-    _onNavigationMove: basicFields.InputField.prototype._onNavigationMove,
+    _onNavigationMove: function (ev) {
+        if (this.is_autocomplete_open) {
+            ev.stopPropagation();
+        }
+        return basicFields.InputField.prototype._onNavigationMove.apply(this, arguments);
+    },
     /**
      * @private
      * @param {OdooEvent} event
@@ -701,14 +715,17 @@ var FieldX2Many = AbstractField.extend({
         }
         return this._super.apply(this, arguments);
     },
+    /**
+     * @override
+     * Will add new record when focus comes on widget
+     * if create is enabled and widget is not readonly
+     */
     activate: function () {
         if (!this.activeActions.create || this.isReadonly) {
             return false;
         }
-        if (!this.isReadonly) {
-            this.trigger_up('add_record');
-            return true;
-        }
+        this.trigger_up('add_record');
+        return true;
     },
 
 
@@ -1480,6 +1497,11 @@ var FieldMany2ManyTags = AbstractField.extend({
             this.activate();
         }
     },
+    /**
+     * @override
+     * Will check whether tags are selected and value is valid
+     * @returns {boolean}
+     */
     isBlank: function () {
         return !this.isValid() || this.value.count ?  false : true;
     },
@@ -1715,6 +1737,12 @@ var FieldMany2ManyCheckBoxes = AbstractField.extend({
     isSet: function () {
         return true;
     },
+    /**
+     * @override
+     * will set focus on first checkbox
+     * If few checkbox are already checked then set focus on first checked checkbox
+     * @returns {boolean}
+     */
     activate: function () {
         var $inputs = this.$("input");
         if ($inputs) {
@@ -1724,6 +1752,14 @@ var FieldMany2ManyCheckBoxes = AbstractField.extend({
             return false
         }
     },
+    /**
+     * Select checkbox on TAB and if it is first checkbox and SHIFT + TAB pressed
+     * then navigate to previous widget, if last checkbox and TAB pressed
+     * then navigate to next widget.
+     * @param {jQuery} $inputs
+     * @param {integer} index
+     * @param {string} direction
+     */
     selectCheckbox: function ($inputs, index, direction) {
         switch (direction) {
             case 'next':
@@ -1920,6 +1956,10 @@ var FieldSelection = AbstractField.extend({
     isSet: function () {
         return this.value !== false;
     },
+    /**
+     * @override
+     * Will check whether value is set and is valid
+     */
     isBlank: function () {
         return !this.isValid() || !this.isSet();
     },

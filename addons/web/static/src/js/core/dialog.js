@@ -31,7 +31,7 @@ var Dialog = Widget.extend({
      *        modal-body class
      * @param {Object[]} [options.buttons]
      *        List of button descriptions. Note: if no buttons, a "ok" primary
-     *        button is added to allow closing the dialog
+     *        button is added to allow closing the dialog with autofocus
      * @param {string} [options.buttons[].text]
      * @param {string} [options.buttons[].classes]
      *        Default to 'btn-primary' if only one button, 'btn-default'
