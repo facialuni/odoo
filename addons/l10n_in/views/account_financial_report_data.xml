@@ -4,7 +4,7 @@
         <!-- 
             Tax Financial Reports
         -->
-        <record id="account_financial_report_taxpayable0" model="account.financial.report">
+        <record id="total_tax_payable_l10n_in_report" model="account.financial.report">
             <field name="name">Tax Payable</field>
             <field name="type">sum</field>
         </record>
@@ -12,7 +12,7 @@
         <record id="account_financial_report_output" model="account.financial.report">
             <field name="name">Output Liability</field>
             <field name="sign" eval="-1" />
-            <field name="parent_id" ref="account_financial_report_taxpayable0"/>
+            <field name="parent_id" ref="total_tax_payable_l10n_in_report"/>
             <field name="type">sum</field>
         </record>
         <record id="account_financial_report_sgst" model="account.financial.report">
@@ -42,7 +42,7 @@
 
         <record id="account_financial_report_input" model="account.financial.report">
             <field name="name">Input Tax Credit</field>
-            <field name="parent_id" ref="account_financial_report_taxpayable0"/>
+            <field name="parent_id" ref="total_tax_payable_l10n_in_report"/>
             <field name="sign" eval="-1" />
             <field name="type">sum</field>
         </record>

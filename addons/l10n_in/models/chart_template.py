@@ -15,9 +15,9 @@ class ChartTemplate(models.Model):
         #For India, rename customer Invoices journal
         for journal in journals:
             if journal['code'] == 'INV':
-                journal['name'] = 'Tax Invoices'
+                journal['name'] = 'Tax Invoice'
         exp_acc = self.env.ref('l10n_in.p20013').id
         ret_acc = self.env.ref('l10n_in.p20012').id
-        journals = journals + [{'name': _('Retail Invoices'), 'type': 'sale', 'code': _('RET'), 'default_credit_account_id': ret_acc,'default_debit_account_id': ret_acc},
-                                {'name': _('Export Invoices'), 'type': 'sale', 'code': _('EXP'), 'default_credit_account_id': exp_acc,'default_debit_account_id': exp_acc},]
+        journals = journals + [{'name': _('Retail Invoice'), 'type': 'sale', 'code': _('RET'), 'default_credit_account_id': ret_acc,'default_debit_account_id': ret_acc},
+                                {'name': _('Export Invoice'), 'type': 'sale', 'code': _('EXP'), 'default_credit_account_id': exp_acc,'default_debit_account_id': exp_acc},]
         return journals
