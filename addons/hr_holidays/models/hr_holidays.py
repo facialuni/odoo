@@ -335,7 +335,7 @@ class Holidays(models.Model):
         for leave in self:
             if leave.type == 'remove':
                 if self.env.context.get('short_name'):
-                    res.append((leave.id, _("%s : %.2f day(s)") % (leave.name or leave.holiday_status_id.name, leave.number_of_days_temp)))
+                    res.append((leave.id, _("%s : %.2f day(s)") % (leave.holiday_status_id.name, leave.number_of_days_temp)))
                 else:
                     res.append((leave.id, _("%s on %s : %.2f day(s)") % (leave.employee_id.name, leave.holiday_status_id.name, leave.number_of_days_temp)))
             else:
