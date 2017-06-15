@@ -207,9 +207,9 @@ var ListRenderer = BasicRenderer.extend({
                 $currentRow.find('.o_list_record_selector input').focus();
             }
         } else {
-            this.$(".o_list_view").focus(); // Set focus to listview table
-            _.each(this.$(".o_row_selected"), function (row) { $(row).removeClass("o_row_selected"); });
-            $currentRow.addClass("o_row_selected");
+            this.$('.o_list_view').focus(); // Set focus to listview table
+            _.each(this.$('.o_row_selected'), function (row) { $(row).removeClass("o_row_selected"); });
+            $currentRow.addClass('o_row_selected');
             this.selectedRow = $currentRow;
         }
         if ($currentRow && $currentRow.length) {

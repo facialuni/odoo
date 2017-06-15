@@ -149,7 +149,7 @@ var FormController = BasicController.extend({
 
             this.$buttons.append(qweb.render("FormView.buttons", {widget: this}));
             this.$buttons.on('mousedown', 'button', function () {mouse_clicked = true;});
-            this.$buttons.find(".o_form_button_edit")
+            this.$buttons.find('.o_form_button_edit')
                 .on('click', this._onEdit.bind(this))
                 .on('focus', function () {
                     on_button_focus(this, _t("Press ENTER to Edit or ESC to Cancel"));
@@ -161,7 +161,7 @@ var FormController = BasicController.extend({
                     }
                 });
 
-            this.$buttons.find(".o_form_button_create")
+            this.$buttons.find('.o_form_button_create')
                 .on('click', this._onCreate.bind(this))
                 .on('focus', function () {
                     on_button_focus(this, _t("Press ENTER to <b>Create</b> and ESC to go back to the list view"));
@@ -176,7 +176,7 @@ var FormController = BasicController.extend({
                     }
                 });
 
-            this.$buttons.find(".o_form_button_save")
+            this.$buttons.find('.o_form_button_save')
                 .on('click', this._onSave.bind(this))
                 .on('focus', function () {
                     on_button_focus(this, _t("Press ENTER to Save or ESC to Discard"));
@@ -592,19 +592,19 @@ var FormController = BasicController.extend({
     },
     _onShiftEnterPress: function (ev) {
         var self = this;
-        if (this.$buttons && this.$buttons.find(".o_form_button_save").length) {
+        if (this.$buttons && this.$buttons.find('.o_form_button_save').length) {
             this._onSave(ev).then(function () {
                 var FirstButton = self.renderer.getFirstButtonWidget(); // Need to get FirstButton in if..else both because reload will re-render buttons
                 if (FirstButton) {
                     _.delay(function () { FirstButton.activate(); }, 0);
                 } else {
-                    self.$buttons && self.$buttons.find(".o_form_button_edit").focus();
+                    self.$buttons && self.$buttons.find('.o_form_button_edit').focus();
                 }
             });
         } else {
             var FirstButton = this.renderer.getFirstButtonWidget();
             if (FirstButton) {
-                FirstButton.$el.trigger("click");
+                FirstButton.$el.trigger('click');
             }
         }
     },
@@ -623,10 +623,10 @@ var FormController = BasicController.extend({
     },
     _focusControlButton: function (event) {
         event.stopPropagation();
-        if (this.mode != "readonly" && this.$buttons && this.$buttons.find(".o_form_button_save").length) {
-            return this.$buttons.find(".o_form_button_save").focus();
-        } else if (this.mode == "readonly" && this.$buttons && this.$buttons.find(".o_form_button_edit")) {
-            return this.$buttons.find(".o_form_button_edit").focus();
+        if (this.mode != "readonly" && this.$buttons && this.$buttons.find('.o_form_button_save').length) {
+            return this.$buttons.find('.o_form_button_save').focus();
+        } else if (this.mode == "readonly" && this.$buttons && this.$buttons.find('.o_form_button_edit')) {
+            return this.$buttons.find('.o_form_button_edit').focus();
         } else {
             return this.renderer.focusFirstButton();
         }
