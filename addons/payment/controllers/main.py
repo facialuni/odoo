@@ -1,14 +1,45 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import logging
-
 from odoo import http, _
 from odoo.exceptions import AccessError
 from odoo.http import request
+from werkzeug.exceptions import NotFound
 
 
-_logger = logging.getLogger(__name__)
+def _message_post_helper(res_model='', res_id=None, message='', token='', token_field='token', nosubscribe=True, **kw):
+    """ Generic chatter function, allowing to write on *any* object that inherits mail.thread.
+        If a token is specified, all logged in users will be able to write a message regardless
+        of access rights; if the user is the public user, the message will be posted under the name
+        of the partner_id of the object (or the public user if there is no partner_id on the object).
+
+        :param string res_model: model name of the object
+        :param int res_id: id of the object
+        :param string message: content of the message
+
+        optional keywords arguments:
+        :param string token: access token if the object's model uses some kind of public access
+                             using tokens (usually a uuid4) to bypass access rules
+        :param string token_field: name of the field that contains the token on the object (defaults to 'token')
+        :param bool nosubscribe: set False if you want the partner to be set as follower of the object when posting (default to True)
+
+        The rest of the kwargs are passed on to message_post()
+    """
+    record = request.env[res_model].browse(res_id)
+    author_id = request.env.user.partner_id.id if request.env.user.partner_id else False
+    if token and record and token == getattr(record.sudo(), token_field, None):
+        record = record.sudo()
+        if request.env.user == request.env.ref('base.public_user'):
+            author_id = record.partner_id.id if hasattr(record, 'partner_id') else author_id
+        else:
+            if not author_id:
+                raise NotFound()
+    return record.with_context(mail_create_nosubscribe=nosubscribe).message_post(
+        body=message,
+        message_type=kw.pop('message_type', "comment"),
+        subtype=kw.pop('subtype', "mt_comment"),
+        author_id=author_id,
+        **kw)
 
 
 class Payment(http.Controller):
