@@ -56,7 +56,7 @@ var DateWidget = Widget.extend({
         this.$input.datetimepicker(this.options);
         this.picker = this.$input.data('DateTimePicker');
         this.$input.click(this.picker.toggle.bind(this.picker));
-        this.$input.on("keydown", function(e) {
+        this.$input.on("keydown", function (e) {
             if (e.which == $.ui.keyCode.DOWN && !self.$el.find(".bootstrap-datetimepicker-widget.dropdown-menu").length) {
                 self.picker.toggle.bind(self.picker);
             }

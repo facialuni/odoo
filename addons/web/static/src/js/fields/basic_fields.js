@@ -212,7 +212,7 @@ var InputField = DebouncedField.extend({
             return this._render();
         }
     },
-    isBlank: function() {
+    isBlank: function () {
         return !this.isValid() || (!this._getValue());
     },
 

@@ -22,7 +22,7 @@ var FormRenderer = BasicRenderer.extend({
         this._super.apply(this, arguments);
         this.formview_in_popup = params.formview_in_popup;
         this.idsForLabels = {};
-        core.bus.on('dialog_closed', this, function() {
+        core.bus.on('dialog_closed', this, function () {
             // Hacky Fix: Note: This is going to be bind on each formview, this will create issue when dialog is closed, it will be trigerred for all formviews
             if (this.$el.is(":visible")) {
                 this.trigger_up('navigation_move', {direction: 'current'});
@@ -38,7 +38,7 @@ var FormRenderer = BasicRenderer.extend({
      * Focuses the field having attribute 'default_focus' set, if any, or the
      * first focusable field otherwise.
      */
-    autofocus: function() {
+    autofocus: function () {
         if (this.mode === 'readonly') {
             return;
         }
@@ -57,7 +57,7 @@ var FormRenderer = BasicRenderer.extend({
             focusWidget.activate({noselect: true});
         }
     },
-    setTabindexWidgets: function() {
+    setTabindexWidgets: function () {
         var self = this;
         this.tabindexWidgets[this.state.id] = [];
         _.each(this.tabindexFieldWidgets[this.state.id], function (widget) {
@@ -67,17 +67,17 @@ var FormRenderer = BasicRenderer.extend({
             self.tabindexWidgets[self.state.id].push(widget);
         });
     },
-    getLastFieldWidget: function() {
-        var lastTabindexField = _.chain(this.tabindexWidgets[this.state.id]).filter(function(w) {
-            return !(w.$el.is(":hidden") || w.$el.hasClass("o_readonly_modifier")) && w.__node.tag === "field";
+    getLastFieldWidget: function () {
+        var lastTabindexField = _.chain(this.tabindexWidgets[this.state.id]).filter(function (widget) {
+            return !(widget.$el.is(":hidden") || widget.$el.hasClass("o_readonly_modifier")) && widget.__node.tag === "field";
         })
         .last()
         .value();
         return lastTabindexField;
     },
-    getFirstButtonWidget: function() {
+    getFirstButtonWidget: function () {
         var recordWidgets = this.tabindexWidgets[this.state.id] || [];
-        var firstButtonWidget = _.find(recordWidgets, function(widget) {
+        var firstButtonWidget = _.find(recordWidgets, function (widget) {
             // FIXME: widget.__node, we may remove __node in future
             return widget.__node.tag === 'button'
                 && (widget.__node.attrs.class.indexOf('oe_highlight') != -1
@@ -87,7 +87,7 @@ var FormRenderer = BasicRenderer.extend({
         });
         return firstButtonWidget;
     },
-    focusFirstButton: function() {
+    focusFirstButton: function () {
         var firstButtonWidget = this.getFirstButtonWidget();
         if (firstButtonWidget) {
             return firstButtonWidget.activate();
@@ -944,7 +944,7 @@ var FormRenderer = BasicRenderer.extend({
             this._activateWidget(this.state, index, {inc: 1});
         } else if (ev.data.direction === "cancel") {
             this.trigger_up('discard_changes', {
-                onSuccess: _.bind(function() {
+                onSuccess: _.bind(function () {
                     if (this.state.res_id) { // Set focus to Edit button, in new record we will do history_back
                         this.trigger_up('focus_control_button');
                     }
@@ -974,7 +974,7 @@ var FormRenderer = BasicRenderer.extend({
      * @param {Array} recordWidgets Array of all record widgets
      * @returns {Class} Widget returns widget
      */
-    _getNextTabindexWidget: function(currentIndex, recordWidgets) {
+    _getNextTabindexWidget: function (currentIndex, recordWidgets) {
         if (recordWidgets.length-1 == currentIndex) {
             currentIndex -= recordWidgets.length-1; // If we are on last widget index then move user back to first widget
         }
@@ -991,9 +991,9 @@ var FormRenderer = BasicRenderer.extend({
      * @private
      * @returns {Class} Widget returns last widget
      */
-    _getLastWidget: function() {
-        var lastTabindexWidget = _.chain(this.tabindexWidgets[this.state.id]).filter(function(w) {
-            return !(w.$el.is(":hidden") || w.$el.hasClass("o_readonly_modifier"));
+    _getLastWidget: function () {
+        var lastTabindexWidget = _.chain(this.tabindexWidgets[this.state.id]).filter(function(widget) {
+            return !(widget.$el.is(":hidden") || widget.$el.hasClass("o_readonly_modifier"));
         })
         .last()
         .value();

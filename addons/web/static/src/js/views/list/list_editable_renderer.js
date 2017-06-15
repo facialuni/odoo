@@ -664,13 +664,13 @@ ListRenderer.include({
                 break;
         }
     },
-    _scrollTo: function(offset) {
+    _scrollTo: function (offset) {
         if (!this._isEditable()) {
             return this._super.apply(this, arguments);
         }
         return BasicRenderer.prototype._scrollTo.apply(this, arguments);
     },
-    _onDiscardChanges: function(ev) {
+    _onDiscardChanges: function (ev) {
         this.unselectRow();
     },
     /**
@@ -682,7 +682,7 @@ ListRenderer.include({
     _getFirstWidget: function () {
         var record = this.state.data[this.currentRow];
         var recordWidgets = this.tabindexFieldWidgets && this.tabindexFieldWidgets[record.id] || this.allFieldWidgets[record.id];
-        var first_widget = _.find(recordWidgets, function(widget) {
+        var first_widget = _.find(recordWidgets, function (widget) {
             return widget.$el.is(":visible") && !widget.$el.hasClass("o_readonly_modifier");
         });
         return first_widget;

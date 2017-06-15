@@ -678,7 +678,7 @@ var ListRenderer = BasicRenderer.extend({
             return;
         }
 
-        var clearPreviousRows = function() {
+        var clearPreviousRows = function () {
             self.$('tr.o_row_selected').each(function () {
                 if ($(this).find('.o_list_record_selector input').prop('checked')) {
                     $(this).find('.o_list_record_selector input').trigger('click');
@@ -709,7 +709,7 @@ var ListRenderer = BasicRenderer.extend({
             }
         } else {
             this.$(".o_list_view").focus(); // Set focus to listview table
-            _.each(this.$(".o_row_selected"), function(row) { $(row).removeClass("o_row_selected"); });
+            _.each(this.$(".o_row_selected"), function (row) { $(row).removeClass("o_row_selected"); });
             $currentRow.addClass("o_row_selected");
             this.selectedRow = $currentRow;
         }
@@ -745,7 +745,7 @@ var ListRenderer = BasicRenderer.extend({
         event.preventDefault();
         this._keyNavigation(event, 'up');
     },
-    _scrollTo: function(offset) {
+    _scrollTo: function (offset) {
         var $scrollableElement = this.$el.scrollParent();
         $scrollableElement.scrollTop(offset);
     },

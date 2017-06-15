@@ -114,15 +114,15 @@ var ListController = BasicController.extend({
             this.$buttons = $(qweb.render('ListView.buttons', {widget: this}));
             this.$buttons.find('.o_list_button_add')
             .on('click', this._onCreateRecord.bind(this))
-            .on('mousedown', function() {mouse_clicked = true;})
-            .on('focus', function(e) {
+            .on('mousedown', function () {mouse_clicked = true;})
+            .on('focus', function (e) {
                 if (mouse_clicked) {
                     mouse_clicked = false;
                     return;
                 }
                 Framework.showFocusTip({attachTo: this, message: _t("Press ENTER to Create"), trigger: 'focus'})
             })
-            .on('keydown', function(event) {
+            .on('keydown', function (event) {
                 if (event.which === $.ui.keyCode.ENTER || event.which == $.ui.keyCode.ESCAPE) {
                     $(this).tooltip('hide'); //forcefully hide tooltip as firefox doesn't hide it when element get hidden
                 }
@@ -176,7 +176,7 @@ var ListController = BasicController.extend({
             this._toggleSidebar();
         }
     },
-    history_back: function() {
+    history_back: function () {
         this.trigger_up('history_back');
     },
 

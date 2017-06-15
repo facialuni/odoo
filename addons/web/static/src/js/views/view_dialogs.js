@@ -128,7 +128,7 @@ var FormViewDialog = ViewDialog.extend({
                     click: function () {
                         this._save().then(self.close.bind(self));
                     },
-                    keydown: function(e) {
+                    keydown: function (e) {
                         if (!multi_select && e.which == $.ui.keyCode.TAB) {
                             e.preventDefault();
                             var is_shiftkey = e.shiftKey ? true : false;
@@ -147,7 +147,7 @@ var FormViewDialog = ViewDialog.extend({
                             this._save().then(self.form_view.createRecord.bind(self.form_view, self.parentID));
                         },
                         // Note: Add support for keydown TAB and set next tabindex widget on Save button
-                        keydown: function(e) {
+                        keydown: function (e) {
                             if (e.which == $.ui.keyCode.TAB) {
                                 e.preventDefault();
                                 var is_shiftkey = e.shiftKey ? true : false;
@@ -392,7 +392,7 @@ var SelectCreateDialog = ViewDialog.extend({
                     text: _t("Create"),
                     classes: "btn-primary",
                     click: self.create_edit_record.bind(self),
-                    keydown: function(e) {
+                    keydown: function (e) {
                         if (e.which == $.ui.keyCode.TAB) {
                             e.preventDefault();
                             self.searchview.set_input_focus();

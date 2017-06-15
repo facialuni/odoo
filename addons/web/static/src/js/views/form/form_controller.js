@@ -24,7 +24,7 @@ var FormController = BasicController.extend({
     /**
      * Called each time the form view is attached into the DOM
      */
-    on_attach_callback: function() {
+    on_attach_callback: function () {
         this.trigger('attached');
         this.renderer.setTabindexWidgets();
         this.autofocus();
@@ -32,7 +32,7 @@ var FormController = BasicController.extend({
     /**
      * Called each time the form view is detached from the DOM
      */
-    on_detach_callback: function() {
+    on_detach_callback: function () {
         this.trigger('detached');
     },
     /**
@@ -138,7 +138,7 @@ var FormController = BasicController.extend({
             this.$buttons.append($footer);
         } else {
             var mouse_clicked = false;
-            var on_button_focus = function(bind_elem, message) {
+            var on_button_focus = function (bind_elem, message) {
                 if (mouse_clicked) {
                     $(bind_elem).tooltip('hide');
                     mouse_clicked = false;
@@ -148,13 +148,13 @@ var FormController = BasicController.extend({
             };
 
             this.$buttons.append(qweb.render("FormView.buttons", {widget: this}));
-            this.$buttons.on('mousedown', 'button', function() {mouse_clicked = true;});
+            this.$buttons.on('mousedown', 'button', function () {mouse_clicked = true;});
             this.$buttons.find(".o_form_button_edit")
                 .on('click', this._onEdit.bind(this))
-                .on('focus', function() {
+                .on('focus', function () {
                     on_button_focus(this, _t("Press ENTER to Edit or ESC to Cancel"));
                 })
-                .on('keydown', function(e) {
+                .on('keydown', function (e) {
                     if (e.which == $.ui.keyCode.ESCAPE) {
                         $(this).tooltip('hide'); //forcefully hide tooltip as firefox doesn't hide it when element get hidden
                         self.trigger_up('history_back');
@@ -163,10 +163,10 @@ var FormController = BasicController.extend({
 
             this.$buttons.find(".o_form_button_create")
                 .on('click', this._onCreate.bind(this))
-                .on('focus', function() {
+                .on('focus', function () {
                     on_button_focus(this, _t("Press ENTER to <b>Create</b> and ESC to go back to the list view"));
                 })
-                .on('keydown', function(e) {
+                .on('keydown', function (e) {
                     if (e.which == $.ui.keyCode.TAB) {
                         e.preventDefault();
                         self.renderer.focusFirstButton();
@@ -178,15 +178,15 @@ var FormController = BasicController.extend({
 
             this.$buttons.find(".o_form_button_save")
                 .on('click', this._onSave.bind(this))
-                .on('focus', function() {
+                .on('focus', function () {
                     on_button_focus(this, _t("Press ENTER to Save or ESC to Discard"));
                 })
-                .on('keydown', function(event) {
+                .on('keydown', function (event) {
                     event.preventDefault();
                     if (event.which == $.ui.keyCode.TAB) {
                         event.shiftKey && self.renderer.getLastFieldWidget() ? self.renderer.getLastFieldWidget().activate() : self.renderer.focusFirstButton();
                     } else if (event.which == $.ui.keyCode.ENTER) {
-                        self._onSave(event).then(function() {
+                        self._onSave(event).then(function () {
                             self.renderer.focusFirstButton();
                         });
                     } else if (event.which == $.ui.keyCode.ESCAPE) {
@@ -544,7 +544,7 @@ var FormController = BasicController.extend({
             shouldSaveLocally: true,
             title: (record ? _t("Open: ") : _t("Create ")) + (event.target.string || data.field.string),
         }).open();
-        FormViewDialog.on('closed', this, function(e) {
+        FormViewDialog.on('closed', this, function (e) {
             _.delay(function () { data.widget.$el.focus(); }, 100);
         });
     },
@@ -577,7 +577,7 @@ var FormController = BasicController.extend({
         ev.stopPropagation(); // Prevent x2m lines to be auto-saved
         return this.saveRecord();
     },
-    _onDiscardChanges: function() {
+    _onDiscardChanges: function () {
         // If popups are open and by chance if popup does not have focus instead focus is on some other form maybe on main form
         // then first close the top popup otherwise main form's cancel will move us to history_back(maybe on listview) but popup still remains open
         // this should never happen so to avoid this worst case scenario we check if popup is available then close top popup
@@ -590,13 +590,13 @@ var FormController = BasicController.extend({
         }
         return this._super.apply(this, arguments);
     },
-    _onShiftEnterPress: function(ev) {
+    _onShiftEnterPress: function (ev) {
         var self = this;
         if (this.$buttons && this.$buttons.find(".o_form_button_save").length) {
-            this._onSave(ev).then(function() {
+            this._onSave(ev).then(function () {
                 var FirstButton = self.renderer.getFirstButtonWidget(); // Need to get FirstButton in if..else both because reload will re-render buttons
                 if (FirstButton) {
-                    _.delay(function() { FirstButton.activate(); }, 0);
+                    _.delay(function () { FirstButton.activate(); }, 0);
                 } else {
                     self.$buttons && self.$buttons.find(".o_form_button_edit").focus();
                 }
@@ -621,7 +621,7 @@ var FormController = BasicController.extend({
         var state = this.model.get(this.handle);
         this.renderer.confirmChange(state, state.id, [field]);
     },
-    _focusControlButton: function(event) {
+    _focusControlButton: function (event) {
         event.stopPropagation();
         if (this.mode != "readonly" && this.$buttons && this.$buttons.find(".o_form_button_save").length) {
             return this.$buttons.find(".o_form_button_save").focus();

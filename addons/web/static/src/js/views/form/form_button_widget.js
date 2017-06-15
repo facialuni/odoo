@@ -33,7 +33,7 @@ var ButtonWidget = ViewWidget.extend({
             this.fa_icon = node.attrs.icon.indexOf('fa-') === 0;
         }
     },
-    start: function() {
+    start: function () {
         var self = this;
         this._super.apply(this, arguments);
         var enterPressed = false;
@@ -49,7 +49,7 @@ var ButtonWidget = ViewWidget.extend({
                 }
             });
         });
-        this.$el.on("keydown", function(e) {
+        this.$el.on("keydown", function (e) {
             // Note: For setting enterPressed variable which will be helpful to set next widget or not, if mouse is used then do not set next widget focus
             e.stopPropagation();
             if (e.which === $.ui.keyCode.ENTER) {
@@ -62,7 +62,7 @@ var ButtonWidget = ViewWidget.extend({
      * @override
      * @returns {jQuery} the focusable element
      */
-    getFocusableElement: function() {
+    getFocusableElement: function () {
         return this.$el || $();
     },
 
@@ -73,19 +73,19 @@ var ButtonWidget = ViewWidget.extend({
     /**
     * Return on_focus_tip attribute if available else will remove current button string
     */
-    _getFocusTip: function(node) {
-        var show_focus_tip = function() {
+    _getFocusTip: function (node) {
+        var show_focus_tip = function () {
             var content = node.attrs.on_focus_tip ? node.attrs.on_focus_tip : _.str.sprintf(_t("Press ENTER to %s"), node.attrs.string);
             return content;
         }
         return show_focus_tip;
     },
-    _addOnFocusAction: function() {
+    _addOnFocusAction: function () {
         var self = this;
         var options = _.extend({
             delay: { show: 1000, hide: 0 },
             trigger: 'focus',
-            title: function() {
+            title: function () {
                 return qweb.render('FocusTooltip', {
                     getFocusTip: self._getFocusTip(self.node)
                 });

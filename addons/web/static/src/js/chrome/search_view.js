@@ -249,7 +249,7 @@ var SearchView = Widget.extend({
                     break;
             }
         },
-        'keyup .o_searchview_input': function(e) {
+        'keyup .o_searchview_input': function (e) {
             if(this.autocomplete && !this.autocomplete.$el.is(":visible")) {
                 switch(e.which) {
                     case $.ui.keyCode.DOWN:
@@ -434,7 +434,7 @@ var SearchView = Widget.extend({
             this.$buttons.toggle(this.visible_filters);
         }
     },
-    set_input_focus: function() {
+    set_input_focus: function () {
         this.$('.o_searchview_input').focus();
     },
     /**

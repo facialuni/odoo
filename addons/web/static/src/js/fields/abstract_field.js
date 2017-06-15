@@ -204,7 +204,7 @@ var AbstractField = ViewWidget.extend({
     isValid: function () {
         return this._isValid;
     },
-    isBlank: function() {
+    isBlank: function () {
         return false;
     },
     /**
@@ -361,7 +361,7 @@ var AbstractField = ViewWidget.extend({
         });
         return def;
     },
-    _onNavigationMove: function(ev) {
+    _onNavigationMove: function (ev) {
         if (ev.data.direction == "next" && this.isBlank() && this.$el.hasClass("o_required_modifier")) {
             this.$el.toggleClass('o_field_invalid', true);
             ev.data.required_error = true;

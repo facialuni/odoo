@@ -219,7 +219,7 @@ var BasicRenderer = AbstractRenderer.extend({
         currentIndex = currentIndex ? (currentIndex - 1) : ((tabindexWidgets[record.id] || []).length - 1);
         return this._activateWidget(record, currentIndex, {inc:-1});
     },
-    _scrollTo: function(widget, reverse) {
+    _scrollTo: function (widget, reverse) {
         var $scrollableElement = this.$el.scrollParent();
         var offsetTop = widget.$el.offset().top;
         offsetTop = (offsetTop - $scrollableElement.offset().top);
@@ -637,7 +637,7 @@ var BasicRenderer = AbstractRenderer.extend({
      * @param {OdooEvent} ev
      */
     _onNavigationMove: function (ev) {},
-    _setLastTabindex: function(ev) {
+    _setLastTabindex: function (ev) {
         this.lastTabindex = this.tabindexWidgets[this.state.id].indexOf(ev.data.target);
     }
 });

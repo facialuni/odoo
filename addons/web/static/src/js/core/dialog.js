@@ -92,7 +92,7 @@ var Dialog = Widget.extend({
             self.$modal.on('hidden.bs.modal', _.bind(self.destroy, self));
             self.$modal
             .off('keydown.dismiss.bs.modal')
-            .on('keydown.dismiss.bs.modal', _.bind(function(e) {
+            .on('keydown.dismiss.bs.modal', _.bind(function (e) {
                 if (e.which == 27) {
                     e.stopPropagation();
                     this.destroy();

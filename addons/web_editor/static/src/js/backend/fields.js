@@ -66,7 +66,7 @@ var FieldTextHtmlSimple = basic_fields.DebouncedField.extend(TranslatableFieldMi
         }
         return $.when();
     },
-    activate: function() {
+    activate: function () {
         if (!this.$textarea) {
             return false;
         }

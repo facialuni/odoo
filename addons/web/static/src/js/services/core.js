@@ -23,14 +23,14 @@ _.each('resize,scroll'.split(','), function(evtype) {
 });
 
 // We can remove usage of jquery hotkey by checking altkey=true and e.which == 191
-$(document).on("keyup", function(e) {
+$(document).on("keyup", function (e) {
     if (e.which == 191 && e.altKey) {
         var accesskey_elements = $(document).find("[accesskey]").filter(":visible");
         var overlays = accesskey_elements.find(".accesskey_overlay")
         if (overlays.length) {
             return overlays.remove();
         }
-        _.each(accesskey_elements, function(elem) {
+        _.each(accesskey_elements, function (elem) {
             $(_.str.sprintf("<div class='accesskey_overlay'>%s</div>", $(elem).attr("accesskey").toUpperCase())).css({
                 position: "absolute",
                 width: "100%",
@@ -47,7 +47,7 @@ $(document).on("keyup", function(e) {
         });
     }
 });
-$(document).on("click", function() {
+$(document).on("click", function () {
     var accesskey_elements = $(document).find("[accesskey]").filter(":visible");
     var overlays = accesskey_elements.find(".accesskey_overlay")
     if (overlays.length) {

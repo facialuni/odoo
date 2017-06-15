@@ -133,7 +133,7 @@ var FieldMany2One = AbstractField.extend({
         this.floating = false;
         this._setValue(value);
     },
-    isBlank: function() {
+    isBlank: function () {
         return !this.isValid() || !this.isSet();
     },
 
@@ -701,7 +701,7 @@ var FieldX2Many = AbstractField.extend({
         }
         return this._super.apply(this, arguments);
     },
-    activate: function() {
+    activate: function () {
         if (!this.activeActions.create || this.isReadonly) {
             return false;
         }
@@ -1007,7 +1007,7 @@ var FieldX2Many = AbstractField.extend({
      * @private
      * @param {OdooEvent} ev
      */
-    _onNavigationMove: function(ev) {
+    _onNavigationMove: function (ev) {
         if (ev.data.direction === 'cancel' && this.renderer.viewType === "list" && this.renderer.cancelling) {
             this.renderer.cancelling = false;
             ev.stopPropagation();
@@ -1715,7 +1715,7 @@ var FieldMany2ManyCheckBoxes = AbstractField.extend({
     isSet: function () {
         return true;
     },
-    activate: function() {
+    activate: function () {
         var $inputs = this.$("input");
         if ($inputs) {
             $inputs.filter(":checked").length ? $inputs.filter(":checked").first().focus() : $inputs.first().focus();
@@ -1724,7 +1724,7 @@ var FieldMany2ManyCheckBoxes = AbstractField.extend({
             return false
         }
     },
-    selectCheckbox: function($inputs, index, direction) {
+    selectCheckbox: function ($inputs, index, direction) {
         switch (direction) {
             case 'next':
                 index == $inputs.length-1 ? $inputs.first().focus() : $inputs[index+1].focus();
@@ -1777,7 +1777,7 @@ var FieldMany2ManyCheckBoxes = AbstractField.extend({
      * @private
      * @param {OdooEvent} ev
      */
-    _onNavigationMove: function(ev) {
+    _onNavigationMove: function (ev) {
         var $inputs = this.$("input");
         var index = $inputs.index(this.$("input:focus"));
         var navigate_checkbox = '';
