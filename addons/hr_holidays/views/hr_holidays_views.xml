@@ -141,8 +141,8 @@
                     <field name="number_of_days" string="Allocated Days" sum="Remaining Days"/>
                     <field name="manager_id" invisible="1"/>
                     <field name="user_id" invisible="1"/>
-                    <field name="date_from"/>
-                    <field name="date_to"/>
+                    <field name="date_from" invisible="1"/>
+                    <field name="date_to" invisible="1"/>
                     <field name="message_needaction" invisible="1"/>
                     <field name="state"/>
                 </tree>
@@ -838,6 +838,8 @@
                     <field name="manager_id" invisible="1"/>
                     <field name="user_id" invisible="1"/>
                     <field name="message_needaction" invisible="1"/>
+                    <field name="date_from" invisible="1"/>
+                    <field name="date_to" invisible="1"/>
                     <field name="state"/>
                     <button string="Approve"
                         name="action_approve"
