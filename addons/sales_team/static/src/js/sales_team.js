@@ -13,7 +13,7 @@ KanbanRecord.include({
      * @private
      */
     _openRecord: function () {
-        if (this.modelName === 'crm.team') {
+        if (this.modelName === 'crm.team' && $(".oe_kanban_crm_salesteams_list").length != 0) {
             this.$('.oe_kanban_crm_salesteams_list a').first().click();
         } else {
             this._super.apply(this, arguments);
