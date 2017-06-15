@@ -258,14 +258,6 @@ class Holidays(models.Model):
                 raise ValidationError(_('The number of remaining leaves is not sufficient for this leave type.\n'
                                         'Please verify also the leaves waiting for validation.'))
 
-    @api.constrains('holiday_type')
-    def _check_holiday_type(self):
-        for holiday in self:
-            if (holiday.holiday_type == 'employee' and not holiday.employee_id) or (holiday.holiday_type == 'category' and not holiday.category_ids):
-                raise ValidationError(_('The employee or employee category of this request is missing.\n'
-                                        'Please make sure that your user login is linked to an employee.'))
-
-
     _sql_constraints = [
         ('date_check2', "CHECK ( (type='add') OR (date_from <= date_to))", "The start date must be anterior to the end date."),
         ('date_check', "CHECK ( number_of_days_temp >= 0 )", "The number of days must be greater than 0."),
