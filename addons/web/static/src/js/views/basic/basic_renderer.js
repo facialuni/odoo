@@ -146,7 +146,7 @@ var BasicRenderer = AbstractRenderer.extend({
     /**
      * Activates the widget at the given index for the given record if possible
      * or the "next" possible one. Usually, a widget can be activated if it is
-     * in edit mode, and if it is visible.
+     * in edit mode(if it is field widget), and if it is visible.
      *
      * @private
      * @param {Object} record
@@ -219,6 +219,15 @@ var BasicRenderer = AbstractRenderer.extend({
         currentIndex = currentIndex ? (currentIndex - 1) : ((tabindexWidgets[record.id] || []).length - 1);
         return this._activateWidget(record, currentIndex, {inc:-1});
     },
+    /**
+     * This will scroll view automatically when widget is at bottom of the screen
+     * Will be called from _activateWidget method so when user using keyboard to navigate
+     * and widget is at bottom of the screen then this method will automatically scroll upto widget position
+     *
+     * @private
+     * @param {Object} widget
+     * @param {boolean} reverse
+     */
     _scrollTo: function (widget, reverse) {
         var $scrollableElement = this.$el.scrollParent();
         var offsetTop = widget.$el.offset().top;
@@ -637,6 +646,15 @@ var BasicRenderer = AbstractRenderer.extend({
      * @param {OdooEvent} ev
      */
     _onNavigationMove: function (ev) {},
+    /**
+     * Set lastTabindex property
+     * When user presses any button then view will be re-rendered
+     * and we will not have reference of last tabindex element, where to set set focus next,
+     * so to have next focus after button pressed we will persist lastTabindex property
+     *
+     * @private
+     * @param {OdooEvent} ev
+     */
     _setLastTabindex: function (ev) {
         this.lastTabindex = this.tabindexWidgets[this.state.id].indexOf(ev.data.target);
     }

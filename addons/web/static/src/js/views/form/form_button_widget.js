@@ -71,15 +71,23 @@ var ButtonWidget = ViewWidget.extend({
     //--------------------------------------------------------------------------
 
     /**
-    * Return on_focus_tip attribute if available else will remove current button string
-    */
+     * Return on_focus_tip attribute if available else will return current button string
+     * @param {Object} node
+     */
     _getFocusTip: function (node) {
-        var show_focus_tip = function () {
+        var showFocusTip = function () {
             var content = node.attrs.on_focus_tip ? node.attrs.on_focus_tip : _.str.sprintf(_t("Press ENTER to %s"), node.attrs.string);
             return content;
         }
-        return show_focus_tip;
+        return showFocusTip;
     },
+
+    /**
+     * When focus comes to button show tip on it,
+     * this function will display tip to explain user what this button will do,
+     * this function will _getFocusTip function to get tip on the button,
+     * tip is either explicitly defined as an on_focus_tip attribute else _getFocusTip will return current button string.
+     */
     _addOnFocusAction: function () {
         var self = this;
         var options = _.extend({
@@ -93,6 +101,10 @@ var ButtonWidget = ViewWidget.extend({
         }, {});
         this.$el.tooltip(options);
     },
+
+    //--------------------------------------------------------------------------
+    // Handlers
+    //--------------------------------------------------------------------------
 
     // Note: We added _onKeydown on ViewWidget and as soon as Enter key is pressed on button it goes for next widget
     // Next button should be focused once reload is done and once lastTabindex variable is set

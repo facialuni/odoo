@@ -104,6 +104,9 @@ var ListController = BasicController.extend({
      * editable rows are saved once left and clicking on the "Save" button does
      * induce the leaving of the current row.
      *
+     * Note: When focus comes to Create button tip will be displayed(tip will be displayed on keyboard focus only)
+     * and when press ESCAPE key, will do history back i.e. move to previous view.
+     *
      * @override
      * @param {jQuery} $node
      */
@@ -176,6 +179,9 @@ var ListController = BasicController.extend({
             this._toggleSidebar();
         }
     },
+    /**
+     * This method is create to do history back, method created so that can easily be overridden.
+     */
     history_back: function () {
         this.trigger_up('history_back');
     },

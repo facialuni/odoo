@@ -22,6 +22,9 @@ _.each('resize,scroll'.split(','), function(evtype) {
     });
 });
 
+/**
+ * Will hide accesskey overlays from all elements.
+ */
 function hide_accesskey_overlay () {
     var accesskey_elements = $(document).find("[accesskey]").filter(":visible");
     var overlays = accesskey_elements.find(".accesskey_overlay")
@@ -30,7 +33,10 @@ function hide_accesskey_overlay () {
     }
 };
 
-// We can remove usage of jquery hotkey by checking altkey=true and e.which == 191
+/**
+ * will show overlay for accesskey
+ * wherever we have accesskey on any tag, pressing ALT+? will show that accesskey as overlay on that element.
+ */
 $(document).on("keyup", function (e) {
     if (e.which == 191 && e.altKey) {
         var accesskey_elements = $(document).find("[accesskey]").filter(":visible");

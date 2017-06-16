@@ -59,10 +59,10 @@ var FormController = BasicController.extend({
      * Calls autofocus on the renderer
      */
     autofocus: function () {
-        this.renderer.autofocus();
         if (this.$buttons && this.mode == 'readonly') {
-            this.$buttons.find('.o_form_button_edit').focus();
+            return this.$buttons.find('.o_form_button_edit').focus();
         }
+        this.renderer.autofocus();
     },
     /**
      * This method switches the form view in edit mode, with a new record.
@@ -121,7 +121,8 @@ var FormController = BasicController.extend({
     /**
      * Render buttons for the control panel.  The form view can be rendered in
      * a dialog, and in that case, if we have buttons defined in the footer, we
-     * have to use them instead of the standard buttons.
+     * have to use them instead of the standard buttons, when focus comes to button
+     * show tip, also support keyboard keys TAB, ENTER and ESCAPE.
      *
      * @override method from AbstractController
      * @param {jQueryElement} $node
@@ -577,6 +578,12 @@ var FormController = BasicController.extend({
         ev.stopPropagation(); // Prevent x2m lines to be auto-saved
         return this.saveRecord();
     },
+    /**
+     * @override
+     * When user press Escape this method will be called and if there is any dialog 
+     * then we will first close top most dialog and set focus to previous dialog, 
+     * if there is not dialog then we will call super method to discard whole record.
+     */
     _onDiscardChanges: function () {
         // If popups are open and by chance if popup does not have focus instead focus is on some other form maybe on main form
         // then first close the top popup otherwise main form's cancel will move us to history_back(maybe on listview) but popup still remains open
@@ -590,6 +597,14 @@ var FormController = BasicController.extend({
         }
         return this._super.apply(this, arguments);
     },
+    /**
+     * Save the record on SHIFT+ENTER and set focus to first header button,
+     * if there is no header button then set focus to Edit button,
+     * if there are not Save/Edit buttons(i.e. form in wizard) then trigger click of first action button.
+     *
+     * @private
+     * @param {OdooEvent} event
+     */
     _onShiftEnterPress: function (ev) {
         var self = this;
         if (this.$buttons && this.$buttons.find('.o_form_button_save').length) {
@@ -621,6 +636,15 @@ var FormController = BasicController.extend({
         var state = this.model.get(this.handle);
         this.renderer.confirmChange(state, state.id, [field]);
     },
+    /**
+     * When someone wants to set focus on Create/Edit/Save buttons then will trigger event focus_control_button,
+     * ususally called using keyboard navigation, when user reach to last field widget and if press TAB
+     * then user will be first navigated to Save button, if all widgets are traversed and user press TAB
+     * then user will be navigated to Create/edit buttons, so this method will set focus to respective button according to mode.
+     *
+     * @private
+     * @param {OdooEvent} event
+     */
     _focusControlButton: function (event) {
         event.stopPropagation();
         if (this.mode != "readonly" && this.$buttons && this.$buttons.find('.o_form_button_save').length) {

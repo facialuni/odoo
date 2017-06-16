@@ -603,9 +603,14 @@ ListRenderer.include({
      * - left/right: move to the first activable cell on the left/right if any
      *          (wrap to the end/beginning of the line if necessary).
      * - previous: move to the first activable cell on the left if any, if not
-     *          move to the rightmost activable cell on the row above.
+     *          move to the rightmost activable cell on the row above,
+     *          if SHIFT + TAB is pressed on first field then set focus to
+     *          previous widget of parent.
      * - next: move to the first activable cell on the right if any, if not move
-     *          to the leftmost activable cell on the row below.
+     *          to the leftmost activable cell on the row below,
+     *          if first field is empty then move to next widget of parent
+     *          regardless of required attribute,
+     *          if it is last widget then create new line else next widget.
      * - next_line: move to leftmost activable cell on the row below.
      *
      * Note: moving to a line below if on the last line or moving to a line
@@ -639,8 +644,8 @@ ListRenderer.include({
                 break;
             case 'previous':
                 var column = this.columns[this.currentCol];
-                var result = this._getFirstWidget();
-                if (column.attrs.name === result.name) {
+                var firstWidget = this._getFirstWidget();
+                if (column.attrs.name === firstWidget.name) {
                     this.unselectRow();
                     var parent = this.getParent();
                     parent.trigger_up('navigation_move', {direction: 'previous'});
@@ -653,8 +658,8 @@ ListRenderer.include({
                 break;
             case 'next':
                 var column = this.columns[this.currentCol];
-                var result = this._getFirstWidget();
-                if (column.attrs.name === result.name && result.isBlank()) {
+                var firstWidget = this._getFirstWidget();
+                if (column.attrs.name === firstWidget.name && firstWidget.isBlank()) {
                     this.unselectRow();
                     var parent = this.getParent();
                     parent.trigger_up('navigation_move', {direction: 'next'});
@@ -677,19 +682,16 @@ ListRenderer.include({
                 break;
         }
     },
+    /**
+     * @override
+     * Do not call listview _scrollTo function if listview is editable instead
+     * call BasicRenderer's _scrollTo function.
+     */
     _scrollTo: function (offset) {
         if (!this._isEditable()) {
             return this._super.apply(this, arguments);
         }
         return BasicRenderer.prototype._scrollTo.apply(this, arguments);
-    },
-    _getFirstWidget: function () {
-        var record = this.state.data[this.currentRow];
-        var recordWidgets = this.tabindexFieldWidgets && this.tabindexFieldWidgets[record.id] || this.allFieldWidgets[record.id];
-        var first_widget = _.find(recordWidgets, function(widget) {
-            return widget.$el.is(":visible") && !widget.$el.hasClass("o_readonly_modifier");
-        });
-        return first_widget;
     },
     /**
      * If the list view editable, just let the event bubble. We don't want to

@@ -745,6 +745,10 @@ var ListRenderer = BasicRenderer.extend({
             $tr.toggleClass(cssClass, py.PY_isTrue(py.evaluate(expr, record.evalContext)));
         });
     },
+    /**
+     * Scroll listview manually with respect to given offset value.
+     * @param {integer} offset
+     */
     _scrollTo: function (offset) {
         var $scrollableElement = this.$el.scrollParent();
         $scrollableElement.scrollTop(offset);

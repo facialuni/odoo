@@ -57,6 +57,11 @@ var FormRenderer = BasicRenderer.extend({
             focusWidget.activate({noselect: true});
         }
     },
+    /**
+     * This method will prepare tabindexWidgets list which contains all widgets per record
+     * which can be navigated through TAB key, this tabindexWidgets will also contain header buttons,
+     * when user press TAB key then we will pick widget from this list instead of allFieldWidgets list.
+     */
     setTabindexWidgets: function () {
         var self = this;
         this.tabindexWidgets[this.state.id] = [];
@@ -67,6 +72,9 @@ var FormRenderer = BasicRenderer.extend({
             self.tabindexWidgets[self.state.id].push(widget);
         });
     },
+    /**
+     * Will return last field widget from tabindeWidgets list for current record.
+     */
     getLastFieldWidget: function () {
         var lastTabindexField = _.chain(this.tabindexWidgets[this.state.id]).filter(function (widget) {
             return !(widget.$el.is(":hidden") || widget.$el.hasClass("o_readonly_modifier")) && widget.__node.tag === "field";
@@ -75,6 +83,9 @@ var FormRenderer = BasicRenderer.extend({
         .value();
         return lastTabindexField;
     },
+    /**
+     * Will return first header button from tabindexWidgets list for current record.
+     */
     getFirstButtonWidget: function () {
         var recordWidgets = this.tabindexWidgets[this.state.id] || [];
         var firstButtonWidget = _.find(recordWidgets, function (widget) {
@@ -87,6 +98,11 @@ var FormRenderer = BasicRenderer.extend({
         });
         return firstButtonWidget;
     },
+    /**
+     * Sets focus to first header button, if there is no header button then
+     * sets focus to next widget i.e. do iteration cycle on all widgets from last widget to first widget
+     * if view is in readonly mode then set focus to control buttons i.e. Create/Edit
+     */
     focusFirstButton: function () {
         var firstButtonWidget = this.getFirstButtonWidget();
         if (firstButtonWidget) {
@@ -897,6 +913,17 @@ var FormRenderer = BasicRenderer.extend({
     //--------------------------------------------------------------------------
 
     /**
+     * This method will do navigation on widgets based on direction(next, previous etc.),
+     * will not allow to proceed further if field is required, direction is next and user did not fill field,
+     * if direction is next then move user to next widget and if direction is previous then on previous widget,
+     * if direction is next and next widget is button then first set focus to Save button if form is in edit mode,
+     * once record is saved and mode is readoly then navigate user in header buttons,
+     * if user is on last wiget and press TAB if mode is edit then navigate user to first widget to do widget iteration cycle,
+     * else on control buttons i.e. Create/Edit,
+     * if direction is current the keep user to current widget, do not move user to next or previous widget,
+     * if SHIFT + ENTER is pressed then save the document and navigate focus to control buttons i.e. Create/Edit
+     * if user press ESCAPE key then discard document.
+     *
      * @override
      * @private
      * @param {OdooEvent} ev
@@ -986,7 +1013,7 @@ var FormRenderer = BasicRenderer.extend({
         }
     },
     /**
-     * It will returns the last visible widget.
+     * It will returns the last visible widget from tabindexWidgets list for current record.
      *
      * @private
      * @returns {Class} Widget returns last widget

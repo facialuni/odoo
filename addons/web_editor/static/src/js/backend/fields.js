@@ -66,6 +66,10 @@ var FieldTextHtmlSimple = basic_fields.DebouncedField.extend(TranslatableFieldMi
         }
         return $.when();
     },
+    /**
+     * Will set focus on textarea, if it fails then set focus on content editable div
+     * @returns {boolean}
+     */
     activate: function () {
         if (!this.$textarea) {
             return false;
