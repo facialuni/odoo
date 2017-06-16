@@ -24,6 +24,11 @@
             <div class="o_viewer-header">
                 <h2 class="o_image_caption"><t t-esc="widget.active_attachment.name"/></h2>
                 <ul class="list-inline pull-right">
+                    <li t-if="widget.active_attachment.type == 'image'">
+                        <a class="o_print_btn" href="#">
+                            <i class="fa fa-2x fa-print"/>
+                        </a>
+                    </li>
                     <li>
                         <a class="o_close_btn" href="#">
                             <i class="fa fa-2x fa-times"/>
@@ -72,6 +77,24 @@
                 <span class="fa fa-3x fa-chevron-right"/>
             </a>
         </div>
+    </t>
+    <t t-name="PrintImage">
+        <html>
+            <head>
+                <script>
+                    function onload_img() {
+                        setTimeout('print_img()', 10);
+                    }
+                    function print_img() {
+                        window.print();
+                        window.close();
+                    }
+                </script>
+            </head>
+            <body onload='onload_img()'>
+                <img t-att-src='src' />
+            </body>
+        </html>
     </t>
 
     <!-- When a channel is empty-->

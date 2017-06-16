@@ -11,13 +11,14 @@ odoo.define('mail.DocumentViewer', function(require) {
     var DocumentViewer = Widget.extend({
         template: "DocumentViewer",
         events: {
-            'click .o_close_btn, .o_viewer_img_wrapper': '_onClose',
             'click .o_download_btn': '_onDownload',
             'click .o_viewer_img': '_onImageClick',
             'click .move_next': '_onNext',
             'click .move_previous': '_onPrevious',
             'click .o_zoom_in': '_onZoomIn',
             'click .o_zoom_out': '_onZoomOut',
+            'click .o_close_btn, .o_viewer_img_wrapper': '_onClose',
+            'click .o_print_btn': '_onPrint',
             'DOMMouseScroll .o_viewer_content': '_onScroll',    // Firefox
             'mousewheel .o_viewer_content': '_onScroll',        // Chrome, Safari, IE
             'keydown': '_onKeydown',
@@ -130,6 +131,21 @@ odoo.define('mail.DocumentViewer', function(require) {
         _onClose: function (e) {
             e.preventDefault();
             this.$el.modal('hide');
+        },
+        /**
+         * @private
+         * @param {MouseEvent} e
+         */
+        _onPrint: function (e) {
+            e.preventDefault();
+            var src = this.$('.o_viewer_img').prop('src');
+            var script = QWeb.render('PrintImage', {
+                src: src
+            });
+            var printWindow = window.open('about:blank', "_new");
+            printWindow.document.open();
+            printWindow.document.write(script);
+            printWindow.document.close();
         },
         /**
          * @private
