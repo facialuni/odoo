@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mail_digest_view_form_inherit_hr_recruitment" model="ir.ui.view">
+        <field name="name">mail.digest.view.form.inherit.hr.recruitment</field>
+        <field name="model">mail.digest</field>
+        <field name="inherit_id" ref="mail.mail_digest_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='kpi_sales']" position="after">
+                <group name="kpi_hr" string="HR">
+                    <field name="kpi_hr_recruitment_new_colleagues"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

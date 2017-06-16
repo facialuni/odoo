@@ -39,3 +39,5 @@ access_mail_activity_all,mail.activity.all,model_mail_activity,,1,0,0,0
 access_mail_activity_user,mail.activity.user,model_mail_activity,base.group_user,1,1,1,1
 access_mail_activity_type_all,mail.activity.type.all,model_mail_activity_type,,1,0,0,0
 access_mail_activity_type_user,mail.activity.type.user,model_mail_activity_type,base.group_user,1,1,1,1
+access_mail_digest,mail.digest,model_mail_digest,base.group_user,1,1,1,0
+access_mail_digest_system,mail.digest,model_mail_digest,base.group_system,1,1,1,1

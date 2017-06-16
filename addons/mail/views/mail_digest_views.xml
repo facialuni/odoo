@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mail_digest_view_tree" model="ir.ui.view">
+        <field name="name">mail.digest.tree</field>
+        <field name="model">mail.digest</field>
+        <field name="arch" type="xml">
+            <tree string="KPI Digest">
+                <field name="name"/>
+                <field name="periodicity"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="mail_digest_view_form" model="ir.ui.view">
+        <field name="name">mail.digest.form</field>
+        <field name="model">mail.digest</field>
+        <field name="arch" type="xml">
+            <form string="Add KPI Digest">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-check">
+                            <field name="active" widget="boolean_button" options="{'terminology': 'active'}"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="periodicity" widget="radio"  options="{'horizontal': true}"/>
+                            <field name="user_ids" widget="many2many_tags"/>
+                            <field name="template_id" options="{'no_create': True}" groups="base.group_no_one"/>
+                            <field name="next_run_date" invisible="1"/>
+                        </group>
+                    </group>
+                    <group name="kpis" string="General">
+                        <group string="General" name="kpi_general">
+                            <field name="kpi_res_users_connected"/>
+                            <field name="kpi_mail_message_total"/>
+                        </group>
+                        <group name="kpi_sales"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="mail_digest_view_search" model="ir.ui.view">
+        <field name="name">mail.digest.search</field>
+        <field name="model">mail.digest</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="mail_digest_action" model="ir.actions.act_window">
+        <field name="name">KPI Digest</field>
+        <field name="res_model">mail.digest</field>
+        <field name="view_type">form</field>
+        <field name="view_id" ref="mail_digest_view_tree"/>
+        <field name="search_view_id" ref="mail_digest_view_search"/>
+    </record>
+    <!-- Menu: -->
+    <menuitem
+            id="mail_digest_menu"
+            name="KPI Digest"
+            parent="base.menu_administration"
+            sequence="1"
+            action="mail_digest_action"
+            groups="base.group_system"/>
+
+</odoo>

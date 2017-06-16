@@ -49,6 +49,7 @@ Dashboard for CRM will include:
         'data/crm_lead_data.xml',
         'data/web_planner_data.xml',
         'data/mail_template_data.xml',
+        'data/mail_digest_data.xml',
 
         'wizard/base_partner_merge_views.xml',
         'wizard/crm_lead_lost_views.xml',
@@ -67,6 +68,7 @@ Dashboard for CRM will include:
         'views/res_partner_views.xml',
         'views/sale_config_settings_views.xml',
         'views/crm_team_views.xml',
+        'views/mail_digest_views.xml',
     ],
     'demo': [
         'data/crm_demo.xml',

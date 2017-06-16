@@ -17,6 +17,7 @@ Core mechanisms for the accounting modules. To display the menuitems, install th
         'security/ir.model.access.csv',
         'data/data_account_type.xml',
         'data/account_data.xml',
+        'data/mail_digest_data.xml',
         'views/account_menuitem.xml',
         'views/account_payment_view.xml',
         'wizard/account_reconcile_view.xml',
@@ -61,6 +62,7 @@ Core mechanisms for the accounting modules. To display the menuitems, install th
         'views/account_journal_dashboard_view.xml',
         'report/account_report_payment_receipt_templates.xml',
         'data/payment_receipt_data.xml',
+        'views/mail_digest_views.xml',
     ],
     'demo': [
         'demo/account_demo.xml',

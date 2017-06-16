@@ -42,6 +42,8 @@ Main Features
         'data/mail_channel_data.xml',
         'data/mail_shortcode_data.xml',
         'data/mail_activity_data.xml',
+        'data/mail_digest_template_data.xml',
+        'data/mail_digest_data.xml',
         'security/mail_security.xml',
         'security/ir.model.access.csv',
         'views/mail_alias_views.xml',
@@ -52,6 +54,7 @@ Main Features
         'views/ir_actions_views.xml',
         'views/ir_model_views.xml',
         'views/res_partner_views.xml',
+        'views/mail_digest_views.xml'
     ],
     'demo': [
         'data/mail_demo.xml',

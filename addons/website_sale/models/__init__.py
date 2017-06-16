@@ -7,3 +7,4 @@ from . import product
 from . import sale_order
 from . import website
 from . import website_config_settings
+from . import mail_digest

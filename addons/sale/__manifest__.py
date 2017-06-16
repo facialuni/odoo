@@ -15,6 +15,7 @@ This module contains all the common features of Sales Management and eCommerce.
         'data/sale_data.xml',
         'report/sale_report.xml',
         'data/mail_template_data.xml',
+        'data/mail_digest_data.xml',
         'report/sale_report_views.xml',
         'report/sale_report_templates.xml',
         'report/invoice_report_templates.xml',
@@ -28,6 +29,7 @@ This module contains all the common features of Sales Management and eCommerce.
         'views/sale_templates.xml',
         'views/sale_layout_category_view.xml',
         'views/sale_config_settings_views.xml',
+        'views/mail_digest_views.xml',
     ],
     'demo': [
         'data/sale_demo.xml',

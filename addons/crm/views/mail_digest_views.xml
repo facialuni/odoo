@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mail_digest_view_form_inherit_crm_lead" model="ir.ui.view">
+        <field name="name">mail.digest.view.form.inherit.crm.lead</field>
+        <field name="model">mail.digest</field>
+        <field name="inherit_id" ref="mail.mail_digest_view_form"/>
+        <field name="arch" type="xml">
+            <group name="kpi_sales" position="attributes">
+                <attribute name="string">Sales</attribute>
+            </group>
+            <xpath expr="//group[@name='kpi_sales']" position="inside">
+                <field name="kpi_crm_lead_created"/>
+                <field name="kpi_crm_opportunities_won"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

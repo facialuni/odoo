@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mail_digest_view_form_inherit_website_sale_order" model="ir.ui.view">
+        <field name="name">mail.digest.view.form.inherit.website.sale.order</field>
+        <field name="model">mail.digest</field>
+        <field name="inherit_id" ref="mail.mail_digest_view_form"/>
+        <field name="arch" type="xml">
+            <group name="kpi_sales" position="attributes">
+                <attribute name="string">Sales</attribute>
+            </group>
+            <xpath expr="//group[@name='kpi_sales']" position="inside">
+                <field name="kpi_website_sale_total"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

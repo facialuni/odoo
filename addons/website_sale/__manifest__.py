@@ -16,6 +16,7 @@ Odoo E-Commerce
         'security/website_sale.xml',
         'data/data.xml',
         'data/web_planner_data.xml',
+        'data/mail_digest_data.xml',
         'views/product_views.xml',
         'views/account_views.xml',
         'views/sale_report_views.xml',
@@ -26,6 +27,7 @@ Odoo E-Commerce
         'views/snippets.xml',
         'views/report_shop_saleorder.xml',
         'views/website_config_settings_views.xml',
+        'views/mail_digest_views.xml',
     ],
     'demo': [
         'data/demo.xml',
