@@ -250,7 +250,7 @@ var SearchView = Widget.extend({
             }
         },
         'keyup .o_searchview_input': function (e) {
-            if(this.autocomplete && !this.autocomplete.$el.is(":visible")) {
+            if (this.autocomplete && !this.autocomplete.$el.is(":visible")) {
                 switch(e.which) {
                     case $.ui.keyCode.DOWN:
                         this.trigger('search_widget_down', e);

@@ -1836,7 +1836,7 @@ var FieldMany2ManyCheckBoxes = AbstractField.extend({
 //------------------------------------------------------------------------------
 
 var FieldStatus = AbstractField.extend({
-    no_tabindex: true,
+    noTabindex: true,
     className: 'o_statusbar_status',
     events: {
         'click button:not(.dropdown-toggle)': '_onClickStage',
@@ -2046,7 +2046,7 @@ var FieldRadio = FieldSelection.extend({
     template: null,
     className: 'o_field_radio',
     tagName: 'span',
-    no_tabindex: true,
+    noTabindex: true,
     specialData: "_fetchSpecialMany2ones",
     supportedFieldTypes: ['selection', 'many2one'],
     events: _.extend({}, AbstractField.prototype.events, {

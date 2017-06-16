@@ -127,7 +127,7 @@ var Dialog = Widget.extend({
                 text: buttonData.text,
             });
             if (buttonData.tabindex) {
-                $button.attr('tabindex', b.tabindex);
+                $button.attr('tabindex', buttonData.tabindex);
             }
             $button.on('click', function (e) {
                 var def;
@@ -139,8 +139,8 @@ var Dialog = Widget.extend({
                 }
             });
             $button.on('keydown', function(e) {
-                if(b.keydown) {
-                    b.keydown.call(self, e);
+                if(buttonData.keydown) {
+                    buttonData.keydown.call(self, e);
                 }
             });
             self.$footer.append($button);

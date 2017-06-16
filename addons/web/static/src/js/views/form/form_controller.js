@@ -582,7 +582,7 @@ var FormController = BasicController.extend({
         // then first close the top popup otherwise main form's cancel will move us to history_back(maybe on listview) but popup still remains open
         // this should never happen so to avoid this worst case scenario we check if popup is available then close top popup
         var modals = $('body > .modal').filter(':visible');
-        if(modals.length) {
+        if (modals.length) {
             var lastModal = modals.last();
             lastModal.modal('hide');
             lastModal.remove();
