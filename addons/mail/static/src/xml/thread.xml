@@ -238,13 +238,13 @@
             </t>
             <t t-if="type == 'image'">
                 <!--TODO: get thumbnail image with resize by center of image
-                if we use 200x200 it will make the edge of image transparent for image which has height > width-->
-                <img class="o_image" t-attf-src="/web/image/#{attachment.id}/?unique=1"/>
+                here we use 200x200 it will make the edge of image transparent for image which has height > width-->
+                <img class="o_image o_image_preview" t-attf-src="/web/image/#{attachment.id}/300x200?unique=1"/>
             </t>
             <a t-att-href='attachment.url' target="_blank"><span class='o_attachment_name'><t t-esc='attachment.name'/></span></a>
-            <div t-attf-class="o_attachment_overlay #{(type == 'image' || type == 'video') ? 'o_attachment_view' : ''}" t-att-data-id="attachment.id">
+            <div t-attf-class="o_attachment_overlay #{(type === 'image' || type === 'video') ? 'o_attachment_view' : ''}" t-att-data-id="attachment.id">
                 <a class="o_attachment_download" t-att-href='attachment.url' target="_blank">
-                    <i class="fa fa-2x fa-arrow-circle-o-down" title="Download this attachment" aria-hidden="true"></i>
+                    <i t-attf-class="fa fa-2x #{type === 'video'? 'fa-play-circle' : 'fa-arrow-circle-o-down'}" title="Download this attachment" aria-hidden="true"></i>
                 </a>
             </div>
             <t t-if="editable">
