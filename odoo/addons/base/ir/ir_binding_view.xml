@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="ir_binding_form_view" model="ir.ui.view">
+        <field name="name">ir.binding form view</field>
+        <field name="model">ir.binding</field>
+        <field name="arch" type="xml">
+            <form string="Action Bindings">
+                <group>
+                    <group>
+                        <field name="type"/>
+                        <field name="model_id"/>
+                        <field name="action_id"/>
+                    </group>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="ir_binding_tree_view" model="ir.ui.view">
+        <field name="name">ir.binding tree view</field>
+        <field name="model">ir.binding</field>
+        <field name="arch" type="xml">
+            <tree string="Action Bindings">
+                <field name="type"/>
+                <field name="model_id"/>
+                <field name="action_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="ir_binding_search_view" model="ir.ui.view">
+        <field name="name">ir.binding search view</field>
+        <field name="model">ir.binding</field>
+        <field name="arch" type="xml">
+            <search string="Action Bindings">
+                <field name="type"/>
+                <field name="model_id"/>
+                <field name="action_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Type" domain="[]" context="{'group_by':'type'}"/>
+                    <filter string="Model" domain="[]" context="{'group_by':'model_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="ir_binding_menu_action" model="ir.actions.act_window">
+        <field name="name">Action Bindings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">ir.binding</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="ir_binding_search_view"/>
+    </record>
+    <menuitem action="ir_binding_menu_action" id="ir_binding_menu" parent="next_id_6"/>
+
+</odoo>
