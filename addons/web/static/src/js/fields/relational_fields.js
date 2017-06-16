@@ -535,8 +535,15 @@ var FieldMany2One = AbstractField.extend({
      * @override
      * @private
      */
-    _onKeydown: function () {
+    _onKeydown: function (ev) {
         this.floating = false;
+        // Note: Forcefully set input value to blank because keydown will do navigation to listview in case of escape
+        // and after then keyup will do focus out and M2ODialog opens in listview which is wrong
+        // to avoid opening M2ODialog set input value blank as soon as autocomplete is closed
+        // and event is escape(i.e. cancel) and input value is different that current m2o value
+        if (!this.is_autocomplete_open && this.m2o_value !== this.$input.val() && ev.which === $.ui.keyCode.ESCAPE) {
+            this.$input.val("");
+        }
         this._super.apply(this, arguments);
     },
     /**
