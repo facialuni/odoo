@@ -431,7 +431,7 @@ class PaymentTransaction(models.Model):
         ('authorized', 'Authorized'),
         ('done', 'Done'),
         ('error', 'Error'),
-        ('cancel', 'Canceled')], 'Status',
+        ('cancel', 'Cancelled')], 'Status',
         copy=False, default='draft', required=True, track_visibility='onchange')
     state_message = fields.Text('Message', help='Field used to store error and/or validation messages for information')
     # payment
