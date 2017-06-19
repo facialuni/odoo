@@ -45,9 +45,11 @@ var ListController = BasicController.extend({
         this.noLeaf = params.noLeaf;
         this.selectedRecords = []; // there is no selected record by default
         var searchView = this.getParent().searchview;
-        searchView.off('search_widget_down').on('search_widget_down', this, function (event) {
-            this.renderer._keydownDownSelect(event);
-        });
+        if (searchView) {
+            searchView.off('search_widget_down').on('search_widget_down', this, function (event) {
+                this.renderer._keydownDownSelect(event);
+            });
+        }
     },
 
     //--------------------------------------------------------------------------

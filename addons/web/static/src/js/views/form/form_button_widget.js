@@ -27,7 +27,7 @@ var ButtonWidget = ViewWidget.extend({
 
         // the 'string' property is a human readable (and translated) description
         // of the button.
-        this.string = this.node.attrs.string;
+        this.string = (this.node.attrs.string || '').replace(/_/g, '');
 
         if (node.attrs.icon) {
             this.fa_icon = node.attrs.icon.indexOf('fa-') === 0;

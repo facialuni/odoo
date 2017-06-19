@@ -632,6 +632,7 @@ var FormRenderer = BasicRenderer.extend({
         if (def.state() === 'pending') {
             this.defs.push(def);
         }
+        widget.$el.append(_.map(node.children, this._renderNode.bind(this)));
         this._handleAttributes(widget.$el, node);
         this._registerModifiers(node, this.state, widget.$el);
         if (node.attrs.class && (node.attrs.class.indexOf('btn-primary') != -1
@@ -1002,7 +1003,7 @@ var FormRenderer = BasicRenderer.extend({
      * @returns {Class} Widget returns widget
      */
     _getNextTabindexWidget: function (currentIndex, recordWidgets) {
-        if (recordWidgets.length-1 == currentIndex) {
+        if (recordWidgets.length == currentIndex) {
             currentIndex -= recordWidgets.length-1; // If we are on last widget index then move user back to first widget
         }
         for (var i = currentIndex ; i < recordWidgets.length ; i++) {

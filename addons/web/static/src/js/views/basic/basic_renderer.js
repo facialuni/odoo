@@ -170,7 +170,9 @@ var BasicRenderer = AbstractRenderer.extend({
             var activated = recordWidgets[currentIndex] && recordWidgets[currentIndex].activate({event: options.event});
             if (activated) {
                 var reverse = true && options.inc < 0; // If options.inc is in negative it means reverse navigation
-                this._scrollTo(recordWidgets[currentIndex], reverse);
+                if (recordWidgets[currentIndex]) {
+                    this._scrollTo(recordWidgets[currentIndex], reverse);
+                }
                 return currentIndex;
             }
 
