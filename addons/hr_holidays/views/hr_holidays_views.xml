@@ -869,7 +869,7 @@
         </record>
 
         <menuitem
-            id="hr_holidays_menu_action_allocation_to_approve_"
+            id="hr_holidays_menu_action_allocation_to_approve"
             name="Allocations to Approve"
             parent="menu_hr_holidays_approvals"
             groups="hr_holidays.group_hr_holidays_user"
