@@ -630,6 +630,7 @@ var FieldX2Many = AbstractField.extend({
         save_line: '_onSaveLine',
         resequence: '_onResequence',
         toggle_column_order: '_onToggleColumnOrder',
+        active_next_widget: '_activeNextWidget'
     }),
 
     /**
@@ -740,6 +741,13 @@ var FieldX2Many = AbstractField.extend({
     // Private
     //--------------------------------------------------------------------------
 
+    /**
+     * Move to next widget.
+     * @private
+     */
+    _activeNextWidget: function () {
+        this.trigger_up('navigation_move', {direction: 'next'});
+    },
     /**
      * Instanciates or updates the adequate renderer.
      *

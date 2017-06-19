@@ -660,9 +660,7 @@ ListRenderer.include({
                 var column = this.columns[this.currentCol];
                 var firstWidget = this._getFirstWidget();
                 if (column.attrs.name === firstWidget.name && firstWidget.isBlank()) {
-                    this.unselectRow();
-                    var parent = this.getParent();
-                    parent.trigger_up('navigation_move', {direction: 'next'});
+                    this.trigger_up('active_next_widget');
                 } else if (this.currentCol + 1 < this.columns.length) {
                     this._selectCell(this.currentRow, this.currentCol + 1, {wrap: false})
                         .fail(this._moveToNextLine.bind(this));
