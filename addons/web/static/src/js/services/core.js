@@ -59,7 +59,7 @@ $(document).on("keyup", function (e) {
                 "align-items": "center"
             }).appendTo($(elem).css("position", "relative"));
         });
-    } else {
+    } else if (e.which != 18) {
         hide_accesskey_overlay();
     }
 });
