@@ -117,11 +117,13 @@ var ListController = BasicController.extend({
         if (!this.noLeaf && this.hasButtons) {
             var mouse_clicked = false;
             this.$buttons = $(qweb.render('ListView.buttons', {widget: this}));
+            this.$buttons.on('click', '.o_list_button_add', this._onCreateRecord.bind(this));
+            // Note: Intentionally kept separate event binding on same element due to test case
             this.$buttons.find('.o_list_button_add')
-            .on('click', this._onCreateRecord.bind(this))
             .on('mousedown', function () {mouse_clicked = true;})
             .on('focus', function (e) {
                 if (mouse_clicked) {
+                    $(this).tooltip('hide');
                     mouse_clicked = false;
                     return;
                 }
@@ -135,6 +137,7 @@ var ListController = BasicController.extend({
                     self.history_back();
                 }
             });
+
             this.$buttons.on('click', '.o_list_button_discard', this._onDiscard.bind(this));
             this.$buttons.appendTo($node);
         }
