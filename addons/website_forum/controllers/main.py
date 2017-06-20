@@ -81,6 +81,8 @@ class WebsiteForum(http.Controller):
     @http.route(['/forum'], type='http', auth="public", website=True)
     def forum(self, **kwargs):
         forums = request.env['forum.forum'].search([])
+        if not forums:
+            return request.render("website.403")
         return request.render("website_forum.forum_all", {'forums': forums})
 
     @http.route('/forum/new', type='json', auth="user", methods=['POST'], website=True)
@@ -107,6 +109,9 @@ class WebsiteForum(http.Controller):
                  ], type='http', auth="public", website=True)
     def questions(self, forum, tag=None, page=1, filters='all', sorting=None, search='', post_type=None, **post):
         Post = request.env['forum.post']
+
+        if not forum.active:
+            return request.render("website.403")
 
         domain = [('forum_id', '=', forum.id), ('parent_id', '=', False), ('state', '=', 'active')]
         if search:
@@ -313,7 +318,7 @@ class WebsiteForum(http.Controller):
             return werkzeug.utils.redirect('/forum/%s' % slug(forum))
         if not user.email or not tools.single_email_re.match(user.email):
             return werkzeug.utils.redirect("/forum/%s/user/%s/edit?email_required=1" % (slug(forum), request.session.uid))
-        values = self._prepare_forum_values(forum=forum, searches={}, header={'ask_hide': not forum.active})
+        values = self._prepare_forum_values(forum=forum, searches={}, header={'ask_hide': True})
         return request.render("website_forum.new_%s" % post_type, values)
 
     @http.route(['/forum/<model("forum.forum"):forum>/new',
