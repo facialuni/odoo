@@ -201,6 +201,129 @@ QUnit.module('Views', {
         assert.strictEqual($dropdown.val(), value, "the value should equal to the value that is selected from form dialog");
         form.destroy();
     });
+
+    QUnit.test('keyboard navigation on form view', function(assert) {
+        assert.expect(5);
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="qux"/>' +
+                            '<field name="foo"/>' +
+                            '<field name="trululu"/>' +
+                            '<field name="state"/>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+            res_id: 1,
+        });
+
+        form.$buttons.find('.o_form_button_edit').focus();
+        $(document.activeElement).trigger('click');
+        assert.strictEqual($(document.activeElement).attr('id'),'o_field_input_4',"First Element Focused");
+        $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.TAB }));
+        assert.strictEqual($(document.activeElement).attr('id'),'o_field_input_5',"Second Element Focused");
+        $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.TAB }));
+        assert.strictEqual($(document.activeElement).attr('id'),'o_field_input_6',"Third Element Focused");
+        $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.TAB }));
+        assert.strictEqual($(document.activeElement).attr('id'),'o_field_input_7',"Fourth Element Focused");
+        $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.TAB }));
+        assert.strictEqual($(document.activeElement).hasClass('o_form_button_save'),true,"Save button focused");
+        form.destroy();
+    });
+
+    QUnit.test('escape key on all widget should show discard warning or call history_back', function(assert) {
+        assert.expect(5);
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="qux"/>' +
+                            '<field name="foo"/>' +
+                            '<field name="trululu"/>' +
+                            '<field name="state"/>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+            res_id: 1,
+        });
+
+        form.$buttons.find('.o_form_button_edit').focus();
+
+        $(document.activeElement).trigger('click');
+        $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.ESCAPE }));
+        assert.strictEqual($(document.activeElement).hasClass('o_form_button_edit'),true,"data discard in float field");
+
+        $(document.activeElement).trigger('click');
+        $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.TAB }));
+        $(document.activeElement).val("Hello").trigger('input');
+        $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.ESCAPE }));
+        assert.ok($('.modal').length, 'discard message show in char field');
+        $('.modal .modal-footer .btn-primary').click();
+
+        $(document.activeElement).trigger('click');
+        form.$el.find('#o_field_input_6').focus();
+        $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.ESCAPE }));
+        assert.strictEqual($(document.activeElement).hasClass('o_form_button_edit'),true,"Data discard in many2one field");
+
+        $(document.activeElement).trigger('click');
+        form.$el.find('#o_field_input_7').focus();
+        form.$el.find('#o_field_input_7 option:eq(2)').prop('selected', true).trigger('change');
+        $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.ESCAPE }));
+        assert.ok($('.modal').length, 'discard message show in selection field');
+        $('.modal .modal-footer .btn-primary').click();
+        assert.strictEqual($(document.activeElement).hasClass('o_form_button_edit'),true,"data saved in selection field");
+
+        form.destroy();
+    });
+
+    QUnit.test('save form view using shift enter', function(assert) {
+        assert.expect(3);
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="qux"/>' +
+                            '<field name="foo"/>' +
+                            '<field name="state"/>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+            res_id: 1,
+        });
+
+        form.$buttons.find('.o_form_button_edit').focus();
+        $(document.activeElement).trigger('click');
+        $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.ENTER , shiftKey : true}));
+        assert.strictEqual($('.o_form_buttons_edit').hasClass('o_hidden'),true,"data saved in float field");
+
+        form.$buttons.find('.o_form_button_edit').focus();
+        $(document.activeElement).trigger('click');
+        $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.TAB }));
+        $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.ENTER , shiftKey : true}));
+        assert.strictEqual($('.o_form_buttons_edit').hasClass('o_hidden'),true,"data saved in char field");
+
+        form.$buttons.find('.o_form_button_edit').focus();
+        $(document.activeElement).trigger('click');
+        $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.TAB }));
+        $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.TAB }));
+        $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.ENTER , shiftKey : true}));
+        assert.strictEqual($('.o_form_buttons_edit').hasClass('o_hidden'),true,"data saved in selection field");
+
+        form.destroy();
+    });
 });
 
 });
