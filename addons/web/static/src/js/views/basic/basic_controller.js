@@ -566,6 +566,7 @@ var BasicController = AbstractController.extend(FieldManagerMixin, {
      */
     _onTranslate: function (event) {
         event.stopPropagation();
+        var self = this;
         var record = this.model.get(event.data.id, {raw: true});
         this._rpc({
             route: '/web/dataset/call_button',
@@ -574,7 +575,13 @@ var BasicController = AbstractController.extend(FieldManagerMixin, {
                 method: 'translate_fields',
                 args: [record.model, record.res_id, event.data.fieldName, record.getContext()],
             }
-        }).then(this.do_action.bind(this));
+        }).then(function (result) {
+            self.do_action(result, {
+                on_reverse_breadcrumb: function () {
+                    self.renderer.displayTranslationAlert();
+                },
+            })
+        });
     },
 });
 

@@ -78,14 +78,12 @@ var FormRenderer = BasicRenderer.extend({
     /**
      * Show a warning message if the user modified a translated field.  For each
      * field, the notification provides a link to edit the field's translations.
-     *
-     * @param {Object[]} alertFields: field list
      */
-    displayTranslationAlert: function (alertFields) {
+    displayTranslationAlert: function () {
         this.$('.o_notification_box').remove();
         var $notification = $(qweb.render('notification-box', {type: 'info'}))
             .append(qweb.render('translation-alert', {
-                fields: alertFields,
+                fields: this.alertFields,
                 lang: _t.database.parameters.name
             }));
         if (this.$('.o_form_statusbar').length) {
