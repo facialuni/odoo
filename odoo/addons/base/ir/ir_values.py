@@ -3,9 +3,8 @@
 
 from ast import literal_eval
 
-from odoo import api, fields, models, tools, _
-from odoo.exceptions import AccessError, MissingError
-from odoo.tools import pickle, pycompat
+from odoo import api, fields, models, tools
+from odoo.tools import pickle
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -208,100 +207,25 @@ class IrValues(models.Model):
     @api.model
     @api.returns('self', lambda value: value.id)
     def set_action(self, name, action_slot, model, action, res_id=False):
-        """Binds an the given action to the given model's action slot - for later
-           retrieval via :meth:`~.get_actions`. Any existing binding of the same action
-           to the same slot is first removed, allowing an update of the action's name.
-           See the class description for more details about the various action
-           slots: :class:`~ir_values`.
-
-           :param string name: action label, usually displayed by UI client
-           :param string action_slot: the action slot to which the action should be
-                                      bound to - one of ``client_action_multi``,
-                                      ``client_print_multi``, ``client_action_relate``,
-                                      ``tree_but_open``.
-           :param string model: model name
-           :param string action: action reference, in the form ``'model,id'``
-           :param int res_id: optional record id - will bind the action only to a
-                              specific record of the model, not all records.
-           :return: the newly created ir.values entry
-        """
+        """ Deprecated, use the model 'ir.binding' instead. """
         assert isinstance(action, basestring) and ',' in action, \
                'Action definition must be an action reference, e.g. "ir.actions.act_window,42"'
         assert action_slot in ACTION_SLOTS, \
                'Action slot (%s) must be one of: %r' % (action_slot, ACTION_SLOTS)
+        assert res_id is False
 
-        # remove existing action definition of same slot and value
-        search_criteria = [
-            ('key', '=', 'action'),
-            ('key2', '=', action_slot),
-            ('model', '=', model),
-            ('res_id', '=', res_id or 0),  # int field -> NULL == 0
-            ('value', '=', action),
-        ]
-        self.search(search_criteria).unlink()
-
-        return self.create({
-            'key': 'action',
-            'key2': action_slot,
-            'model': model,
-            'res_id': res_id,
-            'name': name,
-            'value': action,
-        })
+        _logger.warning("Deprecated use of ir_values.set_action()")
+        action_id = int(action.split(',')[1])
+        self.env['ir.binding'].set(action_slot, model, action_id)
+        return self
 
     @api.model
     @tools.ormcache_context('self._uid', 'action_slot', 'model', 'res_id', keys=('lang',))
     def get_actions(self, action_slot, model, res_id=False):
-        """Retrieves the list of actions bound to the given model's action slot.
-           See the class description for more details about the various action
-           slots: :class:`~.ir_values`.
-
-           :param string action_slot: the action slot to which the actions should be
-                                      bound to - one of ``client_action_multi``,
-                                      ``client_print_multi``, ``client_action_relate``,
-                                      ``tree_but_open``.
-           :param string model: model name
-           :param int res_id: optional record id - will bind the action only to a
-                              specific record of the model, not all records.
-           :return: list of action tuples of the form ``(id, name, action_def)``,
-                    where ``id`` is the ID of the default entry, ``name`` is the
-                    action label, and ``action_def`` is a dict containing the
-                    action definition as obtained by calling
-                    :meth:`~odoo.models.Model.read` on the action record.
-        """
+        """ Deprecated, use the model 'ir.binding' instead. """
         assert action_slot in ACTION_SLOTS, 'Illegal action slot value: %s' % action_slot
-        # use a direct SQL query for performance reasons,
-        # this is called very often
-        query = """ SELECT v.id, v.name, v.value FROM ir_values v
-                    WHERE v.key = %s AND v.key2 = %s AND v.model = %s
-                        AND (v.res_id = %s OR v.res_id IS NULL OR v.res_id = 0)
-                    ORDER BY v.id """
-        self._cr.execute(query, ('action', action_slot, model, res_id or None))
+        assert res_id is False
 
-        # map values to their corresponding action record
-        actions = []
-        for id, name, value in self._cr.fetchall():
-            if not value:
-                continue                # skip if undefined
-            action_model, action_id = value.split(',')
-            if action_model not in self.env:
-                continue                # unknown model? skip it!
-            action = self.env[action_model].browse(int(action_id))
-            actions.append((id, name, action))
-
-        # process values and their action
-        results = {}
-        for id, name, action in actions:
-            # FIXME: needs cleanup
-            try:
-                action_def = dict([(k, v.convert_to_read(action[k], action)) for k, v in action._fields.items()])
-                if action._name in ('ir.actions.report', 'ir.actions.act_window'):
-                    if action.groups_id and not action.groups_id & self.env.user.groups_id:
-                        if name == 'Menuitem':
-                            raise AccessError(_('You do not have the permission to perform this operation!!!'))
-                        continue
-                # keep only the last action registered for each action name
-                results[name] = (id, name, action_def)
-            except (AccessError, MissingError):
-                continue
-        return sorted(pycompat.values(results))
+        _logger.warning("Deprecated use of ir_values.get_actions()")
+        bindings = self.env['ir.binding'].get_all(model)
+        return [(42, action['name'], action) for action in bindings[action_slot]]
