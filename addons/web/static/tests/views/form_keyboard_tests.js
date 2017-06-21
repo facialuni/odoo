@@ -60,6 +60,13 @@ QUnit.module('Views', {
                     trululu: 1,
                     state: "cd",
                 }, {
+                    id: 3,
+                    display_name: "Third record",
+                    foo: "",
+                    bar: true,
+                    trululu: 2,
+
+                }, {
                     id: 4,
                     display_name: "aaa",
                     state: "ef",
@@ -322,6 +329,74 @@ QUnit.module('Views', {
         $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.ENTER , shiftKey : true}));
         assert.strictEqual($('.o_form_buttons_edit').hasClass('o_hidden'),true,"data saved in selection field");
 
+        form.destroy();
+    });
+
+   QUnit.test('required field test and last field widget test', function (assert) {
+        assert.expect(2);
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: '<form string="Partners">' +
+                        '<field name="foo" required="1" />' +
+                        '<field name="bar" />' +
+                        '<field name="trululu" />' +
+                '</form>',
+            res_id: 3,
+        });
+        var tabKey = $.Event("keydown", { which: $.ui.keyCode.TAB });
+        form.$buttons.find('.o_form_button_edit').click();
+        form.$('input[name="foo"]').trigger(tabKey);
+        assert.strictEqual(document.activeElement, form.$('input[name="foo"]')[0],
+            "required field is empty and after pressing the TAB it should't leave the focus from current field");
+        form.$('input[name="foo"]').val("foooo");
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
+        assert.strictEqual($(document.activeElement).hasClass('btn-primary'), true,
+            "focus shoud be on primary button after pressing the tab on last field");
+        form.destroy();
+    });
+
+    QUnit.test('Basic fields test', function (assert) {
+        assert.expect(6);
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: '<form string="Partners">' +
+                        '<field name="foo" />' +
+                        '<field name="bar" />' +
+                        '<field name="int_field" />' +
+                        '<field name="priority" />' +
+                        '<field name="date" />' +
+                        '<field name="datetime" />' +
+                '</form>',
+            res_id: 1,
+        });
+        var tabKey = $.Event("keydown", { which: $.ui.keyCode.TAB });
+        form.$buttons.find('.o_form_button_edit').click();
+        form.$('input[name="foo"]').trigger(tabKey);
+        assert.strictEqual($(document.activeElement).attr('type'), 'checkbox',
+            "focus shoud be on checkbox");
+        $(document.activeElement).click();
+        assert.strictEqual($(document.activeElement)[0].checked, false,
+            "check box shoud unchecked after clicking on it");
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
+        assert.strictEqual($(document.activeElement)[0], form.$('input[name="int_field"]')[0],
+            "focus shoud be on int field");
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
+        assert.strictEqual($(document.activeElement)[0], form.$('select[name="priority"]')[0],
+            "focus shoud be on selection field");
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
+        assert.strictEqual($(document.activeElement)[0], form.$('input[name="date"]')[0],
+            "focus shoud be on date field");
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
+        assert.strictEqual($(document.activeElement)[0], form.$('input[name="datetime"]')[0],
+            "focus shoud be on datetime field");
         form.destroy();
     });
 });
