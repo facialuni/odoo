@@ -77,6 +77,36 @@ QUnit.module('Views', {
                 }, {
                     id: 41,
                     display_name: "xpad",
+                }, {
+                    id: 42,
+                    display_name: "xtab",
+                },{
+                    id: 43,
+                    display_name: "xelec",
+                },{
+                    id: 44,
+                    display_name: "xtrimemer",
+                },{
+                    id: 45,
+                    display_name: "xipad",
+                },{
+                    id: 46,
+                    display_name: "xphone1",
+                },{
+                    id: 47,
+                    display_name: "xphone2",
+                },{
+                    id: 48,
+                    display_name: "xphone3",
+                },{
+                    id: 59,
+                    display_name: "xphone4",
+                },{
+                    id: 62,
+                    display_name: "xphone5",
+                },{
+                    id: 69,
+                    display_name: "xphone6",
                 }]
             },
             partner_type: {
@@ -95,6 +125,82 @@ QUnit.module('Views', {
 
     QUnit.module('FormView Keyboard');
 
+    QUnit.test('m2o autocomplete when open and press escape, it should not discard form changes', function (assert) {
+        assert.expect(3);
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<sheet><group>' +
+                        '<field name="product_id"/>' +
+                    '</group></sheet>' +
+                '</form>',
+            res_id: 1,
+        });
+        form.$buttons.find('.o_form_button_edit').click();
+        var $dropdown = form.$('.o_field_many2one input').autocomplete('widget');
+        form.$('.o_field_many2one input').click();
+        assert.strictEqual($dropdown.find('li:first()').text(), 'xphone', 'the click on m2o widget should open a dropdown');
+        var esc = $.Event("keydown", { keyCode: 27 });
+        form.$('.o_field_many2one input').trigger(esc);
+        assert.strictEqual(form.$buttons.find(".o_form_buttons_edit").hasClass("o_hidden"), false, 'm2o autocomplete when open and press escape it should not discard form changes');
+        assert.ok($(document.activeElement).hasClass('o_input'),
+            "Focus should be set on input field");
+        form.destroy();
+    });
+
+    QUnit.test('test dialog selectCreate popup, Form popup', function (assert) {
+        assert.expect(4);
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            res_id: 1,
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="product_id"/>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+            archs: {
+                'product,false,search':
+                    '<form string="Products">' +
+                        '<sheet>' +
+                            '<group>' +
+                                '<field name="name"/>' +
+                            '</group>' +
+                        '</sheet>' +
+                    '</form>',
+                'product,false,list': '<tree><field name="display_name"/></tree>'
+            },
+        });
+        form.$buttons.find('.o_form_button_edit').click();
+        var upkeyPress = $.Event("keydown", { keyCode: 38 });
+        var downkeyPress = $.Event("keydown", { keyCode: 40 });
+        var downkeyUPress = $.Event("keyup", { keyCode: 40 }); //this event is stored to handle search widget keyup event of down arrow key
+        var enterkeyPress = $.Event("keydown", { keyCode: 13 });
+        var $dropdown = form.$('.o_field_many2one input').autocomplete('widget');
+        form.$('.o_field_many2one input').click();
+        $dropdown.trigger(upkeyPress);
+        $dropdown.trigger(upkeyPress);
+        $dropdown.trigger(enterkeyPress);
+        assert.strictEqual($('.modal').length, 1,
+            "One FormViewDialog should be opened");
+        assert.ok($(document.activeElement).hasClass('o_searchview_input'),
+            "Focus should be set on search view");
+        var firstModel = $('.modal');
+        $(firstModel).find('input[class="o_searchview_input"]').trigger($.Event("keyup", { which: $.ui.keyCode.DOWN }));
+        assert.strictEqual($(document.activeElement).find('.o_row_selected').text(), 'xphone', 'the selected row must have the same name as shown view');
+        var $dataList = $(firstModel).find('.o_list_view');
+        var value = $dataList.find('li:first()').text();
+        $(document.activeElement).trigger(($.Event("keydown", { which: $.ui.keyCode.ENTER })));
+        assert.strictEqual($dropdown.val(), value, "the value should equal to the value that is selected from form dialog");
+        form.destroy();
+    });
 });
 
 });
