@@ -512,7 +512,7 @@ var BasicModel = AbstractModel.extend({
         var defs = [];
         var record_fields = {};
         _.each(fields, function (field) {
-            record_fields[field.name] = _.pick(field, 'type', 'relation', 'domain');
+            record_fields[field.name] = _.pick(field, 'type', 'relation', 'domain', 'context');
         });
         fieldInfo = fieldInfo || {};
         var fieldsInfo = {};
