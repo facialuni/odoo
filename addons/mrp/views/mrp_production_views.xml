@@ -28,13 +28,10 @@
             <field name="code">records.button_plan()</field>
         </record>
 
-        <record id="run_procurement_order_action" model="ir.values">
+        <record id="run_procurement_order_action" model="ir.binding">
+            <field name="type">client_action_multi</field>
             <field name="model_id" ref="mrp.model_mrp_production" />
-            <field name="name">Plan Orders</field>
-            <field name="key2">client_action_multi</field>
-            <field name="key">action</field>
-            <field name="model">mrp.production</field>
-            <field name="value" eval="'ir.actions.server,' + str(ref('production_order_server_action'))" />
+            <field name="action_id" ref="production_order_server_action" />
         </record>
 
         <record id="mrp_production_form_view" model="ir.ui.view">

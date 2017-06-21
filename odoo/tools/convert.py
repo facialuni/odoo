@@ -273,13 +273,6 @@ form: module.record_id""" % (xml_id,)
         if records:
             records.unlink()
 
-    def _remove_ir_values(self, name, value, model):
-        domain = [('name', '=', name), ('value', '=', value), ('model', '=', model)]
-        ir_values = self.env['ir.values'].search(domain)
-        if ir_values:
-            ir_values.unlink()
-        return True
-
     def _tag_report(self, rec, data_node=None, mode=None):
         res = {}
         for dest,f in (('name','string'),('model','model'),('report_name','name')):
@@ -325,15 +318,12 @@ form: module.record_id""" % (xml_id,)
         self.idref[xml_id] = int(id)
 
         if not rec.get('menu') or safe_eval(rec.get('menu','False')):
-            keyword = str(rec.get('keyword', 'client_print_multi'))
-            value = 'ir.actions.report,'+str(id)
-            action = self.env['ir.values'].set_action(res['name'], keyword, res['model'], value)
-            self.env['ir.actions.report'].browse(id).write({'ir_values_id': action.id})
+            report = self.env['ir.actions.report'].browse(id)
+            report.create_action()
         elif self.mode=='update' and safe_eval(rec.get('menu','False'))==False:
             # Special check for report having attribute menu=False on update
-            value = 'ir.actions.report,'+str(id)
-            self._remove_ir_values(res['name'], value, res['model'])
-            self.env['ir.actions.report'].browse(id).write({'ir_values_id': False})
+            report = self.env['ir.actions.report'].browse(id)
+            report.ir_values_id.unlink()
         return id
 
     def _tag_function(self, rec, data_node=None, mode=None):
@@ -441,38 +431,13 @@ form: module.record_id""" % (xml_id,)
 
         if src_model:
             #keyword = 'client_action_relate'
-            res_id = False
             model = src_model
             if isinstance(model, (list, tuple)):
-                model, res_id = model
+                # this case (model, res_id) is deprecated
+                return
             keyword = rec.get('key2','').encode('utf-8') or 'client_action_relate'
-            value = 'ir.actions.act_window,'+str(id)
-            replace = rec.get('replace','') or True
-            self.env['ir.values'].set_action(xml_id, action_slot=keyword, model=model, action=value, res_id=res_id)
+            self.env['ir.binding'].set(keyword, model, id)
         # TODO add remove ir.model.data
-
-    def _tag_ir_set(self, rec, data_node=None, mode=None):
-        """
-            .. deprecated:: 9.0
-
-            Use the <record> notation with ``ir.values`` as model instead.
-        """
-        if self.mode != 'init':
-            return
-        res = {}
-        for field in rec.findall('./field'):
-            f_name = field.get("name",'').encode('utf-8')
-            f_val = _eval_xml(self, field, self.env)
-            res[f_name] = f_val
-        ir_values = self.env['ir.values']
-        for model in res['models']:
-            res_id = False
-            if isinstance(model, (list, tuple)):
-                model, res_id = model
-            if res['key'] == 'default':
-                ir_values.set_default(model, field_name=res['name'], value=res['value'], condition=res['key2'])
-            elif res['key'] == 'action':
-                ir_values.set_action(res['name'], action_slot=res['key2'], model=model, action=res['value'], res_id=res_id)
 
     def _tag_menuitem(self, rec, data_node=None, mode=None):
         rec_id = rec.get("id",'').encode('ascii')
@@ -809,7 +774,6 @@ form: module.record_id""" % (xml_id,)
             'menuitem': self._tag_menuitem,
             'template': self._tag_template,
             'report': self._tag_report,
-            'ir_set': self._tag_ir_set, # deprecated:: 9.0
             'act_window': self._tag_act_window,
             'assert': self._tag_assert,
         }

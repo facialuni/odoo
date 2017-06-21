@@ -83,9 +83,6 @@ def is_ref(node):
     return isinstance(node, yaml_tag.Ref) \
         or _is_yaml_mapping(node, yaml_tag.Ref)
 
-def is_ir_set(node):
-    return _is_yaml_mapping(node, yaml_tag.IrSet)
-
 def is_string(node):
     return isinstance(node, basestring)
 
@@ -734,12 +731,11 @@ class YamlInterpreter(object):
 
         if node.src_model:
             keyword = 'client_action_relate'
-            value = 'ir.actions.act_window,%s' % id
-            res_id = False
             model = node.src_model
             if isinstance(model, (list, tuple)):
-                model, res_id = model
-            self.env['ir.values'].sudo().set_action(node.id, action_slot=keyword, model=model, action=value, res_id=res_id)
+                # this case (model, res_id) is no longer supported
+                return
+            self.env['ir.binding'].set(keyword, model, id)
         # TODO add remove ir.model.data
 
     def process_delete(self, node):
@@ -764,29 +760,7 @@ class YamlInterpreter(object):
         # ir_set
         if (not node.menu or safe_eval(node.menu)) and id:
             keyword = node.keyword or 'client_action_multi'
-            value = 'ir.actions.act_url,%s' % id
-            self.env['ir.values'].sudo().set_action(node.url, action_slot=keyword, model="ir.actions.act_url", action=value, res_id=False)
-
-    def process_ir_set(self, node):
-        if not self.mode == 'init':
-            return False
-        _, fields = next(pycompat.items(node))
-        res = {}
-        for fieldname, expression in pycompat.items(fields):
-            if is_eval(expression):
-                value = safe_eval(expression.expression, self.eval_context)
-            else:
-                value = expression
-            res[fieldname] = value
-        ir_values = self.env['ir.values']
-        for model in res['models']:
-            res_id = False
-            if isinstance(model, (list, tuple)):
-                model, res_id = model
-            if res['key'] == 'default':
-                ir_values.sudo().set_default(model, field_name=res['name'], value=res['value'], condition=res['key2'])
-            elif res['key'] == 'action':
-                ir_values.sudo().set_action(res['name'], action_slot=res['key2'], model=model, action=res['value'], res_id=res_id)
+            self.env['ir.binding'].set(keyword, 'ir.actions.act_url', id)
 
     def process_report(self, node):
         values = {}
@@ -807,14 +781,8 @@ class YamlInterpreter(object):
         self.id_map[xml_id] = int(id)
 
         if not node.menu or safe_eval(node.menu):
-            keyword = node.keyword or 'client_print_multi'
-            value = 'ir.actions.report,%s' % id
-            ir_values = self.env['ir.values']
-            res_id = False
-            model = values['model']
-            if isinstance(model, (list, tuple)):
-                model, res_id = model
-            ir_values.sudo().set_action(values['name'], action_slot=keyword, model=model, action=value, res_id=res_id)
+            report = self.env['ir.actions.report'].browse(id)
+            report.create_action()
 
     def process_none(self):
         """
@@ -855,8 +823,6 @@ class YamlInterpreter(object):
             self.process_url(node)
         elif is_context(node):
             self.process_context(node)
-        elif is_ir_set(node):
-            self.process_ir_set(node)
         elif is_act_window(node):
             self.process_act_window(node)
         elif is_report(node):

@@ -689,14 +689,10 @@ if records:
             </field>
         </record>
 
-        <record id="survey_values_action_clean_test_answers" model="ir.values">
-            <field name="name">Survey clean test answers</field>
-            <field name="action_id" ref="survey_action_server_clean_test_answers" />
-            <field name="value" eval="'ir.actions.server,' + str(ref('survey_action_server_clean_test_answers'))"/>
-            <field name="key">action</field>
+        <record id="survey_values_action_clean_test_answers" model="ir.binding">
+            <field name="type">client_action_multi</field>
             <field name="model_id" ref="model_survey_survey" />
-            <field name="model">survey.survey</field>
-            <field name="key2">client_action_multi</field>
+            <field name="action_id" ref="survey_action_server_clean_test_answers" />
         </record>
 
         <!-- MENU ELEMENTS -->

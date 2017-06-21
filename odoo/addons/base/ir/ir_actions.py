@@ -320,9 +320,9 @@ class IrActionsServer(models.Model):
     model_id = fields.Many2one('ir.model', string='Model', required=True, ondelete='cascade',
                                help="Model on which the server action runs.")
     model_name = fields.Char(related='model_id.model', readonly=True, store=True)
-    menu_ir_values_id = fields.Many2one('ir.values', string='Action on Object',
+    menu_ir_values_id = fields.Many2one('ir.binding', string='Sidebar Button',
                                         copy=False, readonly=True,
-                                        help='IrValues entry of the related more menu entry action')
+                                        help="Sidebar action to run this action.")
     # Python code
     code = fields.Text(string='Python Code', groups='base.group_system',
                        default=DEFAULT_PYTHON_CODE,
@@ -364,14 +364,10 @@ class IrActionsServer(models.Model):
     @api.multi
     def create_action(self):
         """ Create a contextual action for each server action. """
+        IrBinding = self.env['ir.binding'].sudo()
         for action in self:
-            ir_values = self.env['ir.values'].sudo().create({
-                'name': _('Run %s') % action.name,
-                'model': action.model_id.model,
-                'key2': 'client_action_multi',
-                'value': "ir.actions.server,%s" % action.id,
-            })
-            action.write({'menu_ir_values_id': ir_values.id})
+            binding = IrBinding.set('client_action_multi', action.model_id.model, action.id)
+            action.write({'menu_ir_values_id': binding.id})
         return True
 
     @api.multi

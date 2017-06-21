@@ -9,14 +9,10 @@
             <field name="code">records.button_immediate_install()</field>
         </record>
 
-        <record model="ir.values" id="action_module_immediate_install">
-            <field name="name">action_module_immediate_install</field>
-            <field name="action_id" ref="action_server_module_immediate_install" />
-            <field name="value" eval="'ir.actions.server,' + str(ref('action_server_module_immediate_install'))" />
-            <field name="key">action</field>
+        <record model="ir.binding" id="action_module_immediate_install">
+            <field name="type">client_action_multi</field>
             <field name="model_id" ref="model_ir_module_module" />
-            <field name="model">ir.module.module</field>
-            <field name="key2">client_action_multi</field>
+            <field name="action_id" ref="action_server_module_immediate_install" />
         </record>
     </data>
 </odoo>

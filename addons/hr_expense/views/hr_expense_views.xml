@@ -743,12 +743,10 @@ if records:
             </field>
         </record>
 
-        <record id="action_hr_expense_submit" model="ir.values">
-            <field name="name">Submit To Manager</field>
+        <record id="action_hr_expense_submit" model="ir.binding">
+            <field name="type">client_action_multi</field>
             <field name="model_id" ref="model_hr_expense"/>
-            <field name="model">hr.expense</field>
-            <field name="key2">client_action_multi</field>
-            <field eval="'ir.actions.server,%d'%hr_expense_submit_action_server" name="value"/>
+            <field name="action_id" ref="hr_expense_submit_action_server"/>
         </record>
 
         <menuitem id="menu_hr_expense_root" name="Expenses" sequence="100" web_icon="hr_expense,static/description/icon.png"/>

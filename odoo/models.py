@@ -1301,23 +1301,21 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
 
         # Add related action information if aksed
         if toolbar:
-            IrValues = self.env['ir.values']
-            resprint = IrValues.get_actions('client_print_multi', self._name)
-            resaction = IrValues.get_actions('client_action_multi', self._name)
-            resrelate = IrValues.get_actions('client_action_relate', self._name)
-            resprint = [print_[2]
-                        for print_ in resprint
-                        if view_type == 'tree' or not print_[2].get('multi')]
-            resaction = [action[2]
-                         for action in resaction
-                         if view_type == 'tree' or not action[2].get('multi')]
+            bindings = self.env['ir.binding'].get_all(self._name)
+            resprint = [action
+                        for action in bindings['client_print_multi']
+                        if view_type == 'tree' or not action.get('multi')]
+            resaction = [action
+                         for action in bindings['client_action_multi']
+                         if view_type == 'tree' or not action.get('multi')]
             #When multi="True" set it will display only in More of the list view
-            resrelate = [action[2]
-                         for action in resrelate
-                         if (action[2].get('multi') and view_type == 'tree') or (not action[2].get('multi') and view_type == 'form')]
+            resrelate = [action
+                         for action in bindings['client_action_relate']
+                         if (view_type == 'tree' and action.get('multi'))
+                         or (view_type == 'form' and not action.get('multi'))]
 
-            for x in itertools.chain(resprint, resaction, resrelate):
-                x['string'] = x['name']
+            for res in itertools.chain(resprint, resaction, resrelate):
+                res['string'] = res['name']
 
             result['toolbar'] = {
                 'print': resprint,

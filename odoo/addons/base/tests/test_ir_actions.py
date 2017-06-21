@@ -61,18 +61,17 @@ class TestServerActions(TestServerActionsBase):
         # Do: create contextual action
         self.action.create_action()
 
-        # Test: ir_values created
-        ir_values = self.env['ir.values'].search([('name', '=', 'Run TestAction')])
-        self.assertEqual(len(ir_values), 1, 'ir_actions_server: create_action should have created an entry in ir_values')
-        self.assertEqual(ir_values.value, 'ir.actions.server,%s' % self.action.id, 'ir_actions_server: created ir_values should reference the server action')
-        self.assertEqual(ir_values.model, 'res.partner', 'ir_actions_server: created ir_values should be linked to the action base model')
+        # Test: ir_binding created
+        binding = self.env['ir.binding'].search([('action_id', '=', self.action.id)])
+        self.assertEqual(len(binding), 1, 'ir_actions_server: create_action should have created an entry in ir_binding')
+        self.assertEqual(binding.model_id.model, 'res.partner', 'ir_actions_server: created ir_binding should be linked to the action base model')
 
         # Do: remove contextual action
         self.action.unlink_action()
 
-        # Test: ir_values removed
-        ir_values = self.env['ir.values'].search([('name', '=', 'Run TestAction')])
-        self.assertEqual(len(ir_values), 0, 'ir_actions_server: unlink_action should remove the ir_values record')
+        # Test: ir_binding removed
+        binding = self.env['ir.binding'].search([('action_id', '=', self.action.id)])
+        self.assertEqual(len(binding), 0, 'ir_actions_server: unlink_action should remove the ir_values record')
 
     def test_10_code(self):
         self.action.write({

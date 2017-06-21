@@ -30,13 +30,10 @@
             <field name="target">new</field>
         </record>
 
-        <record id="hr_holidays_summary_employee_value" model="ir.values">
+        <record id="hr_holidays_summary_employee_value" model="ir.binding">
+            <field name="type">client_print_multi</field>
             <field name="model_id" ref="hr.model_hr_employee" />
-            <field name="name">Leaves Summary</field>
-            <field name="key2">client_print_multi</field>
-            <field name="value" eval="'ir.actions.act_window,' + str(ref('action_hr_holidays_summary_employee'))" />
-            <field name="key">action</field>
-            <field name="model">hr.employee</field>
+            <field name="action_id" ref="action_hr_holidays_summary_employee" />
         </record>
 
 </odoo>
