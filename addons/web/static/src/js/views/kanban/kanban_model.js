@@ -108,9 +108,34 @@ var KanbanModel = BasicModel.extend({
      * @override
      */
     load: function (params) {
+        this.limitHistory = {};
         this.defaultGroupedBy = params.groupBy;
         params.groupedBy = (params.groupedBy && params.groupedBy.length) ? params.groupedBy : this.defaultGroupedBy;
         return this._super(params);
+    },
+    /**
+     * @override
+     */
+     _load: function (dataPoint, options) {
+        var self = this;
+
+        if (this.limitHistory[dataPoint.res_id]) {
+            _.extend(this.limitHistory[dataPoint.res_id], {'actual_limit': dataPoint.limit});
+        } else {
+            this.limitHistory[dataPoint.res_id] = {'actual_limit': dataPoint.limit};
+        }
+
+        if (dataPoint.loadMoreOffset === 0 && this.limitHistory && this.limitHistory[dataPoint.res_id] && this.limitHistory[dataPoint.res_id]['offset']) {
+            dataPoint.limit = this.limitHistory[dataPoint.res_id]['offset'];
+        }
+
+        _.extend(this.limitHistory[dataPoint.res_id], {'offset': dataPoint.limit + dataPoint.loadMoreOffset});
+
+        return this._super.apply(this, arguments).then(function (result) {
+            _.extend(self.limitHistory[result.res_id], {'limit': result.limit});
+            result.limit = self.limitHistory[result.res_id]['actual_limit'];
+            return result;
+        });
     },
     /**
      * Load more records in a group.
@@ -121,6 +146,9 @@ var KanbanModel = BasicModel.extend({
     loadMore: function (groupID) {
         var group = this.localData[groupID];
         var offset = group.loadMoreOffset + group.limit;
+        if (this.limitHistory && this.limitHistory[group.res_id] && this.limitHistory[group.res_id]['limit']) {
+            offset = group.loadMoreOffset + this.limitHistory[group.res_id]['limit'];
+        }
         return this.reload(group.id, {
             loadMoreOffset: offset,
         });

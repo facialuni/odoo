@@ -1424,8 +1424,8 @@ QUnit.module('Views', {
             "the records should be correctly fetched");
 
         kanban.reload();
-        assert.strictEqual(kanban.$('.o_kanban_group:eq(1) .o_kanban_record').length, 2,
-            "there should be 2 records in the column after reload");
+        assert.strictEqual(kanban.$('.o_kanban_group:eq(1) .o_kanban_record').length, 3,
+            "there should be 3 records in the column after reload");
 
         kanban.destroy();
     });

@@ -22,6 +22,7 @@ var Loading = require('web.Loading');
 var mixins = require('web.mixins');
 var NotificationManager = require('web.notification').NotificationManager;
 var RainbowMan = require('web.rainbow_man');
+var dom = require('web.dom');
 var session = require('web.session');
 var Widget = require('web.Widget');
 
@@ -286,7 +287,18 @@ var AbstractWebClient = Widget.extend(mixins.ServiceProvider, {
     // --------------------------------------------------------------
     // Scrolltop handling
     // --------------------------------------------------------------
-    getScrollTop: function () {
+    getScrollPosition: function () {
+        if (config.device.size_class <= config.device.SIZES.XS) {
+            return {
+                top: this.el.scrollTop,
+                left: this.el.scrollLeft,
+            };
+        } else {
+            return {
+                top: this.action_manager.el.scrollTop,
+                left: this.action_manager.el.scrollLeft,
+            };
+        }
     },
     //--------------------------------------------------------------
     // Misc.
@@ -337,6 +349,32 @@ var AbstractWebClient = Widget.extend(mixins.ServiceProvider, {
             new RainbowMan(data).appendTo(this.$el);
         } else {
             throw new Error('Unknown effect type: ' + type);
+        }
+    },
+    /**
+     * Scrolls the webclient to either a given offset or a target element
+     * Must be called with: trigger_up('scrollTo', options)
+     * @param {Integer} [options.offset] the number of pixels to scroll from top
+     * @param {Integer} [options.offset_left] the number of pixels to scroll from left
+     * @param {String} [options.selector] the selector of the target element to scroll to
+     */
+    scrollTo: function (ev) {
+        var offset = {top: ev.data.offset, left: ev.data.offset_left || 0};
+        var xs_device = config.device.size_class <= config.device.SIZES.XS;
+        if (!offset.top && !offset.left) {
+            offset = dom.getPosition(document.querySelector(ev.data.selector));
+            if (!xs_device) {
+                // Substract the position of the action_manager as it is the scrolling part
+                offset.top -= dom.getPosition(this.action_manager.el).top;
+                offset.left -= dom.getPosition(this.action_manager.el).left;
+            }
+        }
+        if (xs_device) {
+            this.el.scrollTop = offset.top;
+            this.el.scrollLeft = offset.left;
+        } else {
+            this.action_manager.el.scrollTop = offset.top;
+            this.action_manager.el.scrollLeft = offset.left;
         }
     },
 });
