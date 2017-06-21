@@ -1,7 +1,6 @@
 odoo.define('web.list_keyboard_tests', function (require) {
 "use strict";
 
-var config = require('web.config');
 var ListView = require('web.ListView');
 var testUtils = require('web.test_utils');
 
@@ -12,69 +11,15 @@ QUnit.module('Views', {
         this.data = {
             foo: {
                 fields: {
-                    foo: {string: "Foo", type: "char"},
-                    bar: {string: "Bar", type: "boolean"},
-                    date: {string: "Some Date", type: "date"},
-                    int_field: {string: "int_field", type: "integer", sortable: true},
-                    qux: {string: "my float", type: "float"},
-                    m2o: {string: "M2O field", type: "many2one", relation: "bar"},
-                    m2m: {string: "M2M field", type: "many2many", relation: "bar"},
-                    amount: {string: "Monetary field", type: "monetary"},
-                    currency_id: {string: "Currency", type: "many2one",
-                                  relation: "res_currency", default: 1},
-                    datetime: {string: "Datetime Field", type: 'datetime'},
+                    name: {string: "Name", type: "char"},
                 },
                 records: [
-                    {
-                        id: 1,
-                        bar: true,
-                        foo: "yop",
-                        int_field: 10,
-                        qux: 0.4,
-                        m2o: 1,
-                        m2m: [1, 2],
-                        amount: 1200,
-                        currency_id: 2,
-                        date: "2017-01-25",
-                        datetime: "2016-12-12 10:55:05",
-                    },
-                    {id: 2, bar: true, foo: "blip", int_field: 9, qux: 13,
-                     m2o: 2, m2m: [1, 2, 3], amount: 500},
-                    {id: 3, bar: true, foo: "gnap", int_field: 17, qux: -3,
-                     m2o: 1, m2m: [], amount: 300},
-                    {id: 4, bar: false, foo: "blip", int_field: -4, qux: 9,
-                     m2o: 1, m2m: [1], amount: 0},
-                ]
-            },
-            bar: {
-                fields: {},
-                records: [
-                    {id: 1, display_name: "Value 1"},
-                    {id: 2, display_name: "Value 2"},
-                    {id: 3, display_name: "Value 3"},
-                ]
-            },
-            res_currency: {
-                fields: {
-                    symbol: {string: "Symbol", type: "char"},
-                    position: {
-                        string: "Position",
-                        type: "selection",
-                        selection: [['after', 'A'], ['before', 'B']],
-                    },
-                },
-                records: [
-                    {id: 1, display_name: "USD", symbol: '$', position: 'before'},
-                    {id: 2, display_name: "EUR", symbol: '€', position: 'after'},
-                ],
-            },
-            event: {
-                fields: {
-                    id: {string: "ID", type: "integer"},
-                    name: {string: "name", type: "char"},
-                },
-                records: [
-                    {id: "2-20170808020000", name: "virtual"},
+                    {name: "Tyrion Lannister",},
+                    {name: "Oliver Queen"},
+                    {name: "Michael Scofield"},
+                    {name: "Barry Allen"},
+                    {name: "Bruce Wayne"},
+                    {name: "Andrew Lincoln"},
                 ]
             },
         };
@@ -83,7 +28,79 @@ QUnit.module('Views', {
 
     QUnit.module('ListView Keyboard');
 
+    QUnit.test('Listview selection', function (assert) {
+        assert.expect(8);
 
+        var list = createView({
+            View: ListView,
+            model: 'foo',
+            data: this.data,
+            arch: '<tree><field name="name"/></tree>',
+        });
+
+        var shiftKeyPress = function (direction) {
+            var e = $.Event("keydown");
+            e.which = direction;
+            e.shiftKey = true;
+            $firstRecord.find('input').trigger(e);
+        };
+
+        var controlKeyPress = function (direction) {
+            var e = $.Event("keydown");
+            e.which = direction;
+            e.ctrlKey = true;
+            var $activeElement = getActiveRow();
+            $activeElement.find('input').trigger(e);
+        };
+
+        var getActiveRow = function () {
+            return $(document.activeElement).closest('.o_data_row');
+        };
+
+        var upDownKey = function (direction) {
+            var e = $.Event("keydown");
+            e.which = direction;
+            return e;
+        }
+
+        var lastActiveRow;
+        $('.o_data_row input').on('blur', function(e){
+            lastActiveRow = $(e.currentTarget).closest('.o_data_row');
+        });
+
+        var $firstRecord = list.$el.find('.o_data_row').first();
+        $firstRecord.find('input').trigger('click').focus();
+
+        assert.ok($firstRecord.hasClass('o_row_selected'),'First record selected');
+
+        // Press down key will select next record
+        $firstRecord.find('input').trigger(upDownKey(40));
+        assert.ok(!$firstRecord.hasClass('o_row_selected'), 'First record unselected');
+        assert.ok($(lastActiveRow.next()).hasClass('o_row_selected'), 'Second record selected');
+
+        // On shift + down select currrent and next record
+        shiftKeyPress(40);
+        assert.ok($(lastActiveRow,lastActiveRow.next()).hasClass('o_row_selected'), "Select currrent and next record");
+
+        // On Ctrl + down will transfer focus to next record but don't select it
+        controlKeyPress(40);
+        assert.ok($(lastActiveRow.next()).hasClass('o_row_focused'), "Next record is focused");
+
+        // On Ctrl + up will transfer focus to previous record but don't select it
+        controlKeyPress(38);
+        assert.ok($(lastActiveRow.prev()).hasClass('o_row_focused'), "previous record is focused");
+
+        // On shift + up unselect previous record
+        shiftKeyPress(38);
+        assert.ok(!$(lastActiveRow.prev()).hasClass('o_row_selected'), "Unselect previous record");
+
+        // On up(arrow) key it will select previous record
+        var $activeElement = getActiveRow();
+        $activeElement.find('input').trigger(upDownKey(38));
+        assert.ok($(lastActiveRow.prev()).hasClass('o_row_selected'), "Select previous record");
+
+        list.destroy();
+    });
 });
 
 });
