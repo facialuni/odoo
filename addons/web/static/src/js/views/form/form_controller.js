@@ -613,7 +613,7 @@ var FormController = BasicController.extend({
                 if (FirstButton) {
                     _.delay(function () { FirstButton.activate(); }, 0);
                 } else {
-                    self.$buttons && self.$buttons.find('.o_form_button_edit').focus();
+                    _.delay(function() { self.$buttons && self.$buttons.find('.o_form_button_edit').focus(); }, 0);
                 }
             });
         } else {

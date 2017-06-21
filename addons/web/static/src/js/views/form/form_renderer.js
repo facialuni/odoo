@@ -948,7 +948,7 @@ var FormRenderer = BasicRenderer.extend({
             var recordWidgets = this.tabindexWidgets[this.state.id] || [];
             var nextWidget = this._getNextTabindexWidget(index+1, recordWidgets);
             // Note: If user presses TAB on last field and next widget is button then first move user to Save button
-            if (nextWidget instanceof ButtonWidget && lastFieldWidget && _.isEqual(ev.data.target, lastFieldWidget)) {
+            if (lastFieldWidget && _.isEqual(ev.data.target, lastFieldWidget)) {
                 return this.trigger_up('focus_control_button');
             }
             if (nextWidget && !_.isEqual(nextWidget, ev.data.target)) {
