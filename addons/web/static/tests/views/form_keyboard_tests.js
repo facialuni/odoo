@@ -232,13 +232,13 @@ QUnit.module('Views', {
 
         form.$buttons.find('.o_form_button_edit').focus();
         $(document.activeElement).trigger('click');
-        assert.strictEqual($(document.activeElement).attr('id'),'o_field_input_4',"First Element Focused");
+        assert.strictEqual($(document.activeElement).attr('name'),'qux',"First Element Focused");
         $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.TAB }));
-        assert.strictEqual($(document.activeElement).attr('id'),'o_field_input_5',"Second Element Focused");
+        assert.strictEqual($(document.activeElement).attr('name'),'foo',"Second Element Focused");
         $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.TAB }));
-        assert.strictEqual($(document.activeElement).attr('id'),'o_field_input_6',"Third Element Focused");
+        assert.strictEqual($(document.activeElement).closest('.o_field_widget').attr('name'),'trululu',"Third Element Focused");
         $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.TAB }));
-        assert.strictEqual($(document.activeElement).attr('id'),'o_field_input_7',"Fourth Element Focused");
+        assert.strictEqual($(document.activeElement).attr('name'),'state',"Fourth Element Focused");
         $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.TAB }));
         assert.strictEqual($(document.activeElement).hasClass('o_form_button_save'),true,"Save button focused");
         form.destroy();
@@ -278,13 +278,13 @@ QUnit.module('Views', {
         $('.modal .modal-footer .btn-primary').click();
 
         $(document.activeElement).trigger('click');
-        form.$el.find('#o_field_input_6').focus();
+        form.$el.find('[name="qux"]').focus();
         $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.ESCAPE }));
         assert.strictEqual($(document.activeElement).hasClass('o_form_button_edit'),true,"Data discard in many2one field");
 
         $(document.activeElement).trigger('click');
-        form.$el.find('#o_field_input_7').focus();
-        form.$el.find('#o_field_input_7 option:eq(2)').prop('selected', true).trigger('change');
+        form.$el.find('[name="state"]').focus();
+        form.$el.find('[name="state"] option:eq(2)').prop('selected', true).trigger('change');
         $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.ESCAPE }));
         assert.ok($('.modal').length, 'discard message show in selection field');
         $('.modal .modal-footer .btn-primary').click();
@@ -461,10 +461,10 @@ QUnit.module('Views', {
         $(document.activeElement).trigger('click');
         $('.note-editable').focus();
         $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
-        assert.strictEqual($(document.activeElement).attr('id'),"o_field_input_5","tab shoud be change focus on next field");
+        assert.strictEqual($(document.activeElement).attr('name'),"foo","tab shoud be change focus on next field");
         $('.note-editable').focus();
         $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB, shiftKey : true }));
-        assert.strictEqual($(document.activeElement).attr('id'),"o_field_input_3","tab shoud be change focus on previous field");
+        assert.strictEqual($(document.activeElement).attr('name'),"display_name","tab shoud be change focus on previous field");
 
         concurrency.delay(0).then(function() { // content area of html field having timeout in summernote itself
             form.destroy();
