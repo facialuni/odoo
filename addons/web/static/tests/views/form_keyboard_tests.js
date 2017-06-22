@@ -211,7 +211,7 @@ QUnit.module('Views', {
     });
 
     QUnit.test('keyboard navigation on form view', function(assert) {
-        assert.expect(6);
+        assert.expect(7);
 
         var form = createView({
             View: FormView,
@@ -220,19 +220,22 @@ QUnit.module('Views', {
             arch: '<form string="Partners">' +
                     '<sheet>' +
                         '<group>' +
-                            '<field name="qux"/>' +
+                            '<field name="qux" required="1"/>' +
                             '<field name="foo"/>' +
                             '<field name="trululu"/>' +
                             '<field name="state"/>' +
                         '</group>' +
                     '</sheet>' +
                 '</form>',
-            res_id: 1,
+            res_id: 3,
         });
 
         form.$buttons.find('.o_form_button_edit').focus();
         $(document.activeElement).trigger('click');
         assert.strictEqual($(document.activeElement).attr('name'),'qux',"First Element Focused");
+        $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.TAB }));
+        assert.strictEqual(document.activeElement, form.$('input[name="qux"]')[0], "required field is empty and after pressing the TAB it should't leave the focus from current field");
+        form.$('input[name="qux"]').val("qux");
         $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.TAB }));
         assert.strictEqual($(document.activeElement).attr('name'),'foo',"Second Element Focused");
         $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.TAB }));
@@ -386,8 +389,7 @@ QUnit.module('Views', {
         assert.strictEqual($(document.activeElement).attr('type'), 'checkbox',
             "focus shoud be on checkbox");
         $(document.activeElement).click();
-        assert.strictEqual($(document.activeElement)[0].checked, false,
-            "check box shoud unchecked after clicking on it");
+        assert.ok(!$(document.activeElement)[0].checked, "check box shoud unchecked after clicking on it");
         $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
         assert.strictEqual($(document.activeElement)[0], form.$('input[name="int_field"]')[0],
             "focus shoud be on int field");
@@ -543,6 +545,59 @@ QUnit.module('Views', {
         assert.strictEqual($(document.activeElement).hasClass('o_form_button_edit'),true,"Edit button focused");
 
         form.destroy();
+    });
+
+    QUnit.test('when press enter on create and edit it shoud open FormViewDialog', function (assert) {
+        assert.expect(3);
+        this.data.product.fields.product_ids = {
+            string: "one2many product", type: "one2many", relation: "product",
+        };
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            res_id: 1,
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="product_id"/>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+            archs: {
+                'product,false,form':
+                    '<form string="Products">' +
+                        '<sheet>' +
+                            '<group>' +
+                                '<field name="name"/>' +
+                            '</group>' +
+                        '</sheet>' +
+                    '</form>',
+            },
+        });
+        form.$buttons.find('.o_form_button_edit').click();
+        var upKey = $.Event("keydown", { keyCode: 38 });
+        var enterKey = $.Event("keydown", { keyCode: 13 });
+        var tabKey = $.Event("keydown", { which: $.ui.keyCode.TAB });
+        form.$el.find('.o_input_dropdown input').trigger(upKey);
+        var $dropdown = form.$('.o_field_many2one input').autocomplete('widget');
+        $dropdown.trigger(upKey);
+        $dropdown.trigger(enterKey);
+        var firstModel = $('.modal-dialog');
+        assert.strictEqual($(document.activeElement)[0], $(firstModel[0]).find('input[name="name"]')[0],
+        "focus should be on first input field in FormViewDialog");
+        $(document.activeElement).trigger(tabKey);
+        assert.strictEqual($(document.activeElement)[0].innerText, 'SAVE',
+        "if it is last element and tab pressed the focus should be on SAVE button");
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
+        assert.strictEqual($(document.activeElement)[0], $(firstModel[0]).find('input[name="name"]')[0],
+        "again focus should be on first input field");
+        $(firstModel).trigger($.Event("keydown", { which: $.ui.keyCode.ESCAPE }));
+        concurrency.delay(100).then(function() { // content area of html field having timeout in summernote itself
+            assert.ok($(document.activeElement).hasClass('o_input'), "focus should be on first input field after pressing the ESCAPE");
+            form.destroy();
+        });
     });
 
 });
