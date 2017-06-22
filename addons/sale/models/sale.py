@@ -1094,3 +1094,61 @@ class SaleOrderLine(models.Model):
             discount = (new_list_price - price) / new_list_price * 100
             if discount > 0:
                 self.discount = discount
+
+    ###########################
+    # Analytic Methods
+    ###########################
+
+    @api.multi
+    def _analytic_compute_delivered_quantity_domain(self):
+        """ Return the domain of the analytic lines to use to recompute the delivered quantity
+            on SO lines. This method is a hook: since analytic line are used for timesheet,
+            expense, ...  each use case should provide its part of the domain.
+        """
+        return [('so_line', 'in', self.ids), ('amount', '<=', 0.0)]
+
+    @api.multi
+    def _analytic_compute_delivered_quantity(self, unlinked_so_lines=None):
+        """ Compute and write the delivered quantity of current SO lines, based on their related
+            analytic lines.
+            :param unlinked_so_lines: recordset of sale.order.line for which an AAL has been removed.
+        """
+        value_to_write = {}
+
+        unlinked_so_lines = unlinked_so_lines or self.env['sale.order.line']
+        so_lines = self | unlinked_so_lines
+
+        # avoid recomputation if no SO lines concerned
+        if not so_lines:
+            return False
+
+        # if the unlinked analytic line was the last one on the SO line, the qty was not updated.
+        if unlinked_so_lines:
+            for so_line in unlinked_so_lines.sudo():
+                value_to_write.setdefault(so_line, 0.0)
+
+        # group anaytic lines by product uom and so line
+        domain = so_lines._analytic_compute_delivered_quantity_domain()
+        data = self.env['account.analytic.line'].sudo().read_group(
+            domain,
+            ['so_line', 'unit_amount', 'product_uom_id'], ['product_uom_id', 'so_line'], lazy=False
+        )
+
+        # convert uom and sum all unit_amount of analytic lines to get the delivered qty of SO lines
+        for item in data:
+            if not item['product_uom_id']:
+                continue
+            so_line = self.browse(item['so_line'][0]).sudo()  # browse as sudo, since this is an automatic action
+            value_to_write.setdefault(so_line, 0.0)
+            uom = self.env['product.uom'].browse(item['product_uom_id'][0])
+            if so_line.product_uom.category_id == uom.category_id:
+                qty = uom._compute_quantity(item['unit_amount'], so_line.product_uom)
+            else:
+                qty = item['unit_amount']
+            value_to_write[so_line] += qty
+
+        # write the delivered quantity
+        for so_line, qty in pycompat.items(value_to_write):
+            so_line.write({'qty_delivered': qty})
+
+        return True
