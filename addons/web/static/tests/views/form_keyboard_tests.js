@@ -211,7 +211,7 @@ QUnit.module('Views', {
     });
 
     QUnit.test('keyboard navigation on form view', function(assert) {
-        assert.expect(5);
+        assert.expect(6);
 
         var form = createView({
             View: FormView,
@@ -241,6 +241,8 @@ QUnit.module('Views', {
         assert.strictEqual($(document.activeElement).attr('name'),'state',"Fourth Element Focused");
         $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.TAB }));
         assert.strictEqual($(document.activeElement).hasClass('o_form_button_save'),true,"Save button focused");
+        $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.TAB, shiftKey: true}));
+        assert.strictEqual($(document.activeElement).attr('name'),'state',"Last Element Focused");
         form.destroy();
     });
 
@@ -470,6 +472,79 @@ QUnit.module('Views', {
             form.destroy();
         });
     });
+
+    QUnit.test('navigation on header buttons in edit mode', function(assert) {
+        assert.expect(4);
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<field name="state" invisible="1"/>' +
+                    '<header>' +
+                        '<button name="confirm" class="btn-primary confirm" string="Confirm"/>' +
+                        '<button name="doit" class="btn-primary doit" string="Do it"/>' +
+                    '</header>' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="display_name"/>' +
+                            '<field name="foo"/>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+            res_id: 1,
+        });
+
+        form.$buttons.find('.o_form_button_edit').focus();
+        $(document.activeElement).trigger('click');
+        $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
+        $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
+
+        assert.strictEqual($(document.activeElement).hasClass('o_form_button_save'),true,"Save button focused");
+        $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
+        assert.strictEqual($(document.activeElement).hasClass('confirm'),true,"Confirm button focused");
+        $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
+        assert.strictEqual($(document.activeElement).hasClass('doit'),true,"Do It button focused");
+        $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
+        assert.strictEqual($(document.activeElement).attr('name'),'display_name',"first button focused");
+
+        form.destroy();
+    });
+
+    QUnit.test('navigation on header buttons in readonly mode', function(assert) {
+        assert.expect(3);
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<field name="state" invisible="1"/>' +
+                    '<header>' +
+                        '<button name="confirm" class="btn-primary confirm" string="Confirm"/>' +
+                        '<button name="doit" class="btn-primary doit" string="Do it"/>' +
+                    '</header>' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="display_name"/>' +
+                            '<field name="foo"/>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+            res_id: 1,
+        });
+
+        form.$el.find('.confirm').focus();
+        assert.strictEqual($(document.activeElement).hasClass('confirm'),true,"Confirm button focused");
+        $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
+        assert.strictEqual($(document.activeElement).hasClass('doit'),true,"Do It button focused");
+        $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
+        assert.strictEqual($(document.activeElement).hasClass('o_form_button_edit'),true,"Edit button focused");
+
+        form.destroy();
+    });
+
 });
 
 });
