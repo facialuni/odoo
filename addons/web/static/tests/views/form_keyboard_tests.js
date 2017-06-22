@@ -134,7 +134,7 @@ QUnit.module('Views', {
     QUnit.module('FormView Keyboard');
 
     QUnit.test('m2o autocomplete when open and press escape, it should not discard form changes', function (assert) {
-        assert.expect(3);
+        assert.expect(4);
 
         var form = createView({
             View: FormView,
@@ -148,12 +148,14 @@ QUnit.module('Views', {
             res_id: 1,
         });
         form.$buttons.find('.o_form_button_edit').click();
+        $(document.activeElement).trigger(jQuery.Event('keydown', { which: $.ui.keyCode.ENTER , shiftKey : true}));
+        assert.ok(form.$buttons.find(".o_form_buttons_edit").hasClass("o_hidden"), 'the record should be saved on pressing SHIFT + ENTER');
+        form.$buttons.find('.o_form_button_edit').click();
         var $dropdown = form.$('.o_field_many2one input').autocomplete('widget');
         form.$('.o_field_many2one input').click();
         assert.strictEqual($dropdown.find('li:first()').text(), 'xphone', 'the click on m2o widget should open a dropdown');
-        var esc = $.Event("keydown", { keyCode: 27 });
-        form.$('.o_field_many2one input').trigger(esc);
-        assert.strictEqual(form.$buttons.find(".o_form_buttons_edit").hasClass("o_hidden"), false, 'm2o autocomplete when open and press escape it should not discard form changes');
+        form.$('.o_field_many2one input').trigger(jQuery.Event('keydown', { which: $.ui.keyCode.ESCAPE}));
+        assert.ok(!form.$buttons.find(".o_form_buttons_edit").hasClass("o_hidden"), 'm2o autocomplete when open and press escape it should not discard form changes');
         assert.ok($(document.activeElement).hasClass('o_input'),
             "Focus should be set on input field");
         form.destroy();
@@ -188,8 +190,6 @@ QUnit.module('Views', {
         });
         form.$buttons.find('.o_form_button_edit').click();
         var upkeyPress = $.Event("keydown", { keyCode: 38 });
-        var downkeyPress = $.Event("keydown", { keyCode: 40 });
-        var downkeyUPress = $.Event("keyup", { keyCode: 40 }); //this event is stored to handle search widget keyup event of down arrow key
         var enterkeyPress = $.Event("keydown", { keyCode: 13 });
         var $dropdown = form.$('.o_field_many2one input').autocomplete('widget');
         form.$('.o_field_many2one input').click();
@@ -203,8 +203,7 @@ QUnit.module('Views', {
         var firstModel = $('.modal');
         $(firstModel).find('input[class="o_searchview_input"]').trigger($.Event("keyup", { which: $.ui.keyCode.DOWN }));
         assert.strictEqual($(document.activeElement).find('.o_row_selected').text(), 'xphone', 'the selected row must have the same name as shown view');
-        var $dataList = $(firstModel).find('.o_list_view');
-        var value = $dataList.find('li:first()').text();
+        var value = $(firstModel).find('.o_list_view li:first()').text();
         $(document.activeElement).trigger(($.Event("keydown", { which: $.ui.keyCode.ENTER })));
         assert.strictEqual($dropdown.val(), value, "the value should equal to the value that is selected from form dialog");
         form.destroy();
@@ -600,6 +599,95 @@ QUnit.module('Views', {
         });
     });
 
+        QUnit.test('ESCAPE key with editable listview, it should discard editable listview record', function (assert) {
+        assert.expect(4);
+        this.data.partner.records[0].p = [1];
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<sheet>' +
+                        '<field name="p">' +
+                            '<tree default_order="foo desc" editable="bottom" >' +
+                                '<field name="display_name"/>' +
+                                '<field name="foo"/>' +
+                            '</tree>' +
+                        '</field>' +
+                        '<group>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+            res_id: 1,
+        });
+        form.$buttons.find('.o_form_button_edit').click();
+        form.$buttons.find('.o_form_button_save').trigger(($.Event("keydown", { which: $.ui.keyCode.TAB })));
+        assert.strictEqual($(document.activeElement)[0], $(".o_field_widget[name='display_name']")[0], "Focus should be on o2m input");
+        $(document.activeElement).trigger(($.Event("keydown", { which: $.ui.keyCode.ESCAPE })));
+        assert.ok(!form.$buttons.find(".o_form_buttons_edit").hasClass("o_hidden"), 'o2m when press escape it should not discard form changes');
+        assert.strictEqual($(document.activeElement).find('.o_list_view tbody').children().length, 4, "the number of rows should be 4");
+        $(document.activeElement).trigger(($.Event("keydown", { which: $.ui.keyCode.TAB })));
+        form.$buttons.find('.o_form_button_save').trigger(($.Event("keydown", { which: $.ui.keyCode.TAB })));
+        $(document.activeElement).val('suh');
+        $(document.activeElement).trigger(($.Event("keydown", { which: $.ui.keyCode.TAB })));
+        assert.strictEqual($(document.activeElement).val(), 'My little Foo Value', "The focus should be on next editable field");
+        form.destroy();
+    });
+
+    QUnit.test('O2m check dialog form popup, close and check behaviour of o2m field when it is empty and non empty when TAB is pressed', function (assert) {
+        assert.expect(6);
+        this.data.partner.records[0].p = [1];
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<sheet>' +
+                        '<field name="product_id"/>' +
+                        '<field name="p">' +
+                            '<tree default_order="foo desc">' +
+                                '<field name="display_name"/>' +
+                                '<field name="foo"/>' +
+                                '</tree>' +
+                        '</field>' +
+                        '<group>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+            archs: {
+                'partner,false,form':
+                    '<form string="Partner">' +
+                        '<sheet>' +
+                            '<group>' +
+                                '<field name="foo"/>' +
+                            '</group>' +
+                        '</sheet>' +
+                    '</form>',
+            },
+            res_id: 1,
+        });
+        form.$buttons.find('.o_form_button_edit').click();
+        assert.ok($(document.activeElement).hasClass('ui-autocomplete-input'), "Focus should be on m2o widget");
+        assert.strictEqual($(document.activeElement).val(), '', 'the input should not have any value');
+        $(document.activeElement).trigger(($.Event("keydown", { which: $.ui.keyCode.TAB })));
+        assert.strictEqual($('.modal').length, 1,
+            "One FormViewDialog should be opened");
+        assert.ok($(document.activeElement).hasClass('o_field_widget'),
+            "Focus should be on input of FormViewDialog");
+        $(document.activeElement).trigger(($.Event("keydown", { which: $.ui.keyCode.TAB })));
+        assert.ok($(document.activeElement).hasClass('o_form_button_save'),
+            "Focus should be on save button of FormViewDialog");
+        $(document.activeElement).trigger(($.Event("keydown", { which: $.ui.keyCode.TAB })));
+        //the the tab key should work on primary button
+        $('.modal .modal-footer').children()[1].focus();
+        assert.strictEqual(document.activeElement, $('.modal .modal-footer').children()[1], "Focus should be on save & new button of FormViewDialog");
+        $('.modal').trigger(($.Event("keydown", { which: $.ui.keyCode.ESCAPE})));
+        concurrency.delay(100).then(function() { // content area having timeout in summernote itself
+            assert.ok($(document.activeElement).hasClass('o_field_one2many'), "focus should be on first input field after pressing the ESCAPE");
+        });
+    });
 });
 
 });
