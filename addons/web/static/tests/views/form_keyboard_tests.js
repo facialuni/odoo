@@ -20,6 +20,7 @@ QUnit.module('Views', {
                     bar: {string: "Bar", type: "boolean"},
                     int_field: {string: "int_field", type: "integer", sortable: true},
                     qux: {string: "Qux", type: "float", digits: [16,1] },
+                    htmldata : {string: "HTML Field" , type: "html"},
                     p: {string: "one2many field", type: "one2many", relation: 'partner'},
                     trululu: {string: "Trululu", type: "many2one", relation: 'partner'},
                     timmy: { string: "pokemon", type: "many2many", relation: 'partner_type'},
@@ -398,6 +399,76 @@ QUnit.module('Views', {
         assert.strictEqual($(document.activeElement)[0], form.$('input[name="datetime"]')[0],
             "focus shoud be on datetime field");
         form.destroy();
+    });
+
+    QUnit.test('keyboard navigation on html field', function(assert) {
+        assert.expect(2);
+
+        var done = assert.async();
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="display_name"/>' +
+                            '<field name="htmldata"/>' +
+                            '<field name="foo"/>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+            res_id: 1,
+        });
+
+        form.$buttons.find('.o_form_button_edit').focus();
+        $(document.activeElement).trigger('click');
+        $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
+        concurrency.delay(0).then(function() { // content area of html field having timeout in summernote itself
+            assert.strictEqual($(document.activeElement).hasClass('note-editable'),true,"next element is html field");
+        });
+        $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB , shiftKey : true }));
+        concurrency.delay(0).then(function() { // content area of html field having timeout in summernote itself
+            assert.strictEqual($(document.activeElement).hasClass('note-editable'),true,"previous element is html field");
+        });
+        concurrency.delay(0).then(function() { // content area of html field having timeout in summernote itself
+            form.destroy();
+            done();
+        });
+    });
+
+    QUnit.test('tab and shift tab shoud change the focus on html field', function(assert) {
+        assert.expect(2);
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="display_name"/>' +
+                            '<field name="htmldata"/>' +
+                            '<field name="foo"/>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+            res_id: 1,
+        });
+
+        form.$buttons.find('.o_form_button_edit').focus();
+        $(document.activeElement).trigger('click');
+        $('.note-editable').focus();
+        $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
+        assert.strictEqual($(document.activeElement).attr('id'),"o_field_input_5","tab shoud be change focus on next field");
+        $('.note-editable').focus();
+        $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB, shiftKey : true }));
+        assert.strictEqual($(document.activeElement).attr('id'),"o_field_input_3","tab shoud be change focus on previous field");
+
+        concurrency.delay(0).then(function() { // content area of html field having timeout in summernote itself
+            form.destroy();
+        });
     });
 });
 
