@@ -951,14 +951,14 @@ var FormRenderer = BasicRenderer.extend({
             if (lastFieldWidget && _.isEqual(ev.data.target, lastFieldWidget)) {
                 return this.trigger_up('focus_control_button');
             }
-            if (nextWidget && !_.isEqual(nextWidget, ev.data.target)) {
-                return this._activateNextWidget(this.state, index);
-            } else if (_.isEqual(ev.data.target, lastWidget) && !_.isEqual(ev.data.target, lastFieldWidget)) {
+            if (_.isEqual(ev.data.target, lastWidget) && !_.isEqual(ev.data.target, lastFieldWidget)) {
                 if (this.mode != "readonly") {
                     return this._activateNextWidget(this.state, -1);
                 } else {
                     return this.trigger_up('focus_control_button');
                 }
+            } else if (nextWidget && !_.isEqual(nextWidget, ev.data.target)) {
+                return this._activateNextWidget(this.state, index);
             } else {
                 return this.trigger_up('focus_control_button');
             }
