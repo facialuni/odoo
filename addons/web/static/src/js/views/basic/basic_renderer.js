@@ -233,11 +233,13 @@ var BasicRenderer = AbstractRenderer.extend({
     _scrollTo: function (widget, reverse) {
         var $scrollableElement = this.$el.scrollParent();
         var offsetTop = widget.$el.offset().top;
-        offsetTop = (offsetTop - $scrollableElement.offset().top);
-        if (reverse && offsetTop < 0) {
-            $scrollableElement.animate({ scrollTop: offsetTop - ($scrollableElement.height()*0.05)}, 1000);
-        } else if (offsetTop > $scrollableElement.height() - ($scrollableElement.height()*0.10)) {
-            $scrollableElement.animate({ scrollTop: offsetTop - ($scrollableElement.height()*0.05)}, 1000);
+        if ($scrollableElement.offset()) {
+            offsetTop = (offsetTop - $scrollableElement.offset().top);
+            if (reverse && offsetTop < 0) {
+                $scrollableElement.animate({ scrollTop: offsetTop - ($scrollableElement.height()*0.05)}, 1000);
+            } else if (offsetTop > $scrollableElement.height() - ($scrollableElement.height()*0.10)) {
+                $scrollableElement.animate({ scrollTop: offsetTop - ($scrollableElement.height()*0.05)}, 1000);
+            }
         }
     },
     /**
