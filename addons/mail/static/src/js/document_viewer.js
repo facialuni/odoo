@@ -221,12 +221,11 @@ odoo.define('mail.DocumentViewer', function(require) {
         _doDrag: function (e) {
             e.preventDefault();
             if (this.enableDrag) {
-                var $img = $('.o_viewer_img');
-                var imgOffset = $img.offset();
-                var left = imgOffset.left < 0 ? e.clientX - this.dragStartX : 0;
-                var top = imgOffset.top < 0 ? e.clientY - this.dragStartY : 0;
-                this.$('.o_viewer_img_wrapper')
-                    .css("transform", "translate3d("+ left +"px, " + top + "px, 0)");
+                var $image = this.$('.o_viewer_img');
+                var $zoomer = this.$('.o_viewer_zoomer');
+                var top = $image.prop('offsetHeight') * this.scale > $zoomer.height() ? e.clientY - this.dragStartY : 0;
+                var left = $image.prop('offsetWidth') * this.scale > $zoomer.width() ? e.clientX - this.dragStartX : 0;
+                $zoomer.css("transform", "translate3d("+ left +"px, " + top + "px, 0)");
             }
         },
         /**
