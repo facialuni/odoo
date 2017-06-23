@@ -686,8 +686,31 @@ QUnit.module('Views', {
         $('.modal').trigger(($.Event("keydown", { which: $.ui.keyCode.ESCAPE})));
         concurrency.delay(100).then(function() {
             assert.ok($(document.activeElement).hasClass('o_field_one2many'), "focus should be on first input field after pressing the ESCAPE");
+            $(document.activeElement).trigger(($.Event("keydown", { which: $.ui.keyCode.ESCAPE })));
+            assert.ok(form.$buttons.find(".o_form_buttons_edit").hasClass("o_hidden"), 'o2m when focus and press escape it should discard form changes');
             form.destroy();
         });
+    });
+
+    QUnit.test('many2many field when focussed and empty and pressing ESCAPE should discard the form ', function (assert) {
+        assert.expect(2);
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<sheet>' +
+                        '<field name="timmy" widget="many2many_tags"/>' + // no view
+                    '</sheet>' +
+                '</form>',
+            res_id: 1,
+        });
+        form.$buttons.find('.o_form_button_edit').click();
+        assert.ok($(document.activeElement).hasClass("ui-autocomplete-input"), 'm2m should have focus');
+        $(document.activeElement).trigger(($.Event("keydown", { which: $.ui.keyCode.ESCAPE })));
+        assert.ok(form.$buttons.find(".o_form_buttons_edit").hasClass("o_hidden"), 'm2m when focus and press escape it should discard form changes');
+        form.destroy();
     });
 });
 
