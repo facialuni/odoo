@@ -712,6 +712,119 @@ QUnit.module('Views', {
         assert.ok(form.$buttons.find(".o_form_buttons_edit").hasClass("o_hidden"), 'm2m when focus and press escape it should discard form changes');
         form.destroy();
     });
+
+    QUnit.test('move to previous view after pressing ESCAPE on edit', function (assert) {
+        assert.expect(1);
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            res_id: 1,
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="foo"/>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+            intercepts: {
+                history_back: function (event) {
+                    assert.strictEqual(event.name, 'history_back',
+                        "should trigger an history back action when ESCAPE pressed");
+                },
+            }
+        });
+
+        form.$buttons.find('.o_form_button_edit').focus();
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.ESCAPE }));
+        form.destroy();
+    });
+
+    QUnit.test('move to previous view after pressing ESCAPE on create', function (assert) {
+        assert.expect(1);
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            res_id: 1,
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="foo"/>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+            intercepts: {
+                history_back: function (event) {
+                    assert.strictEqual(event.name, 'history_back',
+                        "should trigger an history back action when ESCAPE pressed");
+                },
+            }
+        });
+
+        form.$buttons.find('.o_form_button_create').focus();
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.ESCAPE }));
+        form.destroy();
+    });
+
+    QUnit.test('move to readonly view after pressing ESCAPE on save', function (assert) {
+        assert.expect(1);
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            res_id: 1,
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="foo"/>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+        });
+
+        form.$buttons.find('.o_form_button_edit').click();
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.ESCAPE }));
+        assert.strictEqual(form.$el.find('.o_form_readonly').length, 1, 'should in readonly mode after pressing ESCAPE on save')
+        form.destroy();
+    });
+
+    QUnit.test('when ESCAPE is pressed on header button it should open previous view', function (assert) {
+        assert.expect(2);
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            res_id: 1,
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<header>' +
+                        '<button name="confirm" class="btn-primary confirm" string="Confirm"/>' +
+                        '<button name="doit" class="btn-primary doit" string="Do it"/>' +
+                    '</header>' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="foo"/>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+        });
+        var enterKey = $.Event("keydown", { keyCode: 13 });
+        form.$buttons.find('.o_form_button_edit').click();
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.ESCAPE }));
+        assert.strictEqual(form.$el.find('.o_form_readonly').length, 1, 'should in readonly mode after pressing ESCAPE on header button')
+        form.$buttons.find('.o_form_button_edit').click();
+        form.$el.find('.o_input').val('test').trigger('input');
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.ESCAPE }));
+        var firstModel = $('.modal');
+        assert.strictEqual(firstModel.length, 1, 'after pressing ESCAPE on header button and if data is dirty should open a warning dialog')
+        $(firstModel).find('button[class="btn btn-sm btn-primary"]').trigger($.Event("keydown", { which: $.ui.keyCode.ESCAPE }));
+        form.destroy();
+    });
 });
 
 });
