@@ -1310,11 +1310,7 @@ class Root(object):
                             continue
                         manifest['addons_path'] = addons_path
                         _logger.debug("Loading %s", module)
-                        if 'odoo.addons' in sys.modules:
-                            m = __import__('odoo.addons.' + module)
-                        else:
-                            m = None
-                        addons_module[module] = m
+                        addons_module[module] = True
                         addons_manifest[module] = manifest
                         statics['/%s/static' % module] = path_static
 
