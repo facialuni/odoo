@@ -587,7 +587,7 @@ QUnit.module('Views', {
         assert.strictEqual($(document.activeElement)[0], $(firstModel[0]).find('input[name="name"]')[0],
         "focus should be on first input field in FormViewDialog");
         $(document.activeElement).trigger(tabKey);
-        assert.strictEqual($(document.activeElement)[0].innerText, 'SAVE',
+        assert.strictEqual($(document.activeElement)[0].innerText, 'Save',
         "if it is last element and tab pressed the focus should be on SAVE button");
         $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
         assert.strictEqual($(document.activeElement)[0], $(firstModel[0]).find('input[name="name"]')[0],
