@@ -22,20 +22,6 @@ var FormController = BasicController.extend({
         shift_enter_pressed: '_onShiftEnterPress'
     }),
     /**
-     * Called each time the form view is attached into the DOM
-     */
-    on_attach_callback: function () {
-        this.trigger('attached');
-        this.renderer.setTabindexWidgets();
-        this.autofocus();
-    },
-    /**
-     * Called each time the form view is detached from the DOM
-     */
-    on_detach_callback: function () {
-        this.trigger('detached');
-    },
-    /**
      * @override
      *
      * @param {boolean} params.hasSidebar
@@ -116,6 +102,7 @@ var FormController = BasicController.extend({
      * @todo convert to new style
      */
     on_attach_callback: function () {
+        this.renderer.setTabindexWidgets();
         this.autofocus();
     },
     /**
