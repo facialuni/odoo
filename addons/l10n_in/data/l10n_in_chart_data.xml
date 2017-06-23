@@ -20,28 +20,16 @@
             <field name="chart_template_id" ref="indian_chart_template_standard"/>
          </record>
 
-        <record id="sgst_tag_account_sale" model="account.account.tag">
-            <field name="name">SGST Sale</field>
+        <record id="sgst_tag_account" model="account.account.tag">
+            <field name="name">SGST</field>
             <field name="applicability">accounts</field>
         </record>
-        <record id="sgst_tag_account_purchase" model="account.account.tag">
-            <field name="name">SGST Purchase</field>
+        <record id="cgst_tag_account" model="account.account.tag">
+            <field name="name">CGST</field>
             <field name="applicability">accounts</field>
         </record>
-        <record id="cgst_tag_account_sale" model="account.account.tag">
-            <field name="name">CGST Sale</field>
-            <field name="applicability">accounts</field>
-        </record>
-        <record id="cgst_tag_account_purchase" model="account.account.tag">
-            <field name="name">CGST Purchase</field>
-            <field name="applicability">accounts</field>
-        </record>
-        <record id="igst_tag_account_sale" model="account.account.tag">
-            <field name="name">IGST Sale</field>
-            <field name="applicability">accounts</field>
-        </record>
-        <record id="igst_tag_account_purchase" model="account.account.tag">
-            <field name="name">IGST Purchase</field>
+        <record id="igst_tag_account" model="account.account.tag">
+            <field name="name">IGST</field>
             <field name="applicability">accounts</field>
         </record>
 
@@ -65,7 +53,7 @@
             <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="reconcile" eval="False"/>
             <field name="chart_template_id" ref="indian_chart_template_standard"/>
-            <field name="tag_ids" eval="[(6,0,[ref('sgst_tag_account_purchase'),])]"/>
+            <field name="tag_ids" eval="[(6,0,[ref('sgst_tag_account'),])]"/>
         </record>
 
         <record model="account.account.template" id="p10052">
@@ -74,7 +62,7 @@
             <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="reconcile" eval="False"/>
             <field name="chart_template_id" ref="indian_chart_template_standard"/>
-            <field name="tag_ids" eval="[(6,0,[ref('cgst_tag_account_purchase'),])]"/>
+            <field name="tag_ids" eval="[(6,0,[ref('cgst_tag_account'),])]"/>
         </record>
 
         <record model="account.account.template" id="p10053">
@@ -83,7 +71,7 @@
             <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="reconcile" eval="False"/>
             <field name="chart_template_id" ref="indian_chart_template_standard"/>
-            <field name="tag_ids" eval="[(6,0,[ref('igst_tag_account_purchase'),])]"/>
+            <field name="tag_ids" eval="[(6,0,[ref('igst_tag_account'),])]"/>
         </record>
         <record model="account.account.template" id="p10054">
             <field name="name">TDS Receivable</field>
@@ -221,7 +209,7 @@
             <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="reconcile" eval="False"/>
             <field name="chart_template_id" ref="indian_chart_template_standard"/>
-            <field name="tag_ids" eval="[(6,0,[ref('sgst_tag_account_sale'),])]"/>
+            <field name="tag_ids" eval="[(6,0,[ref('sgst_tag_account'),])]"/>
         </record>
 
         <record model="account.account.template" id="p11233">
@@ -230,7 +218,7 @@
             <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="reconcile" eval="False"/>
             <field name="chart_template_id" ref="indian_chart_template_standard"/>
-            <field name="tag_ids" eval="[(6,0,[ref('cgst_tag_account_sale'),])]"/>
+            <field name="tag_ids" eval="[(6,0,[ref('cgst_tag_account'),])]"/>
         </record>
 
         <record model="account.account.template" id="p11234">
@@ -239,7 +227,7 @@
             <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="reconcile" eval="False"/>
             <field name="chart_template_id" ref="indian_chart_template_standard"/>
-            <field name="tag_ids" eval="[(6,0,[ref('igst_tag_account_sale'),])]"/>
+            <field name="tag_ids" eval="[(6,0,[ref('igst_tag_account'),])]"/>
         </record>
         <record model="account.account.template" id="p11241">
             <field name="name">Wages Payable</field>

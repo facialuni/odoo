@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <record id="sgst_tag_tax" model="account.account.tag">
+        <field name="name">SGST</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="cgst_tag_tax" model="account.account.tag">
+        <field name="name">CGST</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="igst_tag_tax" model="account.account.tag">
+        <field name="name">IGST</field>
+        <field name="applicability">taxes</field>
+    </record>
+
     <!-- GST TAXES-->
 
     <!-- SGST & CGST Sales Group Tax -->
@@ -14,6 +27,8 @@
         <field name="account_id" ref="p11232"/>
         <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('sgst_tag_tax'),])]"/>
+
     </record>
 
     <record id="cgst_sale_0_5" model="account.tax.template">
@@ -25,6 +40,7 @@
         <field name="account_id" ref="p11233"/>
         <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cgst_tag_tax'),])]"/>
     </record>
 
     <record id="sgst_sale_1" model="account.tax.template">
@@ -46,6 +62,7 @@
         <field name="account_id" ref="p11232"/>
         <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('sgst_tag_tax'),])]"/>
     </record>
 
     <record id="cgst_sale_1_2" model="account.tax.template">
@@ -57,6 +74,7 @@
         <field name="account_id" ref="p11233"/>
         <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cgst_tag_tax'),])]"/>
     </record>
 
     <record id="sgst_sale_2" model="account.tax.template">
@@ -78,6 +96,7 @@
         <field name="account_id" ref="p11232"/>
         <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('sgst_tag_tax'),])]"/>
     </record>
 
     <record id="cgst_sale_2_5" model="account.tax.template">
@@ -89,6 +108,7 @@
         <field name="account_id" ref="p11233"/>
         <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cgst_tag_tax'),])]"/>
     </record>
 
     <record id="sgst_sale_5" model="account.tax.template">
@@ -110,6 +130,7 @@
         <field name="account_id" ref="p11232"/>
         <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('sgst_tag_tax'),])]"/>
     </record>
 
     <record id="cgst_sale_6" model="account.tax.template">
@@ -121,6 +142,7 @@
         <field name="account_id" ref="p11233"/>
         <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cgst_tag_tax'),])]"/>
     </record>
 
     <record id="sgst_sale_12" model="account.tax.template">
@@ -142,6 +164,7 @@
         <field name="account_id" ref="p11232"/>
         <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('sgst_tag_tax'),])]"/>
     </record>
 
     <record id="cgst_sale_9" model="account.tax.template">
@@ -153,6 +176,7 @@
         <field name="account_id" ref="p11233"/>
         <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cgst_tag_tax'),])]"/>
     </record>
 
     <record id="sgst_sale_18" model="account.tax.template">
@@ -174,6 +198,7 @@
         <field name="account_id" ref="p11232"/>
         <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('sgst_tag_tax'),])]"/>
     </record>
 
     <record id="cgst_sale_14" model="account.tax.template">
@@ -185,6 +210,7 @@
         <field name="account_id" ref="p11233"/>
         <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cgst_tag_tax'),])]"/>
     </record>
 
     <record id="sgst_sale_28" model="account.tax.template">
@@ -208,6 +234,7 @@
         <field name="account_id" ref="p11234"/>
         <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('igst_tag_tax'),])]"/>
     </record>
 
     <record id="igst_sale_2" model="account.tax.template">
@@ -219,6 +246,7 @@
         <field name="account_id" ref="p11234"/>
         <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('igst_tag_tax'),])]"/>
     </record>
 
     <record id="igst_sale_5" model="account.tax.template">
@@ -230,6 +258,7 @@
         <field name="account_id" ref="p11234"/>
         <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('igst_tag_tax'),])]"/>
     </record>
 
     <record id="igst_sale_12" model="account.tax.template">
@@ -241,6 +270,7 @@
         <field name="account_id" ref="p11234"/>
         <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('igst_tag_tax'),])]"/>
     </record>
 
     <record id="igst_sale_18" model="account.tax.template">
@@ -252,6 +282,7 @@
         <field name="account_id" ref="p11234"/>
         <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('igst_tag_tax'),])]"/>
     </record>
 
     <record id="igst_sale_28" model="account.tax.template">
@@ -263,6 +294,7 @@
         <field name="account_id" ref="p11234"/>
         <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('igst_tag_tax'),])]"/>
     </record>
 
     <!-- SGST & CGST Purchase Group Tax -->
@@ -276,6 +308,7 @@
         <field name="account_id" ref="p10051"/>
         <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('sgst_tag_tax'),])]"/>
     </record>
 
     <record id="cgst_purchase_0_5" model="account.tax.template">
@@ -287,6 +320,7 @@
         <field name="account_id" ref="p10052"/>
         <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cgst_tag_tax'),])]"/>
     </record>
 
     <record id="sgst_purchase_1" model="account.tax.template">
@@ -308,6 +342,7 @@
         <field name="account_id" ref="p10051"/>
         <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('sgst_tag_tax'),])]"/>
     </record>
 
     <record id="cgst_purchase_1_2" model="account.tax.template">
@@ -319,6 +354,7 @@
         <field name="account_id" ref="p10052"/>
         <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cgst_tag_tax'),])]"/>
     </record>
 
     <record id="sgst_purchase_2" model="account.tax.template">
@@ -340,6 +376,7 @@
         <field name="account_id" ref="p10051"/>
         <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('sgst_tag_tax'),])]"/>
     </record>
 
     <record id="cgst_purchase_2_5" model="account.tax.template">
@@ -351,6 +388,7 @@
         <field name="account_id" ref="p10052"/>
         <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cgst_tag_tax'),])]"/>
     </record>
 
     <record id="sgst_purchase_5" model="account.tax.template">
@@ -372,6 +410,7 @@
         <field name="account_id" ref="p10051"/>
         <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('sgst_tag_tax'),])]"/>
     </record>
 
     <record id="cgst_purchase_6" model="account.tax.template">
@@ -383,6 +422,7 @@
         <field name="account_id" ref="p10052"/>
         <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cgst_tag_tax'),])]"/>
     </record>
 
     <record id="sgst_purchase_12" model="account.tax.template">
@@ -404,6 +444,7 @@
         <field name="account_id" ref="p10051"/>
         <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('sgst_tag_tax'),])]"/>
     </record>
 
     <record id="cgst_purchase_9" model="account.tax.template">
@@ -415,6 +456,7 @@
         <field name="account_id" ref="p10052"/>
         <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cgst_tag_tax'),])]"/>
     </record>
 
     <record id="sgst_purchase_18" model="account.tax.template">
@@ -436,6 +478,7 @@
         <field name="account_id" ref="p10051"/>
         <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('sgst_tag_tax'),])]"/>
     </record>
 
     <record id="cgst_purchase_14" model="account.tax.template">
@@ -447,6 +490,7 @@
         <field name="account_id" ref="p10052"/>
         <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cgst_tag_tax'),])]"/>
     </record>
 
     <record id="sgst_purchase_28" model="account.tax.template">
@@ -470,6 +514,7 @@
         <field name="account_id" ref="p10053"/>
         <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('igst_tag_tax'),])]"/>
     </record>
 
     <record id="igst_purchase_2" model="account.tax.template">
@@ -481,6 +526,7 @@
         <field name="account_id" ref="p10053"/>
         <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('igst_tag_tax'),])]"/>
     </record>
 
     <record id="igst_purchase_5" model="account.tax.template">
@@ -492,6 +538,7 @@
         <field name="account_id" ref="p10053"/>
         <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('igst_tag_tax'),])]"/>
     </record>
 
     <record id="igst_purchase_12" model="account.tax.template">
@@ -503,6 +550,7 @@
         <field name="account_id" ref="p10053"/>
         <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('igst_tag_tax'),])]"/>
     </record>
 
     <record id="igst_purchase_18" model="account.tax.template">
@@ -514,6 +562,7 @@
         <field name="account_id" ref="p10053"/>
         <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('igst_tag_tax'),])]"/>
     </record>
 
     <record id="igst_purchase_28" model="account.tax.template">
@@ -525,6 +574,7 @@
         <field name="account_id" ref="p10053"/>
         <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('igst_tag_tax'),])]"/>
     </record>
 
     <!-- Fiscal Position Templates -->
