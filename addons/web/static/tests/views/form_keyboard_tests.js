@@ -684,8 +684,9 @@ QUnit.module('Views', {
         $('.modal .modal-footer').children()[1].focus();
         assert.strictEqual(document.activeElement, $('.modal .modal-footer').children()[1], "Focus should be on save & new button of FormViewDialog");
         $('.modal').trigger(($.Event("keydown", { which: $.ui.keyCode.ESCAPE})));
-        concurrency.delay(100).then(function() { // content area having timeout in summernote itself
+        concurrency.delay(100).then(function() {
             assert.ok($(document.activeElement).hasClass('o_field_one2many'), "focus should be on first input field after pressing the ESCAPE");
+            form.destroy();
         });
     });
 });
