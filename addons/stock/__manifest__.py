@@ -7,7 +7,7 @@
     'summary': 'Inventory, Logistics, Warehousing',
     'description': "",
     'website': 'https://www.odoo.com/page/warehouse',
-    'depends': ['product', 'procurement', 'barcodes', 'web_planner'],
+    'depends': ['product', 'barcodes', 'web_planner'],
     'category': 'Warehouse',
     'sequence': 13,
     'demo': [
@@ -26,6 +26,7 @@
         'security/ir.model.access.csv',
         'views/stock_menu_views.xml',
         'data/stock_traceability_report_data.xml',
+        'data/procurement_data.xml',
 
         'report/report_stock_forecast.xml',
         'report/stock_report_views.xml',
@@ -38,8 +39,7 @@
 
         'wizard/stock_change_product_qty_views.xml',
         'wizard/stock_picking_return_views.xml',
-        'wizard/make_procurement_views.xml',
-        'wizard/procurement_orderpoint_compute_views.xml',
+        'wizard/stock_orderpoint_compute_views.xml',
         'wizard/stock_immediate_transfer_views.xml',
         'wizard/stock_backorder_confirmation_views.xml',
 
@@ -53,7 +53,6 @@
         'views/stock_picking_views.xml',
         'views/stock_quant_views.xml',
         'views/stock_location_views.xml',
-        'views/procurement_views.xml',
         'views/stock_warehouse_views.xml',
         'views/stock_move_line_views.xml',
         'views/stock_move_views.xml',
@@ -61,6 +60,7 @@
         'views/stock_config_settings_views.xml',
         'views/report_stock_traceability.xml',
         'views/stock_template.xml',
+        'views/procurement_views.xml',
 
         'data/default_barcode_patterns.xml',
         'data/stock_data.xml',

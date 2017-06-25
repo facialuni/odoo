@@ -14,7 +14,7 @@ import threading
 _logger = logging.getLogger(__name__)
 
 class ProcurementOrderpointConfirm(models.TransientModel):
-    _name = 'procurement.orderpoint.compute'
+    _name = 'stock.orderpoint.compute'
     _description = 'Compute Minimum Stock Rules'
 
     def _procure_calculation_orderpoint(self):
@@ -22,7 +22,7 @@ class ProcurementOrderpointConfirm(models.TransientModel):
             # As this function is in a new thread, I need to open a new cursor, because the old one may be closed
             new_cr = self.pool.cursor()
             self = self.with_env(self.env(cr=new_cr))
-            scheduler_cron = self.sudo().env.ref('procurement.ir_cron_scheduler_action')
+            scheduler_cron = self.sudo().env.ref('stock.ir_cron_scheduler_action')
             # Avoid to run the scheduler multiple times in the same time
             try:
                 with tools.mute_logger('odoo.sql_db'):
@@ -33,7 +33,7 @@ class ProcurementOrderpointConfirm(models.TransientModel):
                 self._cr.close()
                 return {}
 
-            self.env['procurement.order']._procure_orderpoint_confirm(
+            self.env['procurement.group']._procure_orderpoint_confirm(
                 use_new_cursor=new_cr.dbname,
                 company_id=self.env.user.company_id.id)
             new_cr.close()

@@ -3,6 +3,7 @@
 
 from . import account_invoice
 from . import purchase
+from . import procurement
 from . import purchase_config_settings
 from . import res_company
 from . import res_partner

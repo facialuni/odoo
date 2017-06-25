@@ -130,10 +130,12 @@ class StockWarehouse(models.Model):
                 warehouse.buy_pull_id.write({'location_id': warehouse.in_type_id.default_location_dest_id.id})
         return res
 
-class ReturnPicking(models.TransientModel):
-    _inherit = "stock.return.picking"
 
-    def _prepare_move_default_values(self, return_line, new_picking):
-        vals = super(ReturnPicking, self)._prepare_move_default_values(return_line, new_picking)
-        vals['purchase_line_id'] = return_line.move_id.purchase_line_id.id
-        return vals
+class Orderpoint(models.Model):
+    _inherit = "stock.warehouse.orderpoint"
+
+    def _quantity_in_progress(self):
+        res = super(Orderpoint, self)._quantity_in_progress()
+        for poline in self.env['purchase.order.line'].search([('state','in',('draft','sent','to approve')),('orderpoint_id','in',self.ids)]):
+            res[poline.orderpoint_id.id] += poline.product_uom._compute_quantity(poline.product_qty, poline.orderpoint_id.product_uom, round=False)
+        return res
