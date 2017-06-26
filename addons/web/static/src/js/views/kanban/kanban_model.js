@@ -35,11 +35,7 @@ var KanbanModel = BasicModel.extend({
         group.count++;
 
         // update the res_ids and count of the parent
-        var self = this;
-        var parent = this.localData[group.parentID];
-        parent.res_ids =  _.flatten(_.map(parent.data, function (dataPointID) {
-            return self.localData[dataPointID].res_ids;
-        }));
+        this.resequenceResIDs(group.parentID);
         parent.count++;
 
         return this._fetchRecord(new_record).then(function (result) {
@@ -119,10 +115,15 @@ var KanbanModel = BasicModel.extend({
      * @returns {Deferred<string>} resolves to the localID of the group
      */
     loadMore: function (groupID) {
+        var self = this;
         var group = this.localData[groupID];
         var offset = group.loadMoreOffset + group.limit;
         return this.reload(group.id, {
             loadMoreOffset: offset,
+        }).then(function (db_id) {
+            var parent = self.localData[group.parentID];
+            self.resequenceResIDs(parent.parentID);
+            return db_id;
         });
     },
     /**
@@ -158,6 +159,7 @@ var KanbanModel = BasicModel.extend({
                 var index = _.indexOf(old_group.data, recordID);
                 if (index >= 0) {
                     old_group.data.splice(index, 1);
+                    old_group.res_ids.splice(index, 1);
                     old_group.count--;
                     break;
                 }
@@ -178,6 +180,18 @@ var KanbanModel = BasicModel.extend({
             options.groupBy = this.defaultGroupedBy;
         }
         return this._super(id, options);
+    },
+    /**
+     * Resequences record ids.
+     *
+     * @param {string]} parentID the localID of the parent
+     */
+    resequenceResIDs: function(parentID){
+        var self = this;
+        var parent = this.localData[parentID];
+        parent.res_ids =  _.flatten(_.map(parent.data, function (dataPointID) {
+            return self.localData[dataPointID].res_ids;
+        }));
     },
     /**
      * Resequences records.

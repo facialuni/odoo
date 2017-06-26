@@ -120,7 +120,19 @@ var KanbanController = BasicController.extend({
      * @returns {Deferred}
      */
     _resequenceRecords: function (column_id, ids) {
-        return this.model.resequence(this.modelName, ids, column_id);
+        var self = this;
+        return this.model.resequence(this.modelName, ids, column_id).then(function () {
+            self.model.localData[column_id].res_ids = ids;
+            self._resequenceResIDs();
+        });
+    },
+    /**
+     * This method resequence parent res_ids and update env
+     * so after move records in kanban switch to form view pager next-previous work as aspected
+     */
+    _resequenceResIDs: function(){
+        this.model.resequenceResIDs(this.handle);
+        this._updateEnv();
     },
     /**
      * In grouped mode, set 'Create' button as btn-default if there is no column
@@ -241,6 +253,7 @@ var KanbanController = BasicController.extend({
         this.model.loadMore(column.db_id).then(function (db_id) {
             var data = self.model.get(db_id);
             self.renderer.updateColumn(db_id, data);
+            self._updateEnv();
         });
     },
     /**
@@ -344,9 +357,12 @@ var KanbanController = BasicController.extend({
      * @param {OdooEvent} event
      */
     _onResequenceColumn: function (event) {
+        var self = this;
         var state = this.model.get(this.handle, {raw: true});
         var model = state.fields[state.groupedBy[0]].relation;
-        this.model.resequence(model, event.data.ids, this.handle);
+        this.model.resequence(model, event.data.ids, this.handle).then(function(){
+            self._resequenceResIDs();
+        });
     },
     /**
      * @param {OdooEvent} event
@@ -356,6 +372,7 @@ var KanbanController = BasicController.extend({
         var column = event.target;
         this.model.toggleGroup(column.db_id).then(function (db_id) {
             var data = self.model.get(db_id);
+            self._resequenceResIDs();
             self.renderer.updateColumn(db_id, data);
         });
     },
