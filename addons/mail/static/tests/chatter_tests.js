@@ -528,7 +528,6 @@ QUnit.test('chatter: Attachement viewer', function (assert) {
     var form = createView({
         View: FormView,
         model: 'partner',
-        debug: true,
         data: this.data,
         arch: '<form string="Partners">' +
                 '<sheet>' +
@@ -555,20 +554,20 @@ QUnit.test('chatter: Attachement viewer', function (assert) {
     });
     assert.strictEqual(form.$('.o_thread_message .o_attachment').length, 3,
         "there should be three attachment on message");
-    assert.strictEqual(form.$('.o_thread_message .o_attachment .o_attachment_overlay .o_attachment_download').attr('href'), '/web/content/1?download=true',
-        "Modal popup should have correct download link");
+    assert.strictEqual(form.$('.o_thread_message .o_attachment .caption a').first().attr('href'), '/web/content/1?download=true',
+        "image caption should have correct download link");
     // click on first image attachement
-    form.$('.o_thread_message .o_attachment .o_attachment_overlay .o_attachment_view').first().click();
-    assert.strictEqual($('.o_attachment img').attr('src'), '#test:/web/image/1/?unique=1',
+    form.$('.o_thread_message .o_attachment .o_image_box .o_image_overlay').first().click();
+    assert.strictEqual($('.o_modal_fullscreen img.o_viewer_img[src*="/web/image/1?unique=1"]').length, 1,
         "Modal popup should open with first image src");
     //  click on next button
     $('.modal .arrow.arrow-right.move_next span').click();
-    assert.strictEqual($('.modal .o_viewer_img_wrapper img').attr('src'), '#test:/web/image/2?unique=1',
+    assert.strictEqual($('.o_modal_fullscreen img.o_viewer_img[src*="/web/image/2?unique=1"]').length, 1,
         "Modal popup should have now second image src");
-    assert.strictEqual($('.modal .o_viewer-header .o_header_buttons .o_download_btn').length, 1,
+    assert.strictEqual($('.o_modal_fullscreen .o_viewer_toolbar .o_download_btn').length, 1,
         "Modal popup should have download button");
     // close attachment popup
-    $('.modal .o_viewer-header .o_header_buttons .o_close_btn').click();
+    $('.o_modal_fullscreen .o_viewer-header .o_close_btn').click();
     form.destroy();
 });
 
