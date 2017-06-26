@@ -5,7 +5,7 @@
         <div class="row">
             <form class="col-md-6 form-horizontal">
                 <div class="form-group">
-                    <label class="control-label col-sm-3">Page url</label>
+                    <label class="control-label col-sm-3">Page URL</label>
                     <div class="col-sm-9">
                         <input class="form-control o_facebook_page_url" required="required" t-att-value="href"/>
                     </div>

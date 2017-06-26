@@ -385,8 +385,7 @@ options.registry.facebook_page = options.Class.extend({
             this.fetch_fb_url();
         }
 
-        this.$target.on('click', '.o_add_facebook_page', function (e) {
-            e.preventDefault();
+        this.$target.on('fb_options', function (e) {
             self.fb_page_options(e.type);
         });
     },
@@ -405,7 +404,7 @@ options.registry.facebook_page = options.Class.extend({
         });
     },
     fb_page_options: function(type) {
-        if (type !== "click") return;
+        if (type !== "fb_options" && type !== "click") return;
 
         var self = this;
         var $dialog = new Dialog(null, {
@@ -667,5 +666,27 @@ eventHandler.modules.popover.button.update = function ($container, oStyle) {
     $container.find('button[data-event="transform"]')
         .toggleClass('active', $(oStyle.image).is('[style*="transform"]'))
         .toggleClass('hidden', !$(oStyle.image).is('img'));
+};
+
+/*
+ * To handle click/double-click for facebook snippet
+ *
+ * We can't bind this from snippet options because
+ * if we do that from snippet options, click/dblclick
+ * will only work after first click(focus).
+ */
+var fn_attach = eventHandler.attach;
+eventHandler.attach = function (oLayoutInfo, options) {
+    fn_attach.call(this, oLayoutInfo, options);
+    oLayoutInfo.editor().on("dblclick", '.o_facebook_page', function (e) {
+        $(this).trigger('fb_options');
+    });
+    oLayoutInfo.editor().on("click", '.o_add_facebook_page', function (e) {
+        var self = this;
+        // We need to wait for options to be initialized
+        setTimeout(function () {
+            $(self).trigger('fb_options');
+        }, 0);
+    });
 };
 });
