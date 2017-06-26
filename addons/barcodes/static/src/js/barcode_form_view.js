@@ -26,19 +26,22 @@ FormController.include({
         this.activeBarcode = {
             form_view: {
                 commands: {
-                    'O-CMD.NEW': 'createRecord',
-                    'O-CMD.EDIT': 'toEditMode',
-                    'O-CMD.CANCEL': 'discardChange',
-                    'O-CMD.SAVE': function () { return this.saveRecord({reload: true}); },
-                    // 'O-CMD.PAGER-PREV':
-                    // 'O-CMD.PAGER-NEXT':
-                }
-            }
+                    'O-CMD.NEW': this._onCommandNew.bind(this),
+                    'O-CMD.EDIT': this._onCommandEdit.bind(this),
+                    'O-CMD.CANCEL': this._onCommandCancel.bind(this),
+                    'O-CMD.SAVE': this._onCommandSave.bind(this),
+                    'O-CMD.PAGER-PREV': this._onCommandPrevious.bind(this),
+                    'O-CMD.PAGER-NEXT': this._onCommandNext.bind(this),
+                },
+            },
         };
 
         this.barcodeMutex = new concurrency.Mutex();
         this._barcodeStartListening();
     },
+    /**
+     * @override
+     */
     destroy: function () {
         this._barcodeStopListening();
         this._super();
@@ -128,7 +131,7 @@ FormController.include({
      */
     _getBarCodeRecord: function (record, barcode, activeBarcode) {
         var self = this;
-        if (!activeBarcode.fieldName) {
+        if (!activeBarcode.fieldName || !record.data[activeBarcode.fieldName]) {
             return;
         }
         return _.find(record.data[activeBarcode.fieldName].data, function (record) {
@@ -236,6 +239,42 @@ FormController.include({
                 self.update({}, {reload: false});
             });
         });
+    },
+    /**
+     * @private
+     */
+    _onCommandCancel: function () {
+        return this.discardChanges(this.handle);
+    },
+    /**
+     * @private
+     */
+    _onCommandEdit: function () {
+        return this._setMode('edit');
+    },
+    /**
+     * @private
+     */
+    _onCommandNew: function () {
+        return this.createRecord(this.handle);
+    },
+    /**
+     * @private
+     */
+    _onCommandNext: function () {
+        return this.mutex.exec(function () {}).then(this.pager.next.bind(this.pager));
+    },
+    /**
+     * @private
+     */
+    _onCommandPrevious: function () {
+        return this.mutex.exec(function () {}).then(this.pager.previous.bind(this.pager));
+    },
+    /**
+     * @private
+     */
+    _onCommandSave: function () {
+        return this.saveRecord(this.handle, {reload: true});
     },
     /**
      * @private
@@ -359,6 +398,21 @@ FormRenderer.include({
         }
         return $button;
     },
+    /**
+     * Add barcode event handler
+     *
+     * @override
+     * @private
+     * @param {Object} node
+     * @returns {jQueryElement}
+     */
+    _renderTagButton: function (node) {
+        var $button = this._super.apply(this, arguments);
+        if (node.attrs.barcode_trigger) {
+            this._barcodeButtonHandler($button, node);
+        }
+        return $button;
+    }
 });
 
 BarcodeEvents.ReservedBarcodePrefixes.push('O-BTN');
