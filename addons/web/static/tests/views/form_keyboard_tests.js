@@ -141,19 +141,22 @@ QUnit.module('Views', {
             model: 'partner',
             data: this.data,
             arch: '<form string="Partners">' +
-                    '<sheet><group>' +
-                        '<field name="product_id"/>' +
-                    '</group></sheet>' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="product_id"/>' +
+                        '</group>' +
+                    '</sheet>' +
                 '</form>',
             res_id: 1,
         });
+
         form.$buttons.find('.o_form_button_edit').click();
         $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.ENTER , shiftKey : true}));
         assert.ok(form.$buttons.find(".o_form_buttons_edit").hasClass("o_hidden"), 'the record should be saved on pressing SHIFT + ENTER');
         form.$buttons.find('.o_form_button_edit').click();
         var $dropdown = form.$('.o_field_many2one input').autocomplete('widget');
         form.$('.o_field_many2one input').click();
-        assert.strictEqual($dropdown.find('li:first()').text(), 'xphone', 'the click on m2o widget should open a dropdown');
+        assert.ok($dropdown.find('li').length, 'the click on m2o widget should open a dropdown');
         form.$('.o_field_many2one input').trigger($.Event('keydown', { which: $.ui.keyCode.ESCAPE}));
         assert.ok(!form.$buttons.find(".o_form_buttons_edit").hasClass("o_hidden"), 'm2o autocomplete when open and press escape it should not discard form changes');
         assert.ok($(document.activeElement).hasClass('o_input'),
@@ -161,7 +164,7 @@ QUnit.module('Views', {
         form.destroy();
     });
 
-    QUnit.test('test dialog selectCreate popup, Form popup', function (assert) {
+    QUnit.test('Test dialog selectCreate popup, Form popup', function (assert) {
         assert.expect(4);
 
         var form = createView({
@@ -188,6 +191,7 @@ QUnit.module('Views', {
                 'product,false,list': '<tree><field name="display_name"/></tree>'
             },
         });
+
         form.$buttons.find('.o_form_button_edit').click();
         var $dropdown = form.$('.o_field_many2one input').autocomplete('widget');
         form.$('.o_field_many2one input').click();
