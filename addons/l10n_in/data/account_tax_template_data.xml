@@ -44,8 +44,8 @@
     </record>
 
     <record id="sgst_sale_1" model="account.tax.template">
-        <field name="name">SGST 1%</field>
-        <field name="description">SGST 1%</field>
+        <field name="name">GST 1%</field>
+        <field name="description">GST 1%</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">group</field>
         <field name="amount">0</field>
@@ -78,8 +78,8 @@
     </record>
 
     <record id="sgst_sale_2" model="account.tax.template">
-        <field name="name">SGST 2%</field>
-        <field name="description">SGST 2%</field>
+        <field name="name">GST 2%</field>
+        <field name="description">GST 2%</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">group</field>
         <field name="amount">0</field>
@@ -112,8 +112,8 @@
     </record>
 
     <record id="sgst_sale_5" model="account.tax.template">
-        <field name="name">SGST 5%</field>
-        <field name="description">SGST 5%</field>
+        <field name="name">GST 5%</field>
+        <field name="description">GST 5%</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">group</field>
         <field name="amount">0</field>
@@ -146,8 +146,8 @@
     </record>
 
     <record id="sgst_sale_12" model="account.tax.template">
-        <field name="name">SGST 12%</field>
-        <field name="description">SGST 12%</field>
+        <field name="name">GST 12%</field>
+        <field name="description">GST 12%</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">group</field>
         <field name="amount">0</field>
@@ -180,8 +180,8 @@
     </record>
 
     <record id="sgst_sale_18" model="account.tax.template">
-        <field name="name">SGST 18%</field>
-        <field name="description">SGST 18%</field>
+        <field name="name">GST 18%</field>
+        <field name="description">GST 18%</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">group</field>
         <field name="amount">0</field>
@@ -214,8 +214,8 @@
     </record>
 
     <record id="sgst_sale_28" model="account.tax.template">
-        <field name="name">SGST 28%</field>
-        <field name="description">SGST 28%</field>
+        <field name="name">GST 28%</field>
+        <field name="description">GST 28%</field>
         <field name="type_tax_use">sale</field>
         <field name="amount_type">group</field>
         <field name="amount">0</field>
@@ -324,8 +324,8 @@
     </record>
 
     <record id="sgst_purchase_1" model="account.tax.template">
-        <field name="name">SGST 1%</field>
-        <field name="description">SGST 1%</field>
+        <field name="name">GST 1%</field>
+        <field name="description">GST 1%</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">group</field>
         <field name="amount">0</field>
@@ -358,8 +358,8 @@
     </record>
 
     <record id="sgst_purchase_2" model="account.tax.template">
-        <field name="name">SGST 2%</field>
-        <field name="description">SGST 2%</field>
+        <field name="name">GST 2%</field>
+        <field name="description">GST 2%</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">group</field>
         <field name="amount">0</field>
@@ -392,8 +392,8 @@
     </record>
 
     <record id="sgst_purchase_5" model="account.tax.template">
-        <field name="name">SGST 5%</field>
-        <field name="description">SGST 5%</field>
+        <field name="name">GST 5%</field>
+        <field name="description">GST 5%</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">group</field>
         <field name="amount">0</field>
@@ -426,8 +426,8 @@
     </record>
 
     <record id="sgst_purchase_12" model="account.tax.template">
-        <field name="name">SGST 12%</field>
-        <field name="description">SGST 12%</field>
+        <field name="name">GST 12%</field>
+        <field name="description">GST 12%</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">group</field>
         <field name="amount">0</field>
@@ -460,8 +460,8 @@
     </record>
 
     <record id="sgst_purchase_18" model="account.tax.template">
-        <field name="name">SGST 18%</field>
-        <field name="description">SGST 18%</field>
+        <field name="name">GST 18%</field>
+        <field name="description">GST 18%</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">group</field>
         <field name="amount">0</field>
@@ -494,8 +494,8 @@
     </record>
 
     <record id="sgst_purchase_28" model="account.tax.template">
-        <field name="name">SGST 28%</field>
-        <field name="description">SGST 28%</field>
+        <field name="name">GST 28%</field>
+        <field name="description">GST 28%</field>
         <field name="type_tax_use">purchase</field>
         <field name="amount_type">group</field>
         <field name="amount">0</field>

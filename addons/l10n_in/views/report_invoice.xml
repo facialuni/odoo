@@ -37,15 +37,4 @@
         </xpath>
     </template>
 
-    <template id="l10n_in_account_invoice_report_duplicate" inherit_id="account.account_invoice_report_duplicate">
-        <xpath expr="//h2" position="replace">
-            <h2>
-                <span>Duplicate</span>
-                <span t-if="o.type == 'out_refund'">credit note</span>
-                <span t-if="o.type == 'out_invoice'" t-field="o.journal_id.name"/>
-                <span t-field="o.number"/>
-            </h2>
-        </xpath>
-    </template>
-
 </odoo>
