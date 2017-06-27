@@ -373,7 +373,7 @@ class Holidays(models.Model):
     @api.multi
     def unlink(self):
         for holiday in self.filtered(lambda holiday: holiday.state not in ['draft', 'cancel', 'confirm']):
-            raise UserError(_('You cannot delete a leave which is in %s state.') % (holiday.state,))
+            raise UserError(_('You cannot delete a leave which is in %s state.') % (dict(holiday.fields_get('state')['state']['selection'])[holiday.state],))
         return super(Holidays, self).unlink()
 
     ####################################################
@@ -435,10 +435,14 @@ class Holidays(models.Model):
         self._check_security_action_approve()
 
         current_employee = self.env['hr.employee'].search([('user_id', '=', self.env.uid)], limit=1)
-        for holiday in self:
-            if holiday.state != 'confirm':
-                raise UserError(_('Leave request must be confirmed ("To Approve") in order to approve it.'))
+        state_list = []
+        for validate_holiday in self:
+            if validate_holiday.state not in ['confirm', 'validate1']:
+                state_list.append(dict(validate_holiday.fields_get('state')['state']['selection'])[validate_holiday.state])
+        if state_list:
+            raise UserError(_('Leave request must be confirmed "%s" in order to approve it.') % (', '.join(list(set(state_list)))))
 
+        for holiday in self:
             if holiday.double_validation:
                 return holiday.write({'state': 'validate1', 'first_approver_id': current_employee.id})
             else:
