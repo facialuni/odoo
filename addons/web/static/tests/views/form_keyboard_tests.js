@@ -8,7 +8,6 @@ var testUtils = require('web.test_utils');
 
 var _t = core._t;
 var createView = testUtils.createView;
-var createAsyncView = testUtils.createAsyncView;
 
 QUnit.module('Views', {
     beforeEach: function () {
@@ -480,7 +479,8 @@ QUnit.module('Views', {
     });
 
     QUnit.test('when press enter on create and edit it should open FormViewDialog', function (assert) {
-        assert.expect(3);
+        var done = assert.async();
+        assert.expect(4);
         this.data.product.fields.product_ids = {
             string: "one2many product", type: "one2many", relation: "product",
         };
@@ -505,8 +505,8 @@ QUnit.module('Views', {
                                 '<field name="name"/>' +
                             '</group>' +
                         '</sheet>' +
-                    '</form>',
-            },
+                    '</form>'
+            }
         });
         form.$buttons.find('.o_form_button_edit').click();
         var upKey = $.Event("keydown", { keyCode: 38 });
@@ -516,18 +516,19 @@ QUnit.module('Views', {
         var $dropdown = form.$('.o_field_many2one input').autocomplete('widget');
         $dropdown.trigger(upKey);
         $dropdown.trigger(enterKey);
-        var firstModel = $('.modal-dialog');
-        assert.strictEqual($(document.activeElement)[0], $(firstModel[0]).find('input[name="name"]')[0],
+        var $firstModel = $('.modal-dialog');
+        assert.strictEqual($(document.activeElement)[0], $firstModel.find('input[name="name"]')[0],
         "focus should be on first input field in FormViewDialog");
         $(document.activeElement).trigger(tabKey);
         assert.ok($(document.activeElement).hasClass("o_form_button_save"), "if it is last element and tab pressed the focus should be on SAVE button");
         $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
-        assert.strictEqual($(document.activeElement)[0], $(firstModel[0]).find('input[name="name"]')[0],
+        assert.strictEqual($(document.activeElement)[0], $firstModel.find('input[name="name"]')[0],
         "again focus should be on first input field");
-        $(firstModel).trigger($.Event("keydown", { which: $.ui.keyCode.ESCAPE }));
-        concurrency.delay(100).then(function() {
+        $firstModel.trigger($.Event("keydown", { which: $.ui.keyCode.ESCAPE }));
+        concurrency.delay(200).then(function() {
             assert.ok($(document.activeElement).hasClass('o_input'), "focus should be on first input field after pressing the ESCAPE");
             form.destroy();
+            done();
         });
     });
 
@@ -568,7 +569,8 @@ QUnit.module('Views', {
     });
 
     QUnit.test('O2m check dialog form popup, close and check behaviour of o2m field when it is empty and non empty when TAB is pressed', function (assert) {
-        assert.expect(6);
+        var done = assert.async();
+        assert.expect(8);
         this.data.partner.records[0].p = [1];
 
         var form = createView({
@@ -616,11 +618,12 @@ QUnit.module('Views', {
         $('.modal .modal-footer').children()[1].focus();
         assert.strictEqual(document.activeElement, $('.modal .modal-footer').children()[1], "Focus should be on save & new button of FormViewDialog");
         $('.modal').trigger(($.Event("keydown", { which: $.ui.keyCode.ESCAPE})));
-        concurrency.delay(100).then(function() {
+        concurrency.delay(300).then(function() {
             assert.ok($(document.activeElement).hasClass('o_field_one2many'), "focus should be on first input field after pressing the ESCAPE");
             $(document.activeElement).trigger(($.Event("keydown", { which: $.ui.keyCode.ESCAPE })));
             assert.ok(form.$buttons.find(".o_form_buttons_edit").hasClass("o_hidden"), 'o2m when focus and press escape it should discard form changes');
             form.destroy();
+            done();
         });
     });
 
