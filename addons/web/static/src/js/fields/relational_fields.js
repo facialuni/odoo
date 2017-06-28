@@ -559,7 +559,7 @@ var FieldMany2One = AbstractField.extend({
      * @param {OdooEvent} ev
      */
     _onNavigationMove: function (ev) {
-        if (this.is_autocomplete_open) {
+        if (this.is_autocomplete_open) { // If autocomplete is open then do not move user to previous or next record on up/down key
             ev.stopPropagation();
         }
         return basicFields.InputField.prototype._onNavigationMove.apply(this, arguments);
