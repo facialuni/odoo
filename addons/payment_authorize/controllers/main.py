@@ -5,6 +5,7 @@ from werkzeug import urls, utils
 
 from odoo import http
 from odoo.http import request
+from odoo.exceptions import ValidationError
 
 _logger = logging.getLogger(__name__)
 
@@ -63,7 +64,11 @@ class AuthorizeController(http.Controller):
 
     @http.route(['/payment/authorize/s2s/create'], type='http', auth='public')
     def authorize_s2s_create(self, **post):
+        error = ''
         acquirer_id = int(post.get('acquirer_id'))
         acquirer = request.env['payment.acquirer'].browse(acquirer_id)
-        acquirer.s2s_process(post)
-        return utils.redirect(post.get('return_url', '/'))
+        try:
+            acquirer.s2s_process(post)
+        except ValidationError as e:
+            error = e.args[0]
+        return utils.redirect(post.get('return_url', '/') + (error and '?error=%s' % urls.url_quote(error) or ''))

@@ -70,6 +70,7 @@ class OgoneController(http.Controller):
     @http.route(['/payment/ogone/s2s/create'], type='http', auth='public', methods=["POST"], csrf=False)
     def ogone_s2s_create(self, **post):
         error = ''
+        token = ''
         acq = request.env['payment.acquirer'].browse(int(post.get('acquirer_id')))
         try:
             token = acq.s2s_process(post)
@@ -89,7 +90,7 @@ class OgoneController(http.Controller):
             tx = token.validate(**params)
             if tx and tx.html_3ds:
                 return tx.html_3ds
-        return werkzeug.utils.redirect(post.get('return_url', '/') + (error and '#error=%s' % werkzeug.url_quote(error) or ''))
+        return werkzeug.utils.redirect(post.get('return_url', '/') + (error and '?error=%s' % werkzeug.url_quote(error) or ''))
 
     @http.route([
         '/payment/ogone/validate/accept',

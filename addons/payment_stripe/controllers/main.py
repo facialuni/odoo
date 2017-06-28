@@ -5,6 +5,7 @@ import werkzeug
 
 from odoo import http
 from odoo.http import request
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -19,10 +20,14 @@ class StripeController(http.Controller):
 
     @http.route(['/payment/stripe/s2s/create'], type='http', auth='public')
     def stripe_s2s_create(self, **post):
+        error = ''
         acquirer_id = int(post.get('acquirer_id'))
         acquirer = request.env['payment.acquirer'].browse(acquirer_id)
-        acquirer.s2s_process(post)
-        return werkzeug.utils.redirect(post.get('return_url', '/'))
+        try:
+            acquirer.s2s_process(post)
+        except UserError as e:
+            error = e.args[0]
+        return werkzeug.utils.redirect(post.get('return_url', '/') + (error and '?error=%s' % werkzeug.url_quote(error) or ''))
 
     @http.route(['/payment/stripe/s2s/create_json_3ds'], type='json', auth='public', csrf=False)
     def stripe_s2s_create_json_3ds(self, verify_validity=False, **kwargs):

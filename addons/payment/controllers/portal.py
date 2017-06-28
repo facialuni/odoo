@@ -12,9 +12,11 @@ class WebsitePayment(http.Controller):
         partner = request.env.user.partner_id
         payment_tokens = partner.payment_token_ids
         payment_tokens |= partner.commercial_partner_id.sudo().payment_token_ids
+        errors = request.params.get('error')
         values = {
             'pms': payment_tokens,
-            'acquirers': acquirers
+            'acquirers': acquirers,
+            'error_message': errors.split('\n') if errors else []
         }
         return_url = request.params.get('redirect', '/my/payment_method')
         for acquirer in acquirers:
