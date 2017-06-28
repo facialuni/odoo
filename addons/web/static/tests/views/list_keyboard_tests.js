@@ -89,6 +89,23 @@ QUnit.module('Views', {
 
         list.destroy();
     });
+
+    QUnit.test('Editable Listview on escape discard the editable listview record', function (assert) {
+        assert.expect(1);
+
+        var list = createView({
+            View: ListView,
+            model: 'foo',
+            data: this.data,
+            arch: '<tree editable="bottom"><field name="name"/></tree>',
+        });
+
+        list.$('td:not(.o_list_record_selector)').first().click();
+        $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.ESCAPE}));
+        assert.strictEqual(list.renderer.currentRow, null, "Pressing escape in editable list view should discard the record");
+
+        list.destroy();
+    });
 });
 
 });
