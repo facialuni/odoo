@@ -656,6 +656,43 @@ QUnit.module('Views', {
         $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.ESCAPE }));
         form.destroy();
     });
+
+    QUnit.test('key up event on m2o in editable list', function(assert) {
+        assert.expect(2);
+
+        var done = assert.async();
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="bar" />' +
+                            '<field name="p">' +
+                                '<tree default_order="foo" editable="bottom" >' +
+                                    '<field name="product_id"/>' +
+                                    '<field name="foo"/>' +
+                                '</tree>' +
+                            '</field>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+            res_id: 1,
+        });
+
+        form.$buttons.find('.o_form_button_edit').click();
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.DOWN }));
+
+        concurrency.delay(500).then(function(){
+            assert.strictEqual($('.ui-state-focus a').html(),"xphone","first element focused in autocomplete");
+            $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.UP }));
+            assert.ok($(document.activeElement).hasClass('ui-autocomplete-input'),"focus is in many2one field on key up pressed");
+            form.destroy();
+            done();
+        });
+    });
 });
 
 });
