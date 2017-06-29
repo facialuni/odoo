@@ -1777,7 +1777,7 @@
                 </div>
                 <div t-if="token" class="mt8 bg-danger" style="padding: 15px;">
                     <p>This is your Current cart.</p>
-                    <p><a t-attf-href="/shop/cart/#{token}?new=true">Click Here</a> if you want to restore your previous cart. Your Current cart will be replace with your previous cart.</p>
+                    <p><a t-attf-href="/shop/cart/#{token}?new=true">Click Here</a> if you want to restore your previous cart. Your Current cart will be replaced with your previous cart.</p>
                     <p><a t-attf-href="/shop/cart/#{token}?merge=true">Click Here</a> if you want to merge your previous cart into current cart.</p>
                 </div>
             </div>

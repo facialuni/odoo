@@ -11,8 +11,8 @@ class MailComposeMessage(models.TransientModel):
     @api.multi
     def send_mail(self, auto_commit=False):
         context = self._context
-        one_hour_before = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
         if context.get('default_model') == 'sale.order':
+            one_hour_before = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
             abandoned_cart_domain = [
                 ('id', 'in', context.get('active_ids')),
                 ('state', '=', 'draft'),

@@ -2,7 +2,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import logging
 import random
-import uuid
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -49,7 +48,7 @@ class SaleOrder(models.Model):
     @api.multi
     @api.depends('team_id.team_type', 'date_order', 'order_line', 'state', 'partner_id')
     def _compute_abandoned_cart(self):
-        time_constraint = fields.Datetime.to_string(datetime.now() - relativedelta(hours=1))
+        time_constraint = fields.Datetime.to_string(datetime.utcnow() - relativedelta(hours=1))
         for order in self:
             domain = order.date_order <= time_constraint and order.team_id.team_type == 'website' and order.state == 'draft' and order.partner_id.id != self.env.ref('base.public_partner').id and order.order_line
             order.is_abandoned_cart = bool(domain)
