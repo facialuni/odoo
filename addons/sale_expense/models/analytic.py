@@ -70,9 +70,9 @@ class AccountAnalyticLine(models.Model):
         """
         for analytic_line in self.filtered(lambda aal: not aal.so_line):
             # determine SO : first SO open linked to AA
-            sale_order = self.env['sale.order'].search([('project_id', '=', analytic_line.account_id.id), ('state', '=', 'sale')], limit=1)
+            sale_order = self.env['sale.order'].search([('analytic_account_id', '=', analytic_line.account_id.id), ('state', '=', 'sale')], limit=1)
             if not sale_order:
-                sale_order = self.env['sale.order'].search([('project_id', '=', analytic_line.account_id.id)], limit=1)
+                sale_order = self.env['sale.order'].search([('analytic_account_id', '=', analytic_line.account_id.id)], limit=1)
             if not sale_order:
                 continue
 
