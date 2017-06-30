@@ -356,8 +356,8 @@ QUnit.module('Views', {
         form.destroy();
     });
 
-    QUnit.only('keyboard navigation on html field', function(assert) {
-        assert.expect(2);
+    QUnit.test('keyboard navigation on html field', function(assert) {
+        assert.expect(4);
 
         var done = assert.async();
 
@@ -377,55 +377,25 @@ QUnit.module('Views', {
             res_id: 1,
         });
 
-        // edit record and test focus on html field
+        // edit record and test focus on html field by using TAB and SHIFT+TAB
         form.$buttons.find('.o_form_button_edit').click();
+        assert.strictEqual($(document.activeElement).attr('name'), "display_name", "Focus should be on Displayed name field");
         $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
         concurrency.delay(0).then(function() { // content area of html field having timeout in summernote itself
             assert.ok($(document.activeElement).hasClass('note-editable'), "Active element should be html field");
-        });
-        $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB , shiftKey : true }));
-        concurrency.delay(0).then(function() { // content area of html field having timeout in summernote itself
-            assert.strictEqual($(document.activeElement).hasClass('note-editable'),true,"Active element should be html field");
+            $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
+            assert.strictEqual($(document.activeElement).attr('name'), "foo", "Focus should be on Foo field");
+            $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB, shiftKey : true }));
+            return concurrency.delay(0);
+        }).then(function() {
+            assert.strictEqual($(document.activeElement).hasClass('note-editable'),true,"Active element should be html field again on SHIFT+TAB");
             form.destroy();
             done();
         });
     });
 
-    QUnit.test('tab and shift tab should change the focus on html field', function(assert) {
-        assert.expect(2);
-
-        var form = createView({
-            View: FormView,
-            model: 'partner',
-            data: this.data,
-            arch: '<form string="Partners">' +
-                    '<sheet>' +
-                        '<group>' +
-                            '<field name="display_name"/>' +
-                            '<field name="htmldata"/>' +
-                            '<field name="foo"/>' +
-                        '</group>' +
-                    '</sheet>' +
-                '</form>',
-            res_id: 1,
-        });
-
-        form.$buttons.find('.o_form_button_edit').focus();
-        $(document.activeElement).trigger('click');
-        $('.note-editable').focus();
-        $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
-        assert.strictEqual($(document.activeElement).attr('name'),"foo","tab should be change focus on next field");
-        $('.note-editable').focus();
-        $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB, shiftKey : true }));
-        assert.strictEqual($(document.activeElement).attr('name'),"display_name","tab should be change focus on previous field");
-
-        concurrency.delay(0).then(function() { // content area of html field having timeout in summernote itself
-            form.destroy();
-        });
-    });
-
     QUnit.test('navigation on header buttons in edit mode and readonly mode', function(assert) {
-        assert.expect(7);
+        assert.expect(14);
 
         var done = assert.async();
         var form = createView({
@@ -435,37 +405,70 @@ QUnit.module('Views', {
             arch: '<form string="Partners">' +
                     '<field name="state" invisible="1"/>' +
                     '<header>' +
-                        '<button name="confirm" class="btn-primary confirm" string="Confirm"/>' +
-                        '<button name="doit" class="btn-primary doit" string="Do it"/>' +
+                        '<button name="confirm" states="ab" type="object" class="btn-primary confirm" string="Confirm"/>' +
+                        '<button name="doit" states="cd,ef" type="object" class="btn-primary doit" string="Do it"/>' +
+                        '<button name="done" states="cd,ef" type="object" class="btn-primary done" string="Done"/>' +
                     '</header>' +
                     '<sheet>' +
                         '<group>' +
                             '<field name="display_name"/>' +
                             '<field name="foo"/>' +
+                            '<field name="state" invisible="1"/>' +
                         '</group>' +
                     '</sheet>' +
                 '</form>',
             res_id: 1,
         });
 
-        form.$buttons.find('.o_form_button_edit').focus();
-        $(document.activeElement).trigger('click');
+        // edit record and test focus on html field and test navigation on header buttons
+        form.$buttons.find('.o_form_button_edit').click();
+        assert.strictEqual(form.$('.o_form_statusbar button').length, 3,
+            "should have 3 buttons in the statusbar");
+        assert.strictEqual(form.$('.o_form_statusbar button:visible').length, 1,
+            "should have only 1 visible button in the statusbar");
+
         $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
         $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
 
-        assert.strictEqual($(document.activeElement).hasClass('o_form_button_save'),true,"Save button focused");
+        // Focus should come to save button when TAB pressed from last field widget
+        assert.ok($(document.activeElement).hasClass('o_form_button_save'), "Focus must be on Save button");
+        // When TAB pressed from Save button focus should go to first statubar button
         $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
-        assert.strictEqual($(document.activeElement).hasClass('confirm'),true,"Confirm button focused");
-        $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
-        assert.strictEqual($(document.activeElement).hasClass('doit'),true,"Do It button focused");
-        $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
-        assert.strictEqual($(document.activeElement).attr('name'),'display_name',"first button focused");
-        $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.ENTER ,shiftKey: true}));
+        assert.ok($(document.activeElement).hasClass('confirm'), "Confirm button must have focus");
+
+        // Intercept execute_action i.e. when button is clicked we will check whether confirm button is clicked?
+        testUtils.intercept(form, 'execute_action', _.bind(function (event) {
+            assert.strictEqual(event.data.action_data.name, "confirm",
+                "should trigger execute_action with correct method name");
+            assert.deepEqual(event.data.res_ids, [1], "should have correct id in event data");
+            this.data.partner.records[0].state = "cd"; // Change state value to show next states based buttons
+            event.data.on_success();
+            event.data.on_closed();
+        }, this));
+
+        // Need to trigger ENTER as well as click forcefully(enter doesn't call execute_action I don't know why)
+        // Also ENTER in our case preserve last tabindex widget index so that when record reloaded right next widget get focus
+        $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.ENTER }));
+        $(document.activeElement).click();
 
         concurrency.delay(100).then(function() {
-            assert.strictEqual($(document.activeElement).hasClass('confirm'),true,"Confirm button focused");
+            assert.strictEqual(form.$('.o_form_statusbar button:visible').length, 2,
+            "should have 2 visible button in the statusbar");
+
+            assert.ok($(document.activeElement).hasClass('doit'), "Do It button focused");
             $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
-            assert.strictEqual($(document.activeElement).hasClass('doit'),true,"Do It button focused");
+            assert.ok($(document.activeElement).hasClass('done'), "Done button focused");
+            $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB, shiftKey: true }));
+            assert.ok($(document.activeElement).hasClass('doit'), "Do It button focused");
+            $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
+            $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
+            assert.strictEqual($(document.activeElement).attr('name'),'display_name',"first button focused");
+            $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.ENTER ,shiftKey: true}));
+            return concurrency.delay(100);
+        }).then(function() {
+            assert.ok($(document.activeElement).hasClass('doit'), "Do it button focused");
+            $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
+            assert.ok($(document.activeElement).hasClass('done'), "Done button focused");
             $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
             assert.strictEqual($(document.activeElement).hasClass('o_form_button_edit'),true,"Edit button focused");
             form.destroy();
