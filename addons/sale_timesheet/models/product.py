@@ -28,6 +28,6 @@ class ProductProduct(models.Model):
     @api.multi
     def _need_procurement(self):
         for product in self:
-            if product.type == 'service' and product.track_service == 'task':
+            if product.type == 'service' and product.track_service in ['task', 'timesheet']:
                 return True
         return super(ProductProduct, self)._need_procurement()
