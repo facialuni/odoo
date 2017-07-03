@@ -156,7 +156,7 @@ QUnit.module('Views', {
         assert.ok($dropdown.find('li').length, 'the click on m2o widget should open a dropdown');
         form.$('.o_field_many2one input').trigger($.Event('keydown', { which: $.ui.keyCode.ESCAPE}));
         assert.strictEqual(form.mode, 'edit', 'm2o autocomplete when open and press escape it should not discard form changes');
-        assert.strictEqual(document.activeElement, $("[name='product_id'] input")[0],
+        assert.strictEqual($(document.activeElement).closest('.o_field_widget').attr('name'), 'product_id',
             "Focus should be set on input field");
         form.destroy();
     });
@@ -221,8 +221,8 @@ QUnit.module('Views', {
             arch: '<form string="Partners">' +
                     '<sheet>' +
                         '<group>' +
-                            '<field name="qux" required="1"/>' +
-                            '<field name="foo"/>' +
+                            '<field name="foo" required="1"/>' +
+                            '<field name="qux"/>' +
                             '<field name="bar" />' +
                             '<field name="trululu" />' +
                             '<field name="int_field" />' +
@@ -238,13 +238,13 @@ QUnit.module('Views', {
 
         // edit record and navigate using TAB key
         form.$buttons.find('.o_form_button_edit').click();
-        assert.strictEqual($(document.activeElement).attr('name'), 'qux', "qux field should be focused");
+        assert.strictEqual($(document.activeElement).attr('name'), 'foo', "foo field should be focused");
         $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
         // test required field, qux is required and we try to press TAB, it should not move user to next widget
-        assert.strictEqual(document.activeElement, form.$('input[name="qux"]')[0], "required field is empty and after pressing the TAB it should't leave the focus from current field");
+        assert.strictEqual(document.activeElement, form.$('input[name="foo"]')[0], "required field is empty and after pressing the TAB it should't leave the focus from current field");
         $(document.activeElement).val("qux");
         $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
-        assert.strictEqual($(document.activeElement).attr('name'), 'foo', "foo field should have focus");
+        assert.strictEqual($(document.activeElement).attr('name'), 'qux', "qux field should have focus");
         $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
         assert.strictEqual($(document.activeElement).attr('type'), 'checkbox', "bar field should have focus");
         $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
@@ -388,7 +388,7 @@ QUnit.module('Views', {
             $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB, shiftKey : true }));
             return concurrency.delay(0);
         }).then(function() {
-            assert.strictEqual($(document.activeElement).hasClass('note-editable'),true,"Active element should be html field again on SHIFT+TAB");
+            assert.ok($(document.activeElement).hasClass('note-editable'), "Active element should be html field again on SHIFT+TAB");
             form.destroy();
             done();
         });
@@ -556,7 +556,7 @@ QUnit.module('Views', {
         // go to edit mode and create editable row in o2m and test ESCAPE key, Escape key should discard o2m editable record
         form.$buttons.find('.o_form_button_edit').click();
         $(document.activeElement).trigger(($.Event("keydown", { which: $.ui.keyCode.TAB })));
-        assert.strictEqual(document.activeElement, $(".o_field_widget[name='display_name']")[0], "Focus should be on Display name field of o2m");
+        assert.strictEqual($(document.activeElement).attr('name'), 'display_name', "Focus should be on Display name field of o2m");
         $(document.activeElement).trigger(($.Event("keydown", { which: $.ui.keyCode.ESCAPE })));
         assert.strictEqual($(document.activeElement).attr('name'), "p", "Focus must be on o2m element when editable o2m record is cancelled");
         assert.strictEqual(form.mode, 'edit', 'When escape pressed on o2m it should discard editable record only');

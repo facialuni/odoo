@@ -908,6 +908,40 @@ var FormRenderer = BasicRenderer.extend({
     _setIDForLabel: function (widget, idForLabel) {
         widget.getFocusableElement().attr('id', idForLabel);
     },
+    /**
+     * This method called every time when navigation move next is performed and
+     * it returns the widget that is next too current active widget.
+     *
+     * @private
+     * @param {Integer} currentIndex current widget index
+     * @param {Array} recordWidgets Array of all record widgets
+     * @returns {Class} Widget returns widget
+     */
+    _getNextTabindexWidget: function (currentIndex, recordWidgets) {
+        if (recordWidgets.length == currentIndex) {
+            currentIndex -= recordWidgets.length-1; // If we are on last widget index then move user back to first widget
+        }
+        for (var i = currentIndex ; i < recordWidgets.length ; i++) {
+            var widget = recordWidgets[i];
+            if (widget && widget.$el.is(':visible') && !widget.$el.hasClass("o_readonly_modifier")) { // check it is visible and not readonly
+                return widget;
+            }
+        }
+    },
+    /**
+     * It will returns the last visible widget from tabindexWidgets list for current record.
+     *
+     * @private
+     * @returns {Class} Widget returns last widget
+     */
+    _getLastWidget: function () {
+        var lastTabindexWidget = _.chain(this.tabindexWidgets[this.state.id]).filter(function(widget) {
+            return !(widget.$el.is(":hidden") || widget.$el.hasClass("o_readonly_modifier"));
+        })
+        .last()
+        .value();
+        return lastTabindexWidget;
+    },
 
     //--------------------------------------------------------------------------
     // Handlers
@@ -992,40 +1026,6 @@ var FormRenderer = BasicRenderer.extend({
     _onTranslate: function (event) {
         event.preventDefault();
         this.trigger_up('translate', {fieldName: event.target.name, id: this.state.id});
-    },
-    /**
-     * This method called every time when navigation move next is performed and
-     * it returns the widget that is next too current active widget.
-     *
-     * @private
-     * @param {Integer} currentIndex current widget index
-     * @param {Array} recordWidgets Array of all record widgets
-     * @returns {Class} Widget returns widget
-     */
-    _getNextTabindexWidget: function (currentIndex, recordWidgets) {
-        if (recordWidgets.length == currentIndex) {
-            currentIndex -= recordWidgets.length-1; // If we are on last widget index then move user back to first widget
-        }
-        for (var i = currentIndex ; i < recordWidgets.length ; i++) {
-            var widget = recordWidgets[i];
-            if (widget && widget.$el.is(':visible') && !widget.$el.hasClass("o_readonly_modifier")) { // check it is visible and not readonly
-                return widget;
-            }
-        }
-    },
-    /**
-     * It will returns the last visible widget from tabindexWidgets list for current record.
-     *
-     * @private
-     * @returns {Class} Widget returns last widget
-     */
-    _getLastWidget: function () {
-        var lastTabindexWidget = _.chain(this.tabindexWidgets[this.state.id]).filter(function(widget) {
-            return !(widget.$el.is(":hidden") || widget.$el.hasClass("o_readonly_modifier"));
-        })
-        .last()
-        .value();
-        return lastTabindexWidget;
     }
 });
 

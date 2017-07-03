@@ -163,88 +163,6 @@ var ListRenderer = BasicRenderer.extend({
         return this.hasSelectors ? n+1 : n;
     },
     /**
-     * Whenever user press UP/DOWN key then selection of records are managed by this method.
-     * It also manage shift and control key support for selecting records.
-     *
-     * @private
-     * @param {KeyboardEvent} event
-     * @param {Object} direction Contain the selection direction('up'/'down')
-     */
-    _keyNavigation: function (event, direction) {
-        var self = this;
-        var $currentRow = null;
-        if (!this.state.count) {
-            return;
-        }
-
-        var clearPreviousRows = function () {
-            self.$('tr.o_row_selected').each(function () {
-                if ($(this).find('.o_list_record_selector input').prop('checked')) {
-                    $(this).find('.o_list_record_selector input').trigger('click');
-                    $(this).removeClass('o_row_selected');
-                }
-            });
-        };
-
-        if (!this.selectedRow) {
-            // First remove all previous selected rows when down key pressed from search view
-            clearPreviousRows();
-            $currentRow = direction == 'down' ? this.$('.o_data_row:first') : this.$('.o_data_row:last');
-        } else {
-            var $currentRow = direction == 'down' ? this.selectedRow.next() : this.selectedRow.prev();
-            if (!$currentRow.length) {
-                return;
-            }
-        }
-
-        if (this.hasSelectors) {
-            if (!event.shiftKey && !event.ctrlKey) {
-                clearPreviousRows();
-                $currentRow.find('.o_list_record_selector input').focus().trigger('click');
-            } else if (event.shiftKey && !event.ctrlKey) {
-                $currentRow.find('.o_list_record_selector input').focus().trigger('click');
-            }  else if (event.ctrlKey && !event.shiftKey) {
-                $currentRow.find('.o_list_record_selector input').focus();
-            }
-        } else {
-            this.$('.o_list_view').focus(); // Set focus to listview table
-            _.each(this.$('.o_row_selected'), function (row) { $(row).removeClass("o_row_selected"); });
-            $currentRow.addClass('o_row_selected');
-            this.selectedRow = $currentRow;
-        }
-        if ($currentRow && $currentRow.length) {
-            // Manually scroll instead of standard scrolling
-            var $row = $currentRow.next();
-            var tableOffset = this.$('.o_list_view').offset().top;
-            var rowOffset = $currentRow.offset().top;
-            var scrollAmount = direction == 'down' ? $currentRow.height() : -$currentRow.height();
-            if ((rowOffset - tableOffset) > (this.$el.parent().height()/2) ) {
-                var offset = (rowOffset - tableOffset - (this.$el.parent().height()/2) + scrollAmount)
-                this._scrollTo(offset);
-            }
-        }
-    },
-    /**
-     * During selection of records using keyboard this method called when 'UP' key is pressed
-     *
-     * @private
-     * @param {KeyboardEvent} event
-     */
-    _keydownDownSelect: function (event) {
-        event.preventDefault();
-        this._keyNavigation(event, 'down');
-    },
-    /**
-     * During selection of records using keyboard this method called when 'DOWN' key is pressed
-     *
-     * @private
-     * @param {KeyboardEvent} event
-     */
-    _keydownUpSelect: function (event) {
-        event.preventDefault();
-        this._keyNavigation(event, 'up');
-    },
-    /**
      * Render a list of <td>, with aggregates if available.  It can be displayed
      * in the footer, or for each open groups.
      *
@@ -851,6 +769,88 @@ var ListRenderer = BasicRenderer.extend({
         this.$('.o_data_row').toggleClass('o_row_selected', checked);
         this._updateSelection();
     },
+    /**
+     * Whenever user press UP/DOWN key then selection of records are managed by this method.
+     * It also manage shift and control key support for selecting records.
+     *
+     * @private
+     * @param {KeyboardEvent} event
+     * @param {Object} direction Contain the selection direction('up'/'down')
+     */
+    _keyNavigation: function (event, direction) {
+        var self = this;
+        var $currentRow = null;
+        if (!this.state.count) {
+            return;
+        }
+
+        var clearPreviousRows = function () {
+            self.$('tr.o_row_selected').each(function () {
+                if ($(this).find('.o_list_record_selector input').prop('checked')) {
+                    $(this).find('.o_list_record_selector input').trigger('click');
+                    $(this).removeClass('o_row_selected');
+                }
+            });
+        };
+
+        if (!this.selectedRow) {
+            // First remove all previous selected rows when down key pressed from search view
+            clearPreviousRows();
+            $currentRow = direction == 'down' ? this.$('.o_data_row:first') : this.$('.o_data_row:last');
+        } else {
+            var $currentRow = direction == 'down' ? this.selectedRow.next() : this.selectedRow.prev();
+            if (!$currentRow.length) {
+                return;
+            }
+        }
+
+        if (this.hasSelectors) {
+            if (!event.shiftKey && !event.ctrlKey) {
+                clearPreviousRows();
+                $currentRow.find('.o_list_record_selector input').focus().trigger('click');
+            } else if (event.shiftKey && !event.ctrlKey) {
+                $currentRow.find('.o_list_record_selector input').focus().trigger('click');
+            }  else if (event.ctrlKey && !event.shiftKey) {
+                $currentRow.find('.o_list_record_selector input').focus();
+            }
+        } else {
+            this.$('.o_list_view').focus(); // Set focus to listview table
+            _.each(this.$('.o_row_selected'), function (row) { $(row).removeClass("o_row_selected"); });
+            $currentRow.addClass('o_row_selected');
+            this.selectedRow = $currentRow;
+        }
+        if ($currentRow && $currentRow.length) {
+            // Manually scroll instead of standard scrolling
+            var $row = $currentRow.next();
+            var tableOffset = this.$('.o_list_view').offset().top;
+            var rowOffset = $currentRow.offset().top;
+            var scrollAmount = direction == 'down' ? $currentRow.height() : -$currentRow.height();
+            if ((rowOffset - tableOffset) > (this.$el.parent().height()/2) ) {
+                var offset = (rowOffset - tableOffset - (this.$el.parent().height()/2) + scrollAmount)
+                this._scrollTo(offset);
+            }
+        }
+    },
+    /**
+     * During selection of records using keyboard this method called when 'UP' key is pressed
+     *
+     * @private
+     * @param {KeyboardEvent} event
+     */
+    _keydownDownSelect: function (event) {
+        event.preventDefault();
+        this._keyNavigation(event, 'down');
+    },
+    /**
+     * During selection of records using keyboard this method called when 'DOWN' key is pressed
+     *
+     * @private
+     * @param {KeyboardEvent} event
+     */
+    _keydownUpSelect: function (event) {
+        event.preventDefault();
+        this._keyNavigation(event, 'up');
+    }
 });
 
 return ListRenderer;
