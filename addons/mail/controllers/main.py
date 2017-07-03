@@ -4,6 +4,7 @@
 import base64
 import json
 import logging
+import os
 import psycopg2
 import werkzeug
 
@@ -14,7 +15,8 @@ from odoo import api, http, registry, SUPERUSER_ID, _
 from odoo.addons.web.controllers.main import binary_content
 from odoo.exceptions import AccessError
 from odoo.http import request
-from odoo.tools import consteq
+from odoo.tools import consteq, crop_image, pycompat
+
 
 _logger = logging.getLogger(__name__)
 
@@ -269,3 +271,27 @@ class MailController(http.Controller):
             'menu_id': request.env['ir.model.data'].xmlid_to_res_id('mail.mail_channel_menu_root_chat'),
         }
         return values
+
+    @http.route('/mail/attachment/preview/<int:attachment_id>', type='http', auth="public")
+    def mail_attachment_preview(self, attachment_id):
+        status, headers, content = binary_content(id=attachment_id, unique=True)
+        if status == 304:
+            return werkzeug.wrappers.Response(status=304, headers=headers)
+        elif status == 301:
+            return werkzeug.utils.redirect(content, code=301)
+        elif status != 200:
+            return request.not_found()
+        if content:
+            content = crop_image(content, type='center', ratio=(1, 1), size=(200, 200))
+            image_base64 = base64.b64decode(content)
+        else:
+            addons_path = http.addons_manifest['web']['addons_path']
+            image_base64 = open(os.path.join(addons_path, 'mail', 'static', 'src', 'img', 'no_img_found.jpg'), 'rb').read()
+            dictheaders = dict(headers)
+            dictheaders['Content-Type'] = 'image/jpg'
+            headers = list(pycompat.items(dictheaders))
+
+        headers.append(('Content-Length', len(image_base64)))
+        response = request.make_response(image_base64, headers)
+        response.status_code = status
+        return response

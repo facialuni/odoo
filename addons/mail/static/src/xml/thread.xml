@@ -259,10 +259,8 @@
         <t t-set="type" t-value="attachment.mimetype.split('/').shift()"/>
         <div t-attf-class="o_attachment #{attachment.upload ? 'o_attachment_uploading' : ''}" t-att-title="attachment.name">
             <t t-if="type == 'image'">
-                <!--TODO: get thumbnail image with resize by center of image
-                here we use 200x200 it will make the edge of image transparent for image which has height > width-->
                 <div class="o_image_box">
-                    <img t-attf-src="/web/image/#{attachment.id}/300x200?unique=1"/>
+                    <img t-attf-src="/mail/attachment/preview/#{attachment.id}"/>
                     <div t-attf-class="o_image_overlay o_attachment_view"  t-att-data-id="attachment.id">
                         <a class="o_attachment_download" t-att-href='attachment.url' target="_blank">
                             <i t-attf-class="fa fa-2x fa-arrow-circle-o-down" title="Download this attachment" aria-hidden="true"></i>
