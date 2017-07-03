@@ -51,22 +51,27 @@ KanbanRecord.include({
         }
 
         function open_cover_images_dialog(attachment_ids) {
-            var coverID = self.record.displayed_image_id && self.record.displayed_image_id.raw_value[0];
+            self.imageUploadID = _.uniqueId('o_cover_image_upload');
+            self.image_only = true;
+            var coverID = self.record.displayed_image_id && self.record.displayed_image_id.raw_value;
             var $content = $(QWeb.render("project.SetCoverModal", {
                 cover_id: coverID,
                 attachment_ids: attachment_ids,
+                widget: self
             }));
             var $imgs = $content.find('img');
             var dialog = new Dialog(self, {
                 title: _t("Set a Cover Image"),
-                buttons: [{text: _t("Select"), classes: 'btn-primary', close: true, disabled: !coverID, click: function () {
+                buttons: [{text: _t("Select"), classes: attachment_ids.length ? 'btn-primary' : 'hidden', close: true, disabled: !coverID, click: function () {
                     var $img = $imgs.filter('.o_selected');
                     var data = {
                         id: $img.data('id'),
                         display_name: $img.data('name')
                     };
                     self._updateRecord({displayed_image_id: data});
-                }}, {text: _t("Remove Cover Image"), close: true, click: function () {
+                }}, {text: _t('Upload and Set'), classes: attachment_ids.length ? '' : 'btn-primary', close: false, click: function () {
+                    $content.find('input.o_input_file').click();
+                }}, {text: _t("Remove Cover Image"), classes: coverID ? '' : 'hidden', close: true, click: function () {
                     self._updateRecord({displayed_image_id: false});
                 }}, {text: _t("Discard"), close: true}],
                 $content: $content,
@@ -85,6 +90,21 @@ KanbanRecord.include({
                     display_name: $img.data('name')
                 };
                 self._updateRecord({displayed_image_id: data});
+                dialog.close();
+            });
+
+            $content.on('change', 'input.o_input_file', function (event) {
+                $content.find('form.o_form_binary_form').submit();
+            });
+
+            $(window).on(self.imageUploadID, function () {
+                var images = Array.prototype.slice.call(arguments, 1);
+                self._updateRecord({
+                    displayed_image_id: {
+                        id: images[0].id,
+                        display_name: images[0].filename
+                    }
+                });
                 dialog.close();
             });
         }
