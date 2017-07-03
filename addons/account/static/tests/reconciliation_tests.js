@@ -726,11 +726,11 @@ QUnit.module('account', {
         var widget = clientAction.widgets[0];
 
         assert.strictEqual(clientAction.$('.accounting_view tfoot .cell_right, .accounting_view tfoot .cell_left').text().replace(/[\n\r\s]+/g, ' '),
-            "$ 1,175.00$ 32.58$ 2,000.00", "should display the different amounts with the currency");
+            "$1,175.00$32.58$2,000.00", "should display the different amounts with the currency");
         widget.$('.accounting_view thead .mv_line td:first').trigger('click');
 
         assert.strictEqual(clientAction.$('.accounting_view tbody').text().replace(/[\n\r\s]+/g, ' '),
-            " 101200 2017-02-07 INV/2017/0012 $ 650.00 ", "should display the created reconciliation line with the currency");
+            " 101200 2017-02-07 INV/2017/0012 $650.00 ", "should display the created reconciliation line with the currency");
 
         clientAction.destroy();
     });

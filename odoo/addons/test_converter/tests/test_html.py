@@ -121,7 +121,7 @@ class TestCurrencyExport(TestExport):
 
         self.assertEqual(
             converted, u'<span class="oe_currency_value">\u20110.12</span>'
-                       u'\N{NO-BREAK SPACE}{symbol}'.format(
+                       u'{symbol}'.format(
                 obj=obj,
                 symbol=currency.symbol.encode('utf-8')
             ),)
@@ -135,7 +135,7 @@ class TestCurrencyExport(TestExport):
 
         self.assertEqual(
             converted,
-                      u'{symbol}\N{NO-BREAK SPACE}'
+                      u'{symbol}'
                       '<span class="oe_currency_value">0.12</span>'.format(
                 obj=obj,
                 symbol=currency.symbol.encode('utf-8')
@@ -152,7 +152,7 @@ class TestCurrencyExport(TestExport):
         self.assertEqual(
             converted,
                       '<span class="oe_currency_value">0.12</span>'
-                      u'\N{NO-BREAK SPACE}{symbol}'.format(
+                      u'{symbol}'.format(
                 obj=obj,
                 symbol=currency.symbol.encode('utf-8')
             ),)
