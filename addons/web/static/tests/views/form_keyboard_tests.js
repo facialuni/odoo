@@ -455,28 +455,28 @@ QUnit.module('Views', {
             assert.strictEqual(form.$('.o_form_statusbar button:visible').length, 2,
             "should have 2 visible button in the statusbar");
 
-            assert.ok($(document.activeElement).hasClass('doit'), "Do It button focused");
+            assert.ok($(document.activeElement).hasClass('doit'), "Do It button must have focus");
             $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
-            assert.ok($(document.activeElement).hasClass('done'), "Done button focused");
+            assert.ok($(document.activeElement).hasClass('done'), "Done button must have focus");
             $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB, shiftKey: true }));
-            assert.ok($(document.activeElement).hasClass('doit'), "Do It button focused");
+            assert.ok($(document.activeElement).hasClass('doit'), "Do It button must have focus");
             $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
             $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
-            assert.strictEqual($(document.activeElement).attr('name'),'display_name',"first button focused");
+            assert.strictEqual($(document.activeElement).attr('name'),'display_name',"Display name field must have focus");
             $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.ENTER ,shiftKey: true}));
             return concurrency.delay(100);
         }).then(function() {
-            assert.ok($(document.activeElement).hasClass('doit'), "Do it button focused");
+            assert.ok($(document.activeElement).hasClass('doit'), "Do it button must have focus");
             $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
-            assert.ok($(document.activeElement).hasClass('done'), "Done button focused");
+            assert.ok($(document.activeElement).hasClass('done'), "Done button must have focus");
             $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
-            assert.strictEqual($(document.activeElement).hasClass('o_form_button_edit'),true,"Edit button focused");
+            assert.strictEqual($(document.activeElement).hasClass('o_form_button_edit'),true,"Edit button must have focus");
             form.destroy();
             done();
         });
     });
 
-    QUnit.test('when press enter on create and edit it should open FormViewDialog', function (assert) {
+    QUnit.test('when press enter on Create and Edit in m2o, it should open FormViewDialog', function (assert) {
         var done = assert.async();
         assert.expect(4);
         this.data.product.fields.product_ids = {
@@ -506,32 +506,31 @@ QUnit.module('Views', {
                     '</form>'
             }
         });
+        // go to edit mode, open m2o and press Create and Edit option and test FormViewDialog
         form.$buttons.find('.o_form_button_edit').click();
-        var upKey = $.Event("keydown", { keyCode: 38 });
-        var enterKey = $.Event("keydown", { keyCode: 13 });
-        var tabKey = $.Event("keydown", { which: $.ui.keyCode.TAB });
+        var upKey = $.Event("keydown", { keyCode: $.ui.keyCode.UP });
         form.$el.find('.o_input_dropdown input').trigger(upKey);
         var $dropdown = form.$('.o_field_many2one input').autocomplete('widget');
         $dropdown.trigger(upKey);
-        $dropdown.trigger(enterKey);
+        $dropdown.trigger($.Event("keydown", { keyCode: $.ui.keyCode.ENTER }));
         var $firstModel = $('.modal-dialog');
         assert.strictEqual($(document.activeElement)[0], $firstModel.find('input[name="name"]')[0],
         "focus should be on first input field in FormViewDialog");
-        $(document.activeElement).trigger(tabKey);
-        assert.ok($(document.activeElement).hasClass("o_form_button_save"), "if it is last element and tab pressed the focus should be on SAVE button");
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
+        assert.ok($(document.activeElement).hasClass("o_form_button_save"), "Focus should be on Save button of FormViewDialog");
         $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
         assert.strictEqual($(document.activeElement)[0], $firstModel.find('input[name="name"]')[0],
         "again focus should be on first input field");
         $firstModel.trigger($.Event("keydown", { which: $.ui.keyCode.ESCAPE }));
         concurrency.delay(200).then(function() {
-            assert.ok($(document.activeElement).hasClass('o_input'), "focus should be on first input field after pressing the ESCAPE");
+            assert.ok($(document.activeElement).hasClass('o_input'), "Focus should be on Product field after pressing the ESCAPE on FormViewDialog");
             form.destroy();
             done();
         });
     });
 
     QUnit.test('ESCAPE key with editable listview: it should discard editable listview record only', function (assert) {
-        assert.expect(2);
+        assert.expect(3);
 
         var form = createView({
             View: FormView,
@@ -539,6 +538,9 @@ QUnit.module('Views', {
             data: this.data,
             arch: '<form string="Partners">' +
                     '<sheet>' +
+                        '<group>' +
+                            '<field name="product_id"/>' +
+                        '</group>' +
                         '<field name="p">' +
                             '<tree default_order="foo desc" editable="bottom" >' +
                                 '<field name="display_name"/>' +
@@ -551,17 +553,19 @@ QUnit.module('Views', {
                 '</form>',
             res_id: 1,
         });
+        // go to edit mode and create editable row in o2m and test ESCAPE key, Escape key should discard o2m editable record
         form.$buttons.find('.o_form_button_edit').click();
-        form.$buttons.find('.o_form_button_save').trigger(($.Event("keydown", { which: $.ui.keyCode.TAB })));
-        assert.strictEqual(document.activeElement, $(".o_field_widget[name='display_name']")[0], "Focus should be on o2m input");
+        $(document.activeElement).trigger(($.Event("keydown", { which: $.ui.keyCode.TAB })));
+        assert.strictEqual(document.activeElement, $(".o_field_widget[name='display_name']")[0], "Focus should be on Display name field of o2m");
         $(document.activeElement).trigger(($.Event("keydown", { which: $.ui.keyCode.ESCAPE })));
-        assert.strictEqual(form.mode, 'edit', 'when escape pressed on o2m it should discard editable record only');
+        assert.strictEqual($(document.activeElement).attr('name'), "p", "Focus must be on o2m element when editable o2m record is cancelled");
+        assert.strictEqual(form.mode, 'edit', 'When escape pressed on o2m it should discard editable record only');
         form.destroy();
     });
 
     QUnit.test('Test o2m widget with form popup and escape key', function (assert) {
         var done = assert.async();
-        assert.expect(7);
+        assert.expect(6);
 
         var form = createView({
             View: FormView,
@@ -595,20 +599,21 @@ QUnit.module('Views', {
             },
             res_id: 1,
         });
+        // go to edit mode and open o2m form popup and test Escape key, Escape key should discard o2m record,
+        // close form popup and set focus on o2m element
         form.$buttons.find('.o_form_button_edit').click();
-        assert.strictEqual(document.activeElement, $("[name='product_id'] input")[0], "Focus should be on first widget");
-        assert.strictEqual($(document.activeElement).val(), '', 'The input should not have any value');
+        assert.strictEqual($(document.activeElement).closest('.o_field_widget').attr('name'), 'product_id', "Focus should be on Product field");
         $(document.activeElement).trigger(($.Event("keydown", { which: $.ui.keyCode.TAB })));
         assert.strictEqual($('.modal').length, 1,
-            "One FormViewDialog should be opened");
-        assert.strictEqual(document.activeElement, $("input[name='foo']")[0],
-            "Focus should be on first widget of FormViewDialog");
+            "O2M FormViewDialog should be opened");
+        assert.strictEqual($(document.activeElement).attr("name"), 'foo',
+            "Focus should be on Foo field of FormViewDialog");
         $(document.activeElement).trigger(($.Event("keydown", { which: $.ui.keyCode.TAB })));
         assert.ok($(document.activeElement).hasClass('o_form_button_save'),
             "Focus should be on save button of FormViewDialog");
         $(document.activeElement).trigger(($.Event("keydown", { which: $.ui.keyCode.TAB })));
         $('.modal').trigger(($.Event("keydown", { which: $.ui.keyCode.ESCAPE})));
-        concurrency.delay(300).then(function() {
+        concurrency.delay(100).then(function() {
             assert.ok($(document.activeElement).hasClass('o_field_one2many'), "focus should be on o2m widget after pressing the ESCAPE on o2m form popup");
             $(document.activeElement).trigger(($.Event("keydown", { which: $.ui.keyCode.ESCAPE })));
             assert.strictEqual(form.mode, 'readonly', 'o2m when focus and press escape it should discard form changes');
@@ -633,8 +638,7 @@ QUnit.module('Views', {
                 '</form>',
             intercepts: {
                 history_back: function (event) {
-                    assert.strictEqual(event.name, 'history_back',
-                        "should trigger an history back action when ESCAPE pressed");
+                    assert.ok(true, "should have sent correct event");
                 },
             }
         });
@@ -647,7 +651,7 @@ QUnit.module('Views', {
         form.destroy();
     });
 
-    QUnit.test('key up event on m2o in editable list', function(assert) {
+    QUnit.test('Test key up event on m2o when autocomplete is open inside editable list', function(assert) {
         assert.expect(2);
 
         var done = assert.async();
@@ -671,12 +675,15 @@ QUnit.module('Views', {
             res_id: 1,
         });
 
+        // go to edit mode and create editable record and open m2o autocomplete dropdown and test UP/DOWN keys,
+        // it should not go to next/previous record instead it should select next previous m2o dropdown option
         form.$buttons.find('.o_form_button_edit').click();
         $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
         $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.DOWN }));
 
-        concurrency.delay(500).then(function(){
-            assert.strictEqual($('.ui-state-focus a').html(),"xphone","first element focused in autocomplete");
+        concurrency.delay(500).then(function() {
+            var $dropdown = form.$('.o_field_many2one input').autocomplete('widget');
+            assert.strictEqual($dropdown.find('.ui-state-focus a').html(), "xphone", "First element focused in autocomplete");
             $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.UP }));
             assert.ok($(document.activeElement).hasClass('ui-autocomplete-input'),"focus is in many2one field on key up pressed");
             form.destroy();
