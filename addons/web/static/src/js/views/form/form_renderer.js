@@ -986,11 +986,11 @@ var FormRenderer = BasicRenderer.extend({
                 return this.trigger_up('focus_control_button');
             }
             if (_.isEqual(ev.data.target, lastWidget) && !_.isEqual(ev.data.target, lastFieldWidget)) {
-                if (this.mode != "readonly") {
-                    return this._activateNextWidget(this.state, -1);
-                } else {
+                var activatedWidget = this._activateNextWidget(this.state, index);
+                if (activatedWidget == -1 && this.mode == "readonly") {
                     return this.trigger_up('focus_control_button');
                 }
+                return activatedWidget;
             } else if (nextWidget && !_.isEqual(nextWidget, ev.data.target)) {
                 return this._activateNextWidget(this.state, index);
             } else {

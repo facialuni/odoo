@@ -395,7 +395,9 @@ QUnit.module('Views', {
     });
 
     QUnit.test('navigation on header buttons in edit mode and readonly mode', function(assert) {
-        assert.expect(14);
+        assert.expect(15);
+
+        this.data.partner.records[0].product_id = 37;
 
         var done = assert.async();
         var form = createView({
@@ -413,6 +415,7 @@ QUnit.module('Views', {
                         '<group>' +
                             '<field name="display_name"/>' +
                             '<field name="foo"/>' +
+                            '<field name="product_id"/>' +
                             '<field name="state" invisible="1"/>' +
                         '</group>' +
                     '</sheet>' +
@@ -427,6 +430,7 @@ QUnit.module('Views', {
         assert.strictEqual(form.$('.o_form_statusbar button:visible').length, 1,
             "should have only 1 visible button in the statusbar");
 
+        $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
         $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
         $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
 
@@ -470,7 +474,9 @@ QUnit.module('Views', {
             $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
             assert.ok($(document.activeElement).hasClass('done'), "Done button must have focus");
             $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
-            assert.strictEqual($(document.activeElement).hasClass('o_form_button_edit'),true,"Edit button must have focus");
+            assert.strictEqual($(document.activeElement).closest(".o_field_widget").attr('name'), 'product_id', "Product field must have focus in readonly mode");
+            $(document.activeElement).trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
+            assert.ok($(document.activeElement).hasClass('o_form_button_edit'), "Edit button must have focus");
             form.destroy();
             done();
         });
