@@ -19,10 +19,11 @@ class WebsiteSaleBackend(WebsiteBackend):
             graph=[],
             best_sellers=[],
             summary=dict(
-                order_count=0, order_carts_count=0, order_unpaid_count=0,
+                order_count=0, order_unpaid_count=0,
                 order_to_invoice_count=0, order_carts_abandoned_count=0,
                 payment_to_capture_count=0, total_sold=0,
-                order_per_day_ratio=0, order_sold_ratio=0, order_convertion_pctg=0,
+                order_per_day_ratio=0, order_sold_ratio=0, carts_order_pctg=0,
+                abandoned_amt_untaxed=0, total_untaxed_amt=0,
             )
         )
         results['dashboards']['sales'] = sales_values
@@ -67,16 +68,25 @@ class WebsiteSaleBackend(WebsiteBackend):
                 sales_values['summary']['order_unpaid_count'] += res['state_count']
             elif res.get('state') in ['sale', 'done']:
                 sales_values['summary']['order_count'] += res['state_count']
-            sales_values['summary']['order_carts_count'] += res['state_count']
 
         report_price_lines = request.env['sale.report'].read_group(
             domain=[
+                ('state', '!=', 'cancel'),
                 ('team_id.team_type', '=', 'website'),
-                ('state', 'in', ['sale', 'done']),
                 ('date', '>=', date_from),
-                ('date', '<=', date_to)],
-            fields=['team_id', 'price_subtotal'],
-            groupby=['team_id'],
+                ('date', '<=', fields.Datetime.now())],
+            fields=['price_subtotal', 'state'],
+            groupby='state',
+        )
+        abandoned_amt = request.env['sale.report'].read_group(
+            domain=[
+                ('team_id.team_type', '=', 'website'),
+                ('state', '=', 'draft'),
+                ('partner_id', '!=', request.env.ref('base.public_partner').id),
+                ('date', '>=', date_from),
+                ('date', '<=', fields.Datetime.to_string(datetime.now() - timedelta(hours=1)))],
+            fields='price_subtotal',
+            groupby='price_subtotal',
         )
         sales_values['summary'].update(
             order_to_invoice_count=request.env['sale.order'].search_count(sale_order_domain + [
@@ -87,7 +97,7 @@ class WebsiteSaleBackend(WebsiteBackend):
             ]),
             order_carts_abandoned_count=request.env['sale.order'].search_count(sale_order_domain + [
                 ('state', '=', 'draft'),
-                ('order_line', '!=', 'False'),
+                ('order_line', '!=', False),
                 ('partner_id', '!=', request.env.ref('base.public_partner').id),
                 ('date_order', '<=', fields.Datetime.to_string(datetime.now() - timedelta(hours=1))),
             ]),
@@ -96,13 +106,15 @@ class WebsiteSaleBackend(WebsiteBackend):
                 # that part perform a search on sale.order in order to comply with access rights as tx do not have any
                 ('sale_order_id.id', 'in', request.env['sale.order'].search(sale_order_domain + [('state', '!=', 'cancel')]).ids),
             ]),
-            total_sold=sum(price_line['price_subtotal'] for price_line in report_price_lines)
+            abandoned_amt_untaxed=sum(line['price_subtotal'] for line in abandoned_amt),
+            total_sold=sum(price_line['price_subtotal'] for price_line in report_price_lines if price_line.get('state') in ['sale', 'done']),
+            total_untaxed_amt=sum(price_line['price_subtotal'] for price_line in report_price_lines)
         )
 
         # Ratio computation
         sales_values['summary']['order_per_day_ratio'] = round(float(sales_values['summary']['order_count']) / date_diff_days, 2)
         sales_values['summary']['order_sold_ratio'] = round(float(sales_values['summary']['total_sold']) / sales_values['summary']['order_count'], 2) if sales_values['summary']['order_count'] else 0
-        sales_values['summary']['order_convertion_pctg'] = 100.0 * sales_values['summary']['order_count'] / sales_values['summary']['order_carts_count'] if sales_values['summary']['order_carts_count'] else 0
+        sales_values['summary']['carts_order_pctg'] = 100.0 * sales_values['summary']['total_sold'] / sales_values['summary']['total_untaxed_amt'] if sales_values['summary']['total_untaxed_amt'] else 0
 
         # Graphes computation
         if date_diff_days == 7:
