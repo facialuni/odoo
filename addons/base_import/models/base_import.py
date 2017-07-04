@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import base64
 import csv
 import datetime
 import io
@@ -10,6 +11,7 @@ import psycopg2
 import operator
 import os
 import re
+import requests
 
 from odoo import api, fields, models
 from odoo.tools.translate import _
@@ -601,12 +603,16 @@ class Import(models.TransientModel):
 
     @api.multi
     def _parse_import_data(self, data, import_fields, options):
-        # Get fields of type date/datetime
-        all_fields = self.env[self.res_model].fields_get()
-        for name, field in pycompat.items(all_fields):
-            if field['type'] in ('date', 'datetime') and name in import_fields:
+        fields_splitted = [field.split('/') for field in import_fields]
+        res_model = self.env.context.get('res_model') or self.res_model
+        res_model_fields_list = [f[0] if len(f) > 0 else f for f in fields_splitted]
+        # when recusive call is made to this function we passed blank string(to maintain field's index)
+        # which we have to filter out before passing it to fields_get()
+        res_model_fields = self.env[res_model].fields_get([f for f in res_model_fields_list if f])
+        for name, field in pycompat.items(res_model_fields):
+            if field['type'] in ('date', 'datetime'):
                 # Parse date
-                index = import_fields.index(name)
+                index = res_model_fields_list.index(name)
                 dt = datetime.datetime
                 server_format = DEFAULT_SERVER_DATE_FORMAT if field['type'] == 'date' else DEFAULT_SERVER_DATETIME_FORMAT
 
@@ -621,11 +627,27 @@ class Import(models.TransientModel):
                             except Exception as e:
                                 raise ValueError(_("Error Parsing Date [%s:L%d]: %s") % (name, num + 1, e))
 
-            elif field['type'] in ('float', 'monetary') and name in import_fields:
+            elif field['type'] in ('float', 'monetary'):
                 # Parse float, sometimes float values from file have currency symbol or () to denote a negative value
                 # We should be able to manage both case
-                index = import_fields.index(name)
+                index = res_model_fields_list.index(name)
                 self._parse_float_from_data(data, index, name, options)
+            elif field['type'] == 'binary' and field.get('attachment'):
+                index = res_model_fields_list.index(name)
+                for num, line in enumerate(data):
+                    if re.match("^(http|https)://", line[index], re.IGNORECASE):
+                        try:
+                            bin_file = requests.get(line[index])
+                            bin_file.raise_for_status()
+                            line[index] = base64.encodestring(bin_file.content)
+                        except requests.exceptions.ConnectionError:
+                            raise ValueError(_("Check your internet connection to import from URL!"))
+                        except Exception as e:
+                            raise ValueError(_("Error Parsing URL [field: %s]: %s at line %d: %s") % (name, line[index], num + 1, e))
+            elif field['type'] in ('one2many', 'many2many'):
+                # we append blank string '' to maintain the field's position which is later used to update field's value
+                rel_fields = ['/'.join(f[1:]) if f and f[0] == name else '' for f in fields_splitted]
+                data = self.with_context(res_model=field['relation'])._parse_import_data(data, rel_fields, options)
         return data
 
     @api.multi
@@ -655,7 +677,7 @@ class Import(models.TransientModel):
         try:
             data, import_fields = self._convert_import_data(fields, options)
             # Parse date and float field
-            data = self._parse_import_data(data, import_fields, options)
+            data = self.with_context(res_model=self.res_model)._parse_import_data(data, import_fields, options)
         except ValueError as error:
             return [{
                 'type': 'error',
