@@ -118,6 +118,26 @@ QUnit.module('Views', {
 
         list.destroy();
     });
+
+    QUnit.test('escape on listview create button then user should be moved to previous view', function (assert) {
+        assert.expect(1);
+
+        var list = createView({
+            View: ListView,
+            model: 'foo',
+            data: this.data,
+            arch: '<tree editable="bottom"><field name="name"/></tree>',
+            intercepts: {
+                history_back: function () {
+                    assert.step("move to previous view");
+                },
+            }
+        });
+
+        list.$buttons.find('.o_list_button_add').focus()
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.ESCAPE }));
+        list.destroy();
+    });
 });
 
 });

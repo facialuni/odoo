@@ -696,6 +696,48 @@ QUnit.module('Views', {
             done();
         });
     });
+
+    QUnit.test('focus on widget when discard message in reletional field', function (assert) {
+        assert.expect(1);
+        var done = assert.async();
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            res_id: 1,
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="display_name" />' +
+                            '<field name="p">' +
+                                '<tree default_order="foo" editable="bottom" >' +
+                                    '<field name="product_id"/>' +
+                                    '<field name="foo"/>' +
+                                '</tree>' +
+                            '</field>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+        });
+
+        form.$buttons.find('.o_form_button_edit').focus();
+        $(document.activeElement).click();
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.DOWN }));
+
+        concurrency.delay(500).then(function() {
+            $(".ui-state-focus").click();
+            $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.ESCAPE }));
+            $('.modal-footer .btn-primary').click();
+            concurrency.delay(100).then(function() {
+                assert.strictEqual($(document.activeElement).attr('name'), "display_name", "focuse is in form")
+                form.destroy();
+                done();
+            });
+        });
+    });
+
 });
 
 });
