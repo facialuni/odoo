@@ -117,7 +117,7 @@
                 <field name="name" string="Product" filter_domain="[('name','ilike',self)]"/>
                 <field name="categ_id" filter_domain="[('categ_id', 'child_of', self)]"/>
                 <separator/>
-                <field name="default_code" filter_domain="[('default_code','ilike',self)]"/>
+                <field name="default_code" filter_domain="[('product_variant_ids.default_code','ilike',self)]"/>
                 <field name="barcode" filter_domain="[('barcode','ilike',self)]]"/>
                 <separator/>
                 <filter string="Services" name="services" domain="[('type','=','service')]"/>
