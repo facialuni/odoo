@@ -24,6 +24,20 @@ class MrpProduction(models.Model):
             production.sale_ref = move.procurement_id and move.procurement_id.sale_line_id and move.procurement_id.sale_line_id.order_id.client_order_ref or False
 
 
+class SaleOrder(models.Model):
+    _inherit = 'sale.order'
+
+    @api.multi
+    @api.depends('procurement_group_id')
+    def _compute_picking_ids(self):
+        super(SaleOrder, self)._compute_picking_ids()
+        for order in self:
+            warehouse = order.warehouse_id
+            order.picking_ids = self.env['stock.picking'].search([('group_id', '=', order.procurement_group_id.id),
+                                                                  ('picking_type_id', 'not in', [warehouse.manu_pick_type_id.id, warehouse.manu_store_type_id.id])]) if order.procurement_group_id else []
+            order.delivery_count = len(order.picking_ids)
+
+
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
