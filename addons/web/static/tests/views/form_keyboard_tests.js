@@ -628,6 +628,30 @@ QUnit.module('Views', {
         });
     });
 
+    QUnit.test('move to previous view after pressing ESCAPE in create record', function (assert) {
+        assert.expect(1);
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="foo"/>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+            intercepts: {
+                switch_to_previous_view: function (event) {
+                    assert.ok(true, "should have sent correct event");
+                },
+            }
+        });
+
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.ESCAPE }));
+        form.destroy();
+    });
+
     QUnit.test('move to previous view after pressing ESCAPE on edit', function (assert) {
         assert.expect(2);
         var form = createView({
@@ -697,8 +721,8 @@ QUnit.module('Views', {
         });
     });
 
-    QUnit.test('focus on widget when discard message in reletional field', function (assert) {
-        assert.expect(1);
+    QUnit.test('When form is dirty and press escape should show warning dialog and set focus back to form', function (assert) {
+        assert.expect(2);
         var done = assert.async();
 
         var form = createView({
@@ -709,32 +733,29 @@ QUnit.module('Views', {
             arch: '<form string="Partners">' +
                     '<sheet>' +
                         '<group>' +
-                            '<field name="display_name" />' +
-                            '<field name="p">' +
-                                '<tree default_order="foo" editable="bottom" >' +
-                                    '<field name="product_id"/>' +
-                                    '<field name="foo"/>' +
-                                '</tree>' +
-                            '</field>' +
+                            '<field name="product_id" />' +
                         '</group>' +
                     '</sheet>' +
                 '</form>',
         });
 
-        form.$buttons.find('.o_form_button_edit').focus();
-        $(document.activeElement).click();
-        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
+        // go to edit mode and select m2o value and test escape, pressing escape should show discard warning
+        form.$buttons.find('.o_form_button_edit').click();
         $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.DOWN }));
 
         concurrency.delay(500).then(function() {
-            $(".ui-state-focus").click();
+            var $dropdown = form.$('.o_field_many2one input').autocomplete('widget');
+            $dropdown.trigger($.Event("keydown", { keyCode: $.ui.keyCode.ENTER }));
             $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.ESCAPE }));
-            $('.modal-footer .btn-primary').click();
-            concurrency.delay(100).then(function() {
-                assert.strictEqual($(document.activeElement).attr('name'), "display_name", "focuse is in form")
-                form.destroy();
-                done();
-            });
+            return concurrency.delay(100);
+        }).then(function() {
+            assert.strictEqual(document.activeElement, $('.modal-footer .btn-primary')[0], 'Focus should be on OK button of discard warning');
+            $('.modal-footer').trigger($.Event("keydown", { which: $.ui.keyCode.ESCAPE }));
+            return concurrency.delay(100);
+        }).then(function() {
+            assert.strictEqual($(document.activeElement).closest('.o_field_widget').attr('name'), "product_id", "focus should be on form or form's field")
+            form.destroy();
+            done();
         });
     });
 
