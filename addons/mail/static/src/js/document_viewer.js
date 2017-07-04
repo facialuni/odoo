@@ -13,6 +13,7 @@ odoo.define('mail.DocumentViewer', function(require) {
         events: {
             'click .o_download_btn': '_onDownload',
             'click .o_viewer_img': '_onImageClick',
+            'click .o_viewer_video': '_onVideoClick',
             'click .move_next': '_onNext',
             'click .move_previous': '_onPrevious',
             'click .o_zoom_in': '_onZoomIn',
@@ -162,6 +163,16 @@ odoo.define('mail.DocumentViewer', function(require) {
          */
         _onImageClick: function (e) {
             e.stopPropagation();
+        },
+        /**
+         * On click of image do not close modal so stop event propagation
+         * @private
+         * @param {MouseEvent} e
+         */
+        _onVideoClick: function (e) {
+            e.stopPropagation();
+            var videoElement = e.target;
+            videoElement.paused ? videoElement.play() : videoElement.pause();
         },
         /**
          * @private
