@@ -2,11 +2,9 @@ odoo.define('web.form_keyboard_tests', function (require) {
 "use strict";
 
 var concurrency = require('web.concurrency');
-var core = require('web.core');
 var FormView = require('web.FormView');
 var testUtils = require('web.test_utils');
 
-var _t = core._t;
 var createView = testUtils.createView;
 
 QUnit.module('Views', {
@@ -122,8 +120,10 @@ QUnit.module('Views', {
                     color: {string: "Color index", type: "integer"},
                 },
                 records: [
-                    {id: 12, display_name: "gold", color: 2},
+                    {id: 12, display_name: "iron", color: 2},
                     {id: 14, display_name: "silver", color: 5},
+                    {id: 16, display_name: "gold", color: 6},
+                    {id: 18, display_name: "platinum", color: 7}
                 ]
             },
         };
@@ -131,85 +131,6 @@ QUnit.module('Views', {
 }, function () {
 
     QUnit.module('FormView Keyboard');
-
-    QUnit.test('M2O autocomplete open and press escape should not discard record', function (assert) {
-        assert.expect(3);
-
-        var form = createView({
-            View: FormView,
-            model: 'partner',
-            data: this.data,
-            arch: '<form string="Partners">' +
-                    '<sheet>' +
-                        '<group>' +
-                            '<field name="product_id"/>' +
-                        '</group>' +
-                    '</sheet>' +
-                '</form>',
-            res_id: 1,
-        });
-
-        // go to edit mode and test SHIFT + ENTER
-        form.$buttons.find('.o_form_button_edit').click();
-        var $dropdown = form.$('.o_field_many2one input').autocomplete('widget');
-        form.$('.o_field_many2one input').click();
-        assert.ok($dropdown.find('li').length, 'the click on m2o widget should open a dropdown');
-        form.$('.o_field_many2one input').trigger($.Event('keydown', { which: $.ui.keyCode.ESCAPE}));
-        assert.strictEqual(form.mode, 'edit', 'm2o autocomplete when open and press escape it should not discard form changes');
-        assert.strictEqual($(document.activeElement).closest('.o_field_widget').attr('name'), 'product_id',
-            "Focus should be set on input field");
-        form.destroy();
-    });
-
-    QUnit.test('Test m2o selectCreatePopup and select record', function (assert) {
-        assert.expect(4);
-
-        var form = createView({
-            View: FormView,
-            model: 'partner',
-            res_id: 1,
-            data: this.data,
-            arch: '<form string="Partners">' +
-                    '<sheet>' +
-                        '<group>' +
-                            '<field name="product_id"/>' +
-                        '</group>' +
-                    '</sheet>' +
-                '</form>',
-            archs: {
-                'product,false,search':
-                    '<form string="Products">' +
-                        '<sheet>' +
-                            '<group>' +
-                                '<field name="name"/>' +
-                            '</group>' +
-                        '</sheet>' +
-                    '</form>',
-                'product,false,list': '<tree><field name="display_name"/></tree>'
-            },
-        });
-
-        // go to edit mode and open selectCreatePopup, test first focus on search input
-        form.$buttons.find('.o_form_button_edit').click();
-        var $dropdown = form.$('.o_field_many2one input').autocomplete('widget');
-        form.$('.o_field_many2one input').click();
-        $dropdown.trigger($.Event("keydown", { keyCode: $.ui.keyCode.UP }));
-        $dropdown.trigger($.Event("keydown", { keyCode: $.ui.keyCode.UP }));
-        $dropdown.trigger($.Event("keydown", { keyCode: $.ui.keyCode.ENTER }));
-        var selectCreatePopup = $('.modal');
-        assert.strictEqual(selectCreatePopup.find(".o_list_view").length, 1,
-            "Should open listview");
-        assert.ok($(document.activeElement).hasClass('o_searchview_input'),
-            "Focus should be set on search view");
-
-        // Press down key and and select first record
-        $(selectCreatePopup).find('input[class="o_searchview_input"]').trigger($.Event("keyup", { which: $.ui.keyCode.DOWN }));
-        assert.strictEqual($(document.activeElement).find('.o_row_selected')[0], selectCreatePopup.find(".o_list_view tr.o_data_row:first")[0], 'First row should be selected');
-        var value = $(document.activeElement).find('.o_row_selected').text();
-        $(document.activeElement).trigger(($.Event("keydown", { which: $.ui.keyCode.ENTER })));
-        assert.strictEqual(form.$('.o_field_many2one input').val(), value, "the value should equal to the value that is selected from dialog");
-        form.destroy();
-    });
 
     QUnit.test('keyboard navigation on form view', function(assert) {
         assert.expect(12);
@@ -356,6 +277,134 @@ QUnit.module('Views', {
         form.destroy();
     });
 
+    QUnit.test('M2O autocomplete open and press escape should not discard record', function (assert) {
+        assert.expect(3);
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="product_id"/>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+            res_id: 1,
+        });
+
+        // go to edit mode and test SHIFT + ENTER
+        form.$buttons.find('.o_form_button_edit').click();
+        var $dropdown = form.$('.o_field_many2one input').autocomplete('widget');
+        form.$('.o_field_many2one input').click();
+        assert.ok($dropdown.find('li').length, 'the click on m2o widget should open a dropdown');
+        form.$('.o_field_many2one input').trigger($.Event('keydown', { which: $.ui.keyCode.ESCAPE}));
+        assert.strictEqual(form.mode, 'edit', 'm2o autocomplete when open and press escape it should not discard form changes');
+        assert.strictEqual($(document.activeElement).closest('.o_field_widget').attr('name'), 'product_id',
+            "Focus should be set on input field");
+        form.destroy();
+    });
+
+    QUnit.test('Test m2o selectCreatePopup and select record', function (assert) {
+        assert.expect(4);
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            res_id: 1,
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="product_id"/>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+            archs: {
+                'product,false,search':
+                    '<search string="Products">' +
+                        '<field name="name"/>' +
+                    '</search>',
+                'product,false,list': '<tree><field name="display_name"/></tree>'
+            },
+        });
+
+        // go to edit mode and open selectCreatePopup, test first focus on search input
+        form.$buttons.find('.o_form_button_edit').click();
+        var $dropdown = form.$('.o_field_many2one input').autocomplete('widget');
+        form.$('.o_field_many2one input').click();
+        $dropdown.trigger($.Event("keydown", { keyCode: $.ui.keyCode.UP }));
+        $dropdown.trigger($.Event("keydown", { keyCode: $.ui.keyCode.UP }));
+        $dropdown.trigger($.Event("keydown", { keyCode: $.ui.keyCode.ENTER }));
+        var selectCreatePopup = $('.modal');
+        assert.strictEqual(selectCreatePopup.find(".o_list_view").length, 1,
+            "Should open listview");
+        assert.ok($(document.activeElement).hasClass('o_searchview_input'),
+            "Focus should be set on search view");
+
+        // Press down key and and select first record
+        $(selectCreatePopup).find('input[class="o_searchview_input"]').trigger($.Event("keyup", { which: $.ui.keyCode.DOWN }));
+        assert.strictEqual($(document.activeElement).find('.o_row_selected')[0], selectCreatePopup.find(".o_list_view tr.o_data_row:first")[0], 'First row should be selected');
+        var value = $(document.activeElement).find('.o_row_selected').text();
+        $(document.activeElement).trigger(($.Event("keydown", { which: $.ui.keyCode.ENTER })));
+        assert.strictEqual(form.$('.o_field_many2one input').val(), value, "the value should equal to the value that is selected from dialog");
+        form.destroy();
+    });
+
+    QUnit.test('when press enter on Create and Edit in m2o, it should open FormViewDialog', function (assert) {
+        var done = assert.async();
+        assert.expect(4);
+        this.data.product.fields.product_ids = {
+            string: "one2many product", type: "one2many", relation: "product",
+        };
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            res_id: 1,
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="product_id"/>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+            archs: {
+                'product,false,form':
+                    '<form string="Products">' +
+                        '<sheet>' +
+                            '<group>' +
+                                '<field name="name"/>' +
+                            '</group>' +
+                        '</sheet>' +
+                    '</form>'
+            }
+        });
+        // go to edit mode, open m2o and press Create and Edit option and test FormViewDialog
+        form.$buttons.find('.o_form_button_edit').click();
+        var upKey = $.Event("keydown", { keyCode: $.ui.keyCode.UP });
+        form.$el.find('.o_input_dropdown input').trigger(upKey);
+        var $dropdown = form.$('.o_field_many2one input').autocomplete('widget');
+        $dropdown.trigger(upKey);
+        $dropdown.trigger($.Event("keydown", { keyCode: $.ui.keyCode.ENTER }));
+        var $firstModel = $('.modal-dialog');
+        assert.strictEqual($(document.activeElement)[0], $firstModel.find('input[name="name"]')[0],
+        "focus should be on first input field in FormViewDialog");
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
+        assert.ok($(document.activeElement).hasClass("o_form_button_save"), "Focus should be on Save button of FormViewDialog");
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
+        assert.strictEqual($(document.activeElement)[0], $firstModel.find('input[name="name"]')[0],
+        "again focus should be on first input field");
+        $firstModel.trigger($.Event("keydown", { which: $.ui.keyCode.ESCAPE }));
+        concurrency.delay(200).then(function() {
+            assert.ok($(document.activeElement).hasClass('o_input'), "Focus should be on Product field after pressing the ESCAPE on FormViewDialog");
+            form.destroy();
+            done();
+        });
+    });
+
     QUnit.test('keyboard navigation on html field', function(assert) {
         assert.expect(4);
 
@@ -482,59 +531,6 @@ QUnit.module('Views', {
         });
     });
 
-    QUnit.test('when press enter on Create and Edit in m2o, it should open FormViewDialog', function (assert) {
-        var done = assert.async();
-        assert.expect(4);
-        this.data.product.fields.product_ids = {
-            string: "one2many product", type: "one2many", relation: "product",
-        };
-
-        var form = createView({
-            View: FormView,
-            model: 'partner',
-            res_id: 1,
-            data: this.data,
-            arch: '<form string="Partners">' +
-                    '<sheet>' +
-                        '<group>' +
-                            '<field name="product_id"/>' +
-                        '</group>' +
-                    '</sheet>' +
-                '</form>',
-            archs: {
-                'product,false,form':
-                    '<form string="Products">' +
-                        '<sheet>' +
-                            '<group>' +
-                                '<field name="name"/>' +
-                            '</group>' +
-                        '</sheet>' +
-                    '</form>'
-            }
-        });
-        // go to edit mode, open m2o and press Create and Edit option and test FormViewDialog
-        form.$buttons.find('.o_form_button_edit').click();
-        var upKey = $.Event("keydown", { keyCode: $.ui.keyCode.UP });
-        form.$el.find('.o_input_dropdown input').trigger(upKey);
-        var $dropdown = form.$('.o_field_many2one input').autocomplete('widget');
-        $dropdown.trigger(upKey);
-        $dropdown.trigger($.Event("keydown", { keyCode: $.ui.keyCode.ENTER }));
-        var $firstModel = $('.modal-dialog');
-        assert.strictEqual($(document.activeElement)[0], $firstModel.find('input[name="name"]')[0],
-        "focus should be on first input field in FormViewDialog");
-        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
-        assert.ok($(document.activeElement).hasClass("o_form_button_save"), "Focus should be on Save button of FormViewDialog");
-        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
-        assert.strictEqual($(document.activeElement)[0], $firstModel.find('input[name="name"]')[0],
-        "again focus should be on first input field");
-        $firstModel.trigger($.Event("keydown", { which: $.ui.keyCode.ESCAPE }));
-        concurrency.delay(200).then(function() {
-            assert.ok($(document.activeElement).hasClass('o_input'), "Focus should be on Product field after pressing the ESCAPE on FormViewDialog");
-            form.destroy();
-            done();
-        });
-    });
-
     QUnit.test('ESCAPE key with editable listview: it should discard editable listview record only', function (assert) {
         assert.expect(3);
 
@@ -567,6 +563,46 @@ QUnit.module('Views', {
         assert.strictEqual($(document.activeElement).attr('name'), "p", "Focus must be on o2m element when editable o2m record is cancelled");
         assert.strictEqual(form.mode, 'edit', 'When escape pressed on o2m it should discard editable record only');
         form.destroy();
+    });
+
+    QUnit.test('Test key up event on m2o when autocomplete is open inside editable list', function(assert) {
+        assert.expect(2);
+
+        var done = assert.async();
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="bar" />' +
+                            '<field name="p">' +
+                                '<tree default_order="foo" editable="bottom" >' +
+                                    '<field name="product_id"/>' +
+                                    '<field name="foo"/>' +
+                                '</tree>' +
+                            '</field>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+            res_id: 1,
+        });
+
+        // go to edit mode and create editable record and open m2o autocomplete dropdown and test UP/DOWN keys,
+        // it should not go to next/previous record instead it should select next previous m2o dropdown option
+        form.$buttons.find('.o_form_button_edit').click();
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.DOWN }));
+
+        concurrency.delay(500).then(function() {
+            var $dropdown = form.$('.o_field_many2one input').autocomplete('widget');
+            assert.strictEqual($dropdown.find('.ui-state-focus a').html(), "xphone", "First element focused in autocomplete");
+            $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.UP }));
+            assert.ok($(document.activeElement).hasClass('ui-autocomplete-input'),"focus is in many2one field on key up pressed");
+            form.destroy();
+            done();
+        });
     });
 
     QUnit.test('Test o2m widget with form popup and escape key', function (assert) {
@@ -681,46 +717,6 @@ QUnit.module('Views', {
         form.destroy();
     });
 
-    QUnit.test('Test key up event on m2o when autocomplete is open inside editable list', function(assert) {
-        assert.expect(2);
-
-        var done = assert.async();
-        var form = createView({
-            View: FormView,
-            model: 'partner',
-            data: this.data,
-            arch: '<form string="Partners">' +
-                    '<sheet>' +
-                        '<group>' +
-                            '<field name="bar" />' +
-                            '<field name="p">' +
-                                '<tree default_order="foo" editable="bottom" >' +
-                                    '<field name="product_id"/>' +
-                                    '<field name="foo"/>' +
-                                '</tree>' +
-                            '</field>' +
-                        '</group>' +
-                    '</sheet>' +
-                '</form>',
-            res_id: 1,
-        });
-
-        // go to edit mode and create editable record and open m2o autocomplete dropdown and test UP/DOWN keys,
-        // it should not go to next/previous record instead it should select next previous m2o dropdown option
-        form.$buttons.find('.o_form_button_edit').click();
-        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
-        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.DOWN }));
-
-        concurrency.delay(500).then(function() {
-            var $dropdown = form.$('.o_field_many2one input').autocomplete('widget');
-            assert.strictEqual($dropdown.find('.ui-state-focus a').html(), "xphone", "First element focused in autocomplete");
-            $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.UP }));
-            assert.ok($(document.activeElement).hasClass('ui-autocomplete-input'),"focus is in many2one field on key up pressed");
-            form.destroy();
-            done();
-        });
-    });
-
     QUnit.test('When form is dirty and press escape should show warning dialog and set focus back to form', function (assert) {
         assert.expect(2);
         var done = assert.async();
@@ -754,6 +750,74 @@ QUnit.module('Views', {
             return concurrency.delay(100);
         }).then(function() {
             assert.strictEqual($(document.activeElement).closest('.o_field_widget').attr('name'), "product_id", "focus should be on form or form's field")
+            form.destroy();
+            done();
+        });
+    });
+
+    QUnit.test('Test many2many field and many2many SelectCreatePopup with TAB navigation and ESCAPE key', function (assert) {
+        assert.expect(11);
+        var done = assert.async();
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            res_id: 1,
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="display_name" />' +
+                            '<field name="timmy" />' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+            archs: {
+                'partner_type,false,search': '<search><field name="name"/></search>',
+                'partner_type,false,list': '<tree><field name="display_name"/><field name="name"/></tree>'
+            },
+        });
+
+        // go to edit mode and open many2many SelectCreatePopup and test TAB and ESCAPE key
+        form.$buttons.find('.o_form_button_edit').click();
+        $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
+
+        var selectCreatePopup = $('.modal');
+        var $listview = selectCreatePopup.find(".o_list_view");
+        assert.ok(selectCreatePopup.length, 'Many2Many SelectCreatePopup should open');
+        assert.strictEqual(selectCreatePopup.find(".o_list_view").length, 1,
+            "Should open listview");
+        assert.ok($(document.activeElement).hasClass('o_searchview_input'),
+            "Focus should be set on search view input by default");
+
+        // Press down key and and select first record and then DOWN key should select second record
+        selectCreatePopup.find('input[class="o_searchview_input"]').trigger($.Event("keyup", { which: $.ui.keyCode.DOWN }));
+
+        assert.strictEqual($listview.find('.o_row_selected')[0], $listview.find("tr.o_data_row:first")[0], 'First row should be selected');
+        $listview.trigger($.Event('keydown', { which: $.ui.keyCode.DOWN }));
+        assert.strictEqual($listview.find('.o_row_selected')[0], $listview.find("tr.o_data_row:eq(1)")[0], 'Second row should be selected');
+        // Test navigation on row with shift key
+        $listview.trigger($.Event("keydown", { which: 40, shiftKey: true }));
+        assert.ok($listview.find("tr.o_data_row:eq(1)").hasClass('o_row_selected') && $listview.find("tr.o_data_row:eq(2)").hasClass('o_row_selected'), "Second and Third row should be selected");
+        // Test navigation on row with control key
+        $listview.trigger($.Event("keydown", { which: 40, ctrlKey: true }));
+        assert.ok($listview.find("tr.o_data_row:eq(3)").hasClass('o_row_focused'), "Fourth row should have focus");
+
+        // Press TAB and press ENTER key to select selected records
+        selectCreatePopup.find('.o_select_button').focus();
+        assert.ok($(document.activeElement).hasClass("o_select_button"), "Select button of Many2Many field should have focus");
+        $(document.activeElement).click();
+        concurrency.delay(200).then(function() {
+            assert.ok($(document.activeElement).hasClass('o_field_many2many'), "focus should be on m2m widget after selecting records from SelectCreatePopup");
+            // Again go to previous widget and press TAB again so that m2m SelectCreatePopup is opened again
+            $listview.trigger($.Event('keydown', { which: $.ui.keyCode.TAB, shiftKey: true }));
+            $listview.trigger($.Event('keydown', { which: $.ui.keyCode.TAB }));
+            assert.ok(selectCreatePopup.length, 'Many2Many SelectCreatePopup should open');
+            // Press escape without selecting records, it should set focus on m2m widget
+            $('.modal').trigger(($.Event("keydown", { which: $.ui.keyCode.ESCAPE})));
+            return concurrency.delay(100);
+        }).then(function() {
+            assert.ok($(document.activeElement).hasClass('o_field_many2many'), "focus should be on m2m widget after selecting records from SelectCreatePopup");
             form.destroy();
             done();
         });

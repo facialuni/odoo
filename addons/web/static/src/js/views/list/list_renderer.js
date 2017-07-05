@@ -34,10 +34,10 @@ var ListRenderer = BasicRenderer.extend({
     events: {
         'click tbody tr': '_onRowClicked',
         'click tbody .o_list_record_selector': '_onSelectRecord',
-        'focus tbody .o_list_record_selector': '_onFocusRecord',
+        'focus tbody .o_list_record_selector input': '_onFocusRecord',
         'click thead th.o_column_sortable': '_onSortColumn',
         'click .o_group_header': '_onToggleGroup',
-        'blur tbody .o_list_record_selector': '_onFocusLost',
+        'blur tbody .o_list_record_selector input': '_onFocusLost',
         'click thead .o_list_record_selector input': '_onToggleSelection',
     },
     /**
@@ -712,7 +712,7 @@ var ListRenderer = BasicRenderer.extend({
      * @param {MouseEvent / KeyboardEvent} event
      */
     _onFocusLost: function (event) {
-        var $previousRow = $(event.currentTarget).parent();
+        var $previousRow = $(event.currentTarget).closest('.o_data_row');
         $previousRow.removeClass('o_row_focused');
         this.selectedRow = null;
     },
@@ -721,7 +721,7 @@ var ListRenderer = BasicRenderer.extend({
      * @param {MouseEvent / KeyboardEvent} event
      */
     _onFocusRecord: function (event) {
-        this.selectedRow = $(event.currentTarget).parent();
+        this.selectedRow = $(event.currentTarget).closest('.o_data_row');
         this.selectedRow.addClass('o_row_focused');
     },
     /**

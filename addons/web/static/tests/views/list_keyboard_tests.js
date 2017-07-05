@@ -68,36 +68,36 @@ QUnit.module('Views', {
         var $firstRecord = list.$el.find('.o_data_row').first();
         $firstRecord.find('input').trigger('click').focus();
 
-        assert.ok($firstRecord.hasClass('o_row_selected'),'First record selected');
+        assert.ok($firstRecord.hasClass('o_row_selected'),'First record should be selected');
 
         // Press down key will select next record
         var $lastActiveRow = $firstRecord;
         $listview.trigger($.Event('keydown', {which: $.ui.keyCode.DOWN}));
-        assert.ok(!$firstRecord.hasClass('o_row_selected'), 'First record unselected');
-        assert.ok($lastActiveRow.next().hasClass('o_row_selected'), 'Second record selected');
+        assert.ok(!$firstRecord.hasClass('o_row_selected'), 'First record should be unselected');
+        assert.ok($lastActiveRow.next().hasClass('o_row_selected'), 'Second record should be selected');
         $lastActiveRow = $lastActiveRow.next();
 
         // On shift + down select currrent and next record
         shiftKeyPress(40);
-        assert.ok($lastActiveRow.hasClass('o_row_selected') && $lastActiveRow.next().hasClass('o_row_selected'), "Select currrent and next record");
+        assert.ok($lastActiveRow.hasClass('o_row_selected') && $lastActiveRow.next().hasClass('o_row_selected'), "Selecting record with shift key should select multiple records");
         $lastActiveRow = $lastActiveRow.next();
 
         // On Ctrl + down will transfer focus to next record but don't select it
         controlKeyPress(40);
-        assert.ok($($lastActiveRow.next()).hasClass('o_row_focused'), "Next record is focused");
+        assert.ok($($lastActiveRow.next()).hasClass('o_row_focused'), "Pressing down + control key should set focus on next row");
 
         // On Ctrl + up will transfer focus to previous record but don't select it
         controlKeyPress(38);
-        assert.ok($lastActiveRow.hasClass('o_row_focused'), "Previous record is focused");
+        assert.ok($lastActiveRow.hasClass('o_row_focused'), "Pressing up + control key should set focus on previous row");
 
         // On shift + up unselect previous record
         shiftKeyPress(38);
-        assert.ok(!$($lastActiveRow.prev()).hasClass('o_row_selected'), "Unselect previous record");
+        assert.ok(!$($lastActiveRow.prev()).hasClass('o_row_selected'), "Pressing shift + up key should unselect previous row");
         $lastActiveRow = $lastActiveRow.prev();
 
         // On up(arrow) key it will select previous record
         $listview.trigger($.Event('keydown', { which: $.ui.keyCode.UP }));
-        assert.ok($($lastActiveRow.prev()).hasClass('o_row_selected'), "Select previous record");
+        assert.ok($($lastActiveRow.prev()).hasClass('o_row_selected'), "First row should be selected");
 
         list.destroy();
     });
@@ -119,14 +119,14 @@ QUnit.module('Views', {
         list.destroy();
     });
 
-    QUnit.test('escape on listview create button then user should be moved to previous view', function (assert) {
+    QUnit.test('escape on listview create button should move user to previous view', function (assert) {
         assert.expect(1);
 
         var list = createView({
             View: ListView,
             model: 'foo',
             data: this.data,
-            arch: '<tree editable="bottom"><field name="name"/></tree>',
+            arch: '<tree><field name="name"/></tree>',
             intercepts: {
                 history_back: function () {
                     assert.step("move to previous view");
@@ -134,7 +134,7 @@ QUnit.module('Views', {
             }
         });
 
-        list.$buttons.find('.o_list_button_add').focus()
+        list.$buttons.find('.o_list_button_add').focus();
         $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.ESCAPE }));
         list.destroy();
     });
