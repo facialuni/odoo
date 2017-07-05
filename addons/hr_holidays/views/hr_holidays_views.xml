@@ -21,7 +21,8 @@
             <field name="arch" type="xml">
                 <search string="Search Leave">
                     <field name="name"/>
-                    <filter domain="[('state','in',('confirm','validate1'))]" string="To Approve" name="approve"/>
+                    <filter domain="[('state','=','confirm')]" string="To Approve" name="approve"/>
+                    <filter domain="[('state', '=', 'validate1')]" string="Second Approval"/>
                     <filter string="Approved Leaves" domain="[('state', '=', 'validate')]" name="validated"/>
                     <separator/>
                     <filter name="active_types" string="Active Types" domain="[('holiday_status_id.active', '=', True)]" help="Filters only on allocations and requests that belong to an leave type that is 'active' (active field is True)"/>
