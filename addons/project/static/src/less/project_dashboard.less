@@ -106,18 +106,26 @@
 }
 
 .o_kanban_task_cover_image {
-    div {
-        padding: 7px;
-    }
-    img {
-        height: 86px;
-        cursor: pointer;
-        border: 3px solid transparent;
-        box-shadow: 0px 0px 1px 1px #ccc;
+    .o_kanban_task_cover_image_container {
+        height: 130px;
         display: inline-block;
-        max-width: 138px;
+        position: relative;
+        width: 130px;
+        outline: 1px solid transparent;
+        box-shadow: 0px 0px 1px 1px #ccc;
+        cursor: pointer;
         &.o_selected {
-            border-color: @odoo-brand-optional;
+            outline-color: @odoo-brand-optional;
+        }
+        img {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            margin: auto;
+            max-height: 100%;
+            max-width: 100%;
         }
     }
 }

@@ -59,11 +59,11 @@ KanbanRecord.include({
                 attachment_ids: attachment_ids,
                 widget: self
             }));
-            var $imgs = $content.find('img');
+            var $imgs = $content.find('.o_kanban_task_cover_image_container');
             var dialog = new Dialog(self, {
                 title: _t("Set a Cover Image"),
                 buttons: [{text: _t("Select"), classes: attachment_ids.length ? 'btn-primary' : 'hidden', close: true, disabled: !coverID, click: function () {
-                    var $img = $imgs.filter('.o_selected');
+                    var $img = $imgs.filter('.o_selected').find('img');
                     var data = {
                         id: $img.data('id'),
                         display_name: $img.data('name')
@@ -78,13 +78,13 @@ KanbanRecord.include({
             }).open();
 
             var $selectBtn = dialog.$footer.find('.btn-primary');
-            $content.on('click', 'img', function (ev) {
+            $content.on('click', '.o_kanban_task_cover_image_container', function (ev) {
                 $imgs.not(ev.currentTarget).removeClass('o_selected');
                 $selectBtn.prop('disabled', !$(ev.currentTarget).toggleClass('o_selected').hasClass('o_selected'));
             });
 
-            $content.on('dblclick', 'img', function (ev) {
-                var $img  = $(ev.currentTarget);
+            $content.on('dblclick', '.o_kanban_task_cover_image_container', function (ev) {
+                var $img  = $(ev.currentTarget).find('img');
                 var data = {
                     id: $img.data('id'),
                     display_name: $img.data('name')
