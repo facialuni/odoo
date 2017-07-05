@@ -231,7 +231,11 @@ class Company(models.Model):
             'website': vals.get('website'),
             'vat': vals.get('vat'),
         })
-        vals['partner_id'] = partner.id
+        # Let new company created by `user` be automatically added to it's `Allowed Companies` list
+        vals.update({
+            'partner_id': partner.id,
+            'user_ids':  [(4, self.env.uid)]
+        })
         self.clear_caches()
         company = super(Company, self).create(vals)
         partner.write({'company_id': company.id})
