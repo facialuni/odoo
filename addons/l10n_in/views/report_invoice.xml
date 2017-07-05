@@ -16,7 +16,7 @@
             <td><span t-field="l.name"/><t t-if="l.product_id.hsn_code"><h6><strong class="ml16">HSN Code:</strong> <span t-field="l.product_id.hsn_code"/></h6></t></td>
         </xpath>
         <xpath expr="//div[@name='invoice_address']//div[@t-if='o.partner_id.vat']" position="replace">
-            <div t-if="o.partner_id.vat">GSTIN: <span t-field="o.partner_id.vat"/></div>
+            <div t-if="o.partner_id.gstin">GSTIN: <span t-field="o.partner_id.gstin"/></div>
         </xpath>
         <xpath expr="//table//thead/tr/th[6]" position="attributes">
             <attribute name="t-if">len(o.tax_line_ids) > 0</attribute>
