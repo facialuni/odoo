@@ -180,7 +180,6 @@ class Holidays(models.Model):
     employee_id = fields.Many2one('hr.employee', string='Employee', index=True, readonly=True,
         states={'draft': [('readonly', False)], 'confirm': [('readonly', False)]}, default=_default_employee, track_visibility='onchange')
     manager_id = fields.Many2one('hr.employee', related='employee_id.parent_id', string='Manager', readonly=True, store=True)
-    notes = fields.Text('Reasons', readonly=True, states={'draft': [('readonly', False)], 'confirm': [('readonly', False)]})
     number_of_days_temp = fields.Float(
         'Allocation', copy=False, readonly=True,
         states={'draft': [('readonly', False)], 'confirm': [('readonly', False)]},
@@ -454,7 +453,6 @@ class Holidays(models.Model):
             'holiday_status_id': self.holiday_status_id.id,
             'date_from': self.date_from,
             'date_to': self.date_to,
-            'notes': self.notes,
             'number_of_days_temp': self.number_of_days_temp,
             'parent_id': self.id,
             'employee_id': employee.id
@@ -509,7 +507,6 @@ class Holidays(models.Model):
             'categ_ids': [(6, 0, [
                 self.holiday_status_id.categ_id.id])] if self.holiday_status_id.categ_id else [],
             'duration': self.number_of_days_temp * HOURS_PER_DAY,
-            'description': self.notes,
             'user_id': self.user_id.id,
             'start': self.date_from,
             'stop': self.date_to,
