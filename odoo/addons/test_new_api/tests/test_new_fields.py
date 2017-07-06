@@ -293,6 +293,30 @@ class TestFields(common.TransactionCase):
         discussion.participants += self.env.user
         self.env['test_new_api.message'].create({'discussion': discussion.id, 'body': 'Whatever'})
 
+    def test_16_rw_stored(self):
+        """ test readwrite stored computed fields """
+        discussion = self.env.ref('test_new_api.discussion_0')
+
+        record = self.env['test_new_api.message'].create({
+            'discussion': discussion.id,
+            'body': 'Whatever'
+        })
+        introductory = "%s says on %s: \"" % (record.display_name, record.write_date)
+
+        self.assertTrue(record.introductory.starts_with(introductory))
+        record.write({'introductory': 'Defaced'})
+        self.assertTrue(record.introductory == 'Defaced')
+        record.write({})
+        introductory = "%s says on %s: \"" % (record.display_name, record.write_date)
+        self.assertTrue(record.introductory.starts_with(introductory))
+
+        record = self.env['test_new_api.message'].create({
+            'discussion': discussion.id,
+            'body': 'Whatever',
+            'introductory': 'No intro'
+        })
+        self.assertTrue(record.introductory == 'No intro')
+
     def test_20_float(self):
         """ test float fields """
         record = self.env['test_new_api.mixed'].create({})

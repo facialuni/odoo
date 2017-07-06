@@ -117,6 +117,7 @@ class Message(models.Model):
     size = fields.Integer(compute='_compute_size', search='_search_size')
     double_size = fields.Integer(compute='_compute_double_size')
     discussion_name = fields.Char(related='discussion.name', string="Discussion Name")
+    introductory = fields.Char(string='Introductory', compute='_compute_introductory', readonly=False, store=True)
     author_partner = fields.Many2one(
         'res.partner', compute='_compute_author_partner',
         search='_search_author_partner')
@@ -138,6 +139,14 @@ class Message(models.Model):
     def _compute_display_name(self):
         stuff = "[%s] %s: %s" % (self.author.name, self.discussion.name or '', self.body or '')
         self.display_name = stuff[:80]
+
+    @api.one
+    @api.depends('write_date', 'display_name')
+    def _compute_introductory(self):
+        introductory = "%s says on %s: " % (self.author.name, self.write_date)
+        introductory += "The most exciting phrase to hear in science, the one that heralds "
+        introductory += "new discoveries, is not \"Eureka!\" (I found it!) but \"That's funny...\"."
+        self.introductory = introductory
 
     @api.one
     @api.depends('body')
