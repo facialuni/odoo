@@ -28,12 +28,26 @@
                 </ul>
             </span>
             <t t-if="widget.quick_create">
-                <span class="o_kanban_quick_add"><i class="fa fa-plus"/></span>
+                <span class="o_kanban_quick_add">+</span>
             </t>
         </div>
+        <t t-call="KanbanView.Counter"/>
         <div t-if="widget.remaining > 0" class="o_kanban_load_more">
             <t t-call="KanbanView.LoadMore"/>
         </div>
+    </div>
+</t>
+
+<t t-name="KanbanView.Counter">
+    <div class="o_kamban_counter">
+        <div class="o_kamban_counter_progress progress">
+            <div class="progress-bar o_progress_success">
+                <span data-current-value="0" class="o_kamban_counter_label"/>
+            </div>
+            <div class="progress-bar o_progress_blocked"/>
+            <div class="progress-bar o_progress_warning"/>
+        </div>
+        <div t-att-data-current-value="widget.data_records.length" class="o_kamban_counter_side pull-right"/>
     </div>
 </t>
 

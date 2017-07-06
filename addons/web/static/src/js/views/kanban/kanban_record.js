@@ -62,6 +62,7 @@ var KanbanRecord = Widget.extend({
         _.invoke(_.pluck(this.subWidgets, '$el'), 'detach');
         this._setState(state);
         this._render();
+        this.__parentedParent._updateCounter();
     },
 
     //--------------------------------------------------------------------------

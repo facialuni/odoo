@@ -292,6 +292,7 @@
                     <field name="company_currency"/>
                     <field name="activity_state" />
                     <field name="activity_ids" />
+                    <field name="probability"/>
                     <templates>
                         <field name="date_deadline"/>
                         <t t-name="kanban-box">

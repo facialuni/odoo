@@ -28,6 +28,7 @@ var KanbanColumn = Widget.extend({
         'click .o_kanban_quick_add': '_onAddQuickCreate',
         'click .o_kanban_load_more': '_onLoadMore',
         'click .o_kanban_toggle_fold': '_onToggleFold',
+        'record_update' : '_updateCounter',
     },
     /**
      * @override
@@ -82,6 +83,7 @@ var KanbanColumn = Widget.extend({
     start: function () {
         var self = this;
         this.$header = this.$('.o_kanban_header');
+        this.$counter = this.$('.o_kamban_counter');
 
         for (var i = 0; i < this.data_records.length; i++) {
             this.addRecord(this.data_records[i], {no_update: true});
@@ -148,6 +150,7 @@ var KanbanColumn = Widget.extend({
         var width = this.records.length ? this.records[0].$el.innerWidth() : this.$el.width() - 8;
         this.quickCreateWidget = new RecordQuickCreate(this, width);
         this.quickCreateWidget.insertAfter(this.$header);
+        this.quickCreateWidget.insertAfter(this.$counter);
         this.quickCreateWidget.$el.focusout(function () {
             var taskName = self.quickCreateWidget.$('[type=text]')[0].value;
             if (!taskName && self.quickCreateWidget) {
@@ -215,6 +218,7 @@ var KanbanColumn = Widget.extend({
      * @private
      */
     _update: function () {
+        var self = this;
         var title = this.folded ? this.title + ' (' + this.size + ')' : this.title;
         this.$header.find('.o_column_title').text(title);
         this.$header.find('.o-kanban-count').text(this.records.length);
@@ -228,6 +232,185 @@ var KanbanColumn = Widget.extend({
         } else {
             this.$('.o_kanban_load_more').html(QWeb.render('KanbanView.LoadMore', {widget: this}));
         }
+        if (!this.folded) {
+            self._updateCounter();
+        }
+    },
+    _updateCounter: function() {
+        var self = this;
+        var $counter = this.$('.o_kamban_counter');
+        var $label = $counter.find('.o_kamban_counter_label');
+        var $side_c = $counter.find('.o_kamban_counter_side');
+        var $bar_success = $counter.find('.o_progress_success');
+        var $bar_blocked = $counter.find('.o_progress_blocked');
+        var $bar_warning = $counter.find('.o_progress_warning');
+
+        var bar_n_success = 0;
+        var bar_n_blocked = 0;
+        var bar_n_warning = 0;
+        var tot_n = parseInt($side_c.text()) || this.records.length;
+        $side_c.data('current-value', tot_n);
+
+        switch (self.relation) {
+            case "project.task.type":
+                $(self.records).each(function() {
+                    if (this.state.data.kanban_state == "done") {
+                        bar_n_success++;
+                        this.$el.removeClass('oe_kanban_card_blocked');
+                        this.$el.addClass('oe_kanban_card_success');
+                    } else if (this.state.data.kanban_state == "blocked") {
+                        bar_n_blocked++;
+                        this.$el.removeClass('oe_kanban_card_success');
+                        this.$el.addClass('oe_kanban_card_blocked');
+                    }
+                });
+
+
+                self._animateNumber(tot_n, $side_c, 1000);
+                if (bar_n_success == 0 && bar_n_blocked > 0) {
+                    // Use blocked as label in this particular condition only
+                    self._animateNumber(bar_n_blocked, $label, 1000, "", " blocked");
+                } else {
+                    self._animateNumber(bar_n_success, $label, 1000, "", " ready");
+                }
+
+
+                bar_n_success > 0 ? $bar_success.width((bar_n_success / tot_n) * 100 + "%").addClass('o_bar_active') : $bar_success.width(0).removeClass('o_bar_active');
+                bar_n_blocked > 0 ? $bar_blocked.width((bar_n_blocked / tot_n) * 100 + "%").addClass('o_bar_active') : $bar_blocked.width(0).removeClass('o_bar_active');
+
+                $bar_success.add($bar_blocked).css('cursor', 'pointer');
+
+                $bar_success.attr('title', bar_n_success + ' ready');
+                $bar_blocked.attr('title', bar_n_blocked + ' blocked');
+
+                $bar_success.add($bar_blocked).tooltip({
+                    delay: '0',
+                    trigger:'hover',
+                    placement: 'top'
+                });
+
+                // TODO: Unbind if bars are empty
+                $bar_success.on('click', function() {
+                    $('.o_content').scrollTop(0);
+                    self.$el.removeClass('o_kanban_group_show_blocked');
+                    self.$el.toggleClass('o_kanban_group_show_success');
+                    return false;
+                });
+                $bar_blocked.on('click', function() {
+                    $('.o_content').scrollTop(0);
+                    self.$el.removeClass('o_kanban_group_show_success');
+                    self.$el.toggleClass('o_kanban_group_show_blocked');
+                    return false;
+                });
+                break;
+
+            case "crm.stage":
+                // TODO: It should automatically retrive the right symbol
+                var currency = "$ ";
+                var tot_value = parseInt($side_c.text()) || 0;
+
+                tot_n = 0;
+
+                $counter.addClass('o_counter_number');
+
+                // Reorder bars to match CRM needs
+                $bar_warning.insertBefore($bar_success);
+                $bar_blocked.insertBefore($bar_warning);
+
+
+                $(self.records).each(function() {
+                    var state = this.state.data.activity_state;
+
+                    tot_value = tot_value + this.record.planned_revenue.raw_value;
+                    tot_n++;
+
+                    if (state == "planned") {
+                        bar_n_success++;
+                        this.$el.removeClass('oe_kanban_card_blocked oe_kanban_card_warning');
+                        this.$el.addClass('oe_kanban_card_success');
+                    } else if (state == "today") {
+                        bar_n_warning++;
+                        this.$el.removeClass('oe_kanban_card_success oe_kanban_card_blocked');
+                        this.$el.addClass('oe_kanban_card_warning');
+                    } else if (state == "overdue") {
+                        bar_n_blocked++;
+                        this.$el.removeClass('oe_kanban_card_success oe_kanban_card_warning');
+                        this.$el.addClass('oe_kanban_card_blocked');
+                    }
+                });
+
+                self._animateNumber(tot_value, $side_c, 1000, currency);
+
+                $bar_success.attr('title', bar_n_success + ' future activities');
+                $bar_blocked.attr('title', bar_n_blocked + ' overdue activities');
+                $bar_warning.attr('title', bar_n_warning + ' today activities');
+
+                $bar_success.add($bar_blocked).add($bar_warning).tooltip({
+                    delay: '0',
+                    trigger:'hover',
+                    placement: 'top'
+                });
+
+                bar_n_success > 0 ? $bar_success.width((bar_n_success / tot_n) * 100 + "%").addClass('o_bar_active') : $bar_success.width(0).removeClass('o_bar_active');
+                bar_n_blocked > 0 ? $bar_blocked.width((bar_n_blocked / tot_n) * 100 + "%").addClass('o_bar_active') : $bar_blocked.width(0).removeClass('o_bar_active');
+                bar_n_warning > 0 ? $bar_warning.width((bar_n_warning / tot_n) * 100 + "%").addClass('o_bar_active') : $bar_warning.width(0).removeClass('o_bar_active');
+
+                self.$el.removeClass('o_kanban_group_show_blocked o_kanban_group_show_success o_kanban_group_show_warning');
+
+                // TODO: Unbind if bars are empty
+                $bar_success.on('click', function() {
+                    $('.o_content').scrollTop(0);
+                    self.$el.removeClass('o_kanban_group_show_blocked o_kanban_group_show_warning');
+                    self.$el.toggleClass('o_kanban_group_show_success');
+                    return false;
+                });
+                $bar_warning.on('click', function() {
+                    $('.o_content').scrollTop(0);
+                    self.$el.removeClass('o_kanban_group_show_blocked o_kanban_group_show_success');
+                    self.$el.toggleClass('o_kanban_group_show_warning');
+                    return false;
+                });
+                $bar_blocked.on('click', function() {
+                    $('.o_content').scrollTop(0);
+                    self.$el.removeClass('o_kanban_group_show_success o_kanban_group_show_warning');
+                    self.$el.toggleClass('o_kanban_group_show_blocked');
+                    return false;
+                });
+                break;
+
+            default:
+                console.info("kanban_counter layout for " + self.relation + " not definied");
+        }
+    },
+
+    _animateNumber: function (end, $el, duration, prefix, suffix, bold_value) {
+        suffix = suffix || "";
+        prefix = prefix || "";
+        bold_value = bold_value || false;
+
+        // Retrive current value (buggy)
+        var start = $el.data('current-value') || 0;
+
+        if (end > 100) {
+            end = end / 100;
+            suffix = "K " + suffix;
+        }
+
+        $({ someValue: start }).animate({ someValue: end }, {
+            duration: duration,
+            easing: 'swing',
+            step: function() {
+                if (bold_value) {
+                    $el.html(prefix + "<b>" + Math.round(this.someValue) + "</b>" + suffix);
+                } else {
+                    $el.html(prefix + Math.round(this.someValue) + suffix);
+                }
+            },
+            complete: function() {
+                // Apply new current value
+                $el.data('current-value', end);
+            }
+        });
     },
 
     //--------------------------------------------------------------------------
