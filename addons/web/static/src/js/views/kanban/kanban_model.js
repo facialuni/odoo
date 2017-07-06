@@ -36,7 +36,6 @@ var KanbanModel = BasicModel.extend({
 
         // update the res_ids and count of the parent
         this.resequenceResIDs(group.parentID);
-        parent.count++;
 
         return this._fetchRecord(new_record).then(function (result) {
             return result.id;
@@ -121,8 +120,7 @@ var KanbanModel = BasicModel.extend({
         return this.reload(group.id, {
             loadMoreOffset: offset,
         }).then(function (db_id) {
-            var parent = self.localData[group.parentID];
-            self.resequenceResIDs(parent.parentID);
+            self.resequenceResIDs(group.parentID);
             return db_id;
         });
     },
@@ -192,6 +190,7 @@ var KanbanModel = BasicModel.extend({
         parent.res_ids =  _.flatten(_.map(parent.data, function (dataPointID) {
             return self.localData[dataPointID].res_ids;
         }));
+        parent.count = parent.res_ids.length;
     },
     /**
      * Resequences records.
