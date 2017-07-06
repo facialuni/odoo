@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
     <t t-name="project.SetCoverModal">
-        <div t-if="attachment_ids.length > 0" class="ml32 mr0 o_kanban_task_cover_image row">
+        <div t-if="attachment_ids.length > 0" class="ml32 mr0 o_kanban_task_cover_container">
             <t t-foreach="attachment_ids" t-as="attachment">
-                <div t-attf-class="o_kanban_task_cover_image_container#{cover_id == attachment['id'] ? ' o_selected' : ''}">
+                <div t-attf-class="o_kanban_task_cover_image#{cover_id == attachment['id'] ? ' o_selected' : ''}">
                     <img t-attf-src="/web/image/#{attachment['id']}?unique=1" t-att-data-id="attachment['id']" t-att-data-name="attachment['name']"/>
                 </div>
             </t>
