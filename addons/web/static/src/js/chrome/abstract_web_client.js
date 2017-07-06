@@ -291,7 +291,6 @@ var AbstractWebClient = Widget.extend(mixins.ServiceProvider, {
         if (config.device.size_class <= config.device.SIZES.XS) {
             return {
                 top: this.el.scrollTop,
-                left: this.el.scrollLeft,
             };
         } else {
             return {
@@ -366,16 +365,14 @@ var AbstractWebClient = Widget.extend(mixins.ServiceProvider, {
             if (!xs_device) {
                 // Substract the position of the action_manager as it is the scrolling part
                 offset.top -= dom.getPosition(this.action_manager.el).top;
-                offset.left -= dom.getPosition(this.action_manager.el).left;
             }
         }
         if (xs_device) {
             this.el.scrollTop = offset.top;
-            this.el.scrollLeft = offset.left;
         } else {
             this.action_manager.el.scrollTop = offset.top;
-            this.action_manager.el.scrollLeft = offset.left;
         }
+        this.action_manager.el.scrollLeft = offset.left;
     },
 });
 

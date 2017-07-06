@@ -806,7 +806,7 @@ var FormRenderer = BasicRenderer.extend({
 
         // Necessary to allow all sub widgets to use their dimensions in
         // layout related activities, such as autoresize on fieldtexts
-        core.bus.trigger('DOM_updated');
+        core.bus.trigger('view_shown');
 
         // Attach the tooltips on the fields' label
         _.each(this.allFieldWidgets[this.state.id], function (widget) {

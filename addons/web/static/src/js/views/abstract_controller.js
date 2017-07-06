@@ -174,7 +174,7 @@ var AbstractController = Widget.extend({
      */
     setScrollPosition: function (scroll) {
         this.scrollTop = scroll.top;
-        this.scrollLeft = scroll.left;
+        this.scrollLeft = scroll.left || 0;
     },
     /**
      * This is the main entry point for the controller.  Changes from the search

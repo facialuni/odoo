@@ -267,7 +267,6 @@ var ViewManager = Widget.extend(ControlPanelMixin, {
             self.view_stack.push(view);
 
             self.active_view = view;
-            var set_position_def = $.Deferred();
 
             if (!view.loaded) {
                 view_options = _.extend({}, view.options, view_options, self.env);
@@ -285,8 +284,6 @@ var ViewManager = Widget.extend(ControlPanelMixin, {
                 self.create_view(view, view_options).then(function(controller) {
                     view.controller = controller;
                     view.$fragment = $('<div>');
-
-                    set_position_def.resolve();
                     controller.appendTo(view.$fragment).done(function() {
                         // Remove the unnecessary outer div
                         view.$fragment = view.$fragment.contents();
@@ -301,29 +298,9 @@ var ViewManager = Widget.extend(ControlPanelMixin, {
                     if (view_type === 'form') {
                         view_options.mode = view_options.mode || 'readonly';
                     }
-                    set_position_def.resolve();
                     return view.controller.reload(view_options);
                 });
             }
-            $.when(set_position_def).then(function() {
-                // Detach the old view and store it
-                if (old_view && old_view !== self.active_view) {
-                    // Store the scroll position
-                    if (self.action_manager && self.action_manager.webclient) {
-                        old_view.controller.setScrollPosition(self.action_manager.webclient.getScrollPosition());
-                    }
-
-                    // Do not detach ui-autocomplete elements to let jquery-ui garbage-collect them
-                    var $to_detach = self.$el.contents().not('.ui-autocomplete');
-                    old_view.$fragment = dom.detach([{widget: old_view.controller}], {$to_detach: $to_detach});
-                }
-
-                // If the user switches from a multi-record to a mono-record view,
-                // the action manager should be scrolled to the top.
-                if (old_view && old_view.multi_record === true && self.active_view.multi_record === false) {
-                    self.active_view.controller.setScrollPosition({top: 0, left: 0});
-                }
-            });
 
             return $.when(view.loaded)
                 .then(function() {
@@ -356,6 +333,23 @@ var ViewManager = Widget.extend(ControlPanelMixin, {
             search_view_hidden: !this.active_view.searchable || this.active_view.searchview_hidden,
         };
         this.update_control_panel(cp_status);
+
+        // Detach the old view and store it
+        if (old_view && old_view !== this.active_view) {
+            // Store the scroll position
+            if (this.action_manager && this.action_manager.webclient) {
+                old_view.controller.setScrollPosition(this.action_manager.webclient.getScrollPosition());
+            }
+            // Do not detach ui-autocomplete elements to let jquery-ui garbage-collect them
+            var $to_detach = this.$el.contents().not('.ui-autocomplete');
+            old_view.$fragment = dom.detach([{widget: old_view.controller}], {$to_detach: $to_detach});
+        }
+
+        // If the user switches from a multi-record to a mono-record view,
+        // the action manager should be scrolled to the top.
+        if (old_view && old_view.controller.multi_record === true && view_controller.multi_record === false) {
+            view_controller.setScrollPosition({top: 0, left: 0});
+        }
 
         // Append the view fragment to this.$el
         dom.append(this.$el, view_fragment, {
