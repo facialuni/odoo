@@ -147,7 +147,6 @@
                                 <div>
                                     <b><field name="name"/></b> <br/>
                                     <span name="owner_user_id" t-if="record.owner_user_id.raw_value">Requested by : <field name="owner_user_id"/><br/></span>
-                                    <span name="technician_user_id" t-if="record.technician_user_id.raw_value">Responsible : <field name="technician_user_id"/><br/></span>
                                     <span class="oe_grey" t-if="record.equipment_id.raw_value"><field name="equipment_id"/><br/></span>
                                     <span t-if="record.category_id.raw_value"><field name="category_id"/></span>
                                 </div>
@@ -711,7 +710,7 @@
                 </div>
                 <group>
                     <group>
-                        <field name="member_ids" widget="many2many_tags"/>
+                        <field name="member_ids" widget="many2many_tags" options="{'no_create': True}"/>
                     </group>
                     <group>
                         <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
