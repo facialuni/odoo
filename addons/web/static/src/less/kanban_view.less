@@ -29,6 +29,55 @@
     cursor: pointer;
 }
 
+.o-kanban-css-filter(@class, @accent-color) {
+    // Provide CSS reordering and highlight
+    &.o_kanban_group_show_@{class} {
+        @mix-soft: mix(@accent-color, @odoo-webclient-background-color, 5%);
+        @mix-full: mix(@accent-color, @odoo-webclient-background-color);
+
+        background-color: @mix-soft;
+        border-color: @mix-full;
+
+        .o_kamban_counter {
+            background-color: @mix-soft;
+            border-color: @mix-soft;
+        }
+
+        .o_progress_@{class} {
+            border: 1px solid white;
+        }
+
+        .o_kanban_record:not(.oe_kanban_card_@{class}){
+            order: 3;
+            opacity: 0.5;
+            box-shadow: none;
+            margin: @o-kanban-record-margin*0.5 @o-kanban-record-margin;
+        }
+
+        .o_kanban_load_more {
+            order: 2;
+            padding: @o-kanban-record-margin 0 @o-kanban-record-margin*2;
+        }
+
+        .oe_kanban_card_@{class} {
+            order: 1;
+            margin: 0 @o-kanban-record-margin @o-kanban-record-margin*2;
+
+            & ~ .oe_kanban_card_@{class} {
+                margin-top: -@o-kanban-record-margin;
+            }
+        }
+
+        .o_kamban_counter.affix ~ .oe_kanban_card_@{class} {
+            margin-top: 20px + @o-kanban-record-margin*2;
+
+            & ~ .oe_kanban_card_@{class} {
+                margin-top: -@o-kanban-record-margin;
+            }
+        }
+    }
+}
+
 // LAYOUT
 .o_kanban_view {
     .o-flex-display();
@@ -372,6 +421,8 @@
 
     .o_kanban_group {
         background-color: @odoo-webclient-background-color;
+        border: 1px solid transparent;
+        border-width: 0 1px;
         .o_kamban_counter {
             background-color: @odoo-webclient-background-color;
             border-color: @odoo-webclient-background-color;
@@ -487,7 +538,7 @@
 
             &.affix {
                 position: fixed;
-                width: 240px;
+                width: @o-kanban-small-record-width;
                 margin: 0 0 0 -@o-kanban-record-margin;
                 border-width: @o-kanban-record-margin @o-kanban-record-margin*2;
                 box-shadow: 0 4px 4px -2px;
@@ -496,7 +547,7 @@
                 // TODO: Based on the kanbar header heigth... should be computed
                 margin-top: -38px;
 
-                & + .oe_kanban_card, & + .o_kanban_record {
+                & + .o_kanban_record {
                     margin-top: 18px + @o-kanban-record-margin*4;
                 }
             }
@@ -519,7 +570,7 @@
                     &.o_progress_warning {
                         .o-linear-gradient(45deg, lighten(desaturate(@brand-warning,20%), 5%), desaturate(@brand-warning,20%));
                     }
-                    // Be sure that an active bar has a minimun width
+                    // Be sure that a bar with data has a minimun width
                     &.o_bar_active {
                         min-width: 10px;
                     }
@@ -547,35 +598,22 @@
             }
         }
 
-        &.o_kanban_group_show_success {
-            .o_kanban_record {
-                opacity: 0.5;
-            }
-            .oe_kanban_card_success {
-                outline: 2px solid @odoo-brand-optional;
-                opacity: 1;
+        &.o_kanban_group_show_success, &.o_kanban_group_show_blocked, &.o_kanban_group_show_warning {
+            .o-flex-display();
+            .o-flex-flow(wrap, column);
+
+            .o_kamban_counter.affix {
+                margin-top: 0;
+
+                & + .o_kanban_record {
+                    margin-top: @o-kanban-record-margin;
+                }
             }
         }
 
-        &.o_kanban_group_show_blocked {
-            .o_kanban_record {
-                opacity: 0.5;
-            }
-            .oe_kanban_card_blocked {
-                outline: 2px solid @brand-danger;
-                opacity: 1;
-            }
-        }
-
-        &.o_kanban_group_show_warning {
-            .o_kanban_record {
-                opacity: 0.5;
-            }
-            .oe_kanban_card_warning {
-                outline: 2px solid @brand-warning;
-                opacity: 1;
-            }
-        }
+        .o-kanban-css-filter(success, @odoo-brand-optional);
+        .o-kanban-css-filter(blocked, @brand-danger);
+        .o-kanban-css-filter(warning, @brand-warning);
 
         .o_kanban_quick_create {
             background-color: white;

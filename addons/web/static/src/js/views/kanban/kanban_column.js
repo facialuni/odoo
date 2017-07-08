@@ -300,11 +300,13 @@ var KanbanColumn = Widget.extend({
 
                 // TODO: Unbind if bars are empty
                 $bar_success.on('click', function() {
+                    $('.o_content').scrollTop(0);
                     self.$el.removeClass('o_kanban_group_show_blocked');
                     self.$el.toggleClass('o_kanban_group_show_success');
                     return false;
                 });
                 $bar_blocked.on('click', function() {
+                    $('.o_content').scrollTop(0);
                     self.$el.removeClass('o_kanban_group_show_success');
                     self.$el.toggleClass('o_kanban_group_show_blocked');
                     return false;
@@ -366,16 +368,19 @@ var KanbanColumn = Widget.extend({
 
                 // TODO: Unbind if bars are empty
                 $bar_success.on('click', function() {
+                    $('.o_content').scrollTop(0);
                     self.$el.removeClass('o_kanban_group_show_blocked o_kanban_group_show_warning');
                     self.$el.toggleClass('o_kanban_group_show_success');
                     return false;
                 });
                 $bar_warning.on('click', function() {
+                    $('.o_content').scrollTop(0);
                     self.$el.removeClass('o_kanban_group_show_blocked o_kanban_group_show_success');
                     self.$el.toggleClass('o_kanban_group_show_warning');
                     return false;
                 });
                 $bar_blocked.on('click', function() {
+                    $('.o_content').scrollTop(0);
                     self.$el.removeClass('o_kanban_group_show_success o_kanban_group_show_warning');
                     self.$el.toggleClass('o_kanban_group_show_blocked');
                     return false;
