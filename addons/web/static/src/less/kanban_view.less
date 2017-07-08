@@ -372,8 +372,16 @@
 
     .o_kanban_group {
         background-color: @odoo-webclient-background-color;
+        .o_kamban_counter {
+            background-color: @odoo-webclient-background-color;
+            border-color: @odoo-webclient-background-color;
+        }
         &:nth-child(odd) {
             background-color: darken(@odoo-webclient-background-color, 3%);
+            .o_kamban_counter {
+                background-color: darken(@odoo-webclient-background-color, 3%);
+                border-color: darken(@odoo-webclient-background-color, 3%);
+            }
         }
         &.ui-sortable-helper ~ .o_kanban_group, // Invert odd/even rule for groups which follows the helper (fixed)
         &.ui-sortable-placeholder ~ .o_kanban_group.ui-sortable-helper { // Invert odd/even rule for the helper if the placeholder is before (so that it keep the same color)
@@ -471,7 +479,27 @@
             height: 18px;
             margin-bottom: 10px;
             position: relative;
+            box-sizing: content-box;
+            border-style: solid;
+            border-width: @o-kanban-record-margin 0;
             margin: 0 @o-kanban-record-margin @o-kanban-record-margin*4;
+            .o-transition(box-shadow, 0.3s);
+
+            &.affix {
+                position: fixed;
+                width: 240px;
+                margin: 0 0 0 -@o-kanban-record-margin;
+                border-width: @o-kanban-record-margin @o-kanban-record-margin*2;
+                box-shadow: 0 4px 4px -2px;
+                z-index: 1;
+
+                // TODO: Based on the kanbar header heigth... should be computed
+                margin-top: -38px;
+
+                & + .oe_kanban_card, & + .o_kanban_record {
+                    margin-top: 18px + @o-kanban-record-margin*4;
+                }
+            }
 
             .o_kamban_counter_progress {
                 display: inline-block;
