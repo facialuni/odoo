@@ -45,16 +45,13 @@ class SaleOrder(models.Model):
             order.project_project_id = self.env['project.project'].search([('analytic_account_id', '=', order.analytic_account_id.id)])
 
     @api.multi
-    @api.constrains('order_line')
-    def _check_multi_timesheet(self):
+    @api.depends('order_line.product_id', 'project_project_id')
+    def _compute_project_ids(self):
         for order in self:
-            count = 0
-            for line in order.order_line:
-                if line.product_id.track_service == 'timesheet':
-                    count += 1
-                if count > 1:
-                    raise ValidationError(_("You can use only one product on timesheet within the same sales order. You should split your order to include only one contract based on time and material."))
-        return {}
+            projects = order.order_line.mapped('product_id.project_id')
+            if order.project_project_id:
+                projects |= order.project_project_id
+            order.project_ids = projects
 
     @api.multi
     def action_view_task(self):
