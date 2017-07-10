@@ -559,7 +559,7 @@ var FieldMany2One = AbstractField.extend({
      * @param {OdooEvent} ev
      */
     _onNavigationMove: function (ev) {
-        if (this.is_autocomplete_open) { // If autocomplete is open then do not move user to previous or next record on up/down key
+        if (this.is_autocomplete_open && (ev.which === $.ui.keyCode.UP || ev.which === $.ui.keyCode.DOWN)) { // If autocomplete is open then do not move user to previous or next record on up/down key
             ev.stopPropagation();
         }
         return basicFields.InputField.prototype._onNavigationMove.apply(this, arguments);
@@ -732,7 +732,16 @@ var FieldX2Many = AbstractField.extend({
         if (!this.activeActions.create || this.isReadonly) {
             return false;
         }
-        this.trigger_up('add_record');
+        if (this.editable) {
+            this.trigger_up('add_record');
+        } else {
+            if (this.view.arch.tag === 'kanban') {
+                this.$buttons.find('button.o-kanban-button-new').focus();
+            }
+            if (this.view.arch.tag === 'tree') {
+                this.renderer.$('.o_field_x2many_list_row_add a').focus();
+            }
+        }
         return true;
     },
 

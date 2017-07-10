@@ -152,7 +152,7 @@ var FormController = BasicController.extend({
             this.$buttons.find('.o_form_button_create')
                 .on('click', this._onCreate.bind(this))
                 .on('focus', function () {
-                    on_button_focus(this, _t("Press ENTER to <b>Create</b> and ESC to go back to the list view"));
+                    on_button_focus(this, _t("Press ENTER to <b>Create</b> or ESC to go back to the list view"));
                 })
                 .on('keydown', function (e) {
                     if (e.which == $.ui.keyCode.TAB) {
