@@ -247,11 +247,15 @@ var SearchView = Widget.extend({
                     }
                     e.preventDefault();
                     break;
-                case $.ui.keyCode.ESCAPE:
-                    if (this.autocomplete && !this.autocomplete.$el.is(":visible")) {
+            }
+        },
+        'keydown .o_searchview_input': function(e) {
+            if (this.autocomplete && !this.autocomplete.$el.is(":visible")) {
+                switch(e.which) {
+                    case $.ui.keyCode.ESCAPE:
                         this.trigger_up('previous_breadcrumb');
-                    }
-                    break;
+                        break;
+                }
             }
         },
         'keyup .o_searchview_input': function (e) {

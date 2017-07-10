@@ -607,7 +607,7 @@ QUnit.module('Views', {
 
     QUnit.test('Test o2m widget with form popup and escape key', function (assert) {
         var done = assert.async();
-        assert.expect(6);
+        assert.expect(7);
 
         var form = createView({
             View: FormView,
@@ -646,6 +646,9 @@ QUnit.module('Views', {
         form.$buttons.find('.o_form_button_edit').click();
         assert.strictEqual($(document.activeElement).closest('.o_field_widget').attr('name'), 'product_id', "Focus should be on Product field");
         $(document.activeElement).trigger(($.Event("keydown", { which: $.ui.keyCode.TAB })));
+        assert.strictEqual(document.activeElement, $("div[name='p'] .o_field_x2many_list_row_add a")[0],
+            "Focus should be on Add an Item link of one2many field");
+        $(document.activeElement).click();
         assert.strictEqual($('.modal').length, 1,
             "O2M FormViewDialog should be opened");
         assert.strictEqual($(document.activeElement).attr("name"), 'foo',
@@ -756,7 +759,7 @@ QUnit.module('Views', {
     });
 
     QUnit.test('Test many2many field and many2many SelectCreatePopup with TAB navigation and ESCAPE key', function (assert) {
-        assert.expect(11);
+        assert.expect(12);
         var done = assert.async();
 
         var form = createView({
@@ -781,6 +784,9 @@ QUnit.module('Views', {
         // go to edit mode and open many2many SelectCreatePopup and test TAB and ESCAPE key
         form.$buttons.find('.o_form_button_edit').click();
         $(document.activeElement).trigger($.Event("keydown", { which: $.ui.keyCode.TAB }));
+        assert.strictEqual(document.activeElement, $("div[name='timmy'] .o_field_x2many_list_row_add a")[0],
+            "Focus should be on Add an Item link of one2many field");
+        $(document.activeElement).click();
 
         var selectCreatePopup = $('.modal');
         var $listview = selectCreatePopup.find(".o_list_view");

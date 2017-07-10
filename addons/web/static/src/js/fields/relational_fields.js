@@ -174,11 +174,7 @@ var FieldMany2One = AbstractField.extend({
             focus: function (event, ui) {
                 event.preventDefault(); // don't automatically select values on focus
             },
-            open: function() {
-                self.is_autocomplete_open = true;
-            },
             close: function (event) {
-                self.is_autocomplete_open = false;
                 // it is necessary to prevent ESC key from propagating to field
                 // root, to prevent unwanted discard operations.
                 if (event.which === $.ui.keyCode.ESCAPE) {
@@ -541,7 +537,7 @@ var FieldMany2One = AbstractField.extend({
         // and after then keyup will do focus out and M2ODialog opens in listview which is wrong
         // to avoid opening M2ODialog set input value blank as soon as autocomplete is closed
         // and event is escape(i.e. cancel) and input value is different that current m2o value
-        if (!this.is_autocomplete_open && this.m2o_value !== this.$input.val() && ev.which === $.ui.keyCode.ESCAPE) {
+        if (!this.$input.autocomplete("widget").is(":visible") && this.m2o_value !== this.$input.val() && ev.which === $.ui.keyCode.ESCAPE) {
             this.$input.val("");
         }
         this._super.apply(this, arguments);
@@ -559,7 +555,7 @@ var FieldMany2One = AbstractField.extend({
      * @param {OdooEvent} ev
      */
     _onNavigationMove: function (ev) {
-        if (this.is_autocomplete_open && (ev.which === $.ui.keyCode.UP || ev.which === $.ui.keyCode.DOWN)) { // If autocomplete is open then do not move user to previous or next record on up/down key
+        if (this.$input.autocomplete("widget").is(":visible") || (ev.data.direction === "up" || ev.data.direction === "down")) { // If autocomplete is open then do not move user to previous or next record on up/down key
             ev.stopPropagation();
         }
         return basicFields.InputField.prototype._onNavigationMove.apply(this, arguments);
