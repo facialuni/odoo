@@ -150,7 +150,7 @@ var FieldTextHtmlSimple = basic_fields.DebouncedField.extend(TranslatableFieldMi
 
         // Note: fix: Forcefully call autofocus as mouseup of this.$content will set focus on current widget
         setTimeout(function() {
-            self.getParent().autofocus();
+            self.getParent() && self.getParent().autofocus();
         }, 0);
 
         if (this.nodeOptions['style-inline']) {
