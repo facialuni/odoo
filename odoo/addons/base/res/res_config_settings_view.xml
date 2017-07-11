@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="res_config_setting_form" model="ir.ui.view">
+            <field name="name">res.config.settings.form</field>
+            <field name="model">res.config.settings</field>
+            <field name="arch" type="xml">
+                <form string="Settings">
+                    <sheet>
+                        <div class="row new_setting" style="display:flex;">
+                            <div class="col-md-2 leftpan">
+                            	<div class="apps_header">Apps</div>
+                                <div class="apps"/>
+                            </div>
+                            <div class="col-md-10 rightpan">
+                                <div class="settings"/>
+                            </div>
+                        </div>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="res_config_setting_act_window" model="ir.actions.act_window">
+            <field name="name">Settings</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="view_type">form</field>
+        </record>
+    </data>
+</odoo>
