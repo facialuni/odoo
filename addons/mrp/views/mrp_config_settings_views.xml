@@ -3,14 +3,14 @@
     <data>
         <record id="view_mrp_config" model="ir.ui.view">
             <field name="name">mrp settings</field>
-            <field name="model">mrp.config.settings</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base.res_config_setting_form" />
             <field name="arch" type="xml">
-                <form string="Configure Manufacturing" class= "oe_form_configuration">
-                    <header>
-                        <button string="Save" type="object" name="execute" class="oe_highlight"/>
-                        <button string="Cancel" type="object" name="cancel" class="oe_link" special="cancel"/>
-                    </header>
-                    <sheet>
+                <xpath expr="//div[@class='apps']" position="inside">
+                    <div class="app_name" setting="mrp"><i class="fa fa-wrench mrp" aria-hidden="true"></i> Manufacturing</div>
+                </xpath>
+                <xpath expr="//div[@class='settings']" position="inside">
+                    <div class="mrp_setting_view o_hidden">
                         <h2>Operations</h2>
                         <field name="company_id" invisible="1"/>
                         <div class="row mt16 o_settings_container">
@@ -147,19 +147,12 @@
                                 </div>
                             </div>
                         </div>
-                    </sheet>
-                </form>
+                    </div>
+                </xpath>
             </field>
-        </record>
-        <record id="action_mrp_configuration" model="ir.actions.act_window">
-            <field name="name">Configure Manufacturing</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">mrp.config.settings</field>
-            <field name="view_mode">form</field>
-            <field name="target">inline</field>
         </record>
 
         <menuitem id="menu_mrp_config" name="Settings" parent="menu_mrp_configuration"
-            sequence="0" action="action_mrp_configuration" groups="base.group_system"/>
+            sequence="0" action="base.res_config_setting_act_window" groups="base.group_system"/>
     </data>
 </odoo>
