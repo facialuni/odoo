@@ -5,7 +5,6 @@ from odoo import api, fields, models
 
 
 class SaleConfigSettings(models.TransientModel):
-    _name = 'sale.config.settings'
     _inherit = 'res.config.settings'
 
     company_id = fields.Many2one('res.company', string='Company', required=True,
