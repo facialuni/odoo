@@ -3,14 +3,14 @@
     <data>
         <record id="view_stock_config_settings" model="ir.ui.view">
             <field name="name">stock settings</field>
-            <field name="model">stock.config.settings</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base.res_config_setting_form" />
             <field name="arch" type="xml">
-                <form string="Configure Warehouse" class="oe_form_configuration">
-                    <header>
-                        <button string="Save" type="object" name="execute" class="oe_highlight"/>
-                        <button string="Cancel" type="object" name="cancel" class="oe_link" special="cancel"/>
-                    </header>
-                    <sheet>
+                <xpath expr="//div[@class='apps']" position="inside">
+                    <div class="app_name selected" setting="inventory"><i class="fa fa-industry inventory" aria-hidden="true"></i> Inventory</div>
+                </xpath>
+                <xpath expr="//div[@class='settings']" position="inside">
+                    <div class="inventory_setting_view show">
                         <field name="company_id" invisible="1"/>
                         <h2>Operations</h2>
                         <div class="row mt16 o_settings_container">
@@ -354,22 +354,14 @@
                                 </div>
                             </div>
                         </div>
-                    </sheet>
-                </form>
+                    </div>
+                </xpath>
             </field>
-        </record>
-
-        <record id="action_stock_config_settings" model="ir.actions.act_window">
-            <field name="name">Configure Warehouse</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">stock.config.settings</field>
-            <field name="view_mode">form</field>
-            <field name="target">inline</field>
         </record>
 
         <menuitem id="menu_stock_config_settings" name="Configuration" parent="menu_stock_root"
             sequence="100" groups="group_stock_manager"/>
         <menuitem id="menu_stock_general_settings" name="Settings" parent="menu_stock_config_settings"
-            sequence="0" action="action_stock_config_settings" groups="base.group_system"/>
+            sequence="0" action="base.res_config_setting_act_window" groups="base.group_system"/>
     </data>
 </odoo>

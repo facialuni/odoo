@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
         <record id="project_config_settings_view_form" model="ir.ui.view">
             <field name="name">project.config.settings.form</field>
             <field name="model">res.config.settings</field>
@@ -8,10 +7,10 @@
             <field name="inherit_id" ref="base.res_config_setting_form" />
             <field name="arch" type="xml">
                 <xpath expr="//div[@class='apps']" position="inside">
-                    <div class="app_name"><i class="fa fa-puzzle-piece project" aria-hidden="true"></i> Project</div>
+                    <div class="app_name" setting="project"><i class="fa fa-puzzle-piece project" aria-hidden="true"></i> Project</div>
                 </xpath>
                 <xpath expr="//div[@class='settings']" position="inside">
-                    <div class="project_setting_view">
+                    <div class="project_setting_view o_hidden">
                         <h2>Task Management</h2>
                         <div class="row mt16 o_settings_container" title="This replaces task's description text field by a collaborative rich text pad. This is advised if tasks involve several people.">
                             <div id="use_collaborative_pad" class="col-xs-12 col-md-6 o_setting_box" title="Lets the company customize which Pad installation should be used to link to new pads (for example: http://ietherpad.com/).">
