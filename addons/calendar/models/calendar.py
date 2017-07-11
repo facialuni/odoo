@@ -1577,6 +1577,7 @@ class Meeting(models.Model):
                     # int() required because 'id' from calendar view is a string, since it can be calendar virtual id
                     records_to_unlink |= self.browse(int(meeting.id))
             else:
+                meeting.activity_ids.unlink()
                 records_to_exclude |= meeting
 
         result = False

@@ -35,7 +35,7 @@ Activity.include({
                         confirm_callback: function () {
                             return _super.call(self, event, {
                                 model: 'calendar.event',
-                                args: [[activity.calendar_event_id[0]], {'can_be_deleted': true}],
+                                args: [[activity.calendar_event_id[0]]],
                             });
                         }
                     });
