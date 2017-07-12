@@ -151,6 +151,78 @@ class TestPickShip(TestStockCommon):
         picking_pick_backorder.action_cancel()
         self.assertEqual(picking_client.state, 'partially_available')
 
+    def test_edit_done_chained_move(self):
+        """ Let’s say two moves are chained: the first is done and the second is assigned.
+        Editing the move line of the first move should impact the reservation of the second one.
+        """
+        picking_pick, picking_client = self.create_pick_ship()
+        location = self.env['stock.location'].browse(self.stock_location)
+
+        # make some stock
+        self.env['stock.quant']._increase_available_quantity(self.productA, location, 10.0)
+        picking_pick.action_assign()
+        picking_pick.move_lines[0].move_line_ids[0].qty_done = 10.0
+        picking_pick.action_done()
+
+        self.assertEqual(picking_pick.state, 'done', 'The state of the pick should be done')
+        self.assertEqual(picking_client.state, 'assigned', 'The state of the client should be assigned')
+        self.assertEqual(picking_pick.move_lines.quantity_done, 10.0, 'Wrong quantity_done for pick move')
+        self.assertEqual(picking_client.move_lines.product_qty, 10.0, 'Wrong initial demand for client move')
+        self.assertEqual(picking_client.move_lines.reserved_availability, 10.0, 'Wrong quantity already reserved for client move')
+
+        picking_pick.move_lines[0].move_line_ids[0].qty_done = 5.0
+        self.assertEqual(picking_pick.state, 'done', 'The state of the pick should be done')
+        self.assertEqual(picking_client.state, 'partially_available', 'The state of the client should be partially available')
+        self.assertEqual(picking_pick.move_lines.quantity_done, 5.0, 'Wrong quantity_done for pick move')
+        self.assertEqual(picking_client.move_lines.product_qty, 10.0, 'Wrong initial demand for client move')
+        self.assertEqual(picking_client.move_lines.reserved_availability, 5.0, 'Wrong quantity already reserved for client move')
+
+        # Check if run action_assign does not crash
+        picking_client.action_assign()
+
+    def test_edit_done_chained_move_with_lot(self):
+        """ Let’s say two moves are chained: the first is done and the second is assigned.
+        Editing the lot on the move line of the first move should impact the reservation of the second one.
+        """
+        self.productA.tracking = 'lot'
+        lot1 = self.env['stock.production.lot'].create({
+            'name': 'lot1',
+            'product_id': self.productA.id,
+        })
+        lot2 = self.env['stock.production.lot'].create({
+            'name': 'lot2',
+            'product_id': self.productA.id,
+        })
+        picking_pick, picking_client = self.create_pick_ship()
+        location = self.env['stock.location'].browse(self.stock_location)
+
+        # make some stock
+        self.env['stock.quant']._increase_available_quantity(self.productA, location, 10.0)
+        picking_pick.action_assign()
+        picking_pick.move_lines[0].move_line_ids[0].write({
+            'qty_done': 10.0,
+            'lot_id': lot1.id,
+        })
+        picking_pick.action_done()
+
+        self.assertEqual(picking_pick.state, 'done', 'The state of the pick should be done')
+        self.assertEqual(picking_client.state, 'assigned', 'The state of the client should be assigned')
+        self.assertEqual(picking_pick.move_lines.quantity_done, 10.0, 'Wrong quantity_done for pick move')
+        self.assertEqual(picking_client.move_lines.product_qty, 10.0, 'Wrong initial demand for client move')
+        self.assertEqual(picking_client.move_lines.move_line_ids.lot_id, lot1, 'Wrong lot for client move line')
+        self.assertEqual(picking_client.move_lines.reserved_availability, 10.0, 'Wrong quantity already reserved for client move')
+
+        picking_pick.move_lines[0].move_line_ids[0].lot_id = lot2.id
+        self.assertEqual(picking_pick.state, 'done', 'The state of the pick should be done')
+        self.assertEqual(picking_client.state, 'assigned', 'The state of the client should be partially available')
+        self.assertEqual(picking_pick.move_lines.quantity_done, 10.0, 'Wrong quantity_done for pick move')
+        self.assertEqual(picking_client.move_lines.product_qty, 10.0, 'Wrong initial demand for client move')
+        self.assertEqual(picking_client.move_lines.move_line_ids.lot_id, lot2, 'Wrong lot for client move line')
+        self.assertEqual(picking_client.move_lines.reserved_availability, 10.0, 'Wrong quantity already reserved for client move')
+
+        # Check if run action_assign does not crash
+        picking_client.action_assign()
+
 
 class TestSinglePicking(TestStockCommon):
     def test_backorder_1(self):
