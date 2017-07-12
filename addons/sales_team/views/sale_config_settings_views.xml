@@ -10,7 +10,7 @@
                 <div class="app_name" setting="sales"><i class="fa fa-line-chart sales" aria-hidden="true"></i> Sales</div>
             </xpath>
             <xpath expr="//div[@class='settings']" position="inside">
-                <div class="sales_setting_view show">
+                <div class="sales_setting_view o_hidden">
                     <h2 id="integration_h2" invisible="1">Integrations</h2>
                     <div class="row mt16 o_settings_container" id="integration"/>
                     <h2 id="recommended_apps">Recommended Apps</h2>
