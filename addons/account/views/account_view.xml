@@ -952,6 +952,18 @@
                 </tree>
             </field>
         </record>
+
+        <record id="view_tax_tree_wizard" model="ir.ui.view">
+            <field name="name">account.tax.tree.wizard</field>
+            <field name="model">account.tax</field>
+            <field name="arch" type="xml">
+                <tree string="Account Tax From Wizard">
+                    <field name="name"/>
+                    <field name="description"/>
+                </tree>
+            </field>
+        </record>
+
         <record id="view_tax_kanban" model="ir.ui.view">
             <field name="name">account.tax.kanban</field>
             <field name="model">account.tax</field>
