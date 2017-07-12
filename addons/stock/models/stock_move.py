@@ -451,8 +451,6 @@ class StockMove(models.Model):
         if any(move.state in ('done', 'cancel') for move in self):
             raise UserError(_('Cannot unreserve a done move'))
         for move in self:
-            if move.state in ('done', 'cancel'):
-                raise UserError(_('Cannot unreserve a done move'))
             move.move_line_ids.unlink()
             if(move.procure_method == 'make_to_order' and not move.move_orig_ids):
                 move.state = 'waiting'
