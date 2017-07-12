@@ -314,16 +314,11 @@ class HrExpense(models.Model):
         return res
 
     @api.multi
-    def refuse_expense(self, reason):
-        self.ensure_one()
+    def refuse_expense(self,reason):
         self.write({'is_refused': True})
         self.sheet_id.write({'state': 'cancel'})
-        body = (_("Your Expense %s has been refused.<br/>"
-                  "<ul class=o_timeline_tracking_value_list><li>Reason<span> : "
-                  "</span><span class=o_timeline_tracking_value>%s</span></li></ul>") %
-                (self.name, reason))
-        self.sheet_id.message_post(body=body)
-        self.message_post(body=body)
+        self.sheet_id.message_post_with_view('hr_expense.hr_expense_template_refuse_reason',
+                                             values={'reason': reason,'is_sheet':False})
 
     @api.model
     def get_empty_list_help(self, help_message):
@@ -533,11 +528,8 @@ class HrExpenseSheet(models.Model):
     def refuse_expense(self, reason):
         self.write({'state': 'cancel'})
         for sheet in self:
-            body = (_("Your Expense Report %s has been refused.<br/><ul "
-                      "class=o_timeline_tracking_value_list><li>Reason<span> : "
-                      "</span><span class=o_timeline_tracking_value>%s</span></li></ul>") %
-                    (sheet.name, reason))
-            sheet.message_post(body=body)
+            sheet.message_post_with_view('hr_expense.hr_expense_template_refuse_reason',
+                                         values={'reason': reason ,'is_sheet':True})
 
     @api.multi
     def approve_expense_sheets(self):
