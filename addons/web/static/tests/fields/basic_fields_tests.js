@@ -2479,10 +2479,10 @@ QUnit.module('basic_fields', {
             },
         });
 
-        var $phone = form.$('span.o_field_widget.o_text_overflow:not(.o_form_uri)');
+        var $phone = form.$('a.o_form_uri.o_field_widget.o_text_overflow');
         assert.strictEqual($phone.length, 1,
             "should have a simple span rather than a link");
-        assert.strictEqual($phone.text(), 'yop',
+        assert.strictEqual($phone.text(), 'y\u00ADop',
             "value should be displayed properly as text without skype obfuscation");
 
         // switch to edit mode and check the result
@@ -2497,7 +2497,7 @@ QUnit.module('basic_fields', {
 
         // save
         form.$buttons.find('.o_form_button_save').click();
-        assert.strictEqual(form.$('span.o_field_widget.o_text_overflow:not(.o_form_uri)').text(), 'new',
+        assert.strictEqual(form.$('a.o_form_uri.o_field_widget.o_text_overflow').text(), 'n\u00ADew',
             "new value should be displayed properly as text without skype obfuscation");
 
         form.destroy();
@@ -2529,10 +2529,10 @@ QUnit.module('basic_fields', {
 
         assert.strictEqual(list.$('tbody td:not(.o_list_record_selector)').length, 5,
             "should have 5 cells");
-        assert.strictEqual(list.$('tbody td:not(.o_list_record_selector)').first().text(), 'yop',
+        assert.strictEqual(list.$('tbody td:not(.o_list_record_selector)').first().text(), 'y\u00ADop',
             "value should be displayed properly as text without skype obfuscation");
 
-        assert.strictEqual(list.$('span.o_field_widget.o_text_overflow:not(.o_form_uri)').length, 5,
+        assert.strictEqual(list.$('a.o_form_uri.o_field_widget.o_text_overflow').length, 5,
             "should have spans with correct classes");
 
         // Edit a line and check the result
@@ -2547,9 +2547,9 @@ QUnit.module('basic_fields', {
         list.$buttons.find('.o_list_button_save').click();
         $cell = list.$('tbody td:not(.o_list_record_selector)').first();
         assert.ok(!$cell.parent().hasClass('o_selected_row'), 'should not be in edit mode anymore');
-        assert.strictEqual(list.$('tbody td:not(.o_list_record_selector)').first().text(), 'new',
+        assert.strictEqual(list.$('tbody td:not(.o_list_record_selector)').first().text(), 'n\u00ADew',
             "value should be properly updated");
-        assert.strictEqual(list.$('span.o_field_widget.o_text_overflow:not(.o_form_uri)').length, 5,
+        assert.strictEqual(list.$('a.o_form_uri.o_field_widget.o_text_overflow').length, 5,
             "should still have spans with correct classes");
 
         list.destroy();
