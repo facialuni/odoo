@@ -106,6 +106,9 @@ class StockMoveLine(models.Model):
                         Quant._increase_available_quantity(ml.product_id, ml.location_id, taken_from_untracked_qty, lot_id=ml.lot_id, package_id=ml.package_id, owner_id=ml.owner_id)
             if ml.location_dest_id.should_impact_quants() and ml.product_id.type == 'product':
                 Quant._increase_available_quantity(ml.product_id, ml.location_dest_id, quantity, lot_id=ml.lot_id, package_id=ml.result_package_id, owner_id=ml.owner_id)
+            next_moves = ml.move_id.move_dest_ids.filtered(lambda move: move.state not in ('done', 'cancel'))
+            next_moves.do_unreserve()
+            next_moves.action_assign()
         return ml
 
     @api.multi
@@ -176,6 +179,8 @@ class StockMoveLine(models.Model):
                         new_product_uom_qty = self.product_id.uom_id._compute_quantity(new_product_qty, self.product_uom_id, rounding_method='HALF-UP')
                         ml.with_context(bypass_reservation_update=True).product_uom_qty = new_product_uom_qty
 
+        # When editing a done move line, the reserved availability of a potential chained move is impacted. Take care of running again `action_assign` on the concerned moves.
+        next_moves = self.env['stock.move']
         if updates or 'qty_done' in vals:
             for ml in self.filtered(lambda ml: ml.move_id.state == 'done'):
                 # undo the original move line
@@ -209,7 +214,12 @@ class StockMoveLine(models.Model):
                             ml._free_reservation(ml.product_id, location_id, untracked_qty, lot_id=False, package_id=package_id, owner_id=owner_id)
                 if location_dest_id.should_impact_quants() and ml.product_id.type == 'product' and qty_done:
                     Quant._increase_available_quantity(product_id, location_dest_id, quantity, lot_id=lot_id, package_id=result_package_id, owner_id=owner_id)
-        return super(StockMoveLine, self).write(vals)
+                # Unreserve and reserve following move in order to have the real reserved quantity on move_line.
+                next_moves |= ml.move_id.move_dest_ids.filtered(lambda move: move.state not in ('done', 'cancel'))
+        res = super(StockMoveLine, self).write(vals)
+        next_moves.do_unreserve()
+        next_moves.action_assign()
+        return res
 
     @api.multi
     def unlink(self):
