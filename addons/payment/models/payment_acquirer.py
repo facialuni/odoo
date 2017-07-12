@@ -215,10 +215,13 @@ class PaymentAcquirer(models.Model):
         return True
 
     @api.multi
-    def get_form_action_url(self):
+    def get_form_action_url(self, values):
         """ Returns the form action URL, for form-based acquirer implementations. """
         if hasattr(self, '%s_get_form_action_url' % self.provider):
-            return getattr(self, '%s_get_form_action_url' % self.provider)()
+            if self.provider == 'paypal' and self.paypal_payment_method == 'express':
+                return getattr(self, '%s_get_express_action_url' % self.provider)(values)
+            else:
+                return getattr(self, '%s_get_form_action_url' % self.provider)()
         return False
 
     @api.multi
@@ -332,7 +335,7 @@ class PaymentAcquirer(models.Model):
             values = method(values)
 
         values.update({
-            'tx_url': self._context.get('tx_url', self.get_form_action_url()),
+            'tx_url': self._context.get('tx_url', self.get_form_action_url(values)),
             'submit_class': self._context.get('submit_class', 'btn btn-link'),
             'submit_txt': self._context.get('submit_txt'),
             'acquirer': self,
@@ -614,14 +617,20 @@ class PaymentTransaction(models.Model):
     def form_feedback(self, data, acquirer_name):
         invalid_parameters, tx = None, None
 
-        tx_find_method_name = '_%s_form_get_tx_from_data' % acquirer_name
-        if hasattr(self, tx_find_method_name):
-            tx = getattr(self, tx_find_method_name)(data)
+        if 'PAYMENTINFO_0_TRANSACTIONTYPE' in data:
+            tx = getattr(self, '_paypal_form_get_express_tx_from_data')(data)
+        else:
+            tx_find_method_name = '_%s_form_get_tx_from_data' % acquirer_name
+            if hasattr(self, tx_find_method_name):
+                tx = getattr(self, tx_find_method_name)(data)
 
         # TDE TODO: form_get_invalid_parameters from model to multi
-        invalid_param_method_name = '_%s_form_get_invalid_parameters' % acquirer_name
-        if hasattr(self, invalid_param_method_name):
-            invalid_parameters = getattr(tx, invalid_param_method_name)(data)
+        if 'PAYMENTINFO_0_TRANSACTIONTYPE' in data:
+            invalid_parameters = getattr(tx, '_paypal_form_get_express_invalid_parameters')(data)
+        else:
+            invalid_param_method_name = '_%s_form_get_invalid_parameters' % acquirer_name
+            if hasattr(self, invalid_param_method_name):
+                invalid_parameters = getattr(tx, invalid_param_method_name)(data)
 
         if invalid_parameters:
             _error_message = '%s: incorrect tx data:\n' % (acquirer_name)
@@ -631,9 +640,12 @@ class PaymentTransaction(models.Model):
             return False
 
         # TDE TODO: form_validate from model to multi
-        feedback_method_name = '_%s_form_validate' % acquirer_name
-        if hasattr(self, feedback_method_name):
-            return getattr(tx, feedback_method_name)(data)
+        if 'PAYMENTINFO_0_TRANSACTIONTYPE' in data:
+            return getattr(tx, 'paypal_express_form_validate')(data)
+        else:
+            feedback_method_name = '_%s_form_validate' % acquirer_name
+            if hasattr(self, feedback_method_name):
+                return getattr(tx, feedback_method_name)(data)
 
         return True
 

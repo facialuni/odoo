@@ -8,9 +8,10 @@ import requests
 import werkzeug
 from werkzeug import urls
 
-from odoo import http
+from odoo import http, _
 from odoo.addons.payment.models.payment_acquirer import ValidationError
 from odoo.http import request
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -19,6 +20,8 @@ class PaypalController(http.Controller):
     _notify_url = '/payment/paypal/ipn/'
     _return_url = '/payment/paypal/dpn/'
     _cancel_url = '/payment/paypal/cancel/'
+    _return_express_url = '/payment/paypal/dpnexpress/'
+    _cancel_express_url = '/payment/paypal/cancelexpress/'
 
     def _get_return_url(self, **post):
         """ Extract the return URL from the data coming from paypal. """
@@ -27,6 +30,12 @@ class PaypalController(http.Controller):
             custom = json.loads(urls.url_unquote_plus(post.pop('custom', False) or post.pop('cm', False) or '{}'))
             return_url = custom.get('return_url', '/')
         return return_url
+
+    def _get_email(self):
+        email = request.env['payment.acquirer'].search([('name', 'like', 'Paypal')]).paypal_email_account
+        if email:
+            return email
+        raise UserError(_('Email is Not Configured'))
 
     def _parse_pdt_response(self, response):
         """ Parse a text response for a PDT verification.
@@ -113,4 +122,71 @@ class PaypalController(http.Controller):
         """ When the user cancels its Paypal payment: GET on this route """
         _logger.info('Beginning Paypal cancel with post data %s', pprint.pformat(post))  # debug
         return_url = self._get_return_url(**post)
+        return werkzeug.utils.redirect(return_url)
+
+    def paypal_validate_express_data(self, **post):
+        """ Paypal IPN: three steps validation to ensure data correctness
+
+         - step 1: return an empty HTTP 200 response -> will be done at the end
+           by returning ''
+         - step 2: POST the complete, unaltered message back to Paypal (preceded
+           by cmd=_notify-validate or _notify-synch for PDT), with same encoding
+         - step 3: paypal send either VERIFIED or INVALID (single word) for IPN
+                   or SUCCESS or FAIL (+ data) for PDT
+
+        Once data is validated, process it. """
+        res = False
+        order = request.env['sale.order'].sudo().browse(request.session.sale_order_id)
+        data = {
+            'HTTP method': 'POST',
+            'METHOD': 'DoExpressCheckoutPayment',
+            'SUBJECT': self._get_email(),
+            'VERSION': 93,
+            'PAYMENTREQUEST_0_PAYMENTACTION': 'SALE',
+            'TOKEN': post['token'],
+            'PAYERID': post['PayerID'],
+            'PAYMENTREQUEST_0_AMT': order.amount_total,
+            'PAYMENTREQUEST_0_CURRENCYCODE': order.currency_id.name
+            }
+        if request.env['payment.acquirer'].search([('name', '=', 'Paypal')]).environment == 'test':
+            response = requests.post('https://api-3t.sandbox.paypal.com/nvp', data=data)
+        else:
+            response = requests.post('https://api-3t.paypal.com/nvp', data=data)
+        resp = urls.url_decode(response.text)
+        ack = resp['PAYMENTINFO_0_ACK']
+        if ack == 'Success':
+            _logger.info('Paypal: validated data')
+            resp['PAYMENTREQUEST_0_HANDLINGAMT'] = post['PAYMENTREQUEST_0_HANDLINGAMT']
+            res = request.env['payment.transaction'].sudo().form_feedback(resp, 'paypal')
+        elif ack == 'Failure':
+            _logger.warning('Paypal: answered FAIL on data verification')
+        elif ack == 'SuccessWithWarning':
+            _logger.warning('Paypal: answered success with warning')
+        else:
+            _logger.warning('Paypal: unrecognized paypal answer, received %s instead of SUCCESS or FAIL ' % ack)
+        return res
+
+    @http.route('/payment/paypal/dpnexpress', type='http', auth="none", methods=['POST', 'GET'], csrf=False)
+    def paypal_dpn_express(self, **post):
+        """ Paypal DPN """
+        data = {
+            'HTTP method': 'POST',
+            'METHOD': 'GetExpressCheckoutDetails',
+            'SUBJECT': self._get_email(),
+            'VERSION': 93,
+            'PAYMENTREQUEST_0_PAYMENTACTION': 'SALE',
+            'TOKEN': post['token'],
+            }
+        if request.env['payment.acquirer'].search([('name', '=', 'Paypal')]).environment == 'test':
+            response = requests.post('https://api-3t.sandbox.paypal.com/nvp', data=data)
+        else:
+            response = requests.post('https://api-3t.paypal.com/nvp', data=data)
+        resp = urls.url_decode(response.text)
+        post['PAYMENTREQUEST_0_HANDLINGAMT'] = resp['PAYMENTREQUEST_0_HANDLINGAMT']
+        if resp['ACK'] == 'Success':
+            return_url = 'shop/payment/validate'
+        else:
+            return ''
+        _logger.info('Beginning Paypal DPN form_feedback with post data %s', pprint.pformat(post))  # debug
+        self.paypal_validate_express_data(**post)
         return werkzeug.utils.redirect(return_url)

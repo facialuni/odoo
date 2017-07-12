@@ -8,9 +8,11 @@ import pytz
 from werkzeug import urls
 
 from odoo import api, fields, models, _
+from odoo.http import request
 from odoo.addons.payment.models.payment_acquirer import ValidationError
 from odoo.addons.payment_paypal.controllers.main import PaypalController
 from odoo.tools.float_utils import float_compare
+import requests
 
 
 _logger = logging.getLogger(__name__)
@@ -20,7 +22,7 @@ class AcquirerPaypal(models.Model):
     _inherit = 'payment.acquirer'
 
     provider = fields.Selection(selection_add=[('paypal', 'Paypal')])
-    paypal_email_account = fields.Char('Paypal Email ID', required_if_provider='paypal', groups='base.group_user')
+    paypal_email_account = fields.Char('Paypal Email ID', required_if_provider='paypal', groups='base.group_user', default=lambda self: self.env['res.users'].browse(self._uid).partner_id.email or 'dummy')
     paypal_seller_account = fields.Char(
         'Paypal Merchant ID', groups='base.group_user',
         help='The Merchant ID is used to ensure communications coming from Paypal are valid and secured.')
@@ -32,6 +34,7 @@ class AcquirerPaypal(models.Model):
     paypal_api_password = fields.Char('Rest API Password', groups='base.group_user')
     paypal_api_access_token = fields.Char('Access Token', groups='base.group_user')
     paypal_api_access_token_validity = fields.Datetime('Access Token Validity', groups='base.group_user')
+    paypal_payment_method = fields.Selection([('express', 'Express Checkout'), ('standard', 'Standard Checkout')], default='express', string="Payment Method", copy=False)
     # Default paypal fees
     fees_dom_fixed = fields.Float(default=0.35)
     fees_dom_var = fields.Float(default=3.4)
@@ -66,6 +69,52 @@ class AcquirerPaypal(models.Model):
                 'paypal_form_url': 'https://www.sandbox.paypal.com/cgi-bin/webscr',
                 'paypal_rest_url': 'https://api.sandbox.paypal.com/v1/oauth2/token',
             }
+
+    @api.multi
+    def _get_paypal_express_urls(self, environment, values):
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        data = {
+            'HTTP method': 'POST',
+            'METHOD': 'SetExpressCheckout',
+            'SUBJECT': values['business'],
+            'VERSION': 204,
+            'PAYMENTREQUEST_0_PAYMENTACTION': 'SALE',
+            'AMT': values['amount'],
+            'PAYMENTREQUEST_0_CURRENCYCODE': values['currency_code'],
+            'RETURNURL': urls.url_join(base_url, PaypalController._return_express_url),
+            'CANCELURL': urls.url_join(base_url, PaypalController._cancel_express_url),
+        }
+        if environment == 'prod':
+            credential = {
+                'USER': '',
+                'PWD': '',
+                'SIGNATURE': '',
+            }
+            data.update(credential)
+            response = requests.post('https://api-3t.paypal.com/nvp', data=data)
+            resp = urls.url_decode(response.text)
+            if (resp['ACK'] != 'Failure'):
+                token = resp['TOKEN']
+                return {
+                    'paypal_form_url': 'https://www.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=' + token,
+                    'paypal_rest_url': 'https://api.paypal.com/v1/payments/payment'
+                }
+        else:
+            credential = {
+                'USER': '',
+                'PWD': '',
+                'SIGNATURE': '',
+            }
+            data.update(credential)
+            response = requests.post('https://api-3t.sandbox.paypal.com/nvp', data=data)
+            resp = urls.url_decode(response.text)
+            if (resp['ACK'] != 'Failure'):
+                token = resp['TOKEN']
+                return {
+                    'paypal_form_url': 'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=' + token,
+                    'token': token,
+                    'paypal_rest_url': 'https://api.sandbox.paypal.com/v1/payments/payment'
+                }
 
     @api.multi
     def paypal_compute_fees(self, amount, currency_id, country_id):
@@ -121,6 +170,10 @@ class AcquirerPaypal(models.Model):
     def paypal_get_form_action_url(self):
         return self._get_paypal_urls(self.environment)['paypal_form_url']
 
+    @api.multi
+    def paypal_get_express_action_url(self, values):
+        return self._get_paypal_express_urls(self.environment, values)['paypal_form_url']
+
 
 class TxPaypal(models.Model):
     _inherit = 'payment.transaction'
@@ -132,8 +185,8 @@ class TxPaypal(models.Model):
     # --------------------------------------------------
 
     @api.model
-    def _paypal_form_get_tx_from_data(self, data):
-        reference, txn_id = data.get('item_number'), data.get('txn_id')
+    def _paypal_form_get_express_tx_from_data(self, data):
+        reference, txn_id = data.get('item_number') or request.env['sale.order'].sudo().browse(request.session.sale_order_id).payment_tx_id.reference, data['PAYMENTINFO_0_TRANSACTIONID'],
         if not reference or not txn_id:
             error_msg = _('Paypal: received data with missing reference (%s) or txn_id (%s)') % (reference, txn_id)
             _logger.info(error_msg)
@@ -150,6 +203,45 @@ class TxPaypal(models.Model):
             _logger.info(error_msg)
             raise ValidationError(error_msg)
         return txs[0]
+
+    @api.model
+    def _paypal_form_get_tx_from_data(self, data):
+        reference, txn_id = data.get('item_number'), data.get('txn_id'),
+        if not reference or not txn_id:
+            error_msg = _('Paypal: received data with missing reference (%s) or txn_id (%s)') % (reference, txn_id)
+            _logger.info(error_msg)
+            raise ValidationError(error_msg)
+
+        # find tx -> @TDENOTE use txn_id ?
+        txs = self.env['payment.transaction'].search([('reference', '=', reference)])
+        if not txs or len(txs) > 1:
+            error_msg = 'Paypal: received data for reference %s' % (reference)
+            if not txs:
+                error_msg += '; no order found'
+            else:
+                error_msg += '; multiple order found'
+            _logger.info(error_msg)
+            raise ValidationError(error_msg)
+        return txs[0]
+
+    @api.multi
+    def _paypal_form_get_express_invalid_parameters(self, data):
+        invalid_parameters = []
+        if data.get('test_ipn'):
+            _logger.warning(
+                'Received a notification from Paypal using sandbox'
+            ),
+        if data.get('PAYMENTINFO_0_CURRENCYCODE') != self.currency_id.name:
+            invalid_parameters.append(('mc_currency', data.get('PAYMENTINFO_0_CURRENCYCODE'), self.currency_id.name))
+        if float_compare(float(data.get('PAYMENTINFO_0_AMT', '0.0')), (self.amount + self.fees), 2) != 0:
+            invalid_parameters.append(('mc_gross', data.get('PAYMENTINFO_0_AMT'), '%.2f' % self.amount))
+        # TODO: txn_id: shoudl be false at draft, set afterwards, and verified with txn details
+        if self.acquirer_reference and data.get('PAYMENTINFO_0_TRANSACTIONID') != self.acquirer_reference:
+            invalid_parameters.append(('txn_id', data.get('PAYMENTINFO_0_TRANSACTIONID'), self.acquirer_reference))
+        # check what is buyed
+        if 'PAYMENTREQUEST_0_HANDLINGAMT' in data and float_compare(float(data.get('PAYMENTREQUEST_0_HANDLINGAMT')), self.fees, 2) != 0:
+            invalid_parameters.append(('handling_amount', data.get('PAYMENTREQUEST_0_HANDLINGAMT'), self.fees))
+        return invalid_parameters
 
     @api.multi
     def _paypal_form_get_invalid_parameters(self, data):
@@ -187,6 +279,36 @@ class TxPaypal(models.Model):
                 invalid_parameters.append(('receiver_email', data.get('receiver_email'), self.acquirer_id.paypal_email_account))
 
         return invalid_parameters
+
+    @api.multi
+    def paypal_express_form_validate(self, data):
+        status = data.get('PAYMENTINFO_0_PAYMENTSTATUS')
+        res = {
+            'acquirer_reference': data.get('PAYMENTINFO_0_TRANSACTIONID'),
+            'paypal_txn_type': data.get('PAYMENTINFO_0_PAYMENTTYPE'),
+        }
+        if status in ['Completed', 'Processed']:
+            _logger.info('Validated Paypal payment for tx %s: set as done' % (self.reference))
+            try:
+                # dateutil and pytz don't recognize abbreviations PDT/PST
+                tzinfos = {
+                    'PST': -8 * 3600,
+                    'PDT': -7 * 3600,
+                }
+                date_validate = dateutil.parser.parse(data.get('PAYMENTINFO_0_ORDERTIME'), tzinfos=tzinfos).astimezone(pytz.utc)
+            except:
+                date_validate = fields.Datetime.now()
+            res.update(state='done', date_validate=date_validate)
+            return self.write(res)
+        elif status in ['Pending', 'Expired']:
+            _logger.info('Received notification for Paypal payment %s: set as pending' % (self.reference))
+            res.update(state='pending', state_message=data.get('PAYMENTINFO_0_PENDINGREASON', ''))
+            return self.write(res)
+        else:
+            error = 'Received unrecognized status for Paypal payment %s: %s, set as error' % (self.reference, status)
+            _logger.info(error)
+            res.update(state='error', state_message=error)
+            return self.write(res)
 
     @api.multi
     def _paypal_form_validate(self, data):
