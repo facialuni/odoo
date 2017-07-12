@@ -318,7 +318,7 @@ class HrExpense(models.Model):
         self.write({'is_refused': True})
         self.sheet_id.write({'state': 'cancel'})
         self.sheet_id.message_post_with_view('hr_expense.hr_expense_template_refuse_reason',
-                                             values={'reason': reason,'is_sheet':False})
+                                             values={'reason': reason, 'is_sheet':False, 'name':self.name})
 
     @api.model
     def get_empty_list_help(self, help_message):
@@ -529,7 +529,7 @@ class HrExpenseSheet(models.Model):
         self.write({'state': 'cancel'})
         for sheet in self:
             sheet.message_post_with_view('hr_expense.hr_expense_template_refuse_reason',
-                                         values={'reason': reason ,'is_sheet':True})
+                                         values={'reason': reason ,'is_sheet':True ,'name':self.name})
 
     @api.multi
     def approve_expense_sheets(self):
