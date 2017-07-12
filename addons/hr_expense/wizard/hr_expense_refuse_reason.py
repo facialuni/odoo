@@ -14,8 +14,9 @@ class HrExpenseRefuseWizard(models.TransientModel):
     @api.multi
     def expense_refuse_reason(self):
         self.ensure_one()
-        context = dict(self._context or {})
-        active_ids = context.get('active_ids', [])
-        expense = self.env['hr.expense'].browse(active_ids)
-        expense.refuse_expense(self.reason)
+        active_ids = self.env.context.get('active_ids', [])
+        print active_ids
+        model = self.env.context.get('model')
+        expense_sheet = self.env[model].browse(active_ids)
+        expense_sheet.refuse_expense(self.reason)
         return {'type': 'ir.actions.act_window_close'}
