@@ -301,6 +301,7 @@ class Task(models.Model):
     _date_name = "date_start"
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _mail_post_access = 'read'
+    _parent_store = True
     _order = "priority desc, sequence, date_start, name, id"
 
     def _get_default_partner(self):
@@ -389,7 +390,12 @@ class Task(models.Model):
     legend_blocked = fields.Char(related='stage_id.legend_blocked', string='Kanban Blocked Explanation', readonly=True)
     legend_done = fields.Char(related='stage_id.legend_done', string='Kanban Valid Explanation', readonly=True)
     legend_normal = fields.Char(related='stage_id.legend_normal', string='Kanban Ongoing Explanation', readonly=True)
-    parent_id = fields.Many2one('project.task', string='Parent Task')
+
+    # optimization for subtasks count when using `child_of` operator
+    parent_id = fields.Many2one('project.task', string='Parent Task', index=True, ondelete='restrict')
+    parent_left = fields.Integer('Left Parent', index=True)
+    parent_right = fields.Integer('Right Parent', index=True)
+
     child_ids = fields.One2many('project.task', 'parent_id', string="Sub-tasks")
     subtask_project_id = fields.Many2one('project.project', related="project_id.subtask_project_id", string='Sub-task Project', readonly=True)
     subtask_count = fields.Integer(compute='_compute_subtask_count', type='integer', string="Sub-task count")
