@@ -4,7 +4,6 @@ from odoo import fields, models
 
 
 class HrConfigurator(models.TransientModel):
-    _name = 'hr.config.settings'
     _inherit = 'res.config.settings'
 
     company_id = fields.Many2one(

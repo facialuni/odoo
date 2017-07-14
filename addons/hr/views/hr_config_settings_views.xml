@@ -2,15 +2,15 @@
 <odoo>
     <record id="hr_config_settings_view_form" model="ir.ui.view">
         <field name="name">hr.config.settings.form</field>
-        <field name="model">hr.config.settings</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_setting_form"/>
         <field name="arch" type="xml">
-            <form String="Hr Settings" class="oe_form_configuration">
-                <field name="company_id" invisible="1"/>
-                <header>
-                    <button string="Save" type="object" name="execute" class="oe_highlight"/>
-                    <button string="Cancel" type="object" name="cancel" class="oe_link"/>
-                </header>
-                <sheet>
+            <xpath expr="//div[@class='apps']" position="inside">
+                <div class="app_name" setting="employee"><i class="fa fa-users employee"/> Employee</div>
+            </xpath>
+            <xpath expr="//div[@class='settings']" position="inside">
+                <div class="employee_setting_view o_hidden">
+                    <field name="company_id" invisible="1"/>
                     <h2>Work Organization</h2>
                     <div class="row mt16 o_settings_container" title="Prout prout prout">
                         <div class="col-xs-12 col-md-6 o_setting_box">
@@ -45,23 +45,15 @@
                             </div>
                         </div>
                     </div>
-
-                </sheet>
-            </form>
+                </div>
+            </xpath>
         </field>
-    </record>
-
-    <record id="hr_config_settings_action" model="ir.actions.act_window">
-        <field name="name">Configure HR</field>
-        <field name="res_model">hr.config.settings</field>
-        <field name="view_mode">form</field>
-        <field name="target">inline</field>
     </record>
 
     <menuitem id="hr_menu_configuration"
         name="Settings" 
         parent="menu_human_resources_configuration"
         sequence="0"
-        action="hr_config_settings_action"
+        action="base.res_config_setting_act_window"
         groups="base.group_system"/>
 </odoo>
