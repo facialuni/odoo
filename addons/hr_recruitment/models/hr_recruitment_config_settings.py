@@ -5,7 +5,6 @@ from odoo import fields, models
 
 
 class RecruitmentSettings(models.TransientModel):
-    _name = 'hr.recruitment.config.settings'
     _inherit = ['res.config.settings']
 
     module_website_hr_recruitment = fields.Boolean(string='Online Posting')
