@@ -13,6 +13,14 @@
         <field name="name">IGST</field>
         <field name="applicability">taxes</field>
     </record>
+    <record id="cess_tag_tax" model="account.account.tag">
+        <field name="name">CESS</field>
+        <field name="applicability">taxes</field>
+    </record>
+
+    <record id="cess_group" model="account.tax.group">
+        <field name="name">Cess</field>
+    </record>
 
     <!-- GST TAXES-->
 
@@ -135,7 +143,7 @@
 
     <record id="cgst_sale_6" model="account.tax.template">
         <field name="name">CGST Sale 6%</field>
-        <field name="description">CGST 12%</field>
+        <field name="description">CGST 6%</field>
         <field name="type_tax_use">none</field>
         <field name="amount_type">percent</field>
         <field name="amount">6</field>
@@ -295,6 +303,52 @@
         <field name="refund_account_id" ref="p20011"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('igst_tag_tax'),])]"/>
+    </record>
+
+    <record id="cess_sale_5" model="account.tax.template">
+        <field name="name">CESS Sale 5%</field>
+        <field name="description">CESS 5%</field>
+        <field name="type_tax_use">none</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">5</field>
+        <field name="tax_group_id" ref="cess_group"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cess_tag_tax'),])]"/>
+    </record>
+
+    <record id="cess_sale_1591" model="account.tax.template">
+        <field name="name">CESS Sale 1591 Per Thousand</field>
+        <field name="description">1591 PER THOUSAND</field>
+        <field name="type_tax_use">none</field>
+        <field name="amount_type">fixed</field>
+        <field name="amount">1.591</field>
+        <field name="tax_group_id" ref="cess_group"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cess_tag_tax'),])]"/>
+    </record>
+
+    <record id="cess_5_plus_1591_sale" model="account.tax.template">
+        <field name="name">CESS 5% + RS.1591/THOUSAND </field>
+        <field name="description">CESS 5% + RS.1591/THOUSAND</field>
+        <field name="type_tax_use">sale</field>
+        <field name="amount_type">group</field>
+        <field name="amount">0</field>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="children_tax_ids" eval="[(6, 0, [ref('cess_sale_5'),ref('cess_sale_1591'),])]"/>
+    </record>
+
+    <record id="cess_21_4170_higer_sale" model="account.tax.template">
+        <field name="name">CESS 21% or RS.4170/THOUSAND </field>
+        <field name="description">CESS 21% or RS.4170/THOUSAND</field>
+        <field name="type_tax_use">sale</field>
+        <field name="amount_type">code</field>
+        <field name="amount">0</field>
+        <field name="python_compute">result=base_amount * 0.21
+tax=quantity * 4.17
+if tax > result:result=tax</field>
+        <field name="tax_group_id" ref="cess_group"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cess_tag_tax'),])]"/>
     </record>
 
     <!-- SGST & CGST Purchase Group Tax -->
@@ -575,6 +629,52 @@
         <field name="refund_account_id" ref="p2107"/>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="tag_ids" eval="[(6,0,[ref('igst_tag_tax'),])]"/>
+    </record>
+
+    <record id="cess_purchase_5" model="account.tax.template">
+        <field name="name">CESS Purchase 5%</field>
+        <field name="description">CESS 5%</field>
+        <field name="type_tax_use">none</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">5</field>
+        <field name="tax_group_id" ref="cess_group"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cess_tag_tax'),])]"/>
+    </record>
+
+    <record id="cess_purchase_1591" model="account.tax.template">
+        <field name="name">CESS Purchase 1591 Per Thousand</field>
+        <field name="description">1591 PER THOUSAND</field>
+        <field name="type_tax_use">none</field>
+        <field name="amount_type">fixed</field>
+        <field name="amount">1.591</field>
+        <field name="tax_group_id" ref="cess_group"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cess_tag_tax'),])]"/>
+    </record>
+
+    <record id="cess_5_plus_1591_purchase" model="account.tax.template">
+        <field name="name">CESS 5% + RS.1591/THOUSAND </field>
+        <field name="description">CESS 5% + RS.1591/THOUSAND</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="amount_type">group</field>
+        <field name="amount">0</field>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="children_tax_ids" eval="[(6, 0, [ref('cess_purchase_5'),ref('cess_purchase_1591'),])]"/>
+    </record>
+
+    <record id="cess_21_4170_higer_purchase" model="account.tax.template">
+        <field name="name">CESS 21% or RS.4170/THOUSAND </field>
+        <field name="description">CESS 21% or RS.4170/THOUSAND</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="amount_type">code</field>
+        <field name="amount">0</field>
+        <field name="python_compute">result=base_amount * 0.21
+tax=quantity * 4.17
+if tax > result:result=tax</field>
+        <field name="tax_group_id" ref="cess_group"/>
+        <field name="chart_template_id" ref="indian_chart_template_standard"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cess_tag_tax'),])]"/>
     </record>
 
 </odoo>
