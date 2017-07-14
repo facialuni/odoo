@@ -3,12 +3,14 @@ odoo.define('web_tour.Tip', function(require) {
 
 var core = require('web.core');
 var Widget = require('web.Widget');
+var config = require('web.config');
 
 var Tip = Widget.extend({
     template: "Tip",
     events: {
         mouseenter: "_to_info_mode",
         mouseleave: "_to_bubble_mode",
+        click : "_onClickAction",
     },
     /**
      * @param {info} [Object] description of the tip, containing the following keys:
@@ -174,6 +176,11 @@ var Tip = Widget.extend({
         if (position === "left") return "right-" + this.info.space;
         if (position === "bottom") return "top+" + this.info.space;
         return "bottom-" + this.info.space;
+    },
+    _onClickAction: function () {
+        if (config.device.size_class <= config.device.SIZES.MD) {
+            this.tip_opened ? this._to_bubble_mode() : this._to_info_mode(); 
+        }
     },
     _to_info_mode: function (force) {
         if (this.timerOut !== undefined) {
