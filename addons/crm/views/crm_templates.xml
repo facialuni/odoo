@@ -3,9 +3,11 @@
         <template id="assets_backend" name="crm assets" inherit_id="web.assets_backend">
             <xpath expr="." position="inside">
                 <link rel="stylesheet" href="/crm/static/src/css/crm.css"/>
+                <link rel="stylesheet" href="/crm/static/src/css/crm_opportunity_report.less"/>
                 <!-- Planner assets -->
                 <script type="text/javascript" src="/crm/static/src/js/web_planner_crm.js"></script>
                 <script type="text/javascript" src="/crm/static/src/js/tour.js"></script>
+                <script type="text/javascript" src="/crm/static/src/js/crm_opportunity_report.js"></script>
             </xpath>
         </template>
 </odoo>

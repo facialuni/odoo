@@ -606,7 +606,7 @@
                                     <p>
                                         A sales manager will mostly use these two reports:
                                         <li>
-                                            <a t-att-href="prepare_backend_url('crm.crm_opportunity_report_action', 'pivot')">Opportunities Analysis</a>
+                                            <a t-att-href="prepare_backend_url('crm.crm_opportunity_report_action')">Opportunities Analysis</a>
                                         </li>
                                         <li>
                                             <a t-att-href="prepare_backend_url('account.action_account_invoice_report_all', 'pivot', 'account')">Invoice Analysis</a>

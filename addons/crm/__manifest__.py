@@ -47,6 +47,7 @@
         'report/crm_activity_report_views.xml',
         'report/crm_opportunity_report_views.xml',
         'views/crm_team_views.xml',
+        'views/crm_opportunity_report_view.xml',
     ],
     'demo': [
         'data/crm_demo.xml',
@@ -54,6 +55,7 @@
         'data/crm_lead_demo.xml',
     ],
     'css': ['static/src/css/crm.css'],
+    'qweb': ['static/src/xml/crm_opportunity_reprot.xml'],
     'installable': True,
     'application': True,
     'auto_install': False,
