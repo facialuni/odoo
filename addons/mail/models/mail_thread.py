@@ -282,8 +282,24 @@ class MailThread(models.AbstractModel):
 
         # Perform the tracking
         if tracked_fields:
-            track_self.message_track(tracked_fields, initial_values)
+            for rid, values in initial_values.items():
+                tracking = []
+                for key, val in values.items():
+                    tracking.append((key, val, getattr(self.browse([rid]), key)))
+                body = self.env['mail.template'].with_context(tracking=tracking).render_template("""<ul>
+    % for tracking in ctx['tracking']
+        <li>${tracking[0]} : ${tracking[1]} -&gt; ${tracking[2]}</li>
+    % endfor
+    </ul>""", self._name, [rid])[rid]
+                MailMessage = self.env['mail.message'].create_fast({
+                    'model': self._name,
+                    'res_id': rid,
+                    'body': body,
+                    'message_type': 'notification',
+                    'subtype_id': 2,
+                })
 
+            # track_self.message_track(tracked_fields, initial_values)
         return result
 
     @api.multi
