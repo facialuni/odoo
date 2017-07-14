@@ -26,8 +26,8 @@
                             attrs="{'invisible': [('sale_line_id', '=', False)]}"
                             string="Sales Order"/>
                 </xpath>
-                <field name="company_id" position="before">
-                    <field name="procurement_id" groups="base.group_no_one"/>
+                <field name="user_id" position="after">
+                    <field name="procurement_id" attrs="{'invisible': [('partner_id', '=', False)]}"/>
                     <field name="sale_line_id" string="Order Line" invisible="1"/>
                 </field>
             </field>

@@ -8,7 +8,7 @@ class ProcurementOrder(models.Model):
     _inherit = 'procurement.order'
 
     task_id = fields.Many2one('project.task', 'Task', copy=False)
-    is_service = fields.Boolean("Is service", compute='_compute_is_service', help="Procurement should generate a task and/or a project, depending on the product settings.")
+    is_service = fields.Boolean("Is service", compute='_compute_is_service', store=True, help="Procurement should generate a task and/or a project, depending on the product settings.")
 
     @api.multi
     @api.depends('product_id', 'product_id.type', 'product_id.service_type')
