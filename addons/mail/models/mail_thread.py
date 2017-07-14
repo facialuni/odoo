@@ -227,6 +227,8 @@ class MailThread(models.AbstractModel):
         # subscribe uid unless asked not to
         if not self._context.get('mail_create_nosubscribe'):
             message_follower_ids = values.get('message_follower_ids') or []  # webclient can send None or False
+
+            # FP Note: to optimize
             message_follower_ids += self.env['mail.followers']._add_follower_command(self._name, [], {self.env.user.partner_id.id: None}, {}, force=True)[0]
             values['message_follower_ids'] = message_follower_ids
         thread = super(MailThread, self).create(values)
@@ -234,7 +236,15 @@ class MailThread(models.AbstractModel):
         # automatic logging unless asked not to (mainly for various testing purpose)
         if not self._context.get('mail_create_nolog'):
             doc_name = self.env['ir.model']._get(self._name).name
-            thread.message_post(body=_('%s created') % doc_name)
+            self.env['mail.message'].create_fast({
+                'model': self._name,
+                'res_id': thread.id,
+                'body': _('%s created') % doc_name,
+                'message_type': 'notification',
+                'subtype_id': 2,
+            })
+
+            # thread.message_post(body=_('%s created') % doc_name)
 
         # auto_subscribe: take values and defaults into account
         create_values = dict(values)
@@ -242,6 +252,7 @@ class MailThread(models.AbstractModel):
             if key.startswith('default_') and key[8:] not in create_values:
                 create_values[key[8:]] = val
         thread.message_auto_subscribe(list(create_values), values=create_values)
+
 
         # track values
         if not self._context.get('mail_notrack'):
@@ -291,7 +302,7 @@ class MailThread(models.AbstractModel):
         <li>${tracking[0]} : ${tracking[1]} -&gt; ${tracking[2]}</li>
     % endfor
     </ul>""", self._name, [rid])[rid]
-                MailMessage = self.env['mail.message'].create_fast({
+                self.env['mail.message'].create_fast({
                     'model': self._name,
                     'res_id': rid,
                     'body': body,
