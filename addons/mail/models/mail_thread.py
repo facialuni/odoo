@@ -264,7 +264,6 @@ class MailThread(models.AbstractModel):
             if tracked_fields:
                 initial_values = {thread.id: dict.fromkeys(tracked_fields, False)}
                 track_thread.message_track(tracked_fields, initial_values)
-
         return thread
 
     @api.multi
@@ -293,24 +292,26 @@ class MailThread(models.AbstractModel):
 
         # Perform the tracking
         if tracked_fields:
-            for rid, values in initial_values.items():
-                tracking = []
-                for key, val in values.items():
-                    tracking.append((key, val, getattr(self.browse([rid]), key)))
-                body = self.env['mail.template'].with_context(tracking=tracking).render_template("""<ul>
-    % for tracking in ctx['tracking']
-        <li>${tracking[0]} : ${tracking[1]} -&gt; ${tracking[2]}</li>
-    % endfor
-    </ul>""", self._name, [rid])[rid]
-                self.env['mail.message'].create_fast({
-                    'model': self._name,
-                    'res_id': rid,
-                    'body': body,
-                    'message_type': 'notification',
-                    'subtype_id': 2,
-                })
-
-            # track_self.message_track(tracked_fields, initial_values)
+            #            for rid, values in initial_values.items():
+            #                tracking = []
+            #                for key, val in values.items():
+            #                    if (val != getattr(self.browse([rid]), key)):
+            #                        tracking.append((key, val, getattr(self.browse([rid]), key)))
+            #                if tracking:
+            #                    body = self.env['mail.template'].with_context(tracking=tracking).render_template("""<ul>
+            #        % for tracking in ctx['tracking']
+            #            <li>${tracking[0]} : ${tracking[1]} -&gt; ${tracking[2]}</li>
+            #        % endfor
+            #        </ul>""", self._name, [rid])[rid]
+            #                    self.env['mail.message'].create_fast({
+            #                        'model': self._name,
+            #                        'res_id': rid,
+            #                        'body': body,
+            #                        'message_type': 'notification',
+            #                        'subtype_id': 2,
+            #                    })
+            #
+            track_self.message_track(tracked_fields, initial_values)
         return result
 
     @api.multi
@@ -510,29 +511,48 @@ class MailThread(models.AbstractModel):
         if not tracked_fields:
             return True
 
-        tracking = self._message_track_get_changes(tracked_fields, initial_values)
-        for record in self:
-            changes, tracking_value_ids = tracking[record.id]
-            if not changes:
-                continue
+        for rid, values in initial_values.items():
+            tracking = []
+            for key, val in values.items():
+                if (val != getattr(self.browse([rid]), key)):
+                    tracking.append((key, val, getattr(self.browse([rid]), key)))
+            if tracking:
+                body = self.env['mail.template'].with_context(tracking=tracking).render_template("""<ul>
+    % for tracking in ctx['tracking']
+        <li>${tracking[0]} : ${tracking[1]} -&gt; ${tracking[2]}</li>
+    % endfor
+    </ul>""", self._name, [rid])[rid]
+                self.env['mail.message'].create_fast({
+                    'model': self._name,
+                    'res_id': rid,
+                    'body': body,
+                    'message_type': 'notification',
+                    'subtype_id': 2,
+                })
 
-            # find subtypes and post messages or log if no subtype found
-            subtype_xmlid = False
-            # By passing this key, that allows to let the subtype empty and so don't sent email because partners_to_notify from mail_message._notify will be empty
-            if not self._context.get('mail_track_log_only'):
-                subtype_xmlid = record._track_subtype(dict((col_name, initial_values[record.id][col_name]) for col_name in changes))
 
-            if subtype_xmlid:
-                subtype_rec = self.env.ref(subtype_xmlid)  # TDE FIXME check for raise if not found
-                if not (subtype_rec and subtype_rec.exists()):
-                    _logger.debug('subtype %s not found' % subtype_xmlid)
-                    continue
-                record.message_post(subtype=subtype_xmlid, tracking_value_ids=tracking_value_ids)
-            elif tracking_value_ids:
-                record.message_post(tracking_value_ids=tracking_value_ids)
+        # tracking = self._message_track_get_changes(tracked_fields, initial_values)
+        # for record in self:
+        #     changes, tracking_value_ids = tracking[record.id]
+        #     if not changes:
+        #         continue
 
-        self._message_track_post_template(tracking)
+        #     # find subtypes and post messages or log if no subtype found
+        #     subtype_xmlid = False
+        #     # By passing this key, that allows to let the subtype empty and so don't sent email because partners_to_notify from mail_message._notify will be empty
+        #     if not self._context.get('mail_track_log_only'):
+        #         subtype_xmlid = record._track_subtype(dict((col_name, initial_values[record.id][col_name]) for col_name in changes))
 
+        #     if subtype_xmlid:
+        #         subtype_rec = self.env.ref(subtype_xmlid)  # TDE FIXME check for raise if not found
+        #         if not (subtype_rec and subtype_rec.exists()):
+        #             _logger.debug('subtype %s not found' % subtype_xmlid)
+        #             continue
+        #         record.message_post(subtype=subtype_xmlid, tracking_value_ids=tracking_value_ids)
+        #     elif tracking_value_ids:
+        #         record.message_post(tracking_value_ids=tracking_value_ids)
+
+        # self._message_track_post_template(tracking)
         return True
 
     #------------------------------------------------------
