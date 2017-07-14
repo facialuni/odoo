@@ -34,6 +34,7 @@ class MrpStockReport(models.TransientModel):
                         ('product_id', '=', move_line.product_id.id),
                         ('lot_id', '=', move_line.lot_id.id),
                         ('location_dest_id', '=', move_line.location_id.id),
+                        ('id', '!=', move_line.id),
                     ])
         if res:
             res |= self.get_move_lines_upstream(res)
