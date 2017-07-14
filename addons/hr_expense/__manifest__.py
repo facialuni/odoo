@@ -32,6 +32,7 @@ This module also uses analytic accounting and is compatible with the invoice on 
         'security/ir.model.access.csv',
         'data/hr_expense_data.xml',
         'data/hr_expense_sequence.xml',
+        'data/mail_template_data.xml',
         'wizard/hr_expense_refuse_reason.xml',
         'wizard/hr_expense_register_payment.xml',
         'views/hr_expense_views.xml',
