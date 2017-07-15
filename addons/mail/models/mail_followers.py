@@ -3,6 +3,7 @@
 
 from odoo import api, fields, models
 from odoo.tools import pycompat
+from psycopg2 import IntegrityError
 
 
 class Followers(models.Model):
@@ -33,17 +34,16 @@ class Followers(models.Model):
 
     @api.model
     def _set_default_subtype(self, doc_id):
-        try:
-            self.env.cr.execute('''
-                INSERT INTO
-                    mail_followers_mail_message_subtype_rel (mail_followers_id, mail_message_subtype_id)
-                SELECT %s,id FROM
-                    mail_message_subtype
-                WHERE "default"=true AND ((res_model IS NULL) or (res_model='project.project'))
-                ''', (doc_id ,))
-        except:
-            # FP Todo: ecept the right eception
-            pass
+        self.env.cr.execute('''
+            INSERT INTO
+                mail_followers_mail_message_subtype_rel (mail_followers_id, mail_message_subtype_id)
+            SELECT %s,id FROM
+                mail_message_subtype
+            WHERE
+                "default"=true AND 
+                ((res_model IS NULL) or (res_model='project.project')) AND
+                id not in (select mail_message_subtype_id from mail_followers_mail_message_subtype_rel where mail_followers_id=%s)
+            ''', (doc_id , doc_id))
 
     @api.model
     def _add_follower_command(self, res_model, res_ids, partner_ids=[], channel_ids=[], subtype_ids=None):
@@ -82,31 +82,27 @@ class Followers(models.Model):
         print 'aA1', res_ids, partner_ids
         for resid in res_ids:
             for partner in partner_ids:
-                try:
+                doc = self.search([('res_model','=',res_model),('res_id','=',resid),('partner_id','=',partner)], limit=1)
+                if not doc:
                     doc = self.create({
                         'res_model': res_model,
                         'res_id': resid,
                         'partner_id': partner,
                         'subtype_ids': subtype_ids and [(6,0, subtype_ids)] or []
                     })
-                    print 'aA2'
-                    if not subtype_ids:
-                        self._set_default_subtype(doc.id)
-                    print 'aA3'
-                except:
-                    pass
+                if not subtype_ids:
+                    self._set_default_subtype(doc.id)
             for channel in channel_ids:
-                try:
+                doc = self.search([('res_model','=',res_model),('res_id','=',resid),('channel_id','=',channel)], limit=1)
+                if not doc:
                     doc = self.create({
                         'res_model': res_model,
                         'res_id': resid,
                         'channel_id': channel,
                         'subtype_ids': subtype_ids and [(6,0, subtype_ids)] or []
                     })
-                    if not subtype_ids:
-                        self._set_default_subtype(doc.id)
-                except:
-                    pass
+                if not subtype_ids:
+                    self._set_default_subtype(doc.id)
 
         return True
 
@@ -124,13 +120,7 @@ class Followers(models.Model):
         #     for cid, data in pycompat.items(channel_data):
         #         if not data:
         #             channel_data[cid] = default_subtypes.ids
-
-
-        return True
-
-
         # external_default_subtypes = default_subtypes.filtered(lambda subtype: not subtype.internal)
-
         # if force_mode:
         #     employee_pids = self.env['res.users'].sudo().search([('partner_id', 'in', list(partner_data)), ('share', '=', False)]).mapped('partner_id').ids
         #     for pid, data in pycompat.items(partner_data):
