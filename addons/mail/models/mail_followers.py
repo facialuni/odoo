@@ -41,11 +41,6 @@ class Followers(models.Model):
         :param force: if True, delete existing followers before creating new one
                       using the subtypes given in the parameters
         """
-        return {}, {}
-        print '*'*40
-        print partner_data
-        print channel_data
-        print '*'*40
         res_model_id = self.env['ir.model']._get(res_model).id
         force_mode = force or (all(data for data in pycompat.values(partner_data)) and all(data for data in pycompat.values(channel_data)))
         generic = []
