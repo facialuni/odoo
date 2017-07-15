@@ -42,7 +42,8 @@ class Followers(models.Model):
                 WHERE "default"=true AND ((res_model IS NULL) or (res_model='project.project'))
                 ''', (doc_id ,))
         except:
-            raise
+            # FP Todo: ecept the right eception
+            pass
 
     @api.model
     def _add_follower_command(self, res_model, res_ids, partner_ids=[], channel_ids=[], subtype_ids=None):
@@ -93,7 +94,7 @@ class Followers(models.Model):
                         self._set_default_subtype(doc.id)
                     print 'aA3'
                 except:
-                    raise
+                    pass
             for channel in channel_ids:
                 try:
                     doc = self.create({
@@ -105,7 +106,7 @@ class Followers(models.Model):
                     if not subtype_ids:
                         self._set_default_subtype(doc.id)
                 except:
-                    raise
+                    pass
 
         return True
 
