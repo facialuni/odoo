@@ -224,17 +224,12 @@ class MailThread(models.AbstractModel):
         if self._context.get('tracking_disable'):
             return super(MailThread, self).create(values)
 
-        print '_add_follower_command', '-'*40
-        # subscribe uid unless asked not to
-        if not self._context.get('mail_create_nosubscribe'):
-            message_follower_ids = values.get('message_follower_ids') or []  # webclient can send None or False
-
-            # FP Note: to optimize
-            message_follower_ids += self.env['mail.followers']._add_follower_command(self._name, [], {self.env.user.partner_id.id: None}, {}, force=True)[0]
-            values['message_follower_ids'] = message_follower_ids
-
         print 'create', '-'*40
         thread = super(MailThread, self).create(values)
+        print 'Add Follower', '-'*40
+        if not self._context.get('mail_create_nosubscribe'):
+            self.env['mail.followers']._add_follower_command(self._name, [thread.id], [self.env.user.partner_id.id], [])
+
 
         print 'log', '-'*40
         # automatic logging unless asked not to (mainly for various testing purpose)
@@ -2049,14 +2044,7 @@ class MailThread(models.AbstractModel):
             self.check_access_rights('write')
             self.check_access_rule('write')
 
-        partner_data = dict((pid, subtype_ids) for pid in partner_ids)
-        channel_data = dict((cid, subtype_ids) for cid in channel_ids)
-        gen, part = self.env['mail.followers']._add_follower_command(self._name, self.ids, partner_data, channel_data, force=force)
-        self.sudo().write({'message_follower_ids': gen})
-        for record in self.filtered(lambda self: self.id in part):
-            record.write({'message_follower_ids': part[record.id]})
-
-        self.invalidate_cache()
+        self.env['mail.followers']._add_follower_command(self._name, self.ids, partner_ids, channel_ids, subtype_ids)
         return True
 
     @api.multi

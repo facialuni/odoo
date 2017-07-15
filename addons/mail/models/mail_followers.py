@@ -19,12 +19,8 @@ class Followers(models.Model):
     _log_access = False
     _description = 'Document Followers'
 
-    res_model_id = fields.Many2one(
-        'ir.model', 'Related Document Model',
-        index=True, required=True, ondelete='cascade',
-        help='Model of the followed resource')
     res_model = fields.Char(
-        'Related Document Model Name', index=True, readonly=True, related='res_model_id.model', store=True)
+        'Document Model', index=True, readonly=True)
     res_id = fields.Integer(
         'Related Document ID', index=True, help='Id of the followed resource')
     partner_id = fields.Many2one(
@@ -36,84 +32,149 @@ class Followers(models.Model):
         help="Message subtypes followed, meaning subtypes that will be pushed onto the user's Wall.")
 
     @api.model
-    def _add_follower_command(self, res_model, res_ids, partner_data, channel_data, force=True):
+    def _set_default_subtype(self, doc_id):
+        try:
+            self.env.cr.execute('''
+                INSERT INTO
+                    mail_followers_mail_message_subtype_rel (mail_followers_id, mail_message_subtype_id)
+                SELECT %s,id FROM
+                    mail_message_subtype
+                WHERE "default"=true AND ((res_model IS NULL) or (res_model='project.project'))
+                ''', (doc_id ,))
+        except:
+            raise
+
+    @api.model
+    def _add_follower_command(self, res_model, res_ids, partner_ids=[], channel_ids=[], subtype_ids=None):
         """ Please upate me
         :param force: if True, delete existing followers before creating new one
                       using the subtypes given in the parameters
         """
-        res_model_id = self.env['ir.model']._get(res_model).id
-        force_mode = force or (all(data for data in pycompat.values(partner_data)) and all(data for data in pycompat.values(channel_data)))
-        generic = []
-        specific = {}
-        existing = {}  # {res_id: follower_ids}
-        p_exist = {}  # {partner_id: res_ids}
-        c_exist = {}  # {channel_id: res_ids}
+        # force_mode = force or (all(data for data in pycompat.values(partner_data)) and all(data for data in pycompat.values(channel_data)))
+        # generic = []
+        # specific = {}
+        # existing = {}  # {res_id: follower_ids}
+        # p_exist = {}  # {partner_id: res_ids}
+        # c_exist = {}  # {channel_id: res_ids}
 
-        followers = self.sudo().search([
-            '&',
-            '&', ('res_model_id', '=', res_model_id), ('res_id', 'in', res_ids),
-            '|', ('partner_id', 'in', list(partner_data)), ('channel_id', 'in', list(channel_data))])
+        # followers = self.sudo().search([
+        #     '&',
+        #     '&', ('res_model_id', '=', res_model_id), ('res_id', 'in', res_ids),
+        #     '|', ('partner_id', 'in', list(partner_data)), ('channel_id', 'in', list(channel_data))])
 
-        if force_mode:
-            followers.unlink()
-        else:
-            for follower in followers:
-                existing.setdefault(follower.res_id, list()).append(follower)
-                if follower.partner_id:
-                    p_exist.setdefault(follower.partner_id.id, list()).append(follower.res_id)
-                if follower.channel_id:
-                    c_exist.setdefault(follower.channel_id.id, list()).append(follower.res_id)
+        # if force_mode:
+        #     followers.unlink()
+        # else:
+        #     for follower in followers:
+        #         existing.setdefault(follower.res_id, list()).append(follower)
+        #         if follower.partner_id:
+        #             p_exist.setdefault(follower.partner_id.id, list()).append(follower.res_id)
+        #         if follower.channel_id:
+        #             c_exist.setdefault(follower.channel_id.id, list()).append(follower.res_id)
 
-        default_subtypes = self.env['mail.message.subtype'].search([
-            ('default', '=', True),
-            '|', ('res_model', '=', res_model), ('res_model', '=', False)])
-        external_default_subtypes = default_subtypes.filtered(lambda subtype: not subtype.internal)
+        # default_subtypes = self.env['mail.message.subtype'].search([
+        #     ('default', '=', True),
+        #     '|', ('res_model', '=', res_model), ('res_model', '=', False)])
 
-        if force_mode:
-            employee_pids = self.env['res.users'].sudo().search([('partner_id', 'in', list(partner_data)), ('share', '=', False)]).mapped('partner_id').ids
-            for pid, data in pycompat.items(partner_data):
-                if not data:
-                    if pid not in employee_pids:
-                        partner_data[pid] = external_default_subtypes.ids
-                    else:
-                        partner_data[pid] = default_subtypes.ids
-            for cid, data in pycompat.items(channel_data):
-                if not data:
-                    channel_data[cid] = default_subtypes.ids
+        # insert into mail_followers_mail_message_subtype_rel ()
 
-        # create new followers, batch ok
-        gen_new_pids = [pid for pid in partner_data if pid not in p_exist]
-        gen_new_cids = [cid for cid in channel_data if cid not in c_exist]
-        for pid in gen_new_pids:
-            generic.append([0, 0, {'res_model_id': res_model_id, 'partner_id': pid, 'subtype_ids': [(6, 0, partner_data.get(pid) or default_subtypes.ids)]}])
-        for cid in gen_new_cids:
-            generic.append([0, 0, {'res_model_id': res_model_id, 'channel_id': cid, 'subtype_ids': [(6, 0, channel_data.get(cid) or default_subtypes.ids)]}])
+        print 'aA1', res_ids, partner_ids
+        for resid in res_ids:
+            for partner in partner_ids:
+                try:
+                    doc = self.create({
+                        'res_model': res_model,
+                        'res_id': resid,
+                        'partner_id': partner,
+                        'subtype_ids': subtype_ids and [(6,0, subtype_ids)] or []
+                    })
+                    print 'aA2'
+                    if not subtype_ids:
+                        self._set_default_subtype(doc.id)
+                    print 'aA3'
+                except:
+                    raise
+            for channel in channel_ids:
+                try:
+                    doc = self.create({
+                        'res_model': res_model,
+                        'res_id': resid,
+                        'channel_id': channel,
+                        'subtype_ids': subtype_ids and [(6,0, subtype_ids)] or []
+                    })
+                    if not subtype_ids:
+                        self._set_default_subtype(doc.id)
+                except:
+                    raise
 
-        # create new followers, each document at a time because of existing followers to avoid erasing
-        if not force_mode:
-            for res_id in res_ids:
-                command = []
-                doc_followers = existing.get(res_id, list())
+        return True
 
-                new_pids = set(partner_data) - set([sub.partner_id.id for sub in doc_followers if sub.partner_id]) - set(gen_new_pids)
-                new_cids = set(channel_data) - set([sub.channel_id.id for sub in doc_followers if sub.channel_id]) - set(gen_new_cids)
 
-                # subscribe new followers
-                for new_pid in new_pids:
-                    command.append((0, 0, {
-                        'res_model_id': res_model_id,
-                        'partner_id': new_pid,
-                        'subtype_ids': [(6, 0, partner_data.get(new_pid) or default_subtypes.ids)],
-                    }))
-                for new_cid in new_cids:
-                    command.append((0, 0, {
-                        'res_model_id': res_model_id,
-                        'channel_id': new_cid,
-                        'subtype_ids': [(6, 0, channel_data.get(new_cid) or default_subtypes.ids)],
-                    }))
-                if command:
-                    specific[res_id] = command
-        return generic, specific
+        # external_default_subtypes = default_subtypes.filtered(lambda subtype: not subtype.internal)
+
+        # if force_mode:
+        #     employee_pids = self.env['res.users'].sudo().search([('partner_id', 'in', list(partner_data)), ('share', '=', False)]).mapped('partner_id').ids
+        #     for pid, data in pycompat.items(partner_data):
+        #         if not data:
+        #             if pid not in employee_pids:
+        #                 partner_data[pid] = external_default_subtypes.ids
+        #             else:
+        #                 partner_data[pid] = default_subtypes.ids
+        #     for cid, data in pycompat.items(channel_data):
+        #         if not data:
+        #             channel_data[cid] = default_subtypes.ids
+
+
+        return True
+
+
+        # external_default_subtypes = default_subtypes.filtered(lambda subtype: not subtype.internal)
+
+        # if force_mode:
+        #     employee_pids = self.env['res.users'].sudo().search([('partner_id', 'in', list(partner_data)), ('share', '=', False)]).mapped('partner_id').ids
+        #     for pid, data in pycompat.items(partner_data):
+        #         if not data:
+        #             if pid not in employee_pids:
+        #                 partner_data[pid] = external_default_subtypes.ids
+        #             else:
+        #                 partner_data[pid] = default_subtypes.ids
+        #     for cid, data in pycompat.items(channel_data):
+        #         if not data:
+        #             channel_data[cid] = default_subtypes.ids
+
+        # # create new followers, batch ok
+        # gen_new_pids = [pid for pid in partner_data if pid not in p_exist]
+        # gen_new_cids = [cid for cid in channel_data if cid not in c_exist]
+        # for pid in gen_new_pids:
+        #     generic.append([0, 0, {'res_model_id': res_model_id, 'partner_id': pid, 'subtype_ids': [(6, 0, partner_data.get(pid) or default_subtypes.ids)]}])
+        # for cid in gen_new_cids:
+        #     generic.append([0, 0, {'res_model_id': res_model_id, 'channel_id': cid, 'subtype_ids': [(6, 0, channel_data.get(cid) or default_subtypes.ids)]}])
+
+        # # create new followers, each document at a time because of existing followers to avoid erasing
+        # if not force_mode:
+        #     for res_id in res_ids:
+        #         command = []
+        #         doc_followers = existing.get(res_id, list())
+
+        #         new_pids = set(partner_data) - set([sub.partner_id.id for sub in doc_followers if sub.partner_id]) - set(gen_new_pids)
+        #         new_cids = set(channel_data) - set([sub.channel_id.id for sub in doc_followers if sub.channel_id]) - set(gen_new_cids)
+
+        #         # subscribe new followers
+        #         for new_pid in new_pids:
+        #             command.append((0, 0, {
+        #                 'res_model_id': res_model_id,
+        #                 'partner_id': new_pid,
+        #                 'subtype_ids': [(6, 0, partner_data.get(new_pid) or default_subtypes.ids)],
+        #             }))
+        #         for new_cid in new_cids:
+        #             command.append((0, 0, {
+        #                 'res_model_id': res_model_id,
+        #                 'channel_id': new_cid,
+        #                 'subtype_ids': [(6, 0, channel_data.get(new_cid) or default_subtypes.ids)],
+        #             }))
+        #         if command:
+        #             specific[res_id] = command
+        # return generic, specific
 
     _sql_constraints = [
         ('mail_followers_res_partner_res_model_id_uniq', 'unique(res_model,res_id,partner_id)', 'Error, a partner cannot follow twice the same object.'),
