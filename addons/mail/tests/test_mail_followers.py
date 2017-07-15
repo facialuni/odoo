@@ -58,29 +58,41 @@ class TestMailFollowers(TestMail):
     def test_followers_subtypes_default_internal(self):
         mt_mg_def_int = self.env['mail.message.subtype'].create({'name': 'mt_mg_def', 'default': True, 'res_model': 'mail.test', 'internal': True})
         self.test_pigs.message_subscribe_users(user_ids=[self.user_employee.id])
+        print '1i'
         follower = self.env['mail.followers'].search([
             ('res_model', '=', 'mail.test'),
             ('res_id', '=', self.test_pigs.id),
             ('partner_id', '=', self.user_employee.partner_id.id)])
+        print '2i'
         self.assertEqual(follower.subtype_ids, self.default_group_subtypes | mt_mg_def_int)
+        print '3i'
 
         self.test_pigs.message_subscribe_users(user_ids=[self.user_portal.id])
+        print '4i'
         follower = self.env['mail.followers'].search([
             ('res_model', '=', 'mail.test'),
             ('res_id', '=', self.test_pigs.id),
             ('partner_id', '=', self.user_portal.partner_id.id)])
+        print '5i'
         self.assertEqual(follower.subtype_ids, self.default_group_subtypes.filtered(lambda subtype: not subtype.internal))
+        print '7i'
 
     def test_followers_subtypes_specified(self):
         self.test_pigs.sudo(self.user_employee).message_subscribe_users(subtype_ids=[self.mt_mg_nodef.id])
+        print '1'
         self.assertEqual(self.test_pigs.message_follower_ids.mapped('partner_id'), self.user_employee.partner_id)
+        print '2'
         self.assertEqual(self.test_pigs.message_follower_ids.mapped('channel_id'), self.env['mail.channel'])
+        print '3'
         follower = self.env['mail.followers'].search([
             ('res_model', '=', 'mail.test'),
             ('res_id', '=', self.test_pigs.id),
             ('partner_id', '=', self.user_employee.partner_id.id)])
+        print '4'
         self.assertEqual(len(follower), 1)
+        print '5'
         self.assertEqual(follower.subtype_ids, self.mt_mg_nodef)
+        print '6'
 
     def test_followers_multiple_subscription(self):
         self.test_pigs.sudo(self.user_employee).message_subscribe_users(subtype_ids=[self.mt_mg_nodef.id])

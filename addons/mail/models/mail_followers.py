@@ -33,7 +33,7 @@ class Followers(models.Model):
         help="Message subtypes followed, meaning subtypes that will be pushed onto the user's Wall.")
 
     @api.model
-    def _set_default_subtype(self, doc_id):
+    def _set_default_subtype(self, doc_id, model):
         self.env.cr.execute('''
             INSERT INTO
                 mail_followers_mail_message_subtype_rel (mail_followers_id, mail_message_subtype_id)
@@ -41,9 +41,9 @@ class Followers(models.Model):
                 mail_message_subtype
             WHERE
                 "default"=true AND 
-                ((res_model IS NULL) or (res_model='project.project')) AND
+                ((res_model IS NULL) or (res_model=%s)) AND
                 id not in (select mail_message_subtype_id from mail_followers_mail_message_subtype_rel where mail_followers_id=%s)
-            ''', (doc_id , doc_id))
+            ''', (doc_id, model, doc_id))
 
     @api.model
     def _add_follower_command(self, res_model, res_ids, partner_ids=[], channel_ids=[], subtype_ids=None):
@@ -90,8 +90,12 @@ class Followers(models.Model):
                         'partner_id': partner,
                         'subtype_ids': subtype_ids and [(6,0, subtype_ids)] or []
                     })
+                elif subtype_ids:
+                    print '***', subtype_ids
+                    doc.write({'subtype_ids': [(6,0, subtype_ids)]})
                 if not subtype_ids:
-                    self._set_default_subtype(doc.id)
+                    print '***0', subtype_ids
+                    self._set_default_subtype(doc.id, res_model)
             for channel in channel_ids:
                 doc = self.search([('res_model','=',res_model),('res_id','=',resid),('channel_id','=',channel)], limit=1)
                 if not doc:
@@ -101,8 +105,10 @@ class Followers(models.Model):
                         'channel_id': channel,
                         'subtype_ids': subtype_ids and [(6,0, subtype_ids)] or []
                     })
+                elif subtype_ids:
+                    doc.write({'subtype_ids': [(6,0, subtype_ids)]})
                 if not subtype_ids:
-                    self._set_default_subtype(doc.id)
+                    self._set_default_subtype(doc.id, res_model)
 
         return True
 

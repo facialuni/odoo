@@ -224,14 +224,10 @@ class MailThread(models.AbstractModel):
         if self._context.get('tracking_disable'):
             return super(MailThread, self).create(values)
 
-        print 'create', '-'*40
         thread = super(MailThread, self).create(values)
-        print 'Add Follower', '-'*40
         if not self._context.get('mail_create_nosubscribe'):
             self.env['mail.followers']._add_follower_command(self._name, [thread.id], [self.env.user.partner_id.id], [])
 
-
-        print 'log', '-'*40
         # automatic logging unless asked not to (mainly for various testing purpose)
         if not self._context.get('mail_create_nolog'):
             doc_name = self.env['ir.model']._get(self._name).name
@@ -245,7 +241,6 @@ class MailThread(models.AbstractModel):
 
             # thread.message_post(body=_('%s created') % doc_name)
 
-        print 'auto subs', '-'*40
         # auto_subscribe: take values and defaults into account
         create_values = dict(values)
         for key, val in pycompat.items(self._context):
@@ -265,7 +260,6 @@ class MailThread(models.AbstractModel):
         #     if tracked_fields:
         #         initial_values = {thread.id: dict.fromkeys(tracked_fields, False)}
         #         track_thread.message_track(tracked_fields, initial_values)
-        print 'end', '-'*40
         return thread
 
     @api.multi
