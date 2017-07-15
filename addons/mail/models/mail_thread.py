@@ -254,17 +254,17 @@ class MailThread(models.AbstractModel):
         thread.message_auto_subscribe(list(create_values), values=create_values)
 
 
-        print 'track', '-'*40
+        # print 'track', '-'*40
         # track values
-        if not self._context.get('mail_notrack'):
-            if 'lang' not in self._context:
-                track_thread = thread.with_context(lang=self.env.user.lang)
-            else:
-                track_thread = thread
-            tracked_fields = track_thread._get_tracked_fields(list(values))
-            if tracked_fields:
-                initial_values = {thread.id: dict.fromkeys(tracked_fields, False)}
-                track_thread.message_track(tracked_fields, initial_values)
+        # if not self._context.get('mail_notrack'):
+        #     if 'lang' not in self._context:
+        #         track_thread = thread.with_context(lang=self.env.user.lang)
+        #     else:
+        #         track_thread = thread
+        #     tracked_fields = track_thread._get_tracked_fields(list(values))
+        #     if tracked_fields:
+        #         initial_values = {thread.id: dict.fromkeys(tracked_fields, False)}
+        #         track_thread.message_track(tracked_fields, initial_values)
         print 'end', '-'*40
         return thread
 
