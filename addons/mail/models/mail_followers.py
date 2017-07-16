@@ -79,7 +79,6 @@ class Followers(models.Model):
 
         # insert into mail_followers_mail_message_subtype_rel ()
 
-        print 'aA1', res_ids, partner_ids
         for resid in res_ids:
             for partner in partner_ids:
                 doc = self.search([('res_model','=',res_model),('res_id','=',resid),('partner_id','=',partner)], limit=1)
@@ -91,10 +90,8 @@ class Followers(models.Model):
                         'subtype_ids': subtype_ids and [(6,0, subtype_ids)] or []
                     })
                 elif subtype_ids:
-                    print '***', subtype_ids
                     doc.write({'subtype_ids': [(6,0, subtype_ids)]})
                 if not subtype_ids:
-                    print '***0', subtype_ids
                     self._set_default_subtype(doc.id, res_model)
             for channel in channel_ids:
                 doc = self.search([('res_model','=',res_model),('res_id','=',resid),('channel_id','=',channel)], limit=1)
