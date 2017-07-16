@@ -106,6 +106,7 @@ class Followers(models.Model):
                     doc.write({'subtype_ids': [(6,0, subtype_ids)]})
                 if not subtype_ids:
                     self._set_default_subtype(doc.id, res_model)
+            self.env[res_model].invalidate_cache(ids=res_ids)
 
         return True
 

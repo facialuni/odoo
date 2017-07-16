@@ -2013,8 +2013,10 @@ class MailThread(models.AbstractModel):
         """ Wrapper on message_subscribe, using users. If user_ids is not
             provided, subscribe uid instead. """
         if user_ids is None:
-            user_ids = [self._uid]
-        return self.message_subscribe(self.env['res.users'].browse(user_ids).mapped('partner_id').ids, subtype_ids=subtype_ids)
+            partners = [self.env.user.partner_id.id]
+        else:
+            partners = self.env['res.users'].browse(user_ids).mapped('partner_id').ids
+        return self.message_subscribe(partners, subtype_ids=subtype_ids)
 
     @api.multi
     def message_subscribe(self, partner_ids=None, channel_ids=None, subtype_ids=None, force=True):
