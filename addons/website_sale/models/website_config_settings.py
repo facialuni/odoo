@@ -4,7 +4,7 @@
 from odoo import api, models, fields
 
 class WebsiteConfigSettings(models.TransientModel):
-    _inherit = 'website.config.settings'
+    _inherit = 'res.config.settings'
 
     def _default_order_mail_template(self):
         if self.env['ir.module.module'].search([('name', '=', 'website_quote')]).state in ('installed', 'to upgrade'):

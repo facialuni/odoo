@@ -6,7 +6,6 @@ from odoo.exceptions import AccessDenied
 
 
 class WebsiteConfigSettings(models.TransientModel):
-    _name = 'website.config.settings'
     _inherit = 'res.config.settings'
 
     def _default_website(self):
