@@ -36,7 +36,6 @@ class TestDeliveryCost(common.TransactionCase):
     def test_00_delivery_cost(self):
         # In order to test Carrier Cost
         # Create sales order with Normal Delivery Charges
-
         self.sale_normal_delivery_charges = self.SaleOrder.create({
             'partner_id': self.partner_18.id,
             'partner_invoice_id': self.partner_18.id,
