@@ -17,6 +17,7 @@ class SaleOrder(models.Model):
     tasks_count = fields.Integer(string='Tasks', compute='_compute_tasks_ids')
 
     project_project_id = fields.Many2one('project.project', compute='_compute_project_project_id', string='Project associated to this sale')
+    project_ids = fields.Many2many('project.project', compute="_compute_project_ids", string='Projects', copy=False, help="Projects used in this sales order.")
 
     @api.multi
     @api.depends('analytic_account_id.line_ids')
@@ -79,15 +80,21 @@ class SaleOrder(models.Model):
         return result
 
     @api.multi
-    def action_view_project_project(self):
+    def action_view_project_ids(self):
         self.ensure_one()
-        action = self.env.ref('project.open_view_project_all').read()[0]
-        form_view_id = self.env.ref('project.edit_project').id
-
-        action['views'] = [(form_view_id, 'form')]
-        action['res_id'] = self.project_project_id.id
-        action.pop('target', None)
-
+        if len(self.project_ids) == 1:
+            action = self.project_ids.action_view_timesheet_plan()
+        else:
+            view_form_id = self.env.ref('project.edit_project').id
+            view_kanban_id = self.env.ref('project.view_project_kanban').id
+            action = {
+                'type': 'ir.actions.act_window',
+                'domain': [('id', 'in', self.project_ids.ids)],
+                'views': [(view_kanban_id, 'kanban'), (view_form_id, 'form')],
+                'view_mode': 'kanban,form',
+                'name': _('Projects'),
+                'res_model': 'project.project',
+            }
         return action
 
     @api.multi
