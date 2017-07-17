@@ -5,14 +5,14 @@
 
     <record id="hr_timesheet_config_settings_view_form" model="ir.ui.view">
         <field name="name">hr.timesheet.config.settings.view.form</field>
-        <field name="model">hr.timesheet.config.settings</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_setting_form"/>
         <field name="arch" type="xml">
-            <form class="oe_form_configuration">
-                <header>
-                    <button string="Save" type="object" name="execute" class="oe_highlight"/>
-                    <button string="Cancel" type="object" name="cancel" class="oe_link"/>
-                </header>
-                <sheet>
+            <xpath expr="//div[@class='apps']" position="inside">
+                    <div class="app_name" setting="timesheets"><i class="fa fa-clock-o timesheets"/> Timesheets </div>
+            </xpath>
+            <xpath expr="//div[@class='settings']" position="inside">
+                <div class="timesheets_setting_view o_hidden">
                     <field name="company_id" invisible="1"/>
                     <h2>Timesheet Apps</h2>
                     <div class="row mt16 o_settings_container">
@@ -132,19 +132,11 @@
                             </div>
                         </div>
                     </div>
-                </sheet>
-            </form>
+                </div>
+            </xpath>
         </field>
     </record>
 
-    <record id="hr_timesheet_config_settings_action" model="ir.actions.act_window">
-        <field name="name">Settings</field>
-        <field name="res_model">hr.timesheet.config.settings</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">form</field>
-        <field name="target">inline</field>
-    </record>
-
     <menuitem id="hr_timesheet_config_settings_menu_action" name="Settings" parent="hr_timesheet_menu_configuration"
-        action="hr_timesheet_config_settings_action" sequence="0"/>
+        action="base.res_config_setting_act_window" sequence="0"/>
 </odoo>

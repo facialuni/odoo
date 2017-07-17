@@ -5,8 +5,7 @@ from odoo import fields, models
 
 
 class HrTimesheetConfiguration(models.TransientModel):
-    _name = 'hr.timesheet.config.settings'
-    _inherit = 'base.config.settings'
+    _inherit = 'res.config.settings'
 
     module_project_timesheet_synchro = fields.Boolean("Awesome Timesheet")
     module_sale_timesheet = fields.Boolean("Time Billing")
