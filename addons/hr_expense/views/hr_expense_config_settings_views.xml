@@ -3,15 +3,14 @@
     <data>
         <record id="hr_expense_config_setting_view_form" model="ir.ui.view">
             <field name="name">hr.expense.config.settings.form</field>
-            <field name="model">hr.expense.config.settings</field>
-            <field name="inherit_id" eval="False"/>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base.res_config_setting_form"/>
             <field name="arch" type="xml">
-                <form class="oe_form_configuration">
-                    <header>
-                        <button string="Save" type="object" name="execute" class="oe_highlight"/>
-                        <button string="Cancel" type="object" name="cancel" class="oe_link" special="cancel"/>
-                    </header>
-                    <sheet>
+                <xpath expr="//div[@class='apps']" position="inside">
+                    <div class="app_name" setting="hrexpense"><i class="fa fa-usd hrexpense"/> Expense</div>
+                </xpath>
+                <xpath expr="//div[@class='settings']" position="inside">
+                    <div class="hrexpense_setting_view o_hidden">
                         <h2>Recording</h2>
                         <div class="row mt16 o_settings_container">
                             <div class="col-xs-12 col-md-6 o_setting_box" title="You can setup a generic email alias to create incoming expenses easily. Write an email with the receipt in attachment to create an expense line in one click. If the mail subject contains the product's internal reference between brackets, the product will be set automatically. Type the expense amount in the mail subject to set it on the expense too.">
@@ -95,19 +94,12 @@
                                 </div>
                             </div>
                         </div>
-                    </sheet>
-                </form>
+                    </div>
+                </xpath>
             </field>
         </record>
 
-        <record id="action_hr_expense_configuration" model="ir.actions.act_window">
-            <field name="name">Configure Expense</field>
-            <field name="res_model">hr.expense.config.settings</field>
-            <field name="view_mode">form</field>
-            <field name="target">inline</field>
-        </record>
-
         <menuitem id="menu_hr_expense_global_settings" name="Settings" 
-            parent="menu_hr_expense_configuration" sequence="0" action="action_hr_expense_configuration" groups="base.group_system"/>
+            parent="menu_hr_expense_configuration" sequence="0" action="base.res_config_setting_act_window" groups="base.group_system"/>
     </data>
 </odoo>

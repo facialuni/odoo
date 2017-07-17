@@ -4,7 +4,6 @@ from odoo import api, fields, models
 
 
 class HrExpenseConfigSettings(models.TransientModel):
-    _name = 'hr.expense.config.settings'
     _inherit = 'res.config.settings'
 
     alias_prefix = fields.Char('Default Alias Name for Expenses')
