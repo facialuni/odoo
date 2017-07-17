@@ -7,7 +7,6 @@ from odoo.exceptions import UserError
 
 
 class AccountConfigSettings(models.TransientModel):
-    _name = 'account.config.settings'
     _inherit = 'res.config.settings'
 
     company_id = fields.Many2one('res.company', string='Company', required=True,

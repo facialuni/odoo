@@ -11,14 +11,14 @@
 
         <record id="account_config_settings_view_form" model="ir.ui.view">
             <field name="name">account.config.settings.form</field>
-            <field name="model">account.config.settings</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base.res_config_setting_form"/>
             <field name="arch" type="xml">
-                <form string="Configure Accounting" class="oe_form_configuration">
-                    <header>
-                        <button string="Save" type="object" name="execute" class="oe_highlight"/>
-                        <button string="Cancel" type="object" name="cancel" class="oe_link" special="cancel"/>
-                    </header>
-                    <sheet>
+                <xpath expr="//div[@class='apps']" position="inside">
+                    <div class="app_name" setting="account"><i class="fa fa-file-text-o account"/> Accounting</div>
+                </xpath>
+                <xpath expr="//div[@class='settings']" position="inside">
+                    <div class="account_setting_view o_hidden">
                         <field name="company_id" invisible="1"/>
                         <field name="has_chart_of_accounts" invisible="1"/>
                         <field name="has_accounting_entries" invisible="1"/>
@@ -434,20 +434,12 @@
                                 </div>
                             </div>
                         </div>
-                    </sheet>
-                </form>
+                    </div>
+                </xpath>
             </field>
         </record>
 
-        <record id="action_account_config" model="ir.actions.act_window">
-            <field name="name">Configure Accounting</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">account.config.settings</field>
-            <field name="view_mode">form</field>
-            <field name="target">inline</field>
-        </record>
-
         <menuitem id="menu_account_config" name="Settings" parent="menu_finance_configuration"
-            sequence="0" action="action_account_config" groups="base.group_system"/>
+            sequence="0" action="base.res_config_setting_act_window" groups="base.group_system"/>
     </data>
 </odoo>

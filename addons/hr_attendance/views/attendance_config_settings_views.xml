@@ -54,11 +54,5 @@
         </field>
     </record>
 
-    <menuitem id="hr_attendance.menu_hr_attendance_settings" name="Configuration" parent="menu_hr_attendance_root"
-<<<<<<< HEAD
-        sequence="99" action="action_hr_attendance_settings" groups="hr_attendance.group_hr_attendance_manager"/>
+    <menuitem id="hr_attendance.menu_hr_attendance_settings" name="Configuration" parent="menu_hr_attendance_root" sequence="99" action="base.res_config_setting_act_window" groups="hr_attendance.group_hr_attendance_manager"/>
 </odoo>
-=======
-        sequence="99" action="base.res_config_setting_act_window" groups="hr_attendance.group_hr_attendance_manager"/>
-</odoo>
->>>>>>> 89ce8a4... [IMP] hr_attendance : change setting
