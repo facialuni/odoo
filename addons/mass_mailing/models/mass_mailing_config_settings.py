@@ -5,7 +5,6 @@ from odoo import fields, models
 
 
 class MassMailingConfiguration(models.TransientModel):
-    _name = 'mass.mailing.config.settings'
     _inherit = 'res.config.settings'
 
     group_mass_mailing_campaign = fields.Boolean(string="Mass Mailing Campaigns", implied_group='mass_mailing.group_mass_mailing_campaign', help="""This is useful if your marketing campaigns are composed of several emails""")
