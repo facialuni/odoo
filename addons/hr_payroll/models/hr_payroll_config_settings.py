@@ -5,7 +5,6 @@ from odoo import fields, models
 
 
 class HrPayrollConfigSettings(models.TransientModel):
-    _name = 'hr.payroll.config.settings'
     _inherit = 'res.config.settings'
 
     module_hr_timesheet = fields.Boolean(string='Timesheets')

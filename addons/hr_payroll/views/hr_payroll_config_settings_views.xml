@@ -10,13 +10,14 @@
 
         <record id="view_hr_payroll_configuration" model="ir.ui.view">
             <field name="name">Configure Payroll</field>
-            <field name="model">hr.payroll.config.settings</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base.res_config_setting_form"/>
             <field name="arch" type="xml">
-                <form string="Configure Payroll" class="oe_form_configuration">
-                    <header>
-                        <button string="Apply" type="object" name="execute" class="oe_highlight"/>
-                        <button string="Cancel" type="object" name="cancel" class="oe_link" special="cancel"/>
-                    </header>
+                <xpath expr="//div[@class='apps']" position="inside">
+                    <div class="app_name" setting="hrpayroll"><i class="fa fa-money hrpayroll"/> Payroll</div>
+                </xpath>
+                <xpath expr="//div[@class='settings']" position="inside">
+                    <div class="hrpayroll_setting_view o_hidden">
                     <field name="module_l10n_fr_hr_payroll" invisible="1"/>
                     <field name="module_l10n_be_hr_payroll" invisible="1"/>
                     <field name="module_l10n_in_hr_payroll" invisible="1"/>
@@ -73,17 +74,11 @@
                             </div>
                         </div>
                     </div>
-                </form>
+                </div>
+                </xpath>
             </field>
         </record>
 
-        <record id="action_hr_payroll_configuration" model="ir.actions.act_window">
-            <field name="name">Configure Payroll</field>
-            <field name="res_model">hr.payroll.config.settings</field>
-            <field name="view_mode">form</field>
-            <field name="target">inline</field>
-        </record>
-
         <menuitem id="menu_hr_payroll_global_settings" name="Settings" 
-            parent="menu_hr_payroll_configuration" sequence="0" action="action_hr_payroll_configuration" groups="base.group_system"/>
+            parent="menu_hr_payroll_configuration" sequence="0" action="base.res_config_setting_act_window" groups="base.group_system"/>
 </odoo>
