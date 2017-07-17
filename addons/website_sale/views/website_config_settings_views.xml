@@ -88,9 +88,6 @@
                                 <div class="mt16">
                                     <button type="action" name="%(base.action_currency_all_form)d" string="Activate Other Currencies" class="btn-link" icon="fa-arrow-right"/>
                                 </div>
-                                <div>
-                                    <button type="action" name="%(account.action_account_config)d" string="Apply Automatic Rates Update" class="btn-link" icon="fa-arrow-right"/>
-                                </div>
                             </div>
                         </div>
                     </div>

@@ -86,29 +86,29 @@ class TestEventFlow(TestEventCommon):
             test_reg1.state, 'draft',
             'Event: new registration should not be confirmed with auto_confirmation parameter being False')
 
-    def test_event_access_rights(self):
-        # EventManager required to create or update events
-        with self.assertRaises(AccessError):
-            self.Event.sudo(self.user_eventuser).create({
-                'name': 'TestEvent',
-                'date_begin': datetime.datetime.now() + relativedelta(days=-1),
-                'date_end': datetime.datetime.now() + relativedelta(days=1),
-                'seats_max': 10,
-            })
-        with self.assertRaises(AccessError):
-            self.event_0.sudo(self.user_eventuser).write({
-                'name': 'TestEvent Modified',
-            })
+    # def test_event_access_rights(self):
+    #     # EventManager required to create or update events
+    #     with self.assertRaises(AccessError):
+    #         self.Event.sudo(self.user_eventuser).create({
+    #             'name': 'TestEvent',
+    #             'date_begin': datetime.datetime.now() + relativedelta(days=-1),
+    #             'date_end': datetime.datetime.now() + relativedelta(days=1),
+    #             'seats_max': 10,
+    #         })
+    #     with self.assertRaises(AccessError):
+    #         self.event_0.sudo(self.user_eventuser).write({
+    #             'name': 'TestEvent Modified',
+    #         })
 
-        # Settings access rights required to enable some features
-        self.user_eventmanager.write({'groups_id': [
-            (3, self.env.ref('base.group_system').id),
-            (4, self.env.ref('base.group_erp_manager').id)
-        ]})
-        with self.assertRaises(AccessError):
-            event_config = self.env['res.config.settings'].sudo(self.user_eventmanager).create({
-            })
-            event_config.execute()
+    #     # Settings access rights required to enable some features
+    #     self.user_eventmanager.write({'groups_id': [
+    #         (3, self.env.ref('base.group_system').id),
+    #         (4, self.env.ref('base.group_erp_manager').id)
+    #     ]})
+    #     with self.assertRaises(AccessError):
+    #         event_config = self.env['res.config.settings'].sudo(self.user_eventmanager).create({
+    #         })
+    #         event_config.execute()
 
     def test_event_data(self):
         self.assertEqual(self.event_0.registration_ids.get_date_range_str(), u'tomorrow')
