@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import http
+from odoo import http, _
 from odoo.http import request
 
 from odoo.tools import float_round
@@ -18,13 +18,41 @@ class SaleTimesheetController(http.Controller):
         }
 
     def _prepare_plan_values(self, domain):
+
+        def float_to_time(hour_number):
+            minutes = hour_number * 60
+            return _('%sh%s') % (str(int(minutes/60)), '%02d' % int(minutes % 60))
+
+        timesheet_lines = request.env['account.analytic.line'].search(domain)
+
         values = {
             'currency': request.env.user.company_id.currency_id,
-            'timesheet_lines': request.env['account.analytic.line'].search(domain),
+            'timesheet_lines': timesheet_lines,
             'domain': domain,
+            'float_to_time': float_to_time,
         }
         hour_rounding = request.env.ref('product.product_uom_hour').rounding
         billable_types = ['non_billable', 'non_billable_project', 'billable_time', 'billable_fixed']
+
+        # -- Stat Buttons
+        stat_buttons = []
+        stat_buttons.append({
+            'name': _('Timesheets'),
+            'res_model': 'account.analytic.line',
+            'domain': [('id', 'in', timesheet_lines.ids)],
+            'icon': 'fa fa-calendar',
+        })
+        stat_project_ids = timesheet_lines.mapped('project_id').ids
+        stat_task_domain = [('project_id', 'in', stat_project_ids), '|', ('stage_id', '=', False), ('stage_id.fold', '=', False)]
+        stat_buttons.append({
+            'name': _('Tasks'),
+            'count': request.env['project.task'].search_count(stat_task_domain),
+            'res_model': 'project.task',
+            'domain': stat_task_domain,
+            'icon': 'fa fa-tasks',
+        })
+
+        values['stat_buttons'] = stat_buttons
 
         # -- Dashboard (per billable type)
         dashboard_values = {
@@ -73,8 +101,9 @@ class SaleTimesheetController(http.Controller):
                 non_billable=0.0,
                 billable_time=0.0,
                 billable_fixed=0.0,
-                total=0.0
+                total=0.0,
             ))[data['timesheet_invoice_type']] = float_round(data.get('unit_amount', 0.0), precision_rounding=hour_rounding)
+            repartition_employee[employee_id]['__domain_'+data['timesheet_invoice_type']] = data['__domain']
 
         # compute total
         for employee_id, vals in repartition_employee.items():
@@ -85,3 +114,33 @@ class SaleTimesheetController(http.Controller):
         values['repartition_employee'] = repartition_employee
 
         return values
+
+    @http.route('/timesheet/plan/action', type='json', auth="user")
+    def plan_stat_button(self, domain, res_model='account.analytic.line'):
+        action = {
+            'type': 'ir.actions.act_window',
+            'view_id': False,
+            'view_mode': 'tree,form',
+            'view_type': 'list',
+            'domain': domain,
+        }
+        if res_model == 'account.analytic.line':
+            ts_view_tree_id = request.env.ref('hr_timesheet.hr_timesheet_line_tree').id
+            ts_view_form_id = request.env.ref('hr_timesheet.hr_timesheet_line_form').id
+            action = {
+                'name': _('Timesheets'),
+                'type': 'ir.actions.act_window',
+                'res_model': res_model,
+                'view_mode': 'tree,form',
+                'view_type': 'tree',
+                'views': [[ts_view_tree_id, 'list'], [ts_view_form_id, 'form']],
+                'domain': domain,
+            }
+        if res_model == 'project.task':
+            action = request.env.ref('project.action_view_task').read()[0]
+            action.update({
+                'name': _('Tasks'),
+                'domain': domain,
+                'context': request.env.context,  # erase original context to avoid default filter
+            })
+        return action
