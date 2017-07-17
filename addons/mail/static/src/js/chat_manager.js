@@ -698,11 +698,12 @@ var ChatManager =  Class.extend(Mixins.EventDispatcherMixin, ServicesMixin, {
                 model: 'mail.message',
                 method: 'message_fetch',
                 args: [domain],
-                kwargs: {limit: LIMIT, context: session.user_context},
+                kwargs: {limit: LIMIT + 1, context: session.user_context},
             })
             .then(function (msgs) {
                 if (!cache.all_history_loaded) {
-                    cache.all_history_loaded =  msgs.length < LIMIT;
+                    cache.all_history_loaded =  msgs.length <= LIMIT;
+                    msgs.splice(LIMIT);
                 }
                 cache.loaded = true;
 
