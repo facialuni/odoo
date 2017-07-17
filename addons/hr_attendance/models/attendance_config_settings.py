@@ -5,7 +5,6 @@ from odoo import fields, models
 
 
 class BaseConfigSettings(models.TransientModel):
-    _name = 'attendance.config.settings'
     _inherit = 'res.config.settings'
 
     group_attendance_use_pin = fields.Boolean(string='Employee PIN',
