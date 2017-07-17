@@ -10,13 +10,13 @@ class MailThread(models.AbstractModel):
 
     @api.model
     def message_new(self, msg_dict, custom_values=None):
-    	res = super(MailThread, self).message_new(msg_dict, custom_values)
+        model = self._context.get('thread_model') or self._name
+        res = super(MailThread, self).message_new(msg_dict, custom_values)
         if model == 'hr.expense':
-        	data = {}
-	        model = self._context.get('thread_model') or self._name
-	        RecordModel = self.env[model]
-	        if isinstance(custom_values, dict):
-	            data = custom_values.copy()
-        	data['product_id'] = self.env['product.product'].search(['|',('name', 'like', data['name']), ('default_code', 'like', data['name'])]).id or data['product_id']
-        	expense = RecordModel.create(data)
+            data = {}
+            RecordModel = self.env[model]
+            if isinstance(custom_values, dict):
+                data = custom_values.copy()
+            data['product_id'] = self.env['product.product'].search(['|',('name', 'like', data['name']), ('default_code', 'like', data['name'])]).id or data['product_id']
+            return RecordModel.create(data)
         return res
