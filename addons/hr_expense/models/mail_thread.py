@@ -17,11 +17,11 @@ class MailThread(models.AbstractModel):
             RecordModel = self.env[model]
             if isinstance(custom_values, dict):
                 data = custom_values.copy()
-            data['product_id'] = self.env['product.product'].search(['|', ('name', 'like', data['name']), ('default_code', 'like', data['name'])]).id or data['product_id']
-            expense = RecordModel.create(data)
-            if expense:
+            data['product_id'] = self.env['product.product'].search(['|', ('name', '=ilike', data['name']), ('default_code', '=ilike', data['name'])]).id or data['product_id']
+            res.write({'product_id': data['product_id']})
+            if res:
                 template_id = self.env.ref('hr_expense.email_template_hr_expense_success')
             else:
                 template_id = self.env.ref('hr_expense.email_template_hr_expense_falied')
-            template_id.send_mail(expense.employee_id.user_id.partner_id.id)
+            template_id.send_mail(res.employee_id.user_id.partner_id.id)
         return res

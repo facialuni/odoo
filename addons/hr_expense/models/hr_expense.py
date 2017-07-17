@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import re
+from werkzeug import urls
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
@@ -376,26 +377,16 @@ class HrExpense(models.Model):
         })
         return super(HrExpense, self).message_new(msg_dict, custom_values)
 
-    def get_mail_url(self):
-        self.ensure_one()
-        params = {
-            'model': self._name,
-            'res_id': self.id,
-        }
-        params.update(self.employee_id.user_id.partner_id.signup_get_auth_param()[self.partner_id.id])
-        return '/mail/view?' + url_encode(params)
-
     @api.multi
     def get_access_action(self, access_uid=None):
-        """ Instead of the classic form view, redirect to website for portal users
-        that can read the project. """
+        """ Instead of the classic form view, redirect to the online invoice for portal users. """
         self.ensure_one()
         user, record = self.env.user, self
         if access_uid:
             user = self.env['res.users'].sudo().browse(access_uid)
             record = self.sudo(user)
 
-        if user.share:
+        if user.share or self.env.context.get('force_website'):
             try:
                 record.check_access_rule('read')
             except exceptions.AccessError:
@@ -403,11 +394,21 @@ class HrExpense(models.Model):
             else:
                 return {
                     'type': 'ir.actions.act_url',
-                    'url': '/my/project/%s' % self.id,
+                    'url': '/my/expenses?',
                     'target': 'self',
                     'res_id': self.id,
                 }
         return super(HrExpense, self).get_access_action(access_uid)
+
+    def get_mail_url(self):
+        self.ensure_one()
+        params = {
+            'model': self._name,
+            'res_id': self.id,
+        }
+        params.update(self.employee_id.user_id.partner_id.signup_get_auth_param()[self.employee_id.user_id.partner_id.id])
+        res1 = ('/web?#%s' % urls.url_encode(({'model': 'hr.expense', 'res_id': self.id})))
+        return res1
 
 class HrExpenseSheet(models.Model):
 
