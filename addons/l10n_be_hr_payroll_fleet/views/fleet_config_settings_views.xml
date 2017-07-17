@@ -3,14 +3,14 @@
     <data>
         <record id="fleet_config_settings_view_form" model="ir.ui.view">
             <field name="name">fleet.config.settings.form</field>
-            <field name="model">fleet.config.settings</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base.res_config_setting_form"/>
             <field name="arch" type="xml">
-                <form string="Configure Fleet" class="oe_form_configuration">
-                    <header>
-                        <button string="Save" type="object" name="execute" class="oe_highlight"/>
-                        <button string="Cancel" type="object" name="cancel" class="oe_link"/>
-                    </header>
-                    <sheet>
+                <xpath expr="//div[@class='apps']" position="inside">
+                    <div class="app_name" setting="fleet"><i class="fa fa-car fleet"/> Fleet</div>
+                </xpath>
+                <xpath expr="//div[@class='settings']" position="inside">
+                    <div class="fleet_setting_view o_hidden">
                         <h2>Fleet Management</h2>
                         <div class="row mt16 o_settings_container">
                             <div class="col-xs-12 col-md-6 o_setting_box">
@@ -25,20 +25,13 @@
                                 </div>
                             </div>
                         </div>
-                    </sheet>
-                </form>
+                    </div>
+                </xpath>
             </field>
         </record>
 
-        <record id="fleet_config_settings_action" model="ir.actions.act_window">
-            <field name="name">Configure Fleet</field>
-            <field name="res_model">fleet.config.settings</field>
-            <field name="view_mode">form</field>
-            <field name="target">inline</field>
-        </record>
-
         <menuitem id="fleet_config_settings_menu" name="Settings"
-            parent="fleet.fleet_configuration" sequence="0" action="fleet_config_settings_action"
+            parent="fleet.fleet_configuration" sequence="0" action="base.res_config_setting_act_window"
             groups="base.group_system"/>
     </data>
 </odoo>
