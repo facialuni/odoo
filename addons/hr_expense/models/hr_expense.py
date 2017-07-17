@@ -376,6 +376,39 @@ class HrExpense(models.Model):
         })
         return super(HrExpense, self).message_new(msg_dict, custom_values)
 
+    def get_mail_url(self):
+        self.ensure_one()
+        params = {
+            'model': self._name,
+            'res_id': self.id,
+        }
+        params.update(self.employee_id.user_id.partner_id.signup_get_auth_param()[self.partner_id.id])
+        return '/mail/view?' + url_encode(params)
+
+    @api.multi
+    def get_access_action(self, access_uid=None):
+        """ Instead of the classic form view, redirect to website for portal users
+        that can read the project. """
+        self.ensure_one()
+        user, record = self.env.user, self
+        if access_uid:
+            user = self.env['res.users'].sudo().browse(access_uid)
+            record = self.sudo(user)
+
+        if user.share:
+            try:
+                record.check_access_rule('read')
+            except exceptions.AccessError:
+                pass
+            else:
+                return {
+                    'type': 'ir.actions.act_url',
+                    'url': '/my/project/%s' % self.id,
+                    'target': 'self',
+                    'res_id': self.id,
+                }
+        return super(HrExpense, self).get_access_action(access_uid)
+
 class HrExpenseSheet(models.Model):
 
     _name = "hr.expense.sheet"
