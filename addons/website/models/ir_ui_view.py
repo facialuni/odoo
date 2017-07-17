@@ -109,13 +109,13 @@ class View(models.Model):
         """
         qcontext = super(View, self)._prepare_qcontext()
 
-        if 'main_object' not in qcontext:
-            qcontext['main_object'] = self
-
         if request and getattr(request, 'website_enabled', False):
             editable = request.website.is_publisher()
             translatable = editable and self._context.get('lang') != request.website.default_lang_code
             editable = not translatable and editable
+
+            if 'main_object' not in qcontext:
+                qcontext['main_object'] = self
 
             def unslug_url(s):
                 parts = s.split('/')
@@ -141,7 +141,6 @@ class View(models.Model):
             ))
 
         return qcontext
-
 
     @api.model
     def get_default_lang_code(self):
