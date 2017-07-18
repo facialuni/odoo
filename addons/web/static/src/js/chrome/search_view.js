@@ -253,7 +253,7 @@ var SearchView = Widget.extend({
             if (this.autocomplete && !this.autocomplete.$el.is(":visible")) {
                 switch(e.which) {
                     case $.ui.keyCode.ESCAPE:
-                        this.trigger_up('previous_breadcrumb');
+                        this.trigger_up('switch_to_previous_view');
                         break;
                 }
             }

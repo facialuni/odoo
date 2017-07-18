@@ -47,7 +47,6 @@ var ViewManager = Widget.extend(ControlPanelMixin, {
             this.do_push_state(event.data);
         },
         switch_to_previous_view: '_onSwitchToPreviousView',
-        previous_breadcrumb: '_onPreviousBreadcrumb',
     },
     /**
      * Called each time the view manager is attached into the DOM
@@ -662,15 +661,6 @@ var ViewManager = Widget.extend(ControlPanelMixin, {
      * @private
      */
     _onSwitchToPreviousView: function () {
-        this.do_action('history_back');
-    },
-    /**
-     * This handler is probably called by search view when ESCAPE key is pressed
-     * on it. This will activate previous breadcrumb when ESCAPE is pressed on search view
-     *
-     * @private
-     */
-    _onPreviousBreadcrumb: function() {
         this.trigger_up('history_back');
     }
 });
