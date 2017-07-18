@@ -5,11 +5,11 @@
                 min-width: 500px;
             }
             .o_kanban_image {
-                float: right;
+                .float(right);
 
                 + div {
-                    padding-left: 0;
-                    padding-right: @o-kanban-image-width + @o-kanban-inside-hgutter;
+                    .padding-left(0);
+                    .padding-right(@o-kanban-image-width + @o-kanban-inside-hgutter);
                 }
             }
 
@@ -17,7 +17,7 @@
                 margin-bottom: 28px;
 
                 i.fa {
-                    margin-right: 5px;
+                    .margin-right(5px);
 
                     &.fa-check {
                         color: green;
@@ -29,12 +29,12 @@
                 > button {
                     position: absolute;
                     bottom: 8px;
-                    right: 8px;
+                    .right(8px);
                 }
                 > .label {
                     position: absolute;
                     bottom: 8px;
-                    left: 8px;
+                    .left(8px);
                 }
             }
         }
@@ -48,7 +48,7 @@
             padding: 0;
 
             i.fa {
-                margin-right: 5px;
+                .margin-right(5px);
 
                 &.fa-check {
                     color: green;
