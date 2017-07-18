@@ -35,11 +35,6 @@
     <table style="width:600px;margin:5px auto;">
         <tbody>
             <tr>
-                <td>
-                    <a href="/">
-                        <img src="/logo" alt="${object.company_id.name}" style="vertical-align:baseline;max-width:100px;" />
-                    </a>
-                </td>
                 <td style="text-align:right;vertical-align:middle;">
                     % if 'website_url' in object.event_id and object.event_id.website_url:
                         <a href="${object.event_id.website_url}" style="background-color: #1abc9c; padding: 12px; font-weight: 12px; text-decoration: none; color: #fff; border-radius: 5px; font-size:16px;">View Event</a>
@@ -209,11 +204,6 @@
     <table style="width:600px;margin:5px auto;">
         <tbody>
             <tr>
-                <td>
-                    <a href="/">
-                        <img src="/logo" alt="${object.company_id.name}" style="vertical-align:baseline;max-width:100px;" />
-                    </a>
-                </td>
                 <td style="text-align:right;vertical-align:middle;">
                     % if 'website_url' in object.event_id and object.event_id.website_url:
                         <a href="${object.event_id.website_url}" style="background-color: #1abc9c; padding: 12px; font-weight: 12px; text-decoration: none; color: #fff; border-radius: 5px; font-size:16px;">View Event</a>

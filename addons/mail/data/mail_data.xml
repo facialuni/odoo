@@ -109,9 +109,6 @@
         % endfor
         % endif
     </td>
-    <td valign="center" align="right">
-        <img src="/logo.png" style="padding: 0px; margin: 0px; height: auto; max-width: 80px; max-height: 40px;" alt="${user.company_id.name}">
-    </td>
 </tr>
 <tr>
     <td colspan="2" style="text-align:center;">

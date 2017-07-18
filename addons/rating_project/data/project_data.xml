@@ -38,9 +38,7 @@
     % set access_token = object.rating_get_access_token()
     <table style="width:600px;margin:5px auto;">
         <tbody>
-            <tr><td>
-                <a href="/"><img src="/web/binary/company_logo" style="vertical-align:baseline;max-width:100px;" /></a>
-            </td><td style="text-align:right;vertical-align:middle;">
+            <tr><td style="text-align:right;vertical-align:middle;">
                     Satisfaction Survey
             </td></tr>
         </tbody>

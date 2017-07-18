@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
-
         <!-- Default template user for new users signing in -->
         <record id="default_template_user" model="res.users">
             <field name="name">Portal User Template</field>
@@ -24,15 +23,6 @@
             <field name="email_to">${object.email|safe}</field>
             <field name="subject">Password reset</field>
             <field name="body_html"><![CDATA[
-<div style="padding:0px;width:600px;margin:auto;background: #FFFFFF repeat top /100%;color:#777777">
-    <table cellspacing="0" cellpadding="0" style="width:600px;border-collapse:collapse;background:inherit;color:inherit">
-        <tbody><tr>
-            <td valign="center" width="200" style="padding:10px 10px 10px 5px;font-size: 12px">
-                <img src="/logo.png" style="padding: 0px; margin: 0px; height: auto; width: 80px;" alt="${user.company_id.name}">
-            </td>
-        </tr></tbody>
-    </table>
-</div>
 <div style="padding:0px;width:600px;margin:auto;background: #FFFFFF repeat top /100%;color:#777777">
     <p>Dear ${object.name},</p>
     <p>A password reset was requested for the Odoo account linked to this email.</p>
@@ -60,15 +50,6 @@
             <field name="email_to">${object.email|safe}</field>
             <field name="subject"><![CDATA[${object.company_id.name} invitation to connect on Odoo]]></field>
             <field name="body_html"><![CDATA[
-<div style="padding:0px;width:600px;margin:auto;background: #FFFFFF repeat top /100%;color:#777777">
-    <table cellspacing="0" cellpadding="0" style="width:600px;border-collapse:collapse;background:inherit;color:inherit">
-        <tbody><tr>
-            <td valign="center" width="200" style="padding:10px 10px 10px 5px;font-size: 12px">
-                <img src="/logo.png" style="padding: 0px; margin: 0px; height: auto; width: 80px;" alt="${user.company_id.name}">
-            </td>
-        </tr></tbody>
-    </table>
-</div>
 <div style="padding:0px;width:600px;margin:auto;background: #FFFFFF repeat top /100%;color:#777777">
 <p>Dear ${object.name},</p>
     <p>
@@ -99,15 +80,6 @@
             <field name="email_to">${object.email|safe}</field>
             <field name="subject">Welcome to ${object.company_id.name}!</field>
             <field name="body_html" type="html">
-<div style="padding:0px;width:600px;margin:auto;background: #FFFFFF repeat top /100%;color:#777777">
-    <table cellspacing="0" cellpadding="0" style="width:600px;border-collapse:collapse;background:inherit;color:inherit">
-        <tbody><tr>
-            <td valign="center" width="200" style="padding:10px 10px 10px 5px;font-size: 12px">
-                <img src="/logo.png" style="padding: 0px; margin: 0px; height: auto; width: 80px;" alt="${user.company_id.name}" />
-            </td>
-        </tr></tbody>
-    </table>
-</div>
 <div style="padding:0px;width:600px;margin:auto;background: #FFFFFF repeat top /100%;color:#777777">
     <p>Dear ${object.name},</p>
     <p>
