@@ -28,11 +28,11 @@
     }
     .oe_left {
         .oe_inline;
-        float: left!important;
+        .float(left) !important;
     }
     .oe_right {
         .oe_inline;
-        float: right!important;
+        .float(right) !important;
     }
 
     @media (min-width: @screen-xs-min) {
@@ -49,8 +49,8 @@
             > div, > span, > button, > label, > a, > input { // > * did not add a level of priority to the rule
                 .o-flex(0, 0, auto);
                 width: auto!important;
-                margin-right: @odoo-form-spacing-unit/2;
-                margin-left: @odoo-form-spacing-unit/2;
+                .margin-right(@odoo-form-spacing-unit/2);
+                .margin-left(@odoo-form-spacing-unit/2);
             }
 
             > .o_row {
@@ -67,7 +67,7 @@
 
         .o_row .o_field_many2one, .o_field_many2one.oe_inline {
             &.o_with_button:not(:last-child) { // If invisible element as last child, this line has no effect but that's not very important
-                margin-right: (35px + (@odoo-form-spacing-unit/2));
+                .margin-right(35px + (@odoo-form-spacing-unit/2));
             }
         }
     }
@@ -134,7 +134,7 @@
         position: relative; // Needed for the "More" dropdown
         .o-flex-display();
         .o-justify-content(space-between);
-        padding-left: @odoo-horizontal-padding;
+        .padding-left(@odoo-horizontal-padding);
         border-bottom: 1px solid @odoo-brand-secondary;
         background-color: @odoo-view-background-color;
 
@@ -153,7 +153,7 @@
             .o-flex-flow(row, wrap);
 
             > .btn {
-                margin: 2px 3px 2px 0;
+                .margin(2px, 3px, 2px, 0);
             }
         }
 
@@ -168,16 +168,16 @@
                 font-size: 11px;
                 font-weight: bold;
                 position: relative;
-                padding-left: @odoo-statusbar-arrow-width*2;
+                .padding-left(@odoo-statusbar-arrow-width*2);
                 color: @odoo-main-color-muted;
                 .o-transition(all, 0.2s);
 
                 &:first-child {
-                    padding-right: @odoo-horizontal-padding; // Compensate container padding
+                    .padding-right(@odoo-horizontal-padding); // Compensate container padding
                 }
                 &:last-child {
-                    padding-left: @odoo-horizontal-padding - 1;
-                    border-left: 1px solid @odoo-brand-lightsecondary;
+                    .padding-left(@odoo-horizontal-padding - 1);
+                    .border-left(1px solid @odoo-brand-lightsecondary);
                 }
 
                 &:active {
@@ -189,7 +189,7 @@
                     cursor: auto;
                     pointer-events: auto;
                     color: @odoo-main-text-color;
-                    border-left: 1px solid @odoo-brand-lightsecondary;
+                    .border-left(1px solid @odoo-brand-lightsecondary);
                 }
 
                 &:before, &:after {
@@ -199,8 +199,8 @@
 
                     border-top: @odoo-statusbar-height/2 solid transparent;
                     border-bottom: @odoo-statusbar-height/2 solid transparent;
-                    border-right: none;
-                    border-left: @odoo-statusbar-arrow-width solid @odoo-view-background-color;
+                    .border-right(none);
+                    .border-left(@odoo-statusbar-arrow-width solid @odoo-view-background-color);
                     .o-transition(border, 0.2s);
                     -moz-transform: scale(0.9999); // Smooth the triangle on firefox
                 }
@@ -210,14 +210,14 @@
                         color: white;
                         background-color: @odoo-brand-optional;
                         &:after {
-                            border-left-color: @odoo-brand-optional;
+                            .border-left-color(@odoo-brand-optional);
                         }
                     }
                 }
 
                 &:before {
-                    right: -@odoo-statusbar-arrow-width;
-                    border-left-color: @odoo-brand-lightsecondary;
+                    .right(-@odoo-statusbar-arrow-width);
+                    .border-left-color(@odoo-brand-lightsecondary);
                 }
 
                 &.btn-primary.disabled {
@@ -225,7 +225,7 @@
                     background-color: @odoo-brand-lightsecondary;
 
                     &:after {
-                        border-left-color: @odoo-brand-lightsecondary;
+                        .border-left-color(@odoo-brand-lightsecondary);
                     }
                 }
             }
@@ -235,7 +235,7 @@
                 min-width: 100px;
                 > li > button {
                     width: 100%;
-                    text-align: left;
+                    .text-align(left);
                 }
             }
         }
@@ -245,12 +245,12 @@
             > .dropdown-toggle {
                 &:after {
                     .o-caret-down();
-                    margin-left: @odoo-form-spacing-unit;
+                    .margin-left(@odoo-form-spacing-unit);
                 }
             }
 
             > .dropdown-menu {
-                padding: 5px 0 2px 0;
+                .padding(5px, 0, 2px, 0);
                 min-width: 100px;
 
                 > li > .btn {
@@ -309,7 +309,7 @@
             > tbody > tr > td {
                 &.o_td_label {
                     width: 0%;
-                    padding: 0 15px 0 0;
+                    .padding(0, 15px, 0, 0);
                     min-width: 150px;
                 }
                 vertical-align: top;
@@ -341,7 +341,7 @@
 
         .o_td_label .o_form_label {
             font-weight: bold;
-            margin-right: 0px;
+            .margin-right(0px);
         }
     }
 
@@ -362,11 +362,13 @@
         .nav-tabs > .tab-pane {
             min-height: 100px;
         }
+        .nav-tabs > li {
+            .float(left);
+        }
     }
-
     // Labels
     .o_form_label {
-        margin: 0 @odoo-form-spacing-unit 0 0;
+        .margin(0, @odoo-form-spacing-unit, 0, 0);
         font-size: @font-size-base; // The label muse have the same size whatever their position
         line-height: @line-height-base;
     }
@@ -418,11 +420,11 @@
             padding: 0;
 
             &.o_td_label {
-                text-align: right;
+                .text-align(right);
             }
 
             .o_form_label {
-                padding-right: 20px;
+                .padding-right(20px);
 
                 min-width: 0;
                 white-space: nowrap;
@@ -432,7 +434,7 @@
             }
 
             .o_field_widget {
-                text-align: right;
+                .text-align(right);
                 .o-justify-content(flex-end);
                 width: 100%;
             }
@@ -440,7 +442,7 @@
 
         .oe_subtotal_footer_separator {
             width: 100%;
-            text-align: right;
+            .text-align(right);
             border-top: 1px solid @odoo-brand-secondary;
             font-weight: bold;
             font-size: 1.3em;
@@ -454,30 +456,30 @@
         }
 
         .o_address_city {
-            margin-right: 2%;
+            .margin-right(2%);
         }
         .o_address_state {
-            margin-right: 2%;
+            .margin-right(2%);
         }
         &.o_zip_city {
             .o_address_zip {
-                margin-right: 2%;
+                .margin-right(2%);
             }
             .o_address_city {
-                margin-right: 0;
+                .margin-right(0);
             }
             .o_address_state {
                 display: block;
-                margin-right: 0;
+                .margin-right(0);
             }
         }
         &.o_city_state {
             .o_address_state {
-                margin-right: 0;
+                .margin-right(0);
             }
             .o_address_zip {
                 display: block;
-                margin-right: 0;
+                .margin-right(0);
             }
         }
         > span.o_field_widget {
@@ -520,7 +522,7 @@
 
     // Boolean
     .o_field_boolean {
-        margin: 0 @odoo-form-spacing-unit 0 0;
+        .margin(0, @odoo-form-spacing-unit, 0, 0);
     }
 
     // Timezone widget warning
@@ -528,7 +530,7 @@
         color: @brand-danger;
         cursor: help;
         position: absolute;
-        margin-left: -40px;
+        .margin-left(-40px);
         margin-top: 5px;
     }
 
@@ -557,9 +559,10 @@
     .oe_attachment {
         display: inline-block;
         border: 1px solid @odoo-brand-lightsecondary;
-        margin: 0 @odoo-form-spacing-unit @odoo-form-spacing-unit 0;
+        .margin(0, @odoo-form-spacing-unit, @odoo-form-spacing-unit, 0);
         padding: @odoo-form-spacing-unit;
     }
+
 
     &.oe_form_configuration {
         .o_group .o_form_label {
@@ -608,8 +611,8 @@
 
 // Buttons in ControlPanel
 .o_control_panel .o_form_buttons_view > button:first-child {
-    float: left; // Unfortunately needed for the bounce effect
-    margin-right: 4px;
+    .float(left); // Unfortunately needed for the bounce effect
+    .margin-right(4px);
 }
 
 // Light labels (not in bold) for settings forms
@@ -622,7 +625,7 @@ label.o_light_label, .o_light_label label {
     .o-flex(0, 1, auto);
     .o-flex-flow(row, wrap);
     .o_setting_box:visible:nth-child(odd) {
-        clear: left;
+        .clear(left);
     }
     .text-muted {
         color: #aaaaaa;
@@ -632,12 +635,12 @@ label.o_light_label, .o_light_label label {
         margin-top: 8px;
         .o_setting_left_pane {
             width: 24px;
-            float: left;
+            .float(left);
         }
         .o_setting_right_pane {
-            margin-left: 30px;
-            border-left: 1px solid #bbbbbb;
-            padding-left: 10px;
+            .margin-left(30px);
+            .border-left(1px solid #bbbbbb);
+            .padding-left(10px);
             .o_input_dropdown > .o_input {
                 width: 100%;
             }
