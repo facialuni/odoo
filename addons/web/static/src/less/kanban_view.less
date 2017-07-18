@@ -38,7 +38,7 @@
         background-color: @mix-soft;
         border-color: @mix-full;
 
-        .o_kamban_counter {
+        .o_kanban_counter {
             background-color: @mix-soft;
             border-color: @mix-soft;
         }
@@ -68,7 +68,7 @@
             }
         }
 
-        .o_kamban_counter.affix ~ .oe_kanban_card_@{class} {
+        .o_kanban_counter.affix ~ .oe_kanban_card_@{class} {
             margin-top: 20px + @o-kanban-record-margin*2;
 
             & ~ .oe_kanban_card_@{class} {
@@ -423,13 +423,13 @@
         background-color: @odoo-webclient-background-color;
         border: 1px solid transparent;
         border-width: 0 1px;
-        .o_kamban_counter {
+        .o_kanban_counter {
             background-color: @odoo-webclient-background-color;
             border-color: @odoo-webclient-background-color;
         }
         &:nth-child(odd) {
             background-color: darken(@odoo-webclient-background-color, 3%);
-            .o_kamban_counter {
+            .o_kanban_counter {
                 background-color: darken(@odoo-webclient-background-color, 3%);
                 border-color: darken(@odoo-webclient-background-color, 3%);
             }
@@ -504,7 +504,7 @@
                 position: absolute;
                 overflow: visible;
             }
-            > .o_kanban_record, .o_kanban_quick_add, .o_kanban_config, .o_kanban_load_more, .o_kamban_counter {
+            > .o_kanban_record, .o_kanban_quick_add, .o_kanban_config, .o_kanban_load_more, .o_kanban_counter {
                 display: none!important;
             }
             &:hover {
@@ -526,7 +526,7 @@
             background-color: darken(@odoo-webclient-background-color, 5%);
         }
 
-        .o_kamban_counter {
+        .o_kanban_counter {
             height: 18px;
             margin-bottom: 10px;
             position: relative;
@@ -552,7 +552,7 @@
                 }
             }
 
-            .o_kamban_counter_progress {
+            .o_kanban_counter_progress {
                 display: inline-block;
                 background: fade(black, 7%);
                 padding: 1px;
@@ -576,14 +576,14 @@
                     }
                 }
 
-                .o_kamban_counter_label {
+                .o_kanban_counter_label {
                     font-size: @o-kanban-counter-font-size;
                     .user-select(none);
                     .o-position-absolute(0, auto, auto, @o-kanban-record-margin);
                 }
             }
 
-            .o_kamban_counter_side {
+            .o_kanban_counter_side {
                 color: white;
                 font-size: @o-kanban-counter-font-size*1.2;
                 font-weight: bold;
@@ -592,7 +592,7 @@
             }
 
             &.o_counter_number {
-                .o_kamban_counter_progress {
+                .o_kanban_counter_progress {
                     width: 75%;
                 }
             }
@@ -602,7 +602,7 @@
             .o-flex-display();
             .o-flex-flow(wrap, column);
 
-            .o_kamban_counter.affix {
+            .o_kanban_counter.affix {
                 margin-top: 0;
 
                 & + .o_kanban_record {

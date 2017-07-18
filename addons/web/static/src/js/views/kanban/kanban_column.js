@@ -83,7 +83,7 @@ var KanbanColumn = Widget.extend({
     start: function () {
         var self = this;
         this.$header = this.$('.o_kanban_header');
-        this.$counter = this.$('.o_kamban_counter');
+        this.$counter = this.$('.o_kanban_counter');
 
         for (var i = 0; i < this.data_records.length; i++) {
             this.addRecord(this.data_records[i], {no_update: true});
@@ -237,10 +237,11 @@ var KanbanColumn = Widget.extend({
         }
     },
     _updateCounter: function() {
+        console.log('Welcome to Progress Bar')
         var self = this;
-        var $counter = this.$('.o_kamban_counter');
-        var $label = $counter.find('.o_kamban_counter_label');
-        var $side_c = $counter.find('.o_kamban_counter_side');
+        var $counter = this.$('.o_kanban_counter');
+        var $label = $counter.find('.o_kanban_counter_label');
+        var $side_c = $counter.find('.o_kanban_counter_side');
         var $bar_success = $counter.find('.o_progress_success');
         var $bar_blocked = $counter.find('.o_progress_blocked');
         var $bar_warning = $counter.find('.o_progress_warning');
@@ -248,7 +249,7 @@ var KanbanColumn = Widget.extend({
         var bar_n_success = 0;
         var bar_n_blocked = 0;
         var bar_n_warning = 0;
-        var tot_n = parseInt($side_c.text()) || this.records.length;
+        var tot_n = this.records.length || parseInt($side_c.text());
         $side_c.data('current-value', tot_n);
 
         $counter.affix({
@@ -275,6 +276,26 @@ var KanbanColumn = Widget.extend({
                 });
 
 
+                bar_n_success > 0 ? $bar_success.width((bar_n_success / tot_n) * 100 + "%").addClass('o_bar_active') : $bar_success.width(0).removeClass('o_bar_active');
+                bar_n_blocked > 0 ? $bar_blocked.width((bar_n_blocked / tot_n) * 100 + "%").addClass('o_bar_active') : $bar_blocked.width(0).removeClass('o_bar_active');
+
+                $bar_success.attr({
+                    'title': bar_n_success + ' ready',
+                    'data-original-title': bar_n_success + ' ready'
+                });
+                $bar_success.find($label).attr('data-current-value', bar_n_success);
+                $bar_blocked.attr({
+                    'title': bar_n_blocked + ' blocked',
+                    'data-original-title': bar_n_blocked + ' blocked'
+                });
+
+                $bar_success.add($bar_blocked).css('cursor', 'pointer');
+                $bar_success.add($bar_blocked).tooltip({
+                    delay: '0',
+                    trigger:'hover',
+                    placement: 'top'
+                });
+
                 self._animateNumber(tot_n, $side_c, 1000);
                 if (bar_n_success == 0 && bar_n_blocked > 0) {
                     // Use blocked as label in this particular condition only
@@ -283,29 +304,18 @@ var KanbanColumn = Widget.extend({
                     self._animateNumber(bar_n_success, $label, 1000, "", " ready");
                 }
 
-
-                bar_n_success > 0 ? $bar_success.width((bar_n_success / tot_n) * 100 + "%").addClass('o_bar_active') : $bar_success.width(0).removeClass('o_bar_active');
-                bar_n_blocked > 0 ? $bar_blocked.width((bar_n_blocked / tot_n) * 100 + "%").addClass('o_bar_active') : $bar_blocked.width(0).removeClass('o_bar_active');
-
-                $bar_success.add($bar_blocked).css('cursor', 'pointer');
-
-                $bar_success.attr('title', bar_n_success + ' ready');
-                $bar_blocked.attr('title', bar_n_blocked + ' blocked');
-
-                $bar_success.add($bar_blocked).tooltip({
-                    delay: '0',
-                    trigger:'hover',
-                    placement: 'top'
-                });
-
                 // TODO: Unbind if bars are empty
-                $bar_success.on('click', function() {
+                $bar_success.on('click', function(event) {
+                    event.stopPropagation()
+                    event.preventDefault();
                     $('.o_content').scrollTop(0);
                     self.$el.removeClass('o_kanban_group_show_blocked');
                     self.$el.toggleClass('o_kanban_group_show_success');
+                    console.log('Success')
                     return false;
                 });
-                $bar_blocked.on('click', function() {
+                $bar_blocked.on('click', function(event) {
+                    event.stopPropagation()
                     $('.o_content').scrollTop(0);
                     self.$el.removeClass('o_kanban_group_show_success');
                     self.$el.toggleClass('o_kanban_group_show_blocked');
@@ -350,15 +360,25 @@ var KanbanColumn = Widget.extend({
 
                 self._animateNumber(tot_value, $side_c, 1000, currency);
 
-                $bar_success.attr('title', bar_n_success + ' future activities');
-                $bar_blocked.attr('title', bar_n_blocked + ' overdue activities');
-                $bar_warning.attr('title', bar_n_warning + ' today activities');
+                $bar_success.attr({
+                    'title': bar_n_success + ' future activities',
+                    'data-original-title': bar_n_success + ' future activities'
+                });
+                $bar_blocked.attr({
+                    'title': bar_n_blocked + ' overdue activities',
+                    'data-original-title': bar_n_blocked + ' overdue activities'
+                });
+                $bar_warning.attr({
+                    'title': bar_n_warning + ' today activities',
+                    'data-original-title': bar_n_warning + ' today activities'
+                });
 
                 $bar_success.add($bar_blocked).add($bar_warning).tooltip({
                     delay: '0',
                     trigger:'hover',
                     placement: 'top'
                 });
+
 
                 bar_n_success > 0 ? $bar_success.width((bar_n_success / tot_n) * 100 + "%").addClass('o_bar_active') : $bar_success.width(0).removeClass('o_bar_active');
                 bar_n_blocked > 0 ? $bar_blocked.width((bar_n_blocked / tot_n) * 100 + "%").addClass('o_bar_active') : $bar_blocked.width(0).removeClass('o_bar_active');
@@ -398,9 +418,8 @@ var KanbanColumn = Widget.extend({
         bold_value = bold_value || false;
 
         // Retrive current value (buggy)
-        var start = $el.data('current-value') || 0;
-
-        if (end > 100) {
+        var start = $el.attr('data-current-value') || 0;
+        if (end > 1000) {
             end = end / 100;
             suffix = "K " + suffix;
         }
@@ -417,7 +436,7 @@ var KanbanColumn = Widget.extend({
             },
             complete: function() {
                 // Apply new current value
-                $el.data('current-value', end);
+                $el.attr('data-current-value', end);
             }
         });
     },

@@ -39,15 +39,15 @@
 </t>
 
 <t t-name="KanbanView.Counter">
-    <div class="o_kamban_counter">
-        <div class="o_kamban_counter_progress progress">
+    <div class="o_kanban_counter">
+        <div class="o_kanban_counter_progress progress">
             <div class="progress-bar o_progress_success">
-                <span data-current-value="0" class="o_kamban_counter_label"/>
+                <span data-current-value="0" class="o_kanban_counter_label"/>
             </div>
             <div class="progress-bar o_progress_blocked"/>
             <div class="progress-bar o_progress_warning"/>
         </div>
-        <div t-att-data-current-value="widget.data_records.length" class="o_kamban_counter_side pull-right"/>
+        <div t-att-data-current-value="widget.data_records.length" class="o_kanban_counter_side pull-right"/>
     </div>
 </t>
 
