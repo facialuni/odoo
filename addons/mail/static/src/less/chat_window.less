@@ -2,6 +2,8 @@
 @o-chat-window-width: 300px;
 
 .o_chat_window {
+    direction: @lng-direction;
+    .right(0);
     .o-flex-display();
     .o-flex-flow(column, nowrap);
     position: fixed;
@@ -46,19 +48,17 @@
             .o-flex(1, 1, auto);
             .o-text-overflow();
         }
-
         .o_chat_window_buttons {
             .o-flex(0, 0, auto);
             .o_chat_window_close, .o_chat_window_expand {
                 color: white;
                 padding: 3px;
-                margin-left: 5px;
+                .margin-left(5px);
                 &:hover {
                     background-color: darken(@odoo-brand-primary, 10%);
                 }
             }
         }
-
     }
 
     .o_mail_thread {
@@ -75,7 +75,7 @@
         }
         .o_thread_message {
             .o_thread_message_sidebar {
-                margin-right: 5px;
+                .margin-right(5px);
             }
             padding: 4px 5px;
         }
