@@ -15,8 +15,8 @@
                 <head></head>
                 % set company = object.employee_id.user_id.company_id
                 % set access_action = object.with_context(force_website=True).get_access_action()
-                % set is_online = access_action
-                % set access_url = object.get_mail_url() or ''
+                % set is_online = access_action and access_action['type'] == 'ir.actions.act_url'
+                % set access_url = is_online and object.get_mail_url() or '/web?#id=' + str(object.id) + '&view_type=form&model=hr.expense'
                 <body style="margin: 0; padding: 0;">
                 <table border="0" width="100%" cellpadding="0" bgcolor="#ededed" style="padding: 20px; background-color: #ededed" summary="o_mail_notification">
                     <tbody>
@@ -51,11 +51,17 @@
                                 % if is_online:
                                     <br/><br/>
                                     <center>
-                                      <a href="${access_url}" style="background-color: #1abc9c; padding: 20px; text-decoration: none; color: #fff; border-radius: 5px; font-size: 16px;" class="o_default_snippet_text">View Expense</a>
+                                      <a href="${access_url}" style="background-color: #875A7B; padding: 20px; text-decoration: none; color: #fff;
+                                      border:1px solid #875A7B;  border-radius: 5px; font-size: 16px; border-color:#875A7B" class="o_default_snippet_text">View Expense</a>
                                     </center>
                                 % endif
                                 <br/><br/>
                                 <p>Thank you,</p>
+                                <p style="color:#888888">
+                                    <!-- % if object.user_id and object.user_id.signature: -->
+                                        ${user.signature | safe}
+                                    <!-- % endif -->
+                                </p>
                               </td>
                             </tbody>
                           </table>
