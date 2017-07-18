@@ -89,7 +89,7 @@ var FieldMany2ManyTagsEmail = M2MTags.extend({
             }).open();
             pop.on('closed', self, function () {
                 def.resolve();
-                _.delay(function() { self.focus(); });
+                _.delay(function() { self.activate(); });
             });
         });
         return $.when.apply($, popupDefs).then(function() {
