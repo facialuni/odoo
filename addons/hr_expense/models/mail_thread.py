@@ -13,7 +13,9 @@ class MailThread(models.AbstractModel):
         model = self._context.get('thread_model') or self._name
         if model == 'hr.expense':
             RecordModel = self.env[model]
-            custom_values['product_id'] = self.env['product.product'].search(['|', ('name', '=ilike', custom_values['name']), ('default_code', '=ilike', custom_values['name'])]).id or custom_values['product_id']
+            product = self.env['product.product'].search(['|', ('name', '=ilike', custom_values['name']), ('default_code', '=ilike', custom_values['name']), ('can_be_expensed', '=', True)])
+            custom_values['product_id'] = product.id or custom_values['product_id']
+            custom_values['unit_amount'] = product.standard_price or custom_values['unit_amount']
             if custom_values.get('employee_id'):
                 res = super(MailThread, self).message_new(msg_dict, custom_values)
                 template_id = self.env.ref('hr_expense.email_template_hr_expense_success')
