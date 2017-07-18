@@ -28,12 +28,12 @@
             line-height: 40px;
             > a {
                 color: white;
-                margin-left: 5px;
+                .margin-left(5px);
                 text-decoration: underline;
             }
 
             &.fa-close {
-                margin-right: 10px;
+                .margin-right(10px);
                 cursor: pointer;
             }
         }
@@ -42,7 +42,7 @@
     .o_mail_chat_sidebar {
         width: @mail-chat-sidebar-width;
         height: 100%;
-        float: left;
+        .float(left);
         overflow: auto;
         padding: 8px 0;
         font-weight: 300;
@@ -55,7 +55,7 @@
 
         .o_mail_sidebar_title {
             .o-flex-display();
-            padding: 12px 8px 5px @odoo-horizontal-padding;
+            .padding(12px, 8px, 5px, @odoo-horizontal-padding);
             align-items: center;
             justify-content: space-between;
             h4 {
@@ -72,7 +72,7 @@
         .o_mail_chat_channel_item {
             .o-flex-display();
             width: 100%;
-            padding: 2px 8px 2px 1.5*@odoo-horizontal-padding; // larger padding-left than titles
+            .padding(2px, 8px, 2px, 1.5*@odoo-horizontal-padding); // larger padding-left than titles
             .o_channel_name {
                 .o-flex(1, 1, auto);
                 .o-text-overflow();
@@ -81,13 +81,13 @@
                 .o-flex(0, 0, auto);
             }
             .o_mail_sidebar_needaction {
-                margin: 0 0 0 5px;
+                .margin(0, 0, 0, 5px);
             }
             .o_mail_partner_unpin {
                 padding: 2px 6px;
             }
             i.fa-envelope-o {
-                margin-left: 3px;
+                .margin-left(3px);
             }
 
         }
@@ -99,12 +99,12 @@
             > input {
                 width: 100%;
                 padding: 2px 5px;
-                padding-left: 12px;
+                .padding-left(12px);
             }
             > span {
                 position: absolute;
                 top: 7px;
-                left: 27px;
+                .left(27px);
             }
         }
     }
@@ -113,20 +113,20 @@
         .o-flex-display();
         .o-flex-flow(column, nowrap);
         height: 100%;
-        margin-left: @mail-chat-sidebar-width;
+        .margin-left(@mail-chat-sidebar-width);
         position: relative;
         @media (min-width: @screen-sm-min) {
             overflow: auto;
         }
 
         @media (max-width: @screen-xs-max) {
-            margin-left: 0;
+            .margin-left(0);
         }
 
         .o_mail_thread {
             .o-flex(1, 0, 0);
             overflow: auto;
-            padding: 0 0 15px 0;
+            .padding(0, 0, 15px, 0);
 
             .o_chat_help_message {
                 padding: 25px 0;
@@ -142,21 +142,21 @@
 
                 .o_composer_input {
                     .o-flex(1, 1, auto);
-                    margin-right: 5px;
+                    .margin-right(5px);
                     > textarea {
                         padding: 5px;
                         border: none;
                     }
                 }
                 &.o_extended_composer .o_composer_input {
-                    margin-right: 0;
+                    .margin-right(0);
                 }
             }
 
             .o_composer_buttons {
                 .o-flex(0, 0, auto);
                 .o_composer_button_send {
-                    float: right;
+                    .float(right);
                 }
             }
         }
