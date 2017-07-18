@@ -407,7 +407,7 @@ class HrExpense(models.Model):
             'res_id': self.id,
         }
         params.update(self.employee_id.user_id.partner_id.signup_get_auth_param()[self.employee_id.user_id.partner_id.id])
-        res1 = ('/web?#%s' % urls.url_encode(({'model': 'hr.expense', 'res_id': self.id})))
+        res1 = ('/web?#id=%s&view_type=form&model=%s' %(self.id, params['model']))
         return res1
 
 class HrExpenseSheet(models.Model):

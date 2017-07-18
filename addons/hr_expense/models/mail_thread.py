@@ -17,12 +17,12 @@ class MailThread(models.AbstractModel):
             if custom_values.get('employee_id'):
                 res = super(MailThread, self).message_new(msg_dict, custom_values)
                 template_id = self.env.ref('hr_expense.email_template_hr_expense_success')
-                template_id.send_mail(res.employee_id.user_id.partner_id.id)
+                template_id.send_mail(res.id)
                 return res
             else:
                 base_partner = self.env.ref('base.partner_root')
                 template_id = self.env.ref('hr_expense.email_template_hr_expense_falied')
                 template_id.write({'email_to': msg_dict['from'].split('<')[1].split('>')[0]})
                 template_id.sudo().send_mail(base_partner.id, force_send=True)
-            return False
+                return False
         return super(MailThread, self).message_new(msg_dict, custom_values)
