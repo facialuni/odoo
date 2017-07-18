@@ -15,12 +15,12 @@ class MailComposeMessage(models.TransientModel):
             one_hour_before = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
             abandoned_cart_domain = [
                 ('id', 'in', context.get('active_ids')),
+                ('cart_recovery_email_sent', '!=', 'True'),
                 ('state', '=', 'draft'),
                 ('partner_id.id', '!=', self.env.ref('base.public_partner').id),
                 ('order_line', '!=', 'False'),
                 ('team_id.team_type', '=', 'website'),
                 ('date_order', '<', fields.Datetime.to_string(one_hour_before))]
-            for order in self.env['sale.order'].search(abandoned_cart_domain):
-                order.cart_recovery_email_sent = True
+            abandonned_orders = self.env['sale.order'].search(abandoned_cart_domain).write({'cart_recovery_email_sent': True})
             self = self.with_context(mail_post_autofollow=True)
         return super(MailComposeMessage, self).send_mail(auto_commit=auto_commit)

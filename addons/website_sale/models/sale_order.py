@@ -25,7 +25,6 @@ class SaleOrder(models.Model):
     only_services = fields.Boolean(compute='_compute_cart_info', string='Only Services')
     is_abandoned_cart = fields.Boolean(compute='_compute_abandoned_cart', string='Abandoned Cart')
     cart_recovery_email_sent = fields.Boolean(
-        default=False,
         string='Cart recovery email already sent')
     can_directly_mark_as_paid = fields.Boolean(compute='_compute_can_directly_mark_as_paid',
         string="Can be directly marked as paid", store=True,

@@ -15,7 +15,7 @@
         </field>
     </record>
 
-    <record id="view_order_form_inherit_website_sale" model="ir.ui.view">
+    <record id="sale_order_view_form_cart_recovery" model="ir.ui.view">
         <field name="name">sale.order.form.acquirer</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
