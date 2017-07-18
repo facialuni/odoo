@@ -5,17 +5,18 @@
     .o_web_settings_dashboard_card() {
         box-shadow: 0 1px 2px 0 rgba(0,0,0,.14);
         background: @bg-dashboard-col;
-        border-radius: 2px;
+        .border-radius(2px);
     }
 
     background: #F7F7F7;
     height: 100%;
 
     .o_web_settings_dashboard_col {
+        .float(left);
         padding: 10px 8px;
 
         > div > hr {
-            margin: 12px -18px 15px -18px;
+            .margin(12px, -18px, 15px, -18px);
             border-color: #CBCBCB;
         }
 
@@ -54,7 +55,7 @@
         }
         .o_web_settings_dashboard_invitations {
             .o_web_settings_dashboard_invitation_form {
-                text-align: left;
+                .text-align(left);
                 > textarea {
                     resize: vertical;
                     width: 100%;
@@ -73,13 +74,14 @@
             }
             .o_web_settings_dashboard_planner_progress_text {
                 font-size: 18px;
-                padding-right: 0px;
+                .padding-right(0px);
                 padding-top: 3px;
             }
             .o_web_settings_dashboard_planner_progress_bar {
-                padding-left: 10px;
+                .padding-left(10px);
             }
             .o_web_settings_dashboard_progress_title {
+                .text-align(left);
                 font-weight: bold;
                 cursor: pointer;
                 color: @odoo-brand-optional;
