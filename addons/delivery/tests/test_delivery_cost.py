@@ -33,6 +33,7 @@ class TestDeliveryCost(common.TransactionCase):
         # that the company actually uses USD
         self.env.user.company_id.write({'currency_id': self.env.ref('base.USD').id})
 
+
     def test_00_delivery_cost(self):
         # In order to test Carrier Cost
         # Create sales order with Normal Delivery Charges

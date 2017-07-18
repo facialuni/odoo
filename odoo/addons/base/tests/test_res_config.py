@@ -89,14 +89,13 @@ class TestResConfigExecute(TransactionCase):
     at_install = False
     post_install = True
 
-    print "\n\n\n\n\n\n\n\n\n"
-    print "res cnfig test case file run"
-    print "\n\n\n\n\n\n\n\n\n"
     def test_01_execute_res_config(self):
         """
         Try to create and execute all res_config models. Target settings that can't be
         loaded or saved and avoid remaining methods `get_default_foo` or `set_foo` that
         won't be executed is foo != `fields`
         """
-        _logger.info("Testing res.config.settings")
-        self.env['res.config.settings'].create({}).execute
+        all_config_settings = self.env['ir.model'].search([('name', 'like', 'config.settings')])
+        for config_settings in all_config_settings:
+            _logger.info("Testing %s" % (config_settings.name))
+            self.env[config_settings.name].create({}).execute()
