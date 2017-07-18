@@ -7,5 +7,4 @@ from . import hr
 from . import procurement
 from . import product
 from . import project
-from . import res_company
 from . import sale_order

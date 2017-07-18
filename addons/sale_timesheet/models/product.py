@@ -8,7 +8,7 @@ class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     service_policy = fields.Selection([
-        ('ordered_timesheet', 'Ordered Quantities'),
+        ('ordered_timesheet', 'Ordered quantities'),
         ('delivered_timesheet', 'Timesheets on tasks'),
         ('delivered_manual', 'Milestones (manually set quantities on order)')
     ], string="Invoice based on", compute='_compute_service_policy', inverse='_inverse_service_policy')
@@ -17,7 +17,7 @@ class ProductTemplate(models.Model):
     ])
     service_tracking = fields.Selection([
         ('no', 'Don\'t create task'),
-        ('task_global_project', 'Create task in global Project'),
+        ('task_global_project', 'Create task in existing project'),
         ('task_new_project', 'Create task in new project'),
         ('project_only', 'Create project but not task'),
     ], string="Service Tracking", default="no", help="On Sales order confirmation, this product can generate project and/or task. From thoses, you can track the service you are selling.")
