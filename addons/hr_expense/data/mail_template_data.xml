@@ -46,8 +46,7 @@
                           <table width="590" border="0" cellpadding="0" bgcolor="#ffffff" style="min-width: 590px; background-color: rgb(255, 255, 255); padding: 20px;">
                             <tbody>
                               <td valign="top" style="font-family:Arial,Helvetica,sans-serif; color: #555; font-size: 14px;">
-                                <p>Dear ${object.employee_id.name}
-                                <br/><br/>
+                                <p>
                                 Your expense has been successfully registered.
                                 You can now submit it to the manager from the following link.
                                 % if is_online:
@@ -103,9 +102,8 @@
         <record id="email_template_hr_expense_falied" model="mail.template">
             <field name="name">Expense Notification Failed</field>
             <field name="email_from"><![CDATA["${object.company_id.name|safe}" <${(object.company_id.email or user.email)|safe}>]]></field>
-            <field name="subject">${object.company_id.name} (Ref ${object.name or 'n/a' })</field>
-            <field name="partner_to">${object.employee_id.user_id.partner_id.id}</field>
-            <field name="model_id" ref="hr_expense.model_hr_expense"/>
+            <field name="subject">Your expense can not be registered</field>
+            <field name="model_id" ref="base.model_res_users"/>
             <field name="auto_delete" eval="True"/>
             <field name="body_html"><![CDATA[<html>
                 <head></head>
@@ -120,11 +118,6 @@
                         <td align="center" style="min-width: 590px;">
                           <table width="590" border="0" cellpadding="0" bgcolor="#875A7B" style="min-width: 590px; background-color: rgb(135,90,123); padding: 20px;">
                             <tr>
-                              <td valign="middle">
-                                  <span style="font-size:20px; color:white; font-weight: bold;">
-                                      ${object.record_name}
-                                  </span>
-                              </td>
                               <td valign="middle" align="right">
                                   <img src="/logo.png?company=${company.id}" style="padding: 0px; margin: 0px; height: auto; width: 80px;" alt="${company.name}">
                               </td>
