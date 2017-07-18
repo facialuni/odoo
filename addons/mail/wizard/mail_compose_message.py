@@ -392,6 +392,10 @@ class MailComposer(models.TransientModel):
     def save_as_template(self):
         """ hit save as template button: current form value will be a new
             template attached to the current document. """
+        # strip all newline characters from html
+        st = self.body.replace('\n', '')
+        modified_text = re.findall(r'(?<=<main>)(.*)(?=</main>)', st)
+        original_text = modified_text and modified_text[0] or self.body
         for record in self:
             model = self.env['ir.model']._get(record.model or 'mail.message')
             model_name = model.name or ''
@@ -399,7 +403,7 @@ class MailComposer(models.TransientModel):
             values = {
                 'name': template_name,
                 'subject': record.subject or False,
-                'body_html': record.body or False,
+                'body_html': original_text or False,
                 'model_id': model.id or False,
                 'attachment_ids': [(6, 0, [att.id for att in record.attachment_ids])],
             }

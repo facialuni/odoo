@@ -76,6 +76,43 @@
     <div t-if="activity.feedback"><strong> Feedback : </strong><p t-field="activity.feedback"></p></div>
 </div>
         </template>
-
+        <template id="external_email_layout_clean" name="Clean Layout">
+            <div style="background-color:#F3F5F6;color:#515166;font-family:Arial,Helvetica,sans-serif;font-size:14px;">
+                <div class="header">
+                    <table style="width:600px;margin:10px auto;">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <a href="/">
+                                        <img t-attf-src="/logo.png?company={{company.id}}" t-att-alt="company.name" style="vertical-align:baseline;max-width:100px;" />
+                                    </a>
+                                </td>
+                                <td style="text-align:right;vertical-align:middle;">
+                                    <h3><t t-esc="company.name"/></h3>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <main>
+                    <div style="width:600px;margin:0px auto;background-color:white;padding:8px; border:1px solid #e1e1e1;"><t t-raw="body"/></div>
+                </main>
+                <div class="footer">
+                    <table style="width:600px;margin:0px auto;text-align:center;">
+                        <tbody>
+                            <tr>
+                                <td style="padding-top:10px;font-size: 12px;">
+                                    <div><t t-esc="company.email"/></div>
+                                    <div><t t-esc="company.phone"/></div>
+                                    <div>
+                                        <a t-att-href="company.website" style="text-decoration:none;color:#717188;"><t t-esc="company.website"/></a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </template>
     </data>
 </odoo>
