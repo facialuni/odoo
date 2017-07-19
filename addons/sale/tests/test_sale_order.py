@@ -122,3 +122,51 @@ class TestSaleOrder(TestSale):
         sol = so.order_line.filtered(lambda l: l.product_id == serv_cost)
         self.assertTrue(sol, 'Sale: cost invoicing does not add lines when confirming vendor invoice')
         self.assertTrue(sol.price_unit == 160 and sol.qty_delivered == 2 and sol.product_uom_qty == sol.qty_invoiced == 0, 'Sale: line is wrong after confirming vendor invoice')
+
+    def test_pricelist_application(self):
+        """ Test different prices are correctly applied based on dates """
+        support_product = self.env.ref('product.product_product_2')
+        support_product.list_price = 100
+
+
+        christmas_pricelist = self.env['product.pricelist'].create({
+            'name': 'Christmas pricelist',
+            'item_ids': [(0, 0, {
+                'date_start': "2017-12-01",
+                'date_end': "2017-12-24",
+                'compute_price': 'percentage',
+                'base': 'list_price',
+                'percent_price': 20,
+                'applied_on': '3_global',
+                'name': 'Pre-Christmas discount'
+            }), (0, 0, {
+                'date_start': "2017-12-25",
+                'date_end': "2017-12-31",
+                'compute_price': 'percentage',
+                'base': 'list_price',
+                'percent_price': 50,
+                'applied_on': '3_global',
+                'name': 'Post-Christmas super-discount'
+            })]
+        })
+
+        so = self.env['sale.order'].create({
+            'partner_id': self.partner.id,
+            'date_order': '2017-12-20',
+            'pricelist_id': christmas_pricelist.id,
+        })
+
+        order_line = self.env['sale.order.line'].new({
+            'order_id': so.id,
+            'product_id': support_product.id,
+        })
+
+        # force compute uom and prices
+        order_line.product_id_change()
+        order_line.product_uom_change()
+
+        self.assertEqual(order_line.price_unit, 80, "First date pricelist rule not applied")
+
+        so.date_order = '2017-12-30'
+        order_line.product_id_change()
+        self.assertEqual(order_line.price_unit, 50, "Second date pricelist rule not applied")
