@@ -14,69 +14,101 @@
             margin-top: 15px;
             .selected {
                 background-color: #fff;
-                .project {
-                    color: #8269b8;
-                }
-                .inventory {
-                    color: #ff4657;
-                }
-                .mrp {
-                    color: #00c74b;
-                }
-                .sales {
-                    color: #d5621d;
-                }
-                .pos {
-                    color: #7b8b8c;
-                }
-                .purchase {
-                    color: #5ecede;
-                }
-                .employee {
-                    color: #555191;
-                }
-                .hrrecruitment {
-                    color: #ab0094;
-                }
-                .timesheets {
-                    color: #d32f6d;
-                }
-                .massmailing {
-                    color: #898071;
-                }
-                .hrexpense {
-                    color: #555655;
-                }
-                .hrattendance {
-                    color: #95e9e6;
-                }
-                .fleet {
-                    color: #730094;
-                }
-                .account {
-                    color: #fa9700;
-                }
-                .website {
-                    color: #ee7900;
-                }
-                .events {
-                    color: #70b2aa;
-                }
-                .subscriptions {
-                    color: #defe0c;
-                }
-                .hrpayroll {
-                    color: #cfe786;
+                .logo {
+                    filter: grayscale(0%) !important;
                 }
             }
-            .app_name {
+            .appContainer {
                 font-size: 15px;
                 height: 40px;
+                width: 100%;
                 padding-left: 10px;
                 line-height: 40px;
                 cursor: pointer;
+                display: inline-flex;
                 .fa {
                     padding-right: 8px;
+                }
+                .logo {
+                    width: 25px;
+                    height: 100%;
+                    border-radius: 40px;
+                    filter: grayscale(100%);
+                }
+                .pos {
+                    background : url('/point_of_sale/static/description/icon.png') no-repeat center;
+                    background-size:contain;
+                }
+                .account {
+                    background : url('/account_accountant/static/description/icon.png') no-repeat center;
+                    background-size:contain;
+                }
+                .inventory {
+                    background : url('/stock/static/description/icon.png') no-repeat center;
+                    background-size:contain;
+                }
+                .project {
+                    background : url('/project/static/description/icon.png') no-repeat center;
+                    background-size:contain;
+                }
+                .mrp {
+                    background : url('/mrp/static/description/icon.png') no-repeat center;
+                    background-size:contain;
+                }
+                .sales {
+                    background : url('/sale_management/static/description/icon.png') no-repeat center;
+                    background-size:contain;
+                }
+                .purchase {
+                    background : url('/purchase/static/description/icon.png') no-repeat center;
+                    background-size:contain;
+                }
+                .employee {
+                    background : url('/hr/static/description/icon.png') no-repeat center;
+                    background-size:contain;
+                }
+                .hrrecruitment {
+                    background : url('/hr_recruitment/static/description/icon.png') no-repeat center;
+                    background-size:contain;
+                }
+                .timesheets {
+                    background : url('/hr_timesheet/static/description/icon.png') no-repeat center;
+                    background-size:contain;
+                }
+                .massmailing {
+                    background : url('/mass_mailing/static/description/icon.png') no-repeat center;
+                    background-size:contain;
+                }
+                .hrexpense {
+                    background : url('/hr_expense/static/description/icon.png') no-repeat center;
+                    background-size:contain;
+                }
+                .hrattendance {
+                    background : url('/hr_attendance/static/description/icon.png') no-repeat center;
+                    background-size:contain;
+                }
+                .fleet {
+                    background : url('/fleet/static/description/icon.png') no-repeat center;
+                    background-size:contain;
+                }
+                .website {
+                    background : url('/website/static/description/icon.png') no-repeat center;
+                    background-size:contain;
+                }
+                .events {
+                    background : url('/event/static/description/icon.png') no-repeat center;
+                    background-size:contain;
+                }
+                .subscriptions {
+                    background : url('/sale_subscription/static/description/icon.png') no-repeat center;
+                    background-size:contain;
+                }
+                .hrpayroll {
+                    background : url('/hr_payroll/static/description/icon.png') no-repeat center;
+                    background-size:contain;
+                }
+                .app_name {
+                    padding-left: 10px;
                 }
             }
         }

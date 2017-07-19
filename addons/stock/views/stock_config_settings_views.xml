@@ -7,7 +7,9 @@
             <field name="inherit_id" ref="base.res_config_setting_form" />
             <field name="arch" type="xml">
                 <xpath expr="//div[@class='apps']" position="inside">
-                    <div class="app_name selected" setting="inventory"><i class="fa fa-industry inventory" aria-hidden="true"></i> Inventory</div>
+                    <div class="appContainer selected" setting="inventory">
+                        <div class="logo inventory"/> <span class="app_name">Inventory</span>
+                    </div>
                 </xpath>
                 <xpath expr="//div[@class='settings']" position="inside">
                     <div class="inventory_setting_view show">

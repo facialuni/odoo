@@ -6,7 +6,9 @@
             <field name="inherit_id" ref="base.res_config_setting_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[@class='apps']" position="inside">
-                    <div class="app_name" setting="pos"><i class="fa fa-desktop pos"/> Point of Sale</div>
+                    <div class="appContainer" setting="pos">
+                        <div class="logo pos"/> <span class="app_name">Point of Sale</span>
+                    </div>
                 </xpath>
                 <xpath expr="//div[@class='settings']" position="inside">
                     <div class="pos_setting_view o_hidden">

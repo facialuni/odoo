@@ -6,7 +6,9 @@
         <field name="inherit_id" ref="base.res_config_setting_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[@class='apps']" position="inside">
-                    <div class="app_name" setting="hrattendance"><i class="fa fa-user hrattendance"/> Attendances</div>
+                    <div class="appContainer" setting="hrattendance">
+                        <div class="logo hrattendance"/> <span class="app_name">Attendances</span>
+                    </div>
                 </xpath>
                 <xpath expr="//div[@class='settings']" position="inside">
                     <div class="hrattendance_setting_view o_hidden">

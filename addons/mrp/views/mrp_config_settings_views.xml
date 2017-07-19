@@ -7,7 +7,9 @@
             <field name="inherit_id" ref="base.res_config_setting_form" />
             <field name="arch" type="xml">
                 <xpath expr="//div[@class='apps']" position="inside">
-                    <div class="app_name" setting="mrp"><i class="fa fa-wrench mrp" aria-hidden="true"></i> Manufacturing</div>
+                    <div class="appContainer" setting="mrp">
+                        <div class="logo mrp"/> <span class="app_name">Manufacturing</span>
+                    </div>
                 </xpath>
                 <xpath expr="//div[@class='settings']" position="inside">
                     <div class="mrp_setting_view o_hidden">

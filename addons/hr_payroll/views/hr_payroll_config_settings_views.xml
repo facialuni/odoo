@@ -14,7 +14,9 @@
             <field name="inherit_id" ref="base.res_config_setting_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[@class='apps']" position="inside">
-                    <div class="app_name" setting="hrpayroll"><i class="fa fa-money hrpayroll"/> Payroll</div>
+                    <div class="appContainer" setting="hrpayroll">
+                        <div class="logo hrpayroll"/> <span class="app_name">Payroll</span>
+                    </div>
                 </xpath>
                 <xpath expr="//div[@class='settings']" position="inside">
                     <div class="hrpayroll_setting_view o_hidden">

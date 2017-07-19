@@ -7,7 +7,9 @@
             <field name="inherit_id" ref="base.res_config_setting_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[@class='apps']" position="inside">
-                    <div class="app_name" setting="fleet"><i class="fa fa-car fleet"/> Fleet</div>
+                    <div class="appContainer" setting="fleet">
+                        <div class="logo fleet"/> <span class="app_name">Fleet</span>
+                    </div>
                 </xpath>
                 <xpath expr="//div[@class='settings']" position="inside">
                     <div class="fleet_setting_view o_hidden">

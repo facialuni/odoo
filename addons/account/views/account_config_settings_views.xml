@@ -15,7 +15,9 @@
             <field name="inherit_id" ref="base.res_config_setting_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[@class='apps']" position="inside">
-                    <div class="app_name" setting="account"><i class="fa fa-file-text-o account"/> Accounting</div>
+                    <div class="appContainer" setting="account">
+                        <div class="logo account"/> <span class="app_name">Accounting</span>
+                    </div>
                 </xpath>
                 <xpath expr="//div[@class='settings']" position="inside">
                     <div class="account_setting_view o_hidden">

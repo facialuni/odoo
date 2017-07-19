@@ -1,6 +1,6 @@
 $(document).ready(function() {
 
-    $('body').on('click', '.app_name', function(event) {
+    $('body').on('click', '.appContainer', function(event) {
         var settingName = $(event.currentTarget).attr('setting');
         $('.selected').removeClass('selected');
         $(event.currentTarget).addClass('selected');
