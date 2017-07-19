@@ -6,4 +6,3 @@ from . import hr_expense
 from . import product_template
 from . import hr_expense_config_settings
 from . import web_planner
-from . import mail_thread
