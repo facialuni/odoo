@@ -343,8 +343,8 @@ class HrExpense(models.Model):
         # which is 'Fixed Cost'
         default_product = self.env.ref('hr_expense.product_product_fixed_cost')
         pattern = re.sub(r'[^a-zA-Z]+', ' ', expense_description)
-        exp_products = self.env['product.product'].search([('product_tmpl_id.can_be_expensed', '=', True)])
         product = default_product
+        exp_products = self.env['product.product'].search([('product_tmpl_id.can_be_expensed', '=', True)])
         for each_exp_prod in exp_products:
             if each_exp_prod.name in pattern:
                 product = each_exp_prod
@@ -366,6 +366,7 @@ class HrExpense(models.Model):
             expense_description = expense_description.replace(price, '')
             if employee and employee.company_id.currency_id.symbol in expense_description:
                 expense_description = expense_description.replace(employee.company_id.currency_id.symbol, '')
+            expense_description = re.sub('[^A-Za-z0-9.]+', ' ', expense_description)
             try:
                 price = float(price)
             except ValueError:
