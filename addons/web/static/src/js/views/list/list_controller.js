@@ -134,7 +134,7 @@ var ListController = BasicController.extend({
                     $(this).tooltip('hide'); //forcefully hide tooltip as firefox doesn't hide it when element get hidden
                 }
                 if (event.which == $.ui.keyCode.ESCAPE) {
-                    self.history_back();
+                    self.trigger_up('history_back');
                 }
             });
 
@@ -183,12 +183,6 @@ var ListController = BasicController.extend({
 
             this._toggleSidebar();
         }
-    },
-    /**
-     * This method is create to do history back, method created so that can easily be overridden.
-     */
-    history_back: function () {
-        this.trigger_up('history_back');
     },
 
     //--------------------------------------------------------------------------
