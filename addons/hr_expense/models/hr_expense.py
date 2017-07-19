@@ -342,13 +342,16 @@ class HrExpense(models.Model):
         # of the product to encode on the expense. If not, take the default product instead
         # which is 'Fixed Cost'
         default_product = self.env.ref('hr_expense.product_product_fixed_cost')
-        pattern = '\[([^)]*)\]'
-        product_code = re.search(pattern, expense_description)
-        if product_code is None:
-            product = default_product
-        else:
-            expense_description = expense_description.replace(product_code.group(), '')
-            product = self.env['product.product'].search([('default_code', 'ilike', product_code.group(1))]) or default_product
+        pattern = re.sub(r'[^a-zA-Z]+', ' ', expense_description)
+        exp_products = self.env['product.product'].search([('product_tmpl_id.can_be_expensed', '=', True)])
+        product = default_product
+        for each_exp_prod in exp_products:
+            if each_exp_prod.name in pattern:
+                product = each_exp_prod
+                break
+            elif each_exp_prod.code and each_exp_prod.code in pattern:
+                product = each_exp_prod
+                break
 
         pattern = '[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?'
         # Match the last occurence of a float in the string
@@ -361,6 +364,8 @@ class HrExpense(models.Model):
         else:
             price = expense_price[-1][0]
             expense_description = expense_description.replace(price, '')
+            if employee and employee.company_id.currency_id.symbol in expense_description:
+                expense_description = expense_description.replace(employee.company_id.currency_id.symbol, '')
             try:
                 price = float(price)
             except ValueError:
