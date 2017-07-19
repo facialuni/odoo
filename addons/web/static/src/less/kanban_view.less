@@ -588,7 +588,9 @@
                 font-size: @o-kanban-counter-font-size*1.2;
                 font-weight: bold;
                 text-align: right;
-                .o-animation(grow, .4s, ease-in);
+                .o_kanban_counter_side_update {                    
+                    .o-animation(grow, .4s, ease-in);
+                }
             }
 
             &.o_counter_number {

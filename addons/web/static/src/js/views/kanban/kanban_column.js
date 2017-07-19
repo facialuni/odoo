@@ -8,6 +8,7 @@ var kanban_quick_create = require('web.kanban_quick_create');
 var KanbanRecord = require('web.KanbanRecord');
 var view_dialogs = require('web.view_dialogs');
 var Widget = require('web.Widget');
+var session = require('web.session');
 
 var _t = core._t;
 var QWeb = core.qweb;
@@ -60,7 +61,6 @@ var KanbanColumn = Widget.extend({
         this.remaining = this.size - this.data_records.length;
 
         this.record_options = _.clone(recordOptions);
-
         if (options.grouped_by_m2o) {
             // For many2one, a false value means that the field is not set.
             this.title = value ? value : _t('Undefined');
@@ -75,6 +75,9 @@ var KanbanColumn = Widget.extend({
             }).join('');
         } else {
             this.tooltipInfo = "";
+        }
+        if(data.data[0] && this.relation === 'crm.stage'){
+            this.currency_id = data.data[0].data.company_currency.res_id;
         }
     },
     /**
@@ -113,6 +116,7 @@ var KanbanColumn = Widget.extend({
                     var index = self.records.indexOf(record);
                     record.$el.removeAttr('style');  // jqueryui sortable add display:block inline
                     ui.item.addClass('o_updating');
+                    debugger;
                     if (index >= 0) {
                         if ($.contains(self.$el[0], record.$el[0])) {
                             // resequencing records
@@ -237,7 +241,6 @@ var KanbanColumn = Widget.extend({
         }
     },
     _updateCounter: function() {
-        console.log('Welcome to Progress Bar')
         var self = this;
         var $counter = this.$('.o_kanban_counter');
         var $label = $counter.find('.o_kanban_counter_label');
@@ -279,6 +282,9 @@ var KanbanColumn = Widget.extend({
                 bar_n_success > 0 ? $bar_success.width((bar_n_success / tot_n) * 100 + "%").addClass('o_bar_active') : $bar_success.width(0).removeClass('o_bar_active');
                 bar_n_blocked > 0 ? $bar_blocked.width((bar_n_blocked / tot_n) * 100 + "%").addClass('o_bar_active') : $bar_blocked.width(0).removeClass('o_bar_active');
 
+                $bar_success.off();
+                $bar_blocked.off();
+
                 $bar_success.attr({
                     'title': bar_n_success + ' ready',
                     'data-original-title': bar_n_success + ' ready'
@@ -306,16 +312,12 @@ var KanbanColumn = Widget.extend({
 
                 // TODO: Unbind if bars are empty
                 $bar_success.on('click', function(event) {
-                    event.stopPropagation()
-                    event.preventDefault();
                     $('.o_content').scrollTop(0);
                     self.$el.removeClass('o_kanban_group_show_blocked');
                     self.$el.toggleClass('o_kanban_group_show_success');
-                    console.log('Success')
                     return false;
                 });
                 $bar_blocked.on('click', function(event) {
-                    event.stopPropagation()
                     $('.o_content').scrollTop(0);
                     self.$el.removeClass('o_kanban_group_show_success');
                     self.$el.toggleClass('o_kanban_group_show_blocked');
@@ -324,8 +326,6 @@ var KanbanColumn = Widget.extend({
                 break;
 
             case "crm.stage":
-                // TODO: It should automatically retrive the right symbol
-                var currency = "$ ";
                 var tot_value = parseInt($side_c.text()) || 0;
 
                 tot_n = 0;
@@ -358,7 +358,21 @@ var KanbanColumn = Widget.extend({
                     }
                 });
 
-                self._animateNumber(tot_value, $side_c, 1000, currency);
+                var currency_prefix = "", currency_suffix = "";
+                if(this.currency_id){
+                    if(session.currencies[this.currency_id].position === 'before'){
+                        currency_prefix = session.currencies[this.currency_id].symbol + " ";
+                    }
+                    else{
+                        currency_suffix = " " + session.currencies[this.currency_id].symbol;
+                    }
+                }
+
+                self._animateNumber(tot_value, $side_c, 1000, currency_prefix, currency_suffix);
+
+                $bar_success.off();
+                $bar_blocked.off();
+                $bar_warning.off();
 
                 $bar_success.attr({
                     'title': bar_n_success + ' future activities',
@@ -387,7 +401,7 @@ var KanbanColumn = Widget.extend({
                 self.$el.removeClass('o_kanban_group_show_blocked o_kanban_group_show_success o_kanban_group_show_warning');
 
                 // TODO: Unbind if bars are empty
-                $bar_success.on('click', function() {
+                $bar_success.on('click', function(event) {
                     $('.o_content').scrollTop(0);
                     self.$el.removeClass('o_kanban_group_show_blocked o_kanban_group_show_warning');
                     self.$el.toggleClass('o_kanban_group_show_success');
@@ -420,7 +434,7 @@ var KanbanColumn = Widget.extend({
         // Retrive current value (buggy)
         var start = $el.attr('data-current-value') || 0;
         if (end > 1000) {
-            end = end / 100;
+            end = end / 1000;
             suffix = "K " + suffix;
         }
 
@@ -436,7 +450,7 @@ var KanbanColumn = Widget.extend({
             },
             complete: function() {
                 // Apply new current value
-                $el.attr('data-current-value', end);
+                $el.attr('data-current-value', parseInt(end));
             }
         });
     },
