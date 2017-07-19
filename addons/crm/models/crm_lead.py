@@ -284,15 +284,19 @@ class Lead(models.Model):
         if context.get('default_partner_id') and not vals.get('email_from'):
             partner = self.env['res.partner'].browse(context['default_partner_id'])
             vals['email_from'] = partner.email
-
         # context: no_log, because subtype already handle this
-        return super(Lead, self.with_context(context, mail_create_nolog=True)).create(vals)
+        record = super(Lead, self.with_context(context, mail_create_nolog=True)).create(vals)
+        self.create_crm_opportunity_history(vals)
+        return record
 
     @api.multi
     def write(self, vals):
         # stage change: update date_last_stage_update
         if 'stage_id' in vals:
             vals['date_last_stage_update'] = fields.Datetime.now()
+            # create record for crm.history to maintain history of stage moves and closed opportunity
+            if self.type == 'opportunity':
+                self.create_crm_opportunity_history(vals)
         if vals.get('user_id') and 'date_open' not in vals:
             vals['date_open'] = fields.Datetime.now()
         # stage change with new stage: update probability and date_closed
@@ -327,6 +331,16 @@ class Lead(models.Model):
         if view_type == 'form':
             res['arch'] = self._fields_view_get_address(res['arch'])
         return res
+
+    @api.multi
+    def create_crm_opportunity_history(self, vals):
+        self.env['crm.opportunity.history'].create({
+            'stage_id': vals['stage_id'],
+            'res_id': self.id,
+            'date_closed': vals.get('date_closed') or self.date_closed,
+            'opp_create_date': vals.get('create_date') or self.create_date,
+            'date_deadline': vals.get('date_deadline') or self.date_deadline,
+        })
 
     # ----------------------------------------
     # Actions Methods
@@ -397,52 +411,6 @@ class Lead(models.Model):
                         }
                     }
             return True
-
-    @api.multi
-    def calculate_percentage(self, start_date, end_date, stages):
-        query = """
-            SELECT
-                COUNT(CASE WHEN create_date >= %(start_date)s THEN id END) as new_deals,
-                COUNT(CASE WHEN (date_deadline <= %(end_date)s or date_deadline IS null) and date_closed IS null THEN id END) as deals_left,
-                COUNT(CASE WHEN date_closed BETWEEN %(start_date)s AND %(end_date)s THEN id END) as closed_deals,
-                COUNT(CASE WHEN date_closed IS null THEN id END) as total_open_deals
-            FROM crm_lead
-            WHERE
-                type = 'opportunity'
-                """
-        self.env.cr.execute(query, {'start_date': start_date,
-                                    'end_date': end_date})
-        query_result = self.env.cr.dictfetchone()
-
-        select_clouse = 'SELECT'
-        for stage in stages[1:]:
-            select_clouse += " COUNT(CASE WHEN track.new_value_char = '" + stage + "' THEN msg.res_id END) as " + stage + "_stage_moves,"
-
-        from_clouse = """
-            FROM mail_message msg join mail_tracking_value track on track.mail_message_id = msg.id
-            WHERE
-                msg.model = 'crm.lead'
-            AND
-                msg.create_date BETWEEN %(start_date)s AND %(end_date)s
-            AND
-                track.field = 'stage_id'
-            AND
-                res_id IN (SELECT id FROM crm_lead WHERE type = 'opportunity')
-        """
-
-        query_mail = select_clouse[:-1] + from_clouse
-        self.env.cr.execute(query_mail, {
-                    'start_date': start_date,
-                    'end_date': end_date,
-                    'stage': stages
-            })
-        query_mail_result = self.env.cr.dictfetchone()
-        print ">>>>>>>>\n", query_mail_result
-        return {'data': {
-                    'new_deals': query_result['new_deals'],
-                    'deals_left': query_result['deals_left'],
-                    'all_stage_moves': query_mail_result,
-        }}
 
     @api.multi
     def action_schedule_meeting(self):

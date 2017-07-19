@@ -16,8 +16,10 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
     start: function () {
         this._super.apply(this, arguments);
         this.get_stages();
-        this.start_date = '07/01/2017'
-        this.end_date = '07/31/2017'
+        this.start_date = '07/01/2017';
+        this.end_date = '07/31/2017';
+        this.user_id = 1;
+        this.team_id = 1;
     },
     renderElement: function () {
         this._super.apply(this, arguments);
@@ -38,14 +40,12 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
     calculation: function () {
         var self = this;
         this._rpc({
-            model: 'crm.lead',
-            method: 'calculate_percentage',
-            args: [, this.start_date, this.end_date, this.stages],
+            model: 'crm.opportunity.history',
+            method: 'calculate_moves',
+            args: [, this.start_date, this.end_date, this.stages, this.user_id, this.team_id],
         }).then(function (result) {
-            self.new_deals = result.data.new_deals;
-            self.deals_left = result.data.deals_left;
             self.renderElement();
-        })
+        });
     },
 })
 
