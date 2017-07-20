@@ -171,6 +171,9 @@ class EventEvent(models.Model):
     badge_innerleft = fields.Html(string='Badge Inner Left')
     badge_innerright = fields.Html(string='Badge Inner Right')
     event_logo = fields.Html(string='Event Logo')
+    show_timezone = fields.Selection(
+        [('hidden', 'Don\'s show timezone'), ('visitor', 'Show time in visitior\'s timezone'), ('unique', 'Show timezone in a unique timezone')],
+        string='Show Timezone', required=True, default='hidden')
 
     @api.multi
     @api.depends('seats_max', 'registration_ids.state')

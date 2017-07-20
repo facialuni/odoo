@@ -229,7 +229,11 @@
                             <group>
                                 <field name="date_begin"/>
                                 <field name="date_end"/>
-                                <field name="date_tz"/>
+                                <label for="date_tz" string=""/>
+                                <div>
+                                    <field name="date_tz" attrs="{'readonly': [('show_timezone', '=', 'hidden')]}"/>
+                                    <field name="show_timezone" widget='radio'/>
+                                </div>
                             </group>
                             <group>
                                 <field name="seats_min"/>
