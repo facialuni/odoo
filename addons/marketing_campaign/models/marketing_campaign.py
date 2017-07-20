@@ -330,10 +330,10 @@ class MarketingCampaignActivity(models.Model):
              "cancelled instead of being deleted.")
 
     @api.model
-    def search(self, args, offset=0, limit=None, order=None, count=False):
+    def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
         if 'segment_id' in self.env.context:
             return self.env['marketing.campaign.segment'].browse(self.env.context['segment_id']).campaign_id.activity_ids
-        return super(MarketingCampaignActivity, self).search(args, offset, limit, order, count)
+        return super(MarketingCampaignActivity, self)._search(args, offset, limit, order, count, access_rights_uid=access_rights_uid)
 
     @api.multi
     def _process_wi_email(self, workitem):
