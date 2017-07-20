@@ -677,4 +677,16 @@ if tax > result:result=tax</field>
         <field name="tag_ids" eval="[(6,0,[ref('cess_tag_tax'),])]"/>
     </record>
 
+    <!-- Set Default Tax-->
+
+    <record id="default_sale_tax_config" model="ir.config_parameter">
+        <field name="key">account.default_sale_tax_id</field>
+        <field name="value" ref="sgst_sale_5"/>
+    </record>
+
+    <record id="default_purchase_tax_config" model="ir.config_parameter">
+        <field name="key">account.default_purchase_tax_id</field>
+        <field name="value" ref="sgst_purchase_5"/>
+    </record>
+
 </odoo>

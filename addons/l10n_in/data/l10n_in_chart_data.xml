@@ -510,4 +510,18 @@
             <field name="expense_currency_exchange_account_id" ref="p2117"/>
         </record>
 
+        <!-- Account Journal -->
+
+        <record id="retail_invoice_journal" model="account.journal">
+            <field name="name">Retail Invoice</field>
+            <field name="code">RETINV</field>
+            <field name="type">sale</field>
+        </record>
+
+        <record id="export_invoice_journal" model="account.journal">
+            <field name="name">Export Invoice</field>
+            <field name="code">EXPINV</field>
+            <field name="type">sale</field>
+        </record>
+
 </odoo>
