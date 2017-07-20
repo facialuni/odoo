@@ -342,14 +342,15 @@ class HrExpense(models.Model):
         # of the product to encode on the expense. If not, take the default product instead
         # which is 'Fixed Cost'
         default_product = self.env.ref('hr_expense.product_product_fixed_cost')
-        pattern = re.sub(r'[^a-zA-Z]+', ' ', expense_description)
+        exp_desc_str = re.sub(r'[^a-zA-Z]+', ' ', expense_description).lower()
         product = default_product
         exp_products = self.env['product.product'].search([('product_tmpl_id.can_be_expensed', '=', True)])
+        # Below code will check for each product name/code if its present or not in expense description
         for each_exp_prod in exp_products:
-            if each_exp_prod.name in pattern:
+            if each_exp_prod.name.lower() in exp_desc_str:
                 product = each_exp_prod
                 break
-            elif each_exp_prod.code and each_exp_prod.code in pattern:
+            elif each_exp_prod.code.lower() and each_exp_prod.code in exp_desc_str:
                 product = each_exp_prod
                 break
 
@@ -383,8 +384,8 @@ class HrExpense(models.Model):
         })
         if custom_values.get('employee_id'):
             res = super(HrExpense, self).message_new(msg_dict, custom_values)
-            template_id = self.env.ref('hr_expense.email_template_hr_expense_success')
-            template_id.send_mail(res.id)
+            self.env.ref('hr_expense.email_template_hr_expense_success').send_mail(res.id)
+            # template_id.send_mail(res.id)
             return res
         else:
             base_partner = self.env.ref('base.partner_root')
@@ -392,11 +393,11 @@ class HrExpense(models.Model):
             template_id.write({'email_to': email_split(msg_dict.get('email_from', False))[0]})
             template_id.sudo().send_mail(base_partner.id, force_send=True)
             return False
-        return super(HrExpense, self).message_new(msg_dict, custom_values)
+        # return super(HrExpense, self).message_new(msg_dict, custom_values)
 
     @api.multi
     def get_access_action(self, access_uid=None):
-        """ Instead of the classic form view, redirect to the online invoice for portal users. """
+        """ Instead of the classic form view, redirect to the online expense. """
         self.ensure_one()
         user, record = self.env.user, self
         if access_uid:
