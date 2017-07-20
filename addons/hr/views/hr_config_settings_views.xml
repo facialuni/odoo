@@ -6,12 +6,12 @@
         <field name="inherit_id" ref="base.res_config_setting_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@class='apps']" position="inside">
-                <div class="appContainer" setting="employee">
+                <div class="appContainer" setting="employee" groups="hr.group_hr_manager">
                     <div class="logo employee"/> <span class="app_name">Employee</span>
                 </div>
             </xpath>
             <xpath expr="//div[@class='settings']" position="inside">
-                <div class="employee_setting_view o_hidden">
+                <div class="employee_setting_view o_hidden" groups="hr.group_hr_manager">
                     <field name="company_id" invisible="1"/>
                     <h2>Work Organization</h2>
                     <div class="row mt16 o_settings_container" title="Prout prout prout">

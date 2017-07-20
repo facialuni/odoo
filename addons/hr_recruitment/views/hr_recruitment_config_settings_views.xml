@@ -7,12 +7,12 @@
             <field name="inherit_id" ref="base.res_config_setting_form"/>
             <field name="arch" type="xml">
                <xpath expr="//div[@class='apps']" position="inside">
-                    <div class="appContainer" setting="hrrecruitment">
+                    <div class="appContainer" setting="hrrecruitment" groups="hr_recruitment.group_hr_recruitment_manager">
                         <div class="logo hrrecruitment"/> <span class="app_name">Recruitment</span>
                     </div>
                 </xpath>
                 <xpath expr="//div[@class='settings']" position="inside">
-                    <div class="hrrecruitment_setting_view o_hidden">
+                    <div class="hrrecruitment_setting_view o_hidden" groups="hr_recruitment.group_hr_recruitment_manager">
                         <h2>Job Posting</h2>
                         <div class="row mt16 o_settings_container">
                             <div class="col-xs-12 col-md-6 o_setting_box">

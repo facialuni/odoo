@@ -6,12 +6,12 @@
         <field name="inherit_id" ref="base.res_config_setting_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[@class='apps']" position="inside">
-                    <div class="appContainer" setting="hrattendance">
+                    <div class="appContainer" setting="hrattendance" groups="hr_attendance.group_hr_attendance_manager">
                         <div class="logo hrattendance"/> <span class="app_name">Attendances</span>
                     </div>
                 </xpath>
                 <xpath expr="//div[@class='settings']" position="inside">
-                    <div class="hrattendance_setting_view o_hidden">
+                    <div class="hrattendance_setting_view o_hidden" groups="hr_attendance.group_hr_attendance_manager">
                     <h2>Check-In/Out</h2>
                     <div class="row mt16 o_settings_container">
                         <div class="col-xs-12 col-md-6 o_setting_box" title="Set PIN codes in the employee detail form (in HR Settings tab).">

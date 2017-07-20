@@ -10,7 +10,7 @@
                         <button string="Save" type="object" name="execute" class="oe_highlight" />
                         <button string="Cancel" type="object" name="cancel" class="oe_link" />
                     </header>
-                    <div class="row new_setting" style="display:flex;">
+                    <div class="row new_setting">
                         <div class="col-md-2 leftpan">
                             <div class="apps_header">Apps</div>
                             <div class="apps"/>

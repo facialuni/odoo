@@ -7,12 +7,12 @@
             <field name="inherit_id" ref="base.res_config_setting_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[@class='apps']" position="inside">
-                    <div class="appContainer" setting="events">
+                    <div class="appContainer" setting="events" groups="event.group_event_manager">
                         <div class="logo events"/> <span class="app_name">Events Organization</span>
                     </div>
                 </xpath>
                 <xpath expr="//div[@class='settings']" position="inside">
-                    <div class="events_setting_view o_hidden">
+                    <div class="events_setting_view o_hidden" groups="event.group_event_manager">
                         <h2>Advertising</h2>
                         <div class="row mt16 o_settings_container">
                             <div class="col-xs-12 col-md-6 o_setting_box">

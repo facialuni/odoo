@@ -7,12 +7,12 @@
         <field name="inherit_id" ref="base.res_config_setting_form" />
         <field name="arch" type="xml">
             <xpath expr="//div[@class='apps']" position="inside">
-                <div class="appContainer" setting="sales">
+                <div class="appContainer" setting="sales" groups="sales_team.group_sale_manager">
                     <div class="logo sales"/> <span class="app_name">Sales</span>
                 </div>
             </xpath>
             <xpath expr="//div[@class='settings']" position="inside">
-                <div class="sales_setting_view o_hidden">
+                <div class="sales_setting_view o_hidden" groups="sales_team.group_sale_manager">
                     <h2 id="integration_h2" invisible="1">Integrations</h2>
                     <div class="row mt16 o_settings_container" id="integration"/>
                     <h2 id="recommended_apps">Recommended Apps</h2>

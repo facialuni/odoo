@@ -8,12 +8,12 @@
             <field name="inherit_id" ref="base.res_config_setting_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[@class='apps']" position="inside">
-                    <div class="appContainer" setting="website">
+                    <div class="appContainer" setting="website" groups="website.group_website_designer">
                         <div class="logo website"/> <span class="app_name">Website</span>
                     </div>
                 </xpath>
                 <xpath expr="//div[@class='settings']" position="inside">
-                    <div class="website_setting_view o_hidden">
+                    <div class="website_setting_view o_hidden" groups="website.group_website_designer">
                             <field name="website_id" invisible="1"/>
                             <h2>Website</h2>
                             <div class="row mt16 o_settings_container" id="webmaster_settings">
