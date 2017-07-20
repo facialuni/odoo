@@ -342,18 +342,19 @@ class HrExpense(models.Model):
         # of the product to encode on the expense. If not, take the default product instead
         # which is 'Fixed Cost'
         default_product = self.env.ref('hr_expense.product_product_fixed_cost')
-        exp_desc_str = re.sub(r'[^a-zA-Z]+', ' ', expense_description).lower()
+        # exp_desc_str = re.sub(r'[^a-zA-Z]+', ' ', expense_description).lower()
         product = default_product
         exp_products = self.env['product.product'].search([('product_tmpl_id.can_be_expensed', '=', True)])
         # Below code will check for each product name/code if its present or not in expense description
         for each_exp_prod in exp_products:
-            if each_exp_prod.name.lower() in exp_desc_str:
+            if each_exp_prod.name.lower() in expense_description.lower():
                 product = each_exp_prod
                 break
-            elif each_exp_prod.code.lower() and each_exp_prod.code in exp_desc_str:
+            elif each_exp_prod.code and each_exp_prod.code.lower() in expense_description.lower():
                 product = each_exp_prod
                 break
 
+        expense_description = re.sub(r'[^a-zA-Z]+', ' ', expense_description).lower()
         pattern = '[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?'
         # Match the last occurence of a float in the string
         # Example: '[foo] 50.3 bar 34.5' becomes '34.5'. This is potentially the price
