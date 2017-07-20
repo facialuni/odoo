@@ -1,6 +1,8 @@
 $(document).ready(function() {
 
     $('body').on('click', '.appContainer', function(event) {
+        $('.searchsettinginput').val('');
+        $('.searchsettinginput').trigger('keyup');
         var settingName = $(event.currentTarget).attr('setting');
         $('.selected').removeClass('selected');
         $(event.currentTarget).addClass('selected');
@@ -24,8 +26,14 @@ $(document).ready(function() {
             .indexOf(m[3].toUpperCase()) >= 0;
     };
 
-    $('body').on('keyup', '.searchsettingtext', function(event) {
-        var searchText = $('.searchsettingtext').val();
+    $('body').on('keyup', '.searchsettinginput', function(event) {
+
+        if(!this.selectedAppContainer) {
+            this.selectedAppContainer = $('.selected');
+            this.selectedAppContainer.removeClass('selected');
+        }
+        var parent = this;
+        var searchText = $('.searchsettinginput').val();
         var settingDiv = $('div[class*="_setting_view"]');
         settingDiv.each(function() {
             var mainDiv = this;
@@ -66,6 +74,10 @@ $(document).ready(function() {
                     } else {
                         $(mainDiv).addClass('o_hidden');
                         $(mainDiv).find('.searchheader').removeClass('o_hidden');
+                        if(parent.selectedAppContainer) {
+                            parent.selectedAppContainer.addClass('selected');
+                            delete parent.selectedAppContainer
+                        }
                     }
 
                     if ($(mainDiv).hasClass('show')) {

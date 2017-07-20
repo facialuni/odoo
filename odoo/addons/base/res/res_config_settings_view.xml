@@ -18,11 +18,11 @@
                         <div class="col-md-10 rightpan">
                             <div class="setting_search">
                                 <div class="input-group input-group-sm">
-                                    <input type="text" class="form-control searchsettingtext"></input>
+                                    <input type="text" class="form-control searchsettinginput"></input>
                                     <span class="input-group-addon"><i class="fa fa-search"/></span>
                                 </div>
                             </div>
-                            <div class="settings" />
+                            <div class="settings"/>
                         </div>
                     </div>
                 </form>
