@@ -19,8 +19,9 @@ class CrmTeam(models.Model):
         string='Amount of Abandoned Carts', readonly=True)
 
     def _compute_abandoned_carts(self):
-        # abandoned carts are draft sales orders that have no order lines,
+        # abandoned carts to recover are draft sales orders that have no order lines,
         # a partner other than the public user, and created over an hour ago
+        # and the recovery mail was not yet sent
         website_teams = self.filtered(lambda team: team.team_type == 'website')
         if website_teams:
             abandoned_carts_data = self.env['sale.order'].read_group([
@@ -29,6 +30,7 @@ class CrmTeam(models.Model):
                 ('state', '=', 'draft'),
                 ('partner_id', '!=', self.env.ref('base.public_partner').id),
                 ('order_line', '!=', False),
+                ('cart_recovery_email_sent', '=', False)
             ], ['amount_total', 'team_id'], ['team_id'])
             counts = {data['team_id'][0]: data['team_id_count'] for data in abandoned_carts_data}
             amounts = {data['team_id'][0]: data['amount_total'] for data in abandoned_carts_data}
