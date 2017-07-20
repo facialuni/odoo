@@ -31,14 +31,14 @@
                 <span class="o_kanban_quick_add">+</span>
             </t>
         </div>
-        <t t-call="KanbanView.Counter"/>
+        <!-- <t t-call="KanbanView.Counter"/> -->
         <div t-if="widget.remaining > 0" class="o_kanban_load_more">
             <t t-call="KanbanView.LoadMore"/>
         </div>
     </div>
 </t>
 
-<t t-name="KanbanView.Counter">
+<!-- <t t-name="KanbanView.Counter">
     <div class="o_kanban_counter">
         <div class="o_kanban_counter_progress progress">
             <div class="progress-bar o_progress_success">
@@ -49,7 +49,7 @@
         </div>
         <div t-att-data-current-value="widget.data_records.length" class="o_kanban_counter_side pull-right"/>
     </div>
-</t>
+</t> -->
 
 <t t-name="KanbanView.LoadMore">
     <a href="#">Load more... (<t t-esc="widget.remaining"/> remaining)</a>

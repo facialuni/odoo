@@ -106,6 +106,7 @@ var KanbanColumn = Widget.extend({
                 cursor: 'move',
                 over: function () {
                     self.$el.addClass('o_kanban_hover');
+                    self.$el.find('.o_kanban_counter_side').addClass('o_kanban_counter_side_update');
                     self._update();
                 },
                 out: function () {
@@ -116,7 +117,6 @@ var KanbanColumn = Widget.extend({
                     var index = self.records.indexOf(record);
                     record.$el.removeAttr('style');  // jqueryui sortable add display:block inline
                     ui.item.addClass('o_updating');
-                    debugger;
                     if (index >= 0) {
                         if ($.contains(self.$el[0], record.$el[0])) {
                             // resequencing records
@@ -135,7 +135,6 @@ var KanbanColumn = Widget.extend({
             }
         });
         this._update();
-
         return this._super.apply(this, arguments);
     },
 
@@ -263,7 +262,6 @@ var KanbanColumn = Widget.extend({
             },
             target: $('.o_content'),
         });
-
         switch (self.relation) {
             case "project.task.type":
                 $(self.records).each(function() {
@@ -438,7 +436,7 @@ var KanbanColumn = Widget.extend({
             suffix = "K " + suffix;
         }
 
-        $({ someValue: start }).animate({ someValue: end }, {
+        $({ someValue: start}).animate({ someValue: end || 0 }, {
             duration: duration,
             easing: 'swing',
             step: function() {
@@ -450,7 +448,7 @@ var KanbanColumn = Widget.extend({
             },
             complete: function() {
                 // Apply new current value
-                $el.attr('data-current-value', parseInt(end));
+                $el.attr('data-current-value', Math.round(end));
             }
         });
     },

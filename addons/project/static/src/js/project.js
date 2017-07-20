@@ -4,11 +4,14 @@ odoo.define('project.update_kanban', function (require) {
 var core = require('web.core');
 var Dialog = require('web.Dialog');
 var KanbanRecord = require('web.KanbanRecord');
+var KanbanColumn = require("web.KanbanColumn");
+var KanbanRenderer = require('web.KanbanRenderer');
 
 var QWeb = core.qweb;
 var _t = core._t;
 
 KanbanRecord.include({
+
     //--------------------------------------------------------------------------
     // Private
     //--------------------------------------------------------------------------
@@ -90,4 +93,29 @@ KanbanRecord.include({
         }
     },
 });
+
+KanbanColumn.include({
+    /**
+     * @override
+     */
+    init: function (parent, data, options, recordOptions) {
+        this._super.apply(this, arguments);
+        this.data_records = data.data;
+    },
+    start: function () {
+        var def = this._super.apply(this, arguments);
+            if (this.modelName !== "project.task") {
+                return def;
+            }
+
+            var self = this;
+            return def.done(function () {
+                var $ProgressBar = $(QWeb.render("project.ProgressBar", {
+                    'progress_data': self
+                }));
+                $ProgressBar.insertAfter(self.$el.find('.o_kanban_header'));
+                self._updateCounter();
+            });
+        },
+    });
 });

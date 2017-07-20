@@ -6,4 +6,16 @@
         </div>
         <div t-if="attachment_ids.length == 0">There is no available image to be set as cover. Send a message on the task with an attached image.</div>
     </t>
+    <t t-name="project.ProgressBar">
+    <div class="o_kanban_counter">
+        <div class="o_kanban_counter_progress progress">
+            <div class="progress-bar o_progress_success">
+                <span data-current-value="0" class="o_kanban_counter_label"/>
+            </div>
+            <div class="progress-bar o_progress_blocked"/>
+            <div class="progress-bar o_progress_warning"/>
+        </div>
+        <div t-att-data-current-value="progress_data.data_records.length" class="o_kanban_counter_side pull-right"/>
+    </div>
+	</t>
 </templates>

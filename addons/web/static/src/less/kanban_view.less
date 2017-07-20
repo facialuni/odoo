@@ -512,6 +512,9 @@
             }
             &.o_kanban_hover {
                 background-color: darken(@gray-light, 10%);
+                .o_kanban_counter_side {                    
+                    .o-animation(grow, .4s, ease-in);
+                }
             }
             .o_column_unfold {
                 display: block;
@@ -524,6 +527,11 @@
 
             }
             background-color: darken(@odoo-webclient-background-color, 5%);
+        }
+        .o_kanban_hover {
+            .o_kanban_counter_side {                    
+                .o-animation(grow, .4s, ease-in);
+            }
         }
 
         .o_kanban_counter {
@@ -587,10 +595,7 @@
                 color: white;
                 font-size: @o-kanban-counter-font-size*1.2;
                 font-weight: bold;
-                text-align: right;
-                .o_kanban_counter_side_update {                    
-                    .o-animation(grow, .4s, ease-in);
-                }
+                text-align: right;                
             }
 
             &.o_counter_number {
