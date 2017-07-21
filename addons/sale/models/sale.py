@@ -744,50 +744,29 @@ class SaleOrderLine(models.Model):
 
         return line
 
-    def _update_line_quantity(self, values):
+    def _update_lines(self, values):
+        product_uom_qty_val = values.get('product_uom_qty')
+        price_unit_val = values.get('price_unit')
+        precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
         orders = self.mapped('order_id')
         for order in orders:
             order_lines = self.filtered(lambda x: x.order_id == order)
-            msg = ""
             for line in order_lines:
-                if any([values['product_uom_qty'] < x.product_uom_qty for x in order_lines]):
-                    msg += "<b>" + _(
-                        'The ordered quantity has been decreased. Do not forget to take it into account on your invoices and delivery orders.') + '</b>'
-                msg += "<ul>"
-                msg += "<li> %s:" % (line.product_id.display_name)
-                msg += "<br/>" + _("Ordered Quantity") + ": %s -> %s <br/>" % (
-                line.product_uom_qty, float(values['product_uom_qty']),)
-                if line.product_id.type in ('consu', 'product'):
-                    msg += _("Delivered Quantity") + ": %s <br/>" % (line.qty_delivered,)
-                msg += _("Invoiced Quantity") + ": %s <br/>" % (line.qty_invoiced,)
-                msg += "</ul>"
-            order.message_post(body=msg)
-    def _update_line_price(self, values):
-        orders = self.mapped('order_id')
-        for order in orders:
-            order_lines = self.filtered(lambda x: x.order_id == order)
-            msg = ""
-            for line in order_lines:
-                msg += "<ul>"
-                msg += "<li> %s:" % (line.product_id.display_name)
-                msg += "<br/>" + _("Unit Price") + ": %s -> %s <br/>" % (line.price_unit, float(values['price_unit']),)
-                msg += "</ul>"
-            order.message_post(body=msg)
+                check_product_uom_qty = product_uom_qty_val and float_compare(line.product_uom_qty, product_uom_qty_val, precision_digits=precision)
+                check_price_unit = price_unit_val and float_compare(line.price_unit, price_unit_val, precision_digits=precision)
+                line.order_id.message_post_with_view('sale.track_lines',
+                values={'price_unit_val': price_unit_val, 'product_uom_qty_val': product_uom_qty_val,
+                'check_price_unit': check_price_unit, 'check_product_uom_qty': check_product_uom_qty, 'line': line},
+                subtype_id=self.env.ref('mail.mt_note').id)
 
     @api.multi
     def write(self, values):
         lines = False
-        precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
-        if 'product_uom_qty' in values:
-            lines = self.filtered(
-                lambda r: r.state == 'sale' and float_compare(r.product_uom_qty, values['product_uom_qty'], precision_digits=precision) == -1)
-            self.filtered(
-                lambda r: r.state == 'sale' and float_compare(r.product_uom_qty, values['product_uom_qty'], precision_digits=precision) != 0)._update_line_quantity(values)
-        if 'price_unit' in values:
-            lines = self.filtered(
-                lambda r: r.state == 'sale' and float_compare(r.price_unit, values['price_unit'], precision_digits=precision) == -1)
-            self.filtered(
-                lambda r: r.state == 'sale' and float_compare(r.price_unit, values['price_unit'], precision_digits=precision) != 0)._update_line_price(values)
+        if 'product_uom_qty' in values or 'price_unit' in values:
+            precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
+            if values.get('product_uom_qty'):
+                lines = self.filtered(lambda r: r.state == 'sale' and float_compare(r.product_uom_qty, values['product_uom_qty'], precision_digits=precision) == -1)
+            self.filtered(lambda r: r.state == 'sale')._update_lines(values)
         result = super(SaleOrderLine, self).write(values)
         if lines:
             lines._action_procurement_create()
