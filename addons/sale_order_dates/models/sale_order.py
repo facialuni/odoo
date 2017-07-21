@@ -25,7 +25,7 @@ class SaleOrder(models.Model):
                                           "date will be computed using the default method: based on "
                                           "the Product Lead Times and the Company's Security Delay.")
     effective_date = fields.Date(compute='_compute_picking_ids', string='Effective Date', store=True,
-                                 help="Date on which the first Delivery Order was created.")
+                                 help="Date on which the first shipment successfully delivered to customer.")
 
     @api.depends('date_order', 'order_line.customer_lead', 'confirmation_date')
     def _compute_commitment_date(self):
