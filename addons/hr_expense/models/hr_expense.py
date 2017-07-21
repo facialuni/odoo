@@ -386,7 +386,6 @@ class HrExpense(models.Model):
         if custom_values.get('employee_id'):
             res = super(HrExpense, self).message_new(msg_dict, custom_values)
             self.env.ref('hr_expense.hr_expense_success_email_template').send_mail(res.id)
-            # template_id.send_mail(res.id)
             return res
         else:
             base_partner = self.env.ref('base.partner_root')
@@ -394,7 +393,6 @@ class HrExpense(models.Model):
             template_id.write({'email_to': email_split(msg_dict.get('email_from', False))[0]})
             template_id.sudo().send_mail(base_partner.id, force_send=True)
             return False
-        # return super(HrExpense, self).message_new(msg_dict, custom_values)
 
     @api.multi
     def get_access_action(self, access_uid=None):
