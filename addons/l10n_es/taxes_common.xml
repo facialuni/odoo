@@ -674,7 +674,7 @@
             <field name="refund_account_id" ref="pgc_472_child"/>
             <field name="account_id" ref="pgc_472_child"/>
             <field name="type_tax_use">purchase</field>
-            <field name="tag_ids" eval="[(6,0,[ref('tag_es_59'), ref('tag_es_55')])]"/>
+            <field name="tag_ids" eval="[(6,0,[ref('tag_es_19'), ref('tag_es_59')])]"/>
         </record>
 
         <!-- EXTRACOMUNITARIO-->
@@ -1019,7 +1019,7 @@
             <field eval="100.00" name="amount"/>
             <field name="amount_type">group</field>
             <field name="type_tax_use">purchase</field>
-            <field name="tag_ids" eval="[(6,0,[ref('tag_es_81'), ref('tag_es_37')])]"/>
+            <field name="tag_ids" eval="[(6,0,[ref('tag_es_08'), ref('tag_es_37')])]"/>
             <field name="children_tax_ids" eval="[(6, 0, [ref('iva_IC_compras_4_bi_1'), ref('iva_IC_compras_4_bi_2')])]"/>
         </record>
 
@@ -1245,7 +1245,7 @@
             <field name="refund_account_id" ref="pgc_4751_child"/>
             <field name="account_id" ref="pgc_4751_child"/>
             <field name="type_tax_use">purchase</field>
-            <field name="tag_ids" eval="[(6,0,[ref('tag_es_08'), ref('tag_es_97')])]"/>
+            <field name="tag_ids" eval="[(6,0,[ref('tag_es_81'), ref('tag_es_97')])]"/>
         </record>
 
         <record id="irpf_2" model="account.tax.template">
