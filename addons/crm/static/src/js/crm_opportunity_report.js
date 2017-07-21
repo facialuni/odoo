@@ -4,6 +4,7 @@ odoo.define('crm.opportunity_report', function (require) {
 var ControlPanelMixin = require('web.ControlPanelMixin');
 var core = require('web.core');
 var Widget = require('web.Widget');
+var rpc = require('web.rpc');
 
 var QWeb = core.qweb;
 
@@ -18,8 +19,8 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
         this.get_stages();
         this.start_date = '07/01/2017';
         this.end_date = '07/31/2017';
-        this.user_id = 1;
-        this.team_id = 1;
+        this.user_id = '1';
+        this.team_id = '1';
     },
     renderElement: function () {
         this._super.apply(this, arguments);
@@ -39,11 +40,12 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
     },
     calculation: function () {
         var self = this;
-        this._rpc({
+        rpc.query({
             model: 'crm.opportunity.history',
             method: 'calculate_moves',
-            args: [, this.start_date, this.end_date, this.stages, this.user_id, this.team_id],
+            args: [null, this.start_date, this.end_date, this.stages, this.user_id, this.team_id],
         }).then(function (result) {
+            self.data = result;
             self.renderElement();
         });
     },

@@ -286,7 +286,8 @@ class Lead(models.Model):
             vals['email_from'] = partner.email
         # context: no_log, because subtype already handle this
         record = super(Lead, self.with_context(context, mail_create_nolog=True)).create(vals)
-        self.create_crm_opportunity_history(vals)
+        if self._context.get('default_type') == 'opportunity':
+            record.create_crm_opportunity_history(vals)
         return record
 
     @api.multi
@@ -335,11 +336,10 @@ class Lead(models.Model):
     @api.multi
     def create_crm_opportunity_history(self, vals):
         self.env['crm.opportunity.history'].create({
-            'stage_id': vals['stage_id'],
+            'stage_id': vals.get('stage_id') or self.stage_id.id,
             'res_id': self.id,
-            'date_closed': vals.get('date_closed') or self.date_closed,
-            'opp_create_date': vals.get('create_date') or self.create_date,
-            'date_deadline': vals.get('date_deadline') or self.date_deadline,
+            'user_id': self.user_id.id,
+            'team_id': self.team_id.id,
         })
 
     # ----------------------------------------
@@ -438,6 +438,25 @@ class Lead(models.Model):
     # ----------------------------------------
     # Business Methods
     # ----------------------------------------
+
+    @api.multi
+    def calculate_percentage(self, start_date, end_date, user_id, team_id, where_clause):
+        query = """
+            SELECT
+                COUNT(CASE WHEN create_date >= %(start_date)s THEN id END) as new_deals,
+                COUNT(CASE WHEN (date_deadline <= %(end_date)s or date_deadline is null) and date_closed IS null THEN id END) as deals_left,
+                COUNT(CASE WHEN probability = 100 AND date_closed BETWEEN %(start_date)s AND %(end_date)s THEN id END) as won_deals,
+                COUNT(CASE WHEN active = FALSE AND date_closed BETWEEN %(start_date)s AND %(end_date)s THEN id END) as lost_deals
+            FROM crm_lead
+            WHERE
+                type = 'opportunity'
+                """
+        if where_clause:
+            query += where_clause
+        self.env.cr.execute(query, {'start_date': start_date,
+                                    'end_date': end_date})
+        query_result = self.env.cr.dictfetchone()
+        return query_result
 
     def _stage_find(self, team_id=False, domain=None, order='sequence'):
         """ Determine the stage of the current lead with its teams, the given domain and the given team_id

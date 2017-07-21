@@ -10,10 +10,12 @@
                 </t>
             </div>
             <div class="row">
-                <div class="col-sm-4">
+                <div class="col-sm-3">
                     <div class="oe_pipeline_side_box">
-                        <t t-esc="widget.deals_left"/>
-                        <br/>Deals left open in pipeline at the end of period.
+                        <t t-if="widget.data">
+                            <t t-esc="widget.data.left_deals"/>
+                            <br/>Deals left open in pipeline at the end of period.
+                        </t>
                     </div>
                     <div class="oe_pipeline_side_box">
                         <br/>average time to close a deal
@@ -29,7 +31,7 @@
                 <span class="chevron"/>
             </div>
             <t t-if="stage == 'New'">
-                <t t-esc="widget.new_deals"/>
+                <t t-esc="widget.data.new_deals"/>
                 <br/> New Deals
             </t>
         </div>
