@@ -16,8 +16,32 @@ var EventRegistrationForm = Widget.extend({
                     self.on_click(ev);
                 });
         });
+
+        //  modal for change timezone
+        self.$modal = $('#select_user_timezone');
+        self.$modal.find('.o_set_timezone_btn').on('click', self._onSetVisitorTimezoneClick.bind(self));
+        self.setVisitorDatetime();
         return res
     },
+
+    _onSetVisitorTimezoneClick: function (event) {
+        var $modal = this.$modal,
+            Newtz = $modal.find('#timezone-container').val(),
+            StartDate = $modal.find('input[name="event-origin-date-start"]').val(),
+            EndDate = $modal.find('input[name="event-origin-date-end"]').val();
+
+        $modal.modal('hide');
+        ajax.jsonRpc("/event/set_timezone", 'call', {
+            timezone: Newtz,
+            date_time: {'start_date': StartDate, 'end_date': EndDate}
+        }).done(function(datetime) {
+            // set value of start date and end date on event page
+            $('span.o_event_date_begin').text(datetime.start_date);
+            $('span.o_event_date_end').text(datetime.end_date);
+            $('span.o_event_timezone').text(Newtz);
+        });
+    },
+
     on_click: function(ev) {
         ev.preventDefault();
         ev.stopPropagation();
@@ -42,10 +66,38 @@ var EventRegistrationForm = Widget.extend({
             });
         }
     },
+    /**
+        get visitor's timzone name
+    */
+    getVisitorTimezone: function() {
+        return jstz.determine().name();
+    },
+    /**
+        set datetime on event page as per visitor's timezone
+    */
+    setVisitorDatetime: function() {
+        _.each($('span.o_event_date_begin'), function(element) {
+            $(element).text(moment.utc($(element).data('eventVisitorDate')).utcOffset(moment().utcOffset()).format("L HH:mm"));
+        });
+        _.each($('span.o_event_date_end'), function(element) {
+            $(element).text(moment.utc($(element).data('eventVisitorDate')).utcOffset(moment().utcOffset()).format("L HH:mm"));
+        });
+        $('span.o_event_timezone').text(this.getVisitorTimezone());
+    },
 });
 
 web_editor_base.ready().then(function(){
-    var event_registration_form = new EventRegistrationForm().appendTo($('#registration_form'));
+    var event_registration_form = new EventRegistrationForm();
+    event_registration_form.appendTo($('#registration_form'));
+    // pass visitor timezone for calculation and store datetime as per user timezone
+    // because of event page show visitor timezone, which is configure into event record
+    // that's reason for update the context
+    var get_context = web_editor_base.get_context;
+    web_editor_base.get_context = web_editor_base.get_context = function (dict) {
+        return _.extend({
+            'visitor_tz': event_registration_form.getVisitorTimezone(),
+        }, get_context(dict), dict);
+    };
 });
 
 return { EventRegistrationForm: EventRegistrationForm };

@@ -229,7 +229,9 @@
                             <group>
                                 <field name="date_begin"/>
                                 <field name="date_end"/>
-                                <label for="date_tz" string=""/>
+                                <field name="dummy_date_begin" invisible="1"/>
+                                <field name="dummy_date_end" invisible="1"/>
+                                <label for="date_tz" string="Timezone Visibility"/>
                                 <div>
                                     <field name="date_tz" attrs="{'readonly': [('show_timezone', '=', 'hidden')]}"/>
                                     <field name="show_timezone" widget='radio'/>
