@@ -3,7 +3,7 @@
     <data>
         <template id="report_invoice_document">
             <t t-call="web.external_layout">
-                <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})" />
+                <t t-set="o" t-value="o.with_context({'lang':o.user_id.lang})" />
                 <div class="page">
                     <div class="row">
                         <div name="invoice_address" class="col-xs-5 col-xs-offset-7">
@@ -190,7 +190,7 @@
         <template id="report_invoice">
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="o">
-                    <t t-call="account.report_invoice_document" t-lang="o.partner_id.lang"/>
+                    <t t-call="account.report_invoice_document" t-lang="o.user_id.lang"/>
                 </t>
             </t>
         </template>
@@ -198,7 +198,7 @@
         <template id="report_invoice_with_payments">
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="o">
-                    <t t-call="account.report_invoice_document_with_payments" t-lang="o.partner_id.lang"/>
+                    <t t-call="account.report_invoice_document_with_payments" t-lang="o.user_id.lang"/>
                 </t>
             </t>
         </template>
