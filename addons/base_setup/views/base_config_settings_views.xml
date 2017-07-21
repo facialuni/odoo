@@ -6,12 +6,12 @@
             <field name="inherit_id" ref="base.res_config_setting_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[@class='apps']" position="inside">
-                    <div class="appContainer" setting="generalsettings">
+                    <div class="appContainer selected" setting="generalsettings">
                         <div class="logo generalsettings"/> <span class="app_name">General Settings</span>
                     </div>
                 </xpath>
                 <xpath expr="//div[@class='settings']" position="inside">
-                    <div class="generalsettings_setting_view o_hidden">
+                    <div class="generalsettings_setting_view show">
                         <div id="business_documents">
                             <h2>Business Documents</h2>
                             <div class="row mt16 o_settings_container">
