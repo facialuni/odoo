@@ -5,7 +5,7 @@ from odoo import api, fields, models
 
 
 class BaseConfigSettings(models.TransientModel):
-    _inherit = 'base.config.settings'
+    _inherit = 'res.config.settings'
 
     company_share_product = fields.Boolean(
         'Share product to all companies',

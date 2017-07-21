@@ -6,7 +6,6 @@ from odoo import api, fields, models, _
 
 class BaseConfigSettings(models.TransientModel):
 
-    _name = 'base.config.settings'
     _inherit = 'res.config.settings'
 
     group_multi_company = fields.Boolean("Manage multiple companies", implied_group='base.group_multi_company')
