@@ -24,7 +24,7 @@ class SaleOrder(models.Model):
                                           "processed as soon as possible. In that case the expected "
                                           "date will be computed using the default method: based on "
                                           "the Product Lead Times and the Company's Security Delay.")
-    effective_date = fields.Date(compute='_compute_picking_ids', string='Effective Date', store=True,
+    effective_date = fields.Date(compute='_compute_effective_date', string='Effective Date', store=True,
                                  help="Date on which the first shipment successfully delivered to customer.")
 
     @api.depends('date_order', 'order_line.customer_lead', 'confirmation_date')
@@ -40,14 +40,12 @@ class SaleOrder(models.Model):
                 commit_date = min(dates_list) if order.picking_policy == 'direct' else max(dates_list)
                 order.commitment_date = fields.Datetime.to_string(commit_date)
 
-    def _compute_picking_ids(self):
-        super(SaleOrder, self)._compute_picking_ids()
+    @api.depends('order_line', 'order_line.qty_delivered')
+    def _compute_effective_date(self):
         for order in self:
-            dates_list = []
-            for pick in order.picking_ids:
-                dates_list.append(fields.Datetime.from_string(pick.date))
-            if dates_list:
-                order.effective_date = fields.Datetime.to_string(min(dates_list))
+            pickings = order.picking_ids.filtered(lambda x: x.state == 'done' and x.location_dest_id.usage == 'customer')
+            dates_list = pickings.mapped('move_lines.date')
+            order.effective_date = dates_list and min(dates_list)
 
     @api.onchange('requested_date')
     def onchange_requested_date(self):
