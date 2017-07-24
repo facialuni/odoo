@@ -535,7 +535,7 @@
         </record>
 
          <record id="open_department_holidays_approve" model="ir.actions.act_window">
-            <field name="name">Department Leaves</field>
+            <field name="name">Leaves to Approve</field>
             <field name="res_model">hr.holidays</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,calendar</field>
@@ -558,7 +558,7 @@
             sequence="2"/>
 
          <record id="open_department_holidays_allocation_approve" model="ir.actions.act_window">
-            <field name="name">Department Leaves Allocation</field>
+            <field name="name">Leaves Allocation</field>
             <field name="res_model">hr.holidays</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,calendar</field>
