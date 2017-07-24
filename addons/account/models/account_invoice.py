@@ -2,6 +2,8 @@
 
 import json
 import re
+import uuid
+
 from lxml import etree
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -41,6 +43,9 @@ class AccountInvoice(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = "Invoice"
     _order = "date_invoice desc, number desc, id desc"
+
+    def _get_default_access_token(self):
+        return str(uuid.uuid4())
 
     @api.one
     @api.depends('invoice_line_ids.price_subtotal', 'tax_line_ids.amount', 'currency_id', 'company_id', 'date_invoice', 'type')
@@ -231,6 +236,9 @@ class AccountInvoice(models.Model):
         ], readonly=True, index=True, change_default=True,
         default=lambda self: self._context.get('type', 'out_invoice'),
         track_visibility='always')
+    access_token = fields.Char(
+        'Security Token', copy=False,
+        default=_get_default_access_token)
 
     refund_invoice_id = fields.Many2one('account.invoice', string="Invoice for which this invoice is the credit note")
     number = fields.Char(related='move_id.name', store=True, readonly=True, copy=False)
@@ -479,6 +487,27 @@ class AccountInvoice(models.Model):
                 elif partner.customer and not partner.supplier:
                     view_id = get_view_id('invoice_form', 'account.invoice.form').id
         return super(AccountInvoice, self).fields_view_get(view_id=view_id, view_type=view_type, toolbar=toolbar, submenu=submenu)
+
+    @api.model_cr_context
+    def _init_column(self, column_name):
+        """ Initialize the value of the given column for existing rows.
+
+            Overridden here because we need to generate different access tokens
+            and by default _init_column calls the default method once and applies
+            it for every record.
+        """
+        if column_name != 'access_token':
+            super(AccountInvoice, self)._init_column(column_name)
+        else:
+            query = """UPDATE %(table_name)s
+                          SET %(column_name)s = md5(md5(random()::varchar || id::varchar) || clock_timestamp()::varchar)::uuid::varchar
+                        WHERE %(column_name)s IS NULL
+                    """ % {'table_name': self._name, 'column_name': column_name}
+            self.env.cr.execute(query)
+
+    def _generate_access_token(self):
+        for invoice in self:
+            invoice.access_token = self._get_default_access_token()
 
     @api.multi
     def invoice_print(self):
