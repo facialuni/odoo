@@ -38,7 +38,7 @@
                 <t t-foreach="invoices" t-as="invoice">
                     <tr>
                         <td>
-                            <a t-att-href="'/my/invoices/'+str(invoice.id)" t-att-title="invoice.number"><t t-esc="invoice.number"/></a>
+                            <a t-attf-href="/my/invoices/#{invoice.id}?#{keep_query()}" t-att-title="invoice.number"><t t-esc="invoice.number"/></a>
                         </td>
                         <td><span t-field="invoice.date_invoice"/></td>
                         <td class='hidden-xs'><span t-field="invoice.date_due"/></td>
