@@ -137,7 +137,9 @@
                     <field name="name"/>
                 </h2>
               </xpath>
+                <field name="parent_id"  groups="base.group_multi_company" position="replace" invisible="1"/>
               <xpath expr="//sheet[@id='company_sheet']" position="inside">
+                    <hr />
                     <div class="row mt16">
                         <field name="external_report_layout" invisible="1" widget="text" />
                         <div class="col-xs-3 text-center">
