@@ -228,12 +228,21 @@
             </field>
         </record>
 
+        <record id="action_general_configuration" model="ir.actions.act_window">
+            <field name="name">General Settings</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module' : 'generalsettings'}</field>
+        </record>
+
         <menuitem
             id="menu_config"
             name="General Settings"
             parent="base.menu_administration"
             sequence="2"
-            action="base.res_config_setting_act_window"
+            action="action_general_configuration"
             groups="base.group_system"/>
 
 </odoo>

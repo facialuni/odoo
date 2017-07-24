@@ -441,7 +441,16 @@
             </field>
         </record>
 
+        <record id="action_account_config" model="ir.actions.act_window">
+            <field name="name">Configure Accounting</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module' : 'account'}</field>
+        </record>
+
         <menuitem id="menu_account_config" name="Settings" parent="menu_finance_configuration"
-            sequence="0" action="base.res_config_setting_act_window" groups="base.group_system"/>
+            sequence="0" action="action_account_config" groups="base.group_system"/>
     </data>
 </odoo>

@@ -158,6 +158,15 @@
             </field>
         </record>
 
+        <record id="action_pos_configuration" model="ir.actions.act_window">
+            <field name="name">Configure Point of Sale</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module' : 'pos'}</field>
+        </record>
+
         <menuitem id="menu_pos_global_settings" name="Settings"
-            parent="menu_point_config_product" sequence="1" action="base.res_config_setting_act_window" groups="base.group_system"/>
+            parent="menu_point_config_product" sequence="1" action="action_pos_configuration" groups="base.group_system"/>
 </odoo>

@@ -27,10 +27,15 @@ var GlobleSettingRenderer = FormRenderer.extend({
 
     start: function() {
         this._super.apply(this, arguments);
+        $.expr[':'].contains = function(a, i, m) {
+            return jQuery(a).text().toUpperCase()
+                .indexOf(m[3].toUpperCase()) >= 0;
+        };
+
+        this.searchText = "";
         this.selectedApp = this.$('.selected');
         this.selectedSetting = this.$('.show');
         this.seatchInput = this.$('.searchInput');
-        this.searchText = "";
         this.appContainer = this.$('.appContainer');
         this.modules = {};
         var self = this;
@@ -45,6 +50,11 @@ var GlobleSettingRenderer = FormRenderer.extend({
             }
             settingDiv.prepend($("<h2>").html(appName).addClass('settingSearchHeader o_hidden'));
         });
+
+        console.log("this.currentModule", this.currentModule);
+        if(this.currentModule) {
+            this.$("div[setting='"+this.currentModule+"']").click();
+        }
     },
 
     _onAppContainerClicked: function(event) {
@@ -114,24 +124,18 @@ var GlobleSettingRenderer = FormRenderer.extend({
 
 });
 
-var GlobleSettingModel = BasicModel.extend({
-    init: function () {
-        this._super.apply(this, arguments);
-    },
-});
-
 var GlobleSettingController = FormController.extend({
     custom_events: _.extend({}, FormController.prototype.custom_events, {
     }),
 
     init: function () {
         this._super.apply(this, arguments);
+        this.renderer.currentModule = this.initialState.context.module;
     },
 });
 
 var GlobleSettingView = FormView.extend({
     config: _.extend({}, FormView.prototype.config, {
-        Model: GlobleSettingModel,
         Renderer: GlobleSettingRenderer,
         Controller: GlobleSettingController,
     }),
@@ -143,10 +147,7 @@ var GlobleSettingView = FormView.extend({
 view_registry.add('globle_settings', GlobleSettingView);
 
 return {
-    Model: GlobleSettingModel,
     Renderer: GlobleSettingRenderer,
     Controller: GlobleSettingController,
 };
-
-
 });

@@ -52,10 +52,19 @@
         </field>
     </record>
 
+    <record id="hr_config_settings_action" model="ir.actions.act_window">
+        <field name="name">Configure HR</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'employee'}</field>
+    </record>
+
     <menuitem id="hr_menu_configuration"
         name="Settings" 
         parent="menu_human_resources_configuration"
         sequence="0"
-        action="base.res_config_setting_act_window"
+        action="hr_config_settings_action"
         groups="base.group_system"/>
 </odoo>

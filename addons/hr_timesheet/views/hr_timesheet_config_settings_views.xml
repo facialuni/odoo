@@ -139,6 +139,15 @@
         </field>
     </record>
 
+    <record id="hr_timesheet_config_settings_action" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'timesheets'}</field>
+    </record>
+
     <menuitem id="hr_timesheet_config_settings_menu_action" name="Settings" parent="hr_timesheet_menu_configuration"
-        action="base.res_config_setting_act_window" sequence="0"/>
+        action="hr_timesheet_config_settings_action" sequence="0"/>
 </odoo>

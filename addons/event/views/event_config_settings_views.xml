@@ -8,7 +8,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//div[@class='apps']" position="inside">
                     <div class="appContainer" setting="events" groups="event.group_event_manager">
-                        <div class="logo events"/> <span class="app_name">Events Organization</span>
+                        <div class="logo events"/> <span class="app_name">Events</span>
                     </div>
                 </xpath>
                 <xpath expr="//div[@class='settings']" position="inside">
@@ -82,7 +82,16 @@
             </field>
         </record>
 
+        <record id="action_event_configuration" model="ir.actions.act_window">
+            <field name="name">Configure Event</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module' : 'events'}</field>
+        </record>
+
         <menuitem id="menu_event_global_settings" name="Settings" 
-            parent="menu_event_configuration" sequence="0" action="base.res_config_setting_act_window" groups="base.group_system"/>
+            parent="menu_event_configuration" sequence="0" action="action_event_configuration" groups="base.group_system"/>
     </data>
 </odoo>

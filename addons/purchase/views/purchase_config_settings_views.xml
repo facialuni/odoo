@@ -199,7 +199,16 @@
             </field>
         </record>
 
+        <record id="action_purchase_configuration" model="ir.actions.act_window">
+            <field name="name">Configure Purchases</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module' : 'purchase'}</field>
+        </record>
+
         <menuitem id="menu_purchase_general_settings" name="Settings" parent="menu_purchase_config"
-            sequence="0" action="base.res_config_setting_act_window" groups="base.group_system"/>
+            sequence="0" action="action_purchase_configuration" groups="base.group_system"/>
 
 </odoo>

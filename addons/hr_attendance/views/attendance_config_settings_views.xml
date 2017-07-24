@@ -56,5 +56,14 @@
         </field>
     </record>
 
-    <menuitem id="hr_attendance.menu_hr_attendance_settings" name="Configuration" parent="menu_hr_attendance_root" sequence="99" action="base.res_config_setting_act_window" groups="hr_attendance.group_hr_attendance_manager"/>
+    <record id="action_hr_attendance_settings" model="ir.actions.act_window">
+        <field name="name">Attendance Settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'hrattendance'}</field>
+    </record>
+
+    <menuitem id="hr_attendance.menu_hr_attendance_settings" name="Configuration" parent="menu_hr_attendance_root" sequence="99" action="action_hr_attendance_settings" groups="hr_attendance.group_hr_attendance_manager"/>
 </odoo>

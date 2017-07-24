@@ -384,11 +384,20 @@ You can also edit the fields of the Extra Step page in eCommerce checkout.">
             </field>
         </record>
 
+        <record id="action_website_configuration" model="ir.actions.act_window">
+            <field name="name">Website Settings</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module' : 'website'}</field>
+        </record>
+
         <menuitem id="menu_website_global_configuration" parent="menu_website_configuration"
             sequence="100" name="Configuration" groups="base.group_system"/>
         <menuitem name="Settings"
             id="menu_website_website_settings"
-            action="base.res_config_setting_act_window"
+            action="action_website_configuration"
             parent="menu_website_global_configuration"
             groups="base.group_system"/>
 
