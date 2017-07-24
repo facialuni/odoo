@@ -347,17 +347,19 @@ class Holidays(models.Model):
     @api.model
     def create(self, values):
         """ Override to avoid automatic logging of creation """
-        employee_id = values.get('employee_id', False)
+        current_employee = self.env['hr.employee'].browse(values.get('employee_id'))
         if not self._check_state_access_right(values):
             raise AccessError(_('You cannot set a leave request as \'%s\'. Contact a human resource manager.') % values.get('state'))
         if not values.get('department_id'):
-            values.update({'department_id': self.env['hr.employee'].browse(employee_id).department_id.id})
+            values.update({'department_id': current_employee.department_id.id})
         holiday = super(Holidays, self.with_context(mail_create_nolog=True, mail_create_nosubscribe=True)).create(values)
-        holiday.add_follower(employee_id)
+        holiday.add_follower(current_employee.id)
         for category in holiday.category_ids:
             for employee in category.employee_ids:
                 values = holiday._prepare_create_by_category(employee)
                 self.with_context(mail_notify_force_send=False).create(values)
+        if not holiday.category_ids:
+            holiday.category_ids = [(6, False, current_employee.category_ids.ids)]
         return holiday
 
     @api.multi
