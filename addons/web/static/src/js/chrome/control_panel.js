@@ -240,7 +240,7 @@ var ControlPanel = Widget.extend({
 
         this.nodes.$searchview.toggle(!is_hidden);
         if (searchview) {
-            searchview.set_input_focus();
+            _.delay(function() { searchview.set_input_focus(); }, 100);
         }
         this.$el.toggleClass('o_breadcrumb_full', !!is_hidden);
     },

@@ -369,7 +369,8 @@ var ViewManager = Widget.extend(ControlPanelMixin, {
         view_descr.searchview_hidden = View.prototype.searchview_hidden;
         var view = new View(view_descr.fields_view, params);
         return view.getController(this).then(function(controller) {
-            controller.on('history_back', this, function() {
+            controller.on('history_back', this, function(ev) {
+                ev.stopPropagation();
                 if (self.action_manager) self.action_manager.trigger('history_back');
             });
             controller.on("change:title", this, function() {
