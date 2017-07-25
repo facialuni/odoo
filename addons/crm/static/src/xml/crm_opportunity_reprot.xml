@@ -10,28 +10,47 @@
                 </t>
             </div>
             <div class="row">
-                <div class="col-sm-3">
-                    <div class="oe_pipeline_side_box">
-                        <t t-if="widget.data">
-                            <t t-esc="widget.data.left_deals"/>
+                <t t-if="widget.data" >
+                    <div class="col-sm-3">
+                        <div class="oe_pipeline_side_box">
+                            <strong><t t-esc="widget.data.left_deals"/></strong>
                             <br/>Deals left open in pipeline at the end of period.
-                        </t>
+                        </div>
+                        <div class="oe_pipeline_side_box">
+                            <br/>average time to close a deal
+                        </div>
                     </div>
-                    <div class="oe_pipeline_side_box">
-                        <br/>average time to close a deal
+                    <div class="col-sm-4">
+                        <div class="oe_chart">
+                            <div class="col-sm-4">
+                                <div  class="oe_won_deals">
+                                    <strong>
+                                        <t t-esc="widget.data.won_deals"/>
+                                    </strong>
+                                    <br />Deals Won
+                                </div>
+                                <div class="oe_lost_deals">
+                                    <strong>
+                                        <t t-esc="widget.data.lost_deals"/>
+                                    </strong>
+                                    <br />Deals Lost
+                                </div>
+                            </div>
+                            <div class="oe_piechart col-sm-8" />
+                        </div>
                     </div>
-                </div>
+                </t>
             </div>
         </div>
     </t>
     <t t-name="crm_pipeline_stage">
-        <div class="col-sm-2 oe_pipeline_box">
+        <div class="col-sm-3 oe_pipeline_box">
             <div class="oe_pipeline_stage_name">
-                <t t-esc="stage" />
+                <b><t t-esc="stage" /></b>
                 <span class="chevron"/>
             </div>
             <t t-if="stage == 'New'">
-                <t t-esc="widget.data.new_deals"/>
+                <strong class="oe_new_deals"><t t-esc="widget.data.new_deals" /></strong>
                 <br/> New Deals
             </t>
         </div>

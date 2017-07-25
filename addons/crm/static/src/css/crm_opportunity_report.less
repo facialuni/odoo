@@ -1,34 +1,61 @@
 .oe_pipeline {
     margin: 5%;
     background-color: white;
+    font-family: 'Lato', sans-serif;
 
-    .pipeline{
-    margin: 10px 0px 0px 0px;
-    .oe_pipeline_box {
-        .oe_pipeline_stage_name {
-            background-color: #d8d8d8;
-            padding: 2%;
-        }
-
-        .chevron {
-            position: absolute;
-            top: 0;
-            right: 0px;
-            border: 14px solid #8f8f8f;
-            border-right: 0;
-            border-left: 16px solid #d4d4d4;
-        }
-        background-color: white;
-        box-shadow: 0px 0px 1px 0px #666666;
-        position: relative;
-        min-height: 100px;
+    strong {
+        font-size: 3.0em;
     }
-}
+    .pipeline{
+        margin: 10px 0px 0px 0px;
+
+        .oe_pipeline_box {
+            .oe_pipeline_stage_name {
+                background-color: #d8d8d8;
+                padding: 2%;
+            }
+            .oe_new_deals {
+                font-size: 2.0em;
+            }
+            .chevron {
+                position: absolute;
+                top: 0;
+                right: 0px;
+                border: 14px solid #8f8f8f;
+                border-right: 0;
+                border-left: 16px solid #d4d4d4;
+            }
+            background-color: white;
+            box-shadow: 0px 0px 1px 0px #666666;
+            position: relative;
+            min-height: 100px;
+        }
+    }
     .oe_pipeline_side_box {
+        font-size: 1.2em;
+        padding: 20px 20px;
         margin-top: 10%;
         background-color: white;
         box-shadow: 0px 0px 1px 0px #666666;
         position: relative;
         min-height: 100px;
+    }
+
+    .oe_chart {
+        margin-top: 35px;
+
+        .oe_won_deals {
+            padding-top: 10px;
+            color: green;
+        }
+
+        .oe_lost_deals {
+            padding-top: 40px;
+            color: red;
+        }
+
+        .oe_piechart {
+            padding-right: 0px;
+        }
     }
 }
