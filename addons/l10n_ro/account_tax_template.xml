@@ -687,7 +687,7 @@
         <field name="amount_type">group</field>
         <field name="type_tax_use">purchase</field>
         <field name="children_tax_ids" eval="[(6, 0, [ref('tvatip00-d'), ref('tvatip00-c')])]"/>
-        <field name="tag_ids" eval="[(6,0,[ref('tag_ro_60')])]"/>
+        <field name="tag_ids" eval="[(6,0,[ref('tag_ro_18'), ref('tag_ro_60')])]"/>
     </record>
 
     <record id="tvatip05-c" model="account.tax.template">
@@ -838,7 +838,7 @@
         <field name="type_tax_use">purchase</field>
         <field name="account_id" ref="pcg_4426"/>
         <field name="refund_account_id" ref="pcg_4426"/>
-        <field name="tag_ids" eval="[(6,0,[ref('tag_ro_94')])]"/>
+        <field name="tag_ids" eval="[(6,0,[ref('tag_ro_94'), ref('tag_ro_95')])]"/>
     </record>
 
     <record id="tvatine" model="account.tax.template">
