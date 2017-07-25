@@ -9,6 +9,7 @@ var pyeval = require('web.pyeval');
 var time = require('web.time');
 var utils = require('web.utils');
 var Widget = require('web.Widget');
+var config = require('web.config');
 
 var _t = core._t;
 var _lt = core._lt;
@@ -528,6 +529,7 @@ var FilterGroup = Input.extend(/** @lends instance.web.search.FilterGroup# */{
         }
         this._super(parent);
         this.filters = filters;
+        this.isMobile = config.isMobile;
         this.searchview = parent;
         this.searchview.query.on('add remove change reset', this.proxy('search_change'));
     },

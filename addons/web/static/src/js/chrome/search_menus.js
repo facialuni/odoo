@@ -6,6 +6,7 @@ var data_manager = require('web.data_manager');
 var pyeval = require('web.pyeval');
 var session = require('web.session');
 var Widget = require('web.Widget');
+var config = require('web.config');
 
 var _t = core._t;
 
@@ -36,6 +37,7 @@ return Widget.extend({
         this.query = query;
         this.target_model = target_model;
         this.action_id = action_id;
+        this.isMobile = config.isMobile;
         this.filters = {};
         _.each(filters, this.add_filter.bind(this));
     },
@@ -286,6 +288,7 @@ odoo.define('web.FilterMenu', function (require) {
 var search_filters = require('web.search_filters');
 var search_inputs = require('web.search_inputs');
 var Widget = require('web.Widget');
+var config = require('web.config');
 
 return Widget.extend({
     template: 'SearchView.FilterMenu',
@@ -314,6 +317,7 @@ return Widget.extend({
         this.filters = filters || [];
         this.searchview = parent;
         this.propositions = [];
+        this.isMobile = config.isMobile;
         this.custom_filters_open = false;
         this.fields = _.pick(fields, function (field, name) {
             return field.selectable !== false && name !== 'id';
