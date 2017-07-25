@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="project_config_settings_view_form_inherit_pad_project" model="ir.ui.view">
-        <field name="name">res.config.settings.project.form.inherit.pad.project</field>
+        <field name="name">project.config.settings.form.inherit.pad.project</field>
         <field name="model">res.config.settings</field>
         <field name="inherit_id" ref="project.project_config_settings_view_form" />
         <field name="arch" type="xml">
