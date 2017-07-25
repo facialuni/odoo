@@ -88,5 +88,24 @@
             </ul>
         </li>
     </t>
+
+    <t t-name="SearchViewMobile">
+        <li>
+            <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" title="Activities" href="#">
+                <i class="fa fa-search o_search_mobile"/> <span class="o_notification_counter badge"/>
+            </a>
+            <ul class="o_search_mobile_navbar_dropdown dropdown-menu" role="menu">
+                <li class="o_search_mobile_navbar_dropdown_tray"/>
+            </ul>
+        </li>
+    </t>
+
+    <t t-name="SearchViewMobile.body">
+        <div class="o_search_navbar">
+            <span class="o_ls_arrow"><i class="fa fa-arrow-left"/></span>
+            <span class="o_content_tray">Filter</span>
+            <span class="pull-right">Empty All</span>
+        </div>
+    </t>
 </templates>
 

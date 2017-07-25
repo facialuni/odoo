@@ -6,6 +6,7 @@ var framework = require('web.framework');
 var session = require('web.session');
 var SystrayMenu = require('web.SystrayMenu');
 var Widget = require('web.Widget');
+var config = require('web.config');
 
 var chat_manager = require('mail.chat_manager');
 
@@ -284,8 +285,46 @@ var ActivityMenu = Widget.extend({
 
 });
 
+var SearchMobile = Widget.extend({
+    template: 'SearchViewMobile',
+    events: {
+        "click .o_search_mobile": "_onSearchClick",
+        "click .o_ls_arrow": "_onleftArrowClick",
+        "click .o_search_mobile_navbar_dropdown": "_onSearchNavbar",
+    },
+    init: function() {
+        this._super.apply(this, arguments);
+    },
+    start: function() {
+        this.$searchDropdown = this.$(".o_search_mobile_navbar_dropdown")
+        this.$Searchtray = this.$(".o_search_mobile_navbar_dropdown_tray");
+
+    },
+
+    _onSearchClick: function() {
+        this.$Searchtray.html(QWeb.render('SearchViewMobile.body'));
+    },
+
+    _onleftArrowClick: function() {
+        if (this.$el.hasClass('close')) {
+            this.$el.removeClass('close');
+            this.$el.removeClass('open');
+        } else {
+            this.$el.removeClass('open');
+            this.$el.removeClass('close');
+        }
+    },
+
+    _onSearchNavbar: function(event) {
+        event.stopPropagation(); // To stop bubbuling the normal behavior of the ul
+    }
+});
+
 SystrayMenu.Items.push(MessagingMenu);
 SystrayMenu.Items.push(ActivityMenu);
+if (config.isMobile) {
+    SystrayMenu.Items.push(SearchMobile);
+}
 
 // to test activity menu in qunit test cases we need it
 return {

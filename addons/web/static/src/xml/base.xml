@@ -1044,9 +1044,9 @@
     <ul class="dropdown-menu o_searchview_autocomplete" role="menu"></ul>
 </t>
 <div t-name="SearchView.FilterMenu" class="btn-group o_dropdown">
-    <button class="o_dropdown_toggler_btn btn btn-sm dropdown-toggle" data-toggle="dropdown">
+    <div class="o_dropdown_toggler_btn btn btn-sm dropdown-toggle" data-toggle="dropdown">
         <span class="fa fa-filter"/> Filters <span class="caret"/>
-    </button>
+    </div>
     <ul class="dropdown-menu o_filters_menu" role="menu">
         <li class="o_add_filter o_closed_menu">
             <a href="#">Add Custom Filter</a>
