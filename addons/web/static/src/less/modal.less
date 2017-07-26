@@ -73,6 +73,75 @@
             }
         }
     }
+
+    @media (max-width: @screen-xs-max) {
+        &.o_modal_full {
+            .modal-dialog {
+                position: fixed;
+                margin: 0;
+                width: 100%;
+                height: 100%;
+                .modal-content {
+                    border: 0;
+                    height: 100%;
+                    .modal-header {
+                        color: #fff;
+                        background: @odoo-brand-primary;
+                        border: 0;
+                        .fa {
+                            line-height: @modal-title-line-height;
+                            font-size: 1.2em;
+                            position: absolute;
+                            top: 0;
+                            padding: 16px;
+                            &:hover {
+                                background-color: @odoo-navbar-inverse-link-hover-bg;
+                            }
+                            &.o_btn_back {
+                                left: 0;
+                            }
+                            &.o_btn_remove {
+                                right: 0;
+                            }
+                        }
+                        .modal-title {
+                            padding-left: 35px;
+                        }
+                    }
+                    .modal-body {
+                        position: absolute;
+                        overflow: auto;
+                        width: 100%;
+                    }
+                    .modal-footer {
+                        .o-flex-display();
+                        .o-flex-flow(row, wrap);
+                        .box-shadow(0px -1px 1px @odoo-main-color-muted);
+                        position: absolute;
+                        width: 100%;
+                        bottom: 0;
+                        border: 0;
+                        padding: 8px;
+                        background: background: #fff;
+                        .btn {
+                            .o-flex(0, 0, 47%);
+                            width: 100%;
+                            margin: 4px;
+                            &.o_btn_ghost {
+                                padding: 0;
+                                margin: 0;
+                                background: #fff;
+                                &:hover {
+                                    .box-shadow(none);
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 // Change the z-index of the modal-backdrop elements to be equal to the
