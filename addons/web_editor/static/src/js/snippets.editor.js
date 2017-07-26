@@ -284,7 +284,8 @@ data.Class = Widget.extend({
         });
         $(document).on("keyup", function (event) {
             var r = $.summernote.core.range.create();
-            $(r && r.sc).closest(".o_default_snippet_text").removeClass("o_default_snippet_text");
+            $(r && r.sc).closest(".o_default_snippet_text").removeClass("o_default_snippet_text").addClass('btn btn-primary');
+            debugger;
         });
 
         // clean t-oe
