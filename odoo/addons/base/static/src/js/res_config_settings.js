@@ -48,10 +48,9 @@ var GlobleSettingRenderer = FormRenderer.extend({
                 settingDiv: settingDiv,
                 appName: appName
             }
-            settingDiv.prepend($("<h2>").html(appName).addClass('settingSearchHeader o_hidden'));
+            settingDiv.prepend($("<div>").html('<div class="logos '+settingName+'"></div><span class="appName">'+appName+'</span>').addClass('settingSearchHeader o_hidden'));
         });
 
-        console.log("this.currentModule", this.currentModule);
         if(this.currentModule) {
             this.$("div[setting='"+this.currentModule+"']").click();
         }
@@ -82,6 +81,7 @@ var GlobleSettingRenderer = FormRenderer.extend({
         _.each(this.modules,function(module) {
             module.settingDiv.find('.o_setting_box').addClass('o_hidden');
             module.settingDiv.find('h2').addClass('o_hidden');
+            module.settingDiv.find('.settingSearchHeader').addClass('o_hidden');
             module.settingDiv.find('.o_settings_container').removeClass('mt16');
             var resultSetting = module.settingDiv.find("label:contains('" + self.searchText + "')");
             if (resultSetting.length > 0) {
