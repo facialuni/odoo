@@ -5,7 +5,7 @@ from odoo import api, fields, models
 
 class History(models.Model):
     _name = "crm.opportunity.history"
-    _description = "crm moves History"
+    _description = "crm stage History"
 
     user_id = fields.Integer(string='User')
     team_id = fields.Integer('Sales Channel')
@@ -38,9 +38,6 @@ class History(models.Model):
                     'end_date': end_date,
             })
         query_result = self.env.cr.dictfetchone()
-        result = self.res_id.calculate_percentage(start_date, end_date, user_id, team_id, condition)
-        return {'stages_moves': query_result,
-                'new_deals': result['new_deals'],
-                'left_deals': result['deals_left'],
-                'won_deals': result['won_deals'],
-                'lost_deals': result['lost_deals']}
+        arguments = {'start_date': start_date, 'end_date': end_date}
+        self.env['crm.pipeline.report'].init(arguments)
+        return {'stages_moves': query_result}
