@@ -192,6 +192,9 @@
             <div class="o_cp_pager"/>
             <div class="btn-group btn-group-sm o_cp_switch_buttons"/>
         </div>
+        <div class="o_cp_mobile_search_button hidden">
+            <button class="o_search_mobile_button btn btn-sm btn-primary">Search Result</button>
+        </div>
     </div>
 </t>
 <t t-name="X2ManyControlPanel">
@@ -1162,10 +1165,10 @@
         </option>
     </select>
 </t>
-<div t-name="SearchView.GroupByMenu" class="btn-group hidden-xs o_dropdown">
+<div t-name="SearchView.GroupByMenu" class="btn-group o_dropdown">
     <t t-if="widget.isMobile">
         <div class="o_dropdown_toggler_btn btn btn-sm dropdown-toggle" data-toggle="dropdown">
-            <span class="fa fa-star"/> Group By <i class="fa fa-chevron-right pull-right"/>
+            <span class="fa fa-bars"/> Group By <i class="fa fa-chevron-right pull-right"/>
         </div>
     </t>
     <t t-else="">

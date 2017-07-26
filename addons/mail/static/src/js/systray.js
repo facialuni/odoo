@@ -298,7 +298,6 @@ var SearchMobile = Widget.extend({
     start: function() {
         this.$searchDropdown = this.$(".o_search_mobile_navbar_dropdown")
         this.$Searchtray = this.$(".o_search_mobile_navbar_dropdown_tray");
-
     },
 
     _onSearchClick: function() {

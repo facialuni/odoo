@@ -394,6 +394,7 @@ odoo.define('web.GroupByMenu', function (require) {
 var core = require('web.core');
 var search_inputs = require('web.search_inputs');
 var Widget = require('web.Widget');
+var config = require('web.config');
 
 var QWeb = core.qweb;
 
@@ -416,6 +417,7 @@ return Widget.extend({
         this._super(parent);
         this.searchview = parent;
         this.groups = groups || [];
+        this.isMobile = config.isMobile;
         this.groupableFields = [];
         var groupable_types = ['many2one', 'char', 'boolean', 'selection', 'date', 'datetime'];
         _.each(fields, function (field, name) {

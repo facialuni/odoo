@@ -38,6 +38,9 @@ var config = require('web.config');
 
 var ControlPanel = Widget.extend({
     template: 'ControlPanel',
+    events: {
+           'click .o_search_mobile_button': '_onButtonClick',
+        },
     /**
      * @param {String} [template] the QWeb template to render the ControlPanel.
      * By default, the template 'ControlPanel' will be used
@@ -250,6 +253,11 @@ var ControlPanel = Widget.extend({
         this.nodes.$searchview.toggle(!is_hidden);
         this.$el.toggleClass('o_breadcrumb_full', !!is_hidden);
     },
+
+    _onButtonClick: function() {
+        console.log(this.el)
+        $(this.el).addClass('hidden');
+    }
 });
 
 return ControlPanel;

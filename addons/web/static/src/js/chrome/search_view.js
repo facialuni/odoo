@@ -159,7 +159,7 @@ var InputView = Widget.extend({
                 }
                 break;
         }
-    }
+    },
 });
 
 var FacetView = Widget.extend({
