@@ -972,6 +972,7 @@ var LinkDialog = Dialog.extend({
         if (this.data.range) {
             this.data.iniClassName = $(this.data.range.sc).filter("a").attr("class") || "";
             this.data.className = this.data.iniClassName || " ";
+            debugger;
 
             var is_link = this.data.range.isOnAnchor();
             var r = this.data.range;
