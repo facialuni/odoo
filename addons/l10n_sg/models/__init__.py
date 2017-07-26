@@ -3,4 +3,5 @@
 
 # Copyright (C) 2014 Tech Receptives (<http://techreceptives.com>).
 
-from . import models
+from . import res_company
+from . import res_partner
