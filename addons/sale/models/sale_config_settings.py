@@ -148,8 +148,9 @@ class SaleConfigSettings(models.TransientModel):
     @api.multi
     def set_values(self):
         super(SaleConfigSettings, self).set_values()
-        self.env['ir.config_parameter'].sudo().set_param("sale.use_sale_note", self.use_sale_note)
-        self.env['ir.config_parameter'].sudo().set_param("sale.auto_done_setting", self.auto_done_setting)
-        self.env['ir.config_parameter'].sudo().set_param("sale.default_deposit_product_id", self.default_deposit_product_id.id)
-        self.env['ir.config_parameter'].sudo().set_param('sale.sale_pricelist_setting', self.sale_pricelist_setting)
-        self.env['ir.config_parameter'].sudo().set_param('sale.sale_show_tax', self.sale_show_tax)
+        ICPSudo = self.env['ir.config_parameter'].sudo()
+        ICPSudo.set_param("sale.use_sale_note", self.use_sale_note)
+        ICPSudo.set_param("sale.auto_done_setting", self.auto_done_setting)
+        ICPSudo.set_param("sale.default_deposit_product_id", self.default_deposit_product_id.id)
+        ICPSudo.set_param('sale.sale_pricelist_setting', self.sale_pricelist_setting)
+        ICPSudo.set_param('sale.sale_show_tax', self.sale_show_tax)
