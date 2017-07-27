@@ -1,176 +1,171 @@
-.oe_form_configuration {
-    padding-bottom: 0px !important;
-    padding-top: 12px !important;
-    .title {
-        margin-bottom: 20px;
-        width: 50%;
-        font-size: 18px;
-        color: #8f8f8f;
-    }
-    .o_control_panel {
-        padding-left: 0px;
-        padding-top: 0px;
-    }
-    .o_form_statusbar {
-        margin-bottom: 0px;
-        padding-bottom: 8px;
-    }
-    .setting_search {
-        float: right;
-        width: 50%;
-        .input-group {
-            width: 350px;
-            float: right;
+.globleSettings {
+    padding: 0px !important;
+    .o_panel {
+        padding: 10px 16px 5px 16px;
+        display: flex;
+        .title {
+            width: 50%;
+            font-size: 18px;
+            color: #8f8f8f;
+        }
+        .setting_search {
+            width: 50%;
+            position: relative;
             .searchInput {
                 border: 0px;
                 padding: 0px;
             }
-            .form-control , .form-control:focus {
+            .searchInput , .searchInput:focus {
                 border-bottom: 1px solid #8f8f8f;
                 box-shadow: none;
                 height: 26px;
             }
-            .input-group-addon {
-                background-color: #fff;
-                border: 0px;
-                border-bottom: 1px solid #8f8f8f;
-                padding-right: 0px;
+            .searchIcon {
+                position: absolute;
+                top: 4px;
+                left: auto;
+                bottom: auto;
+                right: 0;
             }
         }
     }
-}
-.new_setting {
-    height: calc(~"100vh - 132px");
-    display: flex;
-    .leftpan {
-        background: #f3f3f3;
-        overflow: auto;
-        padding: 0;
-        .apps_header {
-            padding: 10px 10px;
-            font-size: 25px;
-            color: #b1b0b0;
-        }
-        .apps {
-            margin-top: 15px;
-            .selected {
-                background-color: #fff;
-                .logo {
-                    filter: grayscale(0%) !important;
+    .o_form_statusbar {
+        padding: 0px 16px 5px 16px;
+        margin: 0px !important;
+    }
+    .new_setting {
+        height: calc(~"100vh - 125px");
+        display: flex;
+        width: 100%;
+        margin-left: 0px;
+        margin-right: 0px;
+        .leftpan {
+            background: #f3f3f3;
+            overflow: auto;
+            padding: 0;
+            .apps {
+                .selected {
+                    background-color: #fff;
+                    .logo {
+                        filter: grayscale(0%) !important;
+                    }
+                }
+                .appContainer {
+                    font-size: 15px;
+                    padding-left: 16px;
+                    height: 40px;
+                    width: 100%;
+                    line-height: 40px;
+                    cursor: pointer;
+                    display: inline-flex;
+                    .logo {
+                        width: 23px;
+                        filter: grayscale(100%);
+                    }
+                    .app_name {
+                        padding-left: 10px;
+                    }
                 }
             }
-            .appContainer {
-                font-size: 15px;
-                height: 40px;
-                width: 100%;
-                padding-left: 10px;
-                line-height: 40px;
-                cursor: pointer;
-                display: inline-flex;
-                .logo {
-                    width: 23px;
-                    filter: grayscale(100%);
+        }
+        .rightpan {
+            overflow: auto;
+            .hiliterWord {
+                background: yellow;
+            }
+            .settings {
+                padding: 0 16px 0 16px;
+            }
+            .settingSearchHeader {
+                display: flex;
+                margin-top: 30px;
+                margin-bottom: 15px;
+                .logos {
+                    width: 25px;
+                    height: 25px;
                 }
-                .app_name {
+                .appName {
+                    font-size: 20px;
                     padding-left: 10px;
                 }
             }
         }
-    }
-    .rightpan {
-        overflow: auto;
-        .hiliterWord {
-            background: yellow;
-        }
-        .settingSearchHeader {
-            display: flex;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            .logos {
-                width: 25px;
-                height: 25px;
-            }
-            .appName {
-                font-size: 20px;
-                padding-left: 10px;
-            }
-        }
-    }
 
-    .pos {
-        background : url('/point_of_sale/static/description/icon.png') no-repeat center;
-        background-size:contain;
-    }
-    .account {
-        background : url('/account_accountant/static/description/icon.png') no-repeat center;
-        background-size:contain;
-    }
-    .inventory {
-        background : url('/stock/static/description/icon.png') no-repeat center;
-        background-size:contain;
-    }
-    .project {
-        background : url('/project/static/description/icon.png') no-repeat center;
-        background-size:contain;
-    }
-    .mrp {
-        background : url('/mrp/static/description/icon.png') no-repeat center;
-        background-size:contain;
-    }
-    .sales {
-        background : url('/sale_management/static/description/icon.png') no-repeat center;
-        background-size:contain;
-    }
-    .purchase {
-        background : url('/purchase/static/description/icon.png') no-repeat center;
-        background-size:contain;
-    }
-    .employee {
-        background : url('/hr/static/description/icon.png') no-repeat center;
-        background-size:contain;
-    }
-    .hrrecruitment {
-        background : url('/hr_recruitment/static/description/icon.png') no-repeat center;
-        background-size:contain;
-    }
-    .timesheets {
-        background : url('/hr_timesheet/static/description/icon.png') no-repeat center;
-        background-size:contain;
-    }
-    .massmailing {
-        background : url('/mass_mailing/static/description/icon.png') no-repeat center;
-        background-size:contain;
-    }
-    .hrexpense {
-        background : url('/hr_expense/static/description/icon.png') no-repeat center;
-        background-size:contain;
-    }
-    .hrattendance {
-        background : url('/hr_attendance/static/description/icon.png') no-repeat center;
-        background-size:contain;
-    }
-    .fleet {
-        background : url('/fleet/static/description/icon.png') no-repeat center;
-        background-size:contain;
-    }
-    .website {
-        background : url('/website/static/description/icon.png') no-repeat center;
-        background-size:contain;
-    }
-    .events {
-        background : url('/event/static/description/icon.png') no-repeat center;
-        background-size:contain;
-    }
-    .subscriptions {
-        background : url('/sale_subscription/static/description/icon.png') no-repeat center;
-        background-size:contain;
-    }
-    .hrpayroll {
-        background : url('/hr_payroll/static/description/icon.png') no-repeat center;
-        background-size:contain;
-    }
-    .generalsettings {
-        background : url('/base/static/description/settings.png') no-repeat center;
-        background-size:contain;
+        .pos {
+            background : url('/point_of_sale/static/description/icon.png') no-repeat center;
+            background-size:contain;
+        }
+        .account {
+            background : url('/account_accountant/static/description/icon.png') no-repeat center;
+            background-size:contain;
+        }
+        .inventory {
+            background : url('/stock/static/description/icon.png') no-repeat center;
+            background-size:contain;
+        }
+        .project {
+            background : url('/project/static/description/icon.png') no-repeat center;
+            background-size:contain;
+        }
+        .mrp {
+            background : url('/mrp/static/description/icon.png') no-repeat center;
+            background-size:contain;
+        }
+        .sales {
+            background : url('/sale_management/static/description/icon.png') no-repeat center;
+            background-size:contain;
+        }
+        .purchase {
+            background : url('/purchase/static/description/icon.png') no-repeat center;
+            background-size:contain;
+        }
+        .employee {
+            background : url('/hr/static/description/icon.png') no-repeat center;
+            background-size:contain;
+        }
+        .hrrecruitment {
+            background : url('/hr_recruitment/static/description/icon.png') no-repeat center;
+            background-size:contain;
+        }
+        .timesheets {
+            background : url('/hr_timesheet/static/description/icon.png') no-repeat center;
+            background-size:contain;
+        }
+        .massmailing {
+            background : url('/mass_mailing/static/description/icon.png') no-repeat center;
+            background-size:contain;
+        }
+        .hrexpense {
+            background : url('/hr_expense/static/description/icon.png') no-repeat center;
+            background-size:contain;
+        }
+        .hrattendance {
+            background : url('/hr_attendance/static/description/icon.png') no-repeat center;
+            background-size:contain;
+        }
+        .fleet {
+            background : url('/fleet/static/description/icon.png') no-repeat center;
+            background-size:contain;
+        }
+        .website {
+            background : url('/website/static/description/icon.png') no-repeat center;
+            background-size:contain;
+        }
+        .events {
+            background : url('/event/static/description/icon.png') no-repeat center;
+            background-size:contain;
+        }
+        .subscriptions {
+            background : url('/sale_subscription/static/description/icon.png') no-repeat center;
+            background-size:contain;
+        }
+        .hrpayroll {
+            background : url('/hr_payroll/static/description/icon.png') no-repeat center;
+            background-size:contain;
+        }
+        .generalsettings {
+            background : url('/base/static/description/settings.png') no-repeat center;
+            background-size:contain;
+        }
     }
 }
