@@ -5,7 +5,9 @@
         <field name="model">hr.expense.refuse.wizard</field>
         <field name="arch" type="xml">
             <form string="Expense refuse reason">
-                <separator string="Reason to refuse expense."/>
+                <separator string="Reason to refuse Expense"/>
+                <field name="hr_expense_ids" invisible="1"/>
+                <field name="hr_expense_sheet_id" invisible="1"/>
                 <field name="reason"/>
                 <footer>
                     <button string='Refuse' name="expense_refuse_reason" type="object" class="oe_highlight"/>

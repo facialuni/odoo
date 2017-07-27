@@ -525,7 +525,7 @@ class HrExpenseSheet(models.Model):
         self.attachment_number = sum(self.expense_line_ids.mapped('attachment_number'))
 
     @api.multi
-    def refuse_expense(self, reason):
+    def refuse_sheet(self, reason):
         self.write({'state': 'cancel'})
         for sheet in self:
             sheet.message_post_with_view('hr_expense.hr_expense_template_refuse_reason',
