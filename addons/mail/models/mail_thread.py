@@ -24,7 +24,7 @@ from email.utils import formataddr
 from lxml import etree
 from werkzeug import url_encode
 
-from odoo import _, api, exceptions, fields, models, tools
+from odoo import _, api, exceptions, fields, models, sql_db, tools
 from odoo.tools import pycompat
 from odoo.tools.safe_eval import safe_eval
 
@@ -214,7 +214,10 @@ class MailThread(models.AbstractModel):
     # CRUD overrides for automatic subscription and logging
     # ------------------------------------------------------
 
+    from odoo.tools.profiler import profile
+
     @api.model
+    @profile
     def create(self, values):
         """ Chatter override :
             - subscribe uid
@@ -225,10 +228,11 @@ class MailThread(models.AbstractModel):
             return super(MailThread, self).create(values)
 
         # subscribe uid unless asked not to
-        if not self._context.get('mail_create_nosubscribe'):
-            message_follower_ids = values.get('message_follower_ids') or []  # webclient can send None or False
-            message_follower_ids += self.env['mail.followers']._add_follower_command(self._name, [], {self.env.user.partner_id.id: None}, {}, force=True)[0]
-            values['message_follower_ids'] = message_follower_ids
+        with sql_db._enable_bob:
+            if not self._context.get('mail_create_nosubscribe'):
+                message_follower_ids = values.get('message_follower_ids') or []  # webclient can send None or False
+                message_follower_ids += self.env['mail.followers']._add_follower_command(self._name, [], {self.env.user.partner_id.id: None}, {}, force=True)[0]
+                values['message_follower_ids'] = message_follower_ids
         thread = super(MailThread, self).create(values)
 
         # automatic logging unless asked not to (mainly for various testing purpose)

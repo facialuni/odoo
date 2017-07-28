@@ -1,0 +1,35 @@
+2017-07-27 14:44:38 UTC [25203]: [42-1] LOG:  duration: 45 ms  statement: SELECT "res_users"."id" as "id","res_users"."write_uid" as "write_uid","res_users"."active" as "active","res_users"."create_uid" as "create_uid","res_users"."company_id" as "company_id","res_users"."password" as "password","res_users"."partner_id" as "partner_id","res_users"."login" as "login","res_users"."signature" as "signature","res_users"."write_date" as "write_date","res_users"."action_id" as "action_id","res_users"."alias_id" as "alias_id","res_users"."share" as "share","res_users"."create_date" as "create_date","res_users"."password_crypt" as "password_crypt","res_users"."notification_type" as "notification_type" FROM "res_users" WHERE "res_users".id IN (12)
+
+2017-07-27 14:44:38 UTC [25203]: [42-1] LOG:  duration: 45 ms  statement: SELECT id FROM ir_model WHERE model='mail.test'
+
+2017-07-27 14:44:38 UTC [25203]: [42-1] LOG:  duration: 45 ms  statement: SELECT "mail_followers".id FROM "mail_followers" WHERE ((("mail_followers"."res_model_id" = 134)  AND  FALSE)  AND  (("mail_followers"."partner_id" in (49))  OR  FALSE)) ORDER BY "mail_followers"."id"  
+
+2017-07-27 14:44:38 UTC [25203]: [42-1] LOG:  duration: 45 ms  statement: SELECT MAX(CASE WHEN perm_read THEN 1 ELSE 0 END)
+                              FROM ir_model_access a
+                              JOIN ir_model m ON (m.id = a.model_id)
+                              JOIN res_groups_users_rel gu ON (gu.gid = a.group_id)
+                             WHERE m.model = 'mail.message.subtype'
+                               AND gu.uid = 12
+                               AND a.active IS TRUE
+
+2017-07-27 14:44:38 UTC [25203]: [42-1] LOG:  duration: 45 ms  statement: SELECT MAX(CASE WHEN perm_read THEN 1 ELSE 0 END)
+                                  FROM ir_model_access a
+                                  JOIN ir_model m ON (m.id = a.model_id)
+                                 WHERE a.group_id IS NULL
+                                   AND m.model = 'mail.message.subtype'
+                                   AND a.active IS TRUE
+
+2017-07-27 14:44:38 UTC [25203]: [42-1] LOG:  duration: 45 ms  statement:  SELECT r.id FROM ir_rule r JOIN ir_model m ON (r.model_id=m.id)
+                    WHERE m.model='mail.message.subtype' AND r.active AND r.perm_read
+                    AND (r.id IN (SELECT rule_group_id FROM rule_group_rel rg
+                                  JOIN res_groups_users_rel gu ON (rg.group_id=gu.gid)
+                                  WHERE gu.uid=12)
+                         OR r.global)
+                
+
+2017-07-27 14:44:38 UTC [25203]: [42-1] LOG:  duration: 45 ms  statement: SELECT "mail_message_subtype".id FROM "mail_message_subtype" WHERE (("mail_message_subtype"."default" = true)  AND  (("mail_message_subtype"."res_model" = 'mail.test')  OR  "mail_message_subtype"."res_model" IS NULL )) ORDER BY "mail_message_subtype"."sequence" ,"mail_message_subtype"."id"  
+
+2017-07-27 14:44:38 UTC [25203]: [42-1] LOG:  duration: 45 ms  statement: SELECT "mail_message_subtype"."id" as "id","mail_message_subtype"."name" as "name","mail_message_subtype"."hidden" as "hidden","mail_message_subtype"."res_model" as "res_model","mail_message_subtype"."write_uid" as "write_uid","mail_message_subtype"."create_uid" as "create_uid","mail_message_subtype"."relation_field" as "relation_field","mail_message_subtype"."sequence" as "sequence","mail_message_subtype"."description" as "description","mail_message_subtype"."parent_id" as "parent_id","mail_message_subtype"."write_date" as "write_date","mail_message_subtype"."internal" as "internal","mail_message_subtype"."create_date" as "create_date","mail_message_subtype"."default" as "default" FROM "mail_message_subtype" WHERE "mail_message_subtype".id IN (1, 3)
+
+2017-07-27 14:44:38 UTC [25203]: [42-1] LOG:  duration: 45 ms  statement: SELECT "res_users".id FROM "res_users" LEFT JOIN "res_partner" as "res_users__partner_id" ON ("res_users"."partner_id" = "res_users__partner_id"."id") WHERE ((("res_users"."active" = true)  AND  ("res_users"."partner_id" in (49)))  AND  ("res_users"."share" IS NULL or "res_users"."share" = false )) ORDER BY "res_users__partner_id"."name" ,"res_users"."login"  
+
