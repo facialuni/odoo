@@ -55,4 +55,55 @@
             </t>
         </div>
     </t>
+
+    <t t-name="crm.searchView">
+        <div class="btn-group o_dropdown oe_crm_opportunity_reports_filter_date">
+            <a type="button" class="dropdown-toggle" data-toggle="dropdown">
+                <span class="fa fa-calendar"/>
+                <span class="caret"/>
+            </a>
+            <ul class="dropdown-menu o_filters_menu" role="menu">
+                <li title="This Week" data-filter="this_week" class="oe_crm_opportunity_report_date_filter"><a>This Week</a></li>
+                <li title="This Month" data-filter="this_month" class="oe_crm_opportunity_report_date_filter"><a>This Month</a></li>
+                <li title="This Quarter" data-filter="this_quarter" class="oe_crm_opportunity_report_date_filter"><a>This Quarter</a></li>
+                <li title="This Financial Year" data-filter="this_year" class="oe_crm_opportunity_report_date_filter"><a>This Year</a></li>
+                <li class="divider"></li>
+                <li class="js_foldable_trigger o_closed_menu" data-filter='custom_filter_date'><a>Custom</a></li>
+                <li class="o_foldable_menu o_closed_menu" data-filter='custom_filter_date' style='margin-left: 10px; margin-right: 10px;'>
+                    <label class="custom-date" for="date_from">Start Date :</label>
+                    <div class="form-group custom-date">
+                        <div class='o_datepicker js_report_datetimepicker' default-value="">
+                            <input type='text' class="o_datepicker_input" name="date_from" />
+                            <span class="o_datepicker_button"/>
+                        </div>
+                    </div>
+                    <label class="custom-date" for="date_to">End Date :</label>
+                    <label class="custom-date" for="date_to">Date :</label>
+                    <div class="form-group custom-date">
+                        <div class='o_datepicker js_report_datetimepicker' default-value="">
+                            <input type='text' class="o_datepicker_input" name="date_to" />
+                            <span class="o_datepicker_button"/>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary oe_crm_opportunity_report_date_filter" data-filter="custom">Apply</button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="btn-group o_dropdown oe_crm_opportunity_reports_filter_custom">
+            <a type="button" class="dropdown-toggle" data-toggle="dropdown">
+            `<span class="fa fa-filter"/>  Filters <span class="caret"/>
+            </a>
+            <ul class="dropdown-menu o_filters_menu" role="menu">
+                <li title="My Pipeline" data-filter="my_pipeline" class="oe_crm_opportunity_report_filter_extra"><a>My Pipeline</a></li>
+                <li title="My Channel" data-filter="my_channel" class="oe_crm_opportunity_report_filter_extra"><a>My Channel</a></li>
+                <li class="divider"></li>
+                <li class="js_foldable_trigger o_closed_menu" data-filter='extra_custom_filter'><a>Custom</a></li>
+                <li class="o_foldable_menu o_closed_menu" data-filter='extra_custom_filter' style='margin-left: 10px; margin-right: 10px;'>
+                    <input type="text" class="o_input"/>
+                    <button type="button" class="btn btn-primary oe_crm_opportunity_report_filter_extra" data-filter="custom">Apply</button>
+                </li>
+            </ul>
+        </div>
+    </t>
 </templates>

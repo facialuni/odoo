@@ -38,6 +38,14 @@ class History(models.Model):
                     'end_date': end_date,
             })
         query_result = self.env.cr.dictfetchone()
-        arguments = {'start_date': start_date, 'end_date': end_date}
+        arguments = {'start_date': start_date,
+                     'end_date': end_date,
+                     'user_id': user_id,
+                     'team_id': team_id}
         self.env['crm.pipeline.report'].init(arguments)
-        return {'stages_moves': query_result}
+        result = self.env['crm.pipeline.report'].search_read([])[0]
+        return {'stages_moves': query_result,
+                'new_deals': result['new_deals'],
+                'left_deals': result['deals_left'],
+                'won_deals': result['won_deals'],
+                'lost_deals': result['lost_deals']}
