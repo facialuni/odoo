@@ -971,8 +971,7 @@ var LinkDialog = Dialog.extend({
         this.data.className = "";
         if (this.data.range) {
             this.data.iniClassName = $(this.data.range.sc).filter("a").attr("class") || "";
-            this.data.className = this.data.iniClassName || " ";
-            debugger;
+            this.data.className = this.data.iniClassName.replace(/(^|\s+)btn(-[a-z0-9_-]*)?/gi, ' ');
 
             var is_link = this.data.range.isOnAnchor();
             var r = this.data.range;
@@ -1079,7 +1078,7 @@ var LinkDialog = Dialog.extend({
 
         var style = this.$("input[name='link-style-type']:checked").val() || '';
         var size = this.$("select.link-style").val() || '';
-        var classes = style.length ? "btn " + style : " ";
+        var classes = (this.data.className || "") + (style && style.length ? " btn " : "") + style + " " + size;
         var isNewWindow = this.$('input.window-new').prop('checked');
 
         if ($e.hasClass('email-address') && $e.val().indexOf("@") !== -1) {
@@ -1105,7 +1104,7 @@ var LinkDialog = Dialog.extend({
             self.data.text = label;
             self.data.className = classes.replace(/\s+/gi, ' ').replace(/^\s+|\s+$/gi, '');
                 if (classes.replace(/(^|[ ])(btn-default|btn-success|btn-primary|btn-info|btn-warning|btn-danger)([ ]|$)/gi, ' ')) {
-                    self.data.style = {'background-color': '', 'color': 'white'};
+                    self.data.style = {'background-color': '', 'color': ''};
                 }
             self.final_data = self.data;
         }).then(_super);
@@ -1118,7 +1117,7 @@ var LinkDialog = Dialog.extend({
 
         this.$('input#o_link_dialog_label_input').val(text);
         this.$('input.window-new').prop('checked', new_window);
-        this.$('input.link-style').prop('checked', false).first().prop("checked", true);
+        this.$('input.link-style[value="btn-alpha"]').prop('checked', true);
 
         if (classes) {
             this.$('input.link-style, select.link-style > option').each(function () {

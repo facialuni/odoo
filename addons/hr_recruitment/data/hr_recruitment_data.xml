@@ -28,7 +28,7 @@
                         </td>
                         <td style="text-align:right;vertical-align:middle;">
                             % if 'website_url' in object.job_id and object.job_id.website_url:
-                                <a href="${object.job_id.website_url}" style="background-color: #1abc9c; padding: 12px; font-weight: 12px; text-decoration: none; color: #fff; border-radius: 5px; font-size:16px;">Job Description</a>
+                                <a href="${object.job_id.website_url}" style="background-color: #1cc1a9; padding: 12px; font-weight: 12px; text-decoration: none; color: #fff; border-radius: 5px; font-size:16px;">Job Description</a>
                             % endif
                         </td>
                     </tr>
@@ -117,7 +117,7 @@
                         </td>
                         <td style="text-align:right;vertical-align:middle;">
                             % if 'website_url' in object.job_id and object.job_id.website_url:
-                                <a href="${object.job_id.website_url}" style="background-color: #1abc9c; padding: 12px; font-weight: 12px; text-decoration: none; color: #fff; border-radius: 5px; font-size:16px;">Job Description</a>
+                                <a href="${object.job_id.website_url}" style="background-color: #1cc1a9; padding: 12px; font-weight: 12px; text-decoration: none; color: #fff; border-radius: 5px; font-size:16px;">Job Description</a>
                             % endif
                         </td>
                     </tr>
@@ -265,7 +265,7 @@
                         </td>
                         <td style="text-align:right;vertical-align:middle;">
                             % if 'website_url' in object.job_id and object.job_id.website_url:
-                                <a href="${object.job_id.website_url}" style="background-color: #1abc9c; padding: 12px; font-weight: 12px; text-decoration: none; color: #fff; border-radius: 5px; font-size:16px;">Job Description</a>
+                                <a href="${object.job_id.website_url}" style="background-color: #1cc1a9; padding: 12px; font-weight: 12px; text-decoration: none; color: #fff; border-radius: 5px; font-size:16px;">Job Description</a>
                             % endif
                         </td>
                     </tr>
