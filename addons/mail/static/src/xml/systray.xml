@@ -106,6 +106,8 @@
             <span class="o_content_tray">Filter</span>
             <span class="pull-right">Empty All</span>
         </div>
+        <div class="o_search_on_mobile"/>
+        <div class="o_search_mobile_buttons"/>
     </t>
 </templates>
 

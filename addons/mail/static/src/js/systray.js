@@ -7,6 +7,8 @@ var session = require('web.session');
 var SystrayMenu = require('web.SystrayMenu');
 var Widget = require('web.Widget');
 var config = require('web.config');
+var WebClient = require('web.WebClient');
+var SearchView = require('web.SearchView');
 
 var chat_manager = require('mail.chat_manager');
 
@@ -301,7 +303,23 @@ var SearchMobile = Widget.extend({
     },
 
     _onSearchClick: function() {
+        var self = this;
         this.$Searchtray.html(QWeb.render('SearchViewMobile.body'));
+        var options = {
+            hidden: this.searchview_data.flags.search_view === false,
+            disable_custom_filters: this.searchview_data.flags.search_disable_custom_filters,
+            $buttons:$('<div/>').addClass('o_search_options').appendTo(this.$Searchtray.find('.o_search_mobile_buttons')),
+            action: this.searchview_data.action,
+            search_defaults: this.searchview_data.search_defaults,
+        };
+        this.searchview = new SearchView(this.searchview_data, this.searchview_data.dataset, this.searchview_data.search_fields_view, options);
+
+        $.when(this.searchview.appendTo(this.$Searchtray.find('.o_search_on_mobile'))).done(function() {
+            self.searchview_elements = {};
+            self.searchview_elements.$searchview = self.searchview.$el;
+            self.searchview_elements.$searchview_buttons = self.searchview.$buttons.contents();
+        });
+        this.searchview.do_show();
     },
 
     _onleftArrowClick: function() {
@@ -316,13 +334,28 @@ var SearchMobile = Widget.extend({
 
     _onSearchNavbar: function(event) {
         event.stopPropagation(); // To stop bubbuling the normal behavior of the ul
-    }
+    },
+
+     update: function (tag, descriptor, widget) {
+        this.searchview_data = widget;
+    },
+
 });
 
 SystrayMenu.Items.push(MessagingMenu);
 SystrayMenu.Items.push(ActivityMenu);
 if (config.isMobile) {
     SystrayMenu.Items.push(SearchMobile);
+
+    WebClient.include({
+        current_action_updated: function(action) {
+            this._super.apply(this, arguments);
+            var action_descr = action && action.action_descr;
+            var action_widget = action && action.widget;
+            var search_mobile = _.find(this.systray_menu.widgets, function(item) {return item instanceof SearchMobile; });
+            search_mobile.update('action', action_descr, action_widget);
+        },
+    });
 }
 
 // to test activity menu in qunit test cases we need it
