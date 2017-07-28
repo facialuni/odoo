@@ -15,6 +15,7 @@ class ProjectConfiguration(models.TransientModel):
     module_project_timesheet_synchro = fields.Boolean("Awesome Timesheet")
     module_rating_project = fields.Boolean(string="Rating on Tasks")
     module_project_forecast = fields.Boolean(string="Forecasts")
+    module_project_gantt = fields.Boolean(string="Resources Allocations")
     module_hr_holidays = fields.Boolean("Leave Management")
     module_hr_timesheet_attendance = fields.Boolean("Attendances")
     module_sale_timesheet = fields.Boolean("Time Billing")
