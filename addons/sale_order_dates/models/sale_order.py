@@ -27,14 +27,14 @@ class SaleOrder(models.Model):
     effective_date = fields.Date(compute='_compute_picking_ids', string='Effective Date', store=True,
                                  help="Date on which the first Delivery Order was created.")
 
-    @api.depends('date_order', 'order_line.customer_lead')
+    @api.depends('date_order', 'order_line.customer_lead', 'confirmation_date')
     def _compute_commitment_date(self):
         """Compute the commitment date"""
         for order in self:
             dates_list = []
-            order_datetime = fields.Datetime.from_string(order.date_order)
+            date = order.confirmation_date or order.date_order
             for line in order.order_line.filtered(lambda x: x.state != 'cancel'):
-                dt = order_datetime + timedelta(days=line.customer_lead or 0.0)
+                dt = fields.Datetime.from_string(date) + timedelta(days=line.customer_lead or 0.0)
                 dates_list.append(dt)
             if dates_list:
                 commit_date = min(dates_list) if order.picking_policy == 'direct' else max(dates_list)
