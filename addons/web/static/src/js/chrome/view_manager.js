@@ -573,7 +573,6 @@ var ViewManager = Widget.extend(ControlPanelMixin, {
                       return pair[0].match('^(?:(?:default_|search_default_|show_).+|.+_view_ref|group_by|group_by_no_leaf|active_id|active_ids)$') !== null;
                     }))
                 );
-                ncontext.add(action_data.context || {});
                 ncontext.add({active_model: self.env.modelName});
                 if (res_ids) {
                     ncontext.add({
@@ -581,6 +580,7 @@ var ViewManager = Widget.extend(ControlPanelMixin, {
                         active_ids: res_ids,
                     });
                 }
+                ncontext.add(action_data.context || {});
                 ncontext.add(action.context || {});
                 action.context = ncontext;
                 return self.do_action(action, {

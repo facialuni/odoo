@@ -235,10 +235,18 @@ var BasicController = AbstractController.extend(FieldManagerMixin, {
             return self.isDestroyed() ? $.when() : self.reload();
         };
         record = record || this.model.get(this.handle);
+
+         var env = this.model.get(this.handle, {env: true});
+         var context = _.extend({
+             active_model: this.modelName,
+             active_id: env.currentId,
+             active_ids: env.ids,
+         }, record.getContext({ additionalContext: attrs.context}));
+
         var recordID = record.data.id;
         this.trigger_up('execute_action', {
             action_data: _.extend({}, attrs, {
-                context: record.getContext({additionalContext: attrs.context}),
+                context: context,
             }),
             model: record.model,
             res_ids: [recordID],
