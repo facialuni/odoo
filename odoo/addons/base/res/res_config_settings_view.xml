@@ -9,7 +9,7 @@
                     <div class="o_panel">
                         <div class="title">Settings</div>
                         <div class="setting_search">
-                            <input type="text" class="searchInput"/>
+                            <input type="text" class="searchInput" placeholder="Search..."/>
                             <span class="searchIcon"><i class="fa fa-search"/></span>
                         </div>
                     </div>

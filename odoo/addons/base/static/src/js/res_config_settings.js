@@ -53,6 +53,7 @@ var GlobleSettingRenderer = FormRenderer.extend({
 
         if(this.currentModule) {
             this.$("div[setting='"+this.currentModule+"']").click();
+            this.$("div[setting='generalsettings']").after(this.selectedApp);
         }
     },
 

@@ -237,6 +237,9 @@ var FormRenderer = BasicRenderer.extend({
         if (node.attrs.style) {
             $el.attr('style', node.attrs.style);
         }
+        if (node.attrs.placeholder) {
+            $el.attr('placeholder', node.attrs.placeholder);
+        }
     },
     /**
      * @private
