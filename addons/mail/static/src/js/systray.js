@@ -292,7 +292,6 @@ var SearchMobile = Widget.extend({
     events: {
         "click .o_search_mobile": "_onSearchClick",
         "click .o_ls_arrow": "_onleftArrowClick",
-        "click .o_search_mobile_navbar_dropdown": "_onSearchNavbar",
     },
     init: function() {
         this._super.apply(this, arguments);
@@ -304,10 +303,11 @@ var SearchMobile = Widget.extend({
 
     _onSearchClick: function() {
         var self = this;
+        this.$searchDropdown.toggleClass('hidden');
         this.$Searchtray.html(QWeb.render('SearchViewMobile.body'));
         var options = {
-            hidden: this.searchview_data.flags.search_view === false,
-            disable_custom_filters: this.searchview_data.flags.search_disable_custom_filters,
+            hidden: this.searchview_data.action.flags.search_view === false,
+            disable_custom_filters: this.searchview_data.action.flags.search_disable_custom_filters,
             $buttons:$('<div/>').addClass('o_search_options').appendTo(this.$Searchtray.find('.o_search_mobile_buttons')),
             action: this.searchview_data.action,
             search_defaults: this.searchview_data.search_defaults,
@@ -323,21 +323,16 @@ var SearchMobile = Widget.extend({
     },
 
     _onleftArrowClick: function() {
-        if (this.$el.hasClass('close')) {
-            this.$el.removeClass('close');
-            this.$el.removeClass('open');
-        } else {
-            this.$el.removeClass('open');
-            this.$el.removeClass('close');
-        }
-    },
-
-    _onSearchNavbar: function(event) {
-        event.stopPropagation(); // To stop bubbuling the normal behavior of the ul
+        this.$searchDropdown.toggleClass('hidden');
     },
 
      update: function (tag, descriptor, widget) {
         this.searchview_data = widget;
+        if (widget && widget.action && widget.action.flags.search_view) {
+             $(this.el).removeClass('hidden');
+        } else {
+            $(this.el).addClass('hidden');
+        }
     },
 
 });

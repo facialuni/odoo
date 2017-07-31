@@ -90,20 +90,20 @@
     </t>
 
     <t t-name="SearchViewMobile">
-        <li>
+        <li class='o_search_mobile_item hidden'>
             <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" title="Activities" href="#">
                 <i class="fa fa-search o_search_mobile"/> <span class="o_notification_counter badge"/>
             </a>
-            <ul class="o_search_mobile_navbar_dropdown dropdown-menu" role="menu">
-                <li class="o_search_mobile_navbar_dropdown_tray"/>
-            </ul>
+            <div class="o_search_mobile_navbar_dropdown hidden">
+                <div class="o_search_mobile_navbar_dropdown_tray"/>
+            </div>
         </li>
     </t>
 
     <t t-name="SearchViewMobile.body">
         <div class="o_search_navbar">
-            <span class="o_ls_arrow"><i class="fa fa-arrow-left"/></span>
-            <span class="o_content_tray">Filter</span>
+            <span class="o_ls_arrow pull-left"><i class="fa fa-arrow-left"/></span>
+            <span class="o_content_tray pull-left">Filter</span>
             <span class="pull-right">Empty All</span>
         </div>
         <div class="o_search_on_mobile"/>

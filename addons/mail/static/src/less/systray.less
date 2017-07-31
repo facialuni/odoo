@@ -138,11 +138,19 @@
 }
 
 .o_search_mobile_navbar_dropdown {
-    top: 0px !important;
-    heigth:100%;
-    padding: 0px;
+    top: 0px;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: fixed;
+    width: auto;
+    z-index:10;
+    background-color: white;
 }
 
+.o_search_on_mobile {
+    color:@gray-light;
+}
 .o_search_navbar {
     background-color: #875A7B;
     height: 46px;
@@ -151,4 +159,33 @@
 
 .o_content_tray {
     padding-left: 15px;
+}
+.o_search_mobile_buttons {
+    width:100%;
+    .o_dropdown {
+        margin: 0px;
+        width: 100%;
+        border: solid 1px #e0d7d7;
+    }
+    .dropdown-menu {
+        position: relative;
+        width:100%;
+    }
+    div{
+        width: 100%;
+        text-align: left;
+        i{
+            padding-top: 3px;
+        }
+    }
+    ul {
+        position: relative;
+        width: 100%;
+        box-shadow: none;
+        border: none;
+        color:@gray-light;
+        .o_checkbox {
+            width: inherit;
+        }
+    }
 }
