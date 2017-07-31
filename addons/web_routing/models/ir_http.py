@@ -258,7 +258,7 @@ class IrHttp(models.AbstractModel):
             if request.routing_iteration == 1:
                 langs = [lg.code for lg in cls._get_languages()]
                 is_a_bot = cls.is_a_bot()
-                cook_lang = request.httprequest.cookies.get('website_lang')
+                cook_lang = request.httprequest.cookies.get('frontend_lang')
                 nearest_lang = not func and cls.get_nearest_lang(path[1])
                 preferred_lang = ((cook_lang if cook_lang in langs else False)
                                   or (not is_a_bot and cls.get_nearest_lang(request.lang))
@@ -300,7 +300,7 @@ class IrHttp(models.AbstractModel):
             request.is_frontend = True
             request.routing_failed = True
 
-        request.website_multilang = (
+        request.is_frontend_multilang = (
             request.is_frontend and
             func and func.routing.get('multilang', func.routing['type'] == 'http')
         )
@@ -318,7 +318,7 @@ class IrHttp(models.AbstractModel):
             return cls._handle_exception(e)
 
         # For website routes (only), add website params on `request`
-        cook_lang = request.httprequest.cookies.get('website_lang')
+        cook_lang = request.httprequest.cookies.get('frontend_lang')
         if request.is_frontend:
             request.redirect = lambda url, code=302: werkzeug.utils.redirect(url_for(url), code)
 
@@ -335,7 +335,7 @@ class IrHttp(models.AbstractModel):
                 # and not a POST request
                 # and not a bot or bot but default lang in url
                 if ((url_lang and (url_lang != request.lang or url_lang == cls._get_default_lang().code))
-                        or (not url_lang and request.website_multilang and request.lang != cls._get_default_lang().code)
+                        or (not url_lang and request.is_frontend_multilang and request.lang != cls._get_default_lang().code)
                         and request.httprequest.method != 'POST') \
                         and (not is_a_bot or (url_lang and url_lang == cls._get_default_lang().code)):
                     if url_lang:
@@ -346,7 +346,7 @@ class IrHttp(models.AbstractModel):
                     # request.context = context
                     request.routing_failed = False
                     redirect = request.redirect(path + '?' + request.httprequest.query_string)
-                    redirect.set_cookie('website_lang', request.lang)
+                    redirect.set_cookie('frontend_lang', request.lang)
                     return redirect
                 elif url_lang:
                     request.uid = None
@@ -368,7 +368,7 @@ class IrHttp(models.AbstractModel):
         result = super(IrHttp, cls)._dispatch()
 
         if request.is_frontend and cook_lang != request.lang and hasattr(result, 'set_cookie'):
-            result.set_cookie('website_lang', request.lang)
+            result.set_cookie('frontend_lang', request.lang)
 
         return result
 
@@ -398,7 +398,7 @@ class IrHttp(models.AbstractModel):
         except Exception as e:
             return cls._handle_exception(e, code=404)
 
-        if getattr(request, 'website_multilang', False) and request.httprequest.method in ('GET', 'HEAD'):
+        if getattr(request, 'is_frontend_multilang', False) and request.httprequest.method in ('GET', 'HEAD'):
             generated_path = werkzeug.url_unquote_plus(path)
             current_path = werkzeug.url_unquote_plus(request.httprequest.path)
             if generated_path != current_path:
