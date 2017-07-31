@@ -87,10 +87,10 @@ class WebsiteSaleBackend(WebsiteBackend):
             ]),
             order_carts_abandoned_count=request.env['sale.order'].search_count(sale_order_domain + [
                 ('state', '=', 'draft'),
-                ('order_line', '!=', 'False'),
+                ('order_line', '!=', False),
                 ('partner_id', '!=', request.env.ref('base.public_partner').id),
                 ('date_order', '<=', fields.Datetime.to_string(datetime.utcnow() - timedelta(hours=1))),
-                ('cart_recovery_email_sent', '=', 'False')
+                ('cart_recovery_email_sent', '=', False)
             ]),
             payment_to_capture_count=request.env['payment.transaction'].search_count([
                 ('state', '=', 'authorized'),

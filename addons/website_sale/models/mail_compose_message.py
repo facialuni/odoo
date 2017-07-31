@@ -11,14 +11,14 @@ class MailComposeMessage(models.TransientModel):
     @api.multi
     def send_mail(self, auto_commit=False):
         context = self._context
-        if context.get('default_model') == 'sale.order':
+        if self.model == 'sale.order':
             one_hour_before = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
             abandoned_cart_domain = [
                 ('id', 'in', context.get('active_ids')),
-                ('cart_recovery_email_sent', '!=', 'True'),
+                ('cart_recovery_email_sent', '!=', True),
                 ('state', '=', 'draft'),
                 ('partner_id.id', '!=', self.env.ref('base.public_partner').id),
-                ('order_line', '!=', 'False'),
+                ('order_line', '!=', False),
                 ('team_id.team_type', '=', 'website'),
                 ('date_order', '<', fields.Datetime.to_string(one_hour_before))]
             abandonned_orders = self.env['sale.order'].search(abandoned_cart_domain).write({'cart_recovery_email_sent': True})
