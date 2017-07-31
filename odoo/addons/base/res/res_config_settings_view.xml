@@ -22,6 +22,7 @@
                             <div class="apps"/>
                         </div>
                         <div class="col-md-10 rightpan">
+                            <div class="notFound o_hidden">No Record Found</div>
                             <div class="settings"/>
                         </div>
                     </div>

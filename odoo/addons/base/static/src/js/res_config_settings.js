@@ -79,6 +79,7 @@ var GlobleSettingRenderer = FormRenderer.extend({
 
     _searchSetting: function() {
         var self = this;
+        this.count = 0;
         _.each(this.modules,function(module) {
             module.settingDiv.find('.o_setting_box').addClass('o_hidden');
             module.settingDiv.find('h2').addClass('o_hidden');
@@ -92,8 +93,15 @@ var GlobleSettingRenderer = FormRenderer.extend({
                 });
                 module.settingDiv.find('.settingSearchHeader').removeClass('o_hidden');
                 module.settingDiv.removeClass('o_hidden');
+            } else {
+                ++self.count;
             }
         });
+        if(this.count == _.size(this.modules)) {
+            this.$('.notFound').removeClass('o_hidden');
+        } else {
+            this.$('.notFound').addClass('o_hidden');
+        }
         if(this.searchText.length == 0) {
             this._resetSearch();
         }
