@@ -247,7 +247,7 @@ class IrHttp(models.AbstractModel):
 
     @classmethod
     def _add_dispatch_parameters(cls, func):
-        if request.website_enabled:
+        if request.is_frontend:
             request.redirect = lambda url, code=302: werkzeug.utils.redirect(url_for(url), code)
             context = dict(request.context)
 
@@ -293,15 +293,15 @@ class IrHttp(models.AbstractModel):
                 return werkzeug.utils.redirect(new_url, 301)
             rule, arguments = cls._find_handler(return_rule=True)
             func = rule.endpoint
-            request.website_enabled = func.routing.get('website', False)
+            request.is_frontend = func.routing.get('website', False)
         except werkzeug.exceptions.NotFound as e:
             # either we have a language prefixed route, either a real 404
             # in all cases, website processes them
-            request.website_enabled = True
+            request.is_frontend = True
             request.routing_failed = True
 
         request.website_multilang = (
-            request.website_enabled and
+            request.is_frontend and
             func and func.routing.get('multilang', func.routing['type'] == 'http')
         )
 
@@ -312,14 +312,14 @@ class IrHttp(models.AbstractModel):
         try:
             if func:
                 cls._authenticate(func.routing['auth'])
-            elif request.uid is None and request.website_enabled:
+            elif request.uid is None and request.is_frontend:
                 cls._auth_method_public()
         except Exception as e:
             return cls._handle_exception(e)
 
         # For website routes (only), add website params on `request`
         cook_lang = request.httprequest.cookies.get('website_lang')
-        if request.website_enabled:
+        if request.is_frontend:
             request.redirect = lambda url, code=302: werkzeug.utils.redirect(url_for(url), code)
 
             cls._add_dispatch_parameters(func)
@@ -367,7 +367,7 @@ class IrHttp(models.AbstractModel):
         request.cache_save = False
         result = super(IrHttp, cls)._dispatch()
 
-        if request.website_enabled and cook_lang != request.lang and hasattr(result, 'set_cookie'):
+        if request.is_frontend and cook_lang != request.lang and hasattr(result, 'set_cookie'):
             result.set_cookie('website_lang', request.lang)
 
         return result
