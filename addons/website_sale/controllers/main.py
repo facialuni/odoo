@@ -350,7 +350,7 @@ class WebsiteSale(http.Controller):
             if abandoned_order.state != 'draft':
                 # Abandoned cart already finished
                 values.update({'proceed' : 1})
-            elif revive == 'squash':
+            elif revive == 'squash' or ( revive=='merge' and not request.session['sale_order_id']):
                 request.session['sale_order_id'] = abandoned_order.id
                 return request.redirect('/shop/cart')
             elif revive == 'merge':
