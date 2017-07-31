@@ -286,6 +286,7 @@ class IrHttp(models.AbstractModel):
         request.pager = pager
 
         func = None
+        prout = False
         # locate the controller method
         try:
             if request.httprequest.method == 'GET' and '//' in request.httprequest.path:
@@ -297,8 +298,9 @@ class IrHttp(models.AbstractModel):
         except werkzeug.exceptions.NotFound as e:
             # either we have a language prefixed route, either a real 404
             # in all cases, website processes them
-            # request.website_enabled = True
-            return cls._handle_exception(e)
+            request.website_enabled = True
+            prout = True
+            # return cls._handle_exception(e)
 
         request.website_multilang = (
             request.website_enabled and
@@ -357,6 +359,9 @@ class IrHttp(models.AbstractModel):
             if request.lang == cls._get_default_lang().code:
                 context['edit_translations'] = False
             request.context = context
+
+        if prout:
+            return cls._handle_exception(e)
 
         # removed cache for auth public
         request.cache_save = False
