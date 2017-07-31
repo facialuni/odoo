@@ -18,25 +18,25 @@
         <field name="user_signature" eval="False"/>
         <field name="body_html"><![CDATA[
           <div style="background-color:#F3F5F6;color:#515166;font-family:Arial,Helvetica,sans-serif;font-size:14px;">
-            <table style="width:600px;margin:10px auto;">
-                <tbody>
-                    <tr>
-                        <td>
+            <div style="width:600px;margin:10px auto;">
+                <div>
+                    <p>
+                        <p>
                             <a href="/">
                                 <img src="/logo" alt="${object.company_id.name}" style="vertical-align:baseline;max-width:100px;" />
                             </a>
-                        </td>
-                        <td style="text-align:right;vertical-align:middle;">
+                        </p>
+                        <p style="text-align:right;vertical-align:middle;">
                             % if 'website_url' in object.job_id and object.job_id.website_url:
                                 <a href="${object.job_id.website_url}" style="background-color: #1cc1a9; padding: 12px; font-weight: 12px; text-decoration: none; color: #fff; border-radius: 5px; font-size:16px;">Job Description</a>
                             % endif
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <table style="width:600px;margin:0px auto;background-color:white;padding:8px; border:1px solid #e1e1e1;">
-            <tr>
-                <td style="font-size:16px; font-weight:300;">
+                        </p>
+                    </p>
+                </div>
+            </div>
+            <div style="width:600px;margin:0px auto;background-color:white;padding:8px; border:1px solid #e1e1e1;">
+            <p>
+                <p style="font-size:16px; font-weight:300;">
                     <p style="font-size:16px;">
                         Hi,
                     </p><p style="font-size:16px;">
@@ -75,23 +75,23 @@
                     % endif
                     </p>
 
-                </td>
-            </tr>
-            </table>
-            <table style="width:600px;margin:0px auto;text-align:center;">
-                <tbody>
-                    <tr>
-                        <td style="padding-top:10px;font-size: 12px;">
+                </p>
+            </p>
+            </div>
+            <div style="width:600px;margin:0px auto;text-align:center;">
+                <div>
+                    <p>
+                        <p style="padding-top:10px;font-size: 12px;">
                             <div>Sent by ${object.company_id.name}</div>
                             % if 'website_url' in object.job_id and object.job_id.website_url:
                             <div>
                                 Discover <a href="/jobs" style="text-decoration:none;color:#717188;">our others jobs</a>.
                             </div>
                             % endif
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                        </p>
+                    </p>
+                </div>
+            </div>
 
           </div>
         ]]></field>
@@ -107,25 +107,25 @@
         <field name="user_signature" eval="False"/>
         <field name="body_html"><![CDATA[
           <div style="background-color:#F3F5F6;color:#515166;font-family:Arial,Helvetica,sans-serif;font-size:14px;">
-            <table style="width:600px;margin:10px auto;">
-                <tbody>
-                    <tr>
-                        <td>
+            <div style="width:600px;margin:10px auto;">
+                <div>
+                    <p>
+                        <p>
                             <a href="/">
                                 <img src="/logo" alt="${object.company_id.name}" style="vertical-align:baseline;max-width:100px;" />
                             </a>
-                        </td>
-                        <td style="text-align:right;vertical-align:middle;">
+                        </p>
+                        <p style="text-align:right;vertical-align:middle;">
                             % if 'website_url' in object.job_id and object.job_id.website_url:
                                 <a href="${object.job_id.website_url}" style="background-color: #1cc1a9; padding: 12px; font-weight: 12px; text-decoration: none; color: #fff; border-radius: 5px; font-size:16px;">Job Description</a>
                             % endif
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <table style="width:600px;margin:0px auto;background-color:white;padding:8px;border:1px solid #e1e1e1;">
-            <tr>
-                <td style="font-size:16px; font-weight:300;">
+                        </p>
+                    </p>
+                </div>
+            </div>
+            <div style="width:600px;margin:0px auto;background-color:white;padding:8px;border:1px solid #e1e1e1;">
+            <p>
+                <p style="font-size:16px; font-weight:300;">
                     <div style="text-align: center">
                         <h2>Congratulations!</h2>
                         <div style="color:grey;">Your resume has been positively reviewed.</div>
@@ -143,17 +143,17 @@
                     <p style="font-size:16px;">
                         You will soon be contacted by:
                     </p>
-                    <table style="width:100%; border:0px solid white;">
-                    <tr>
-                        <td width="75">
+                    <div style="width:100%; border:0px solid white;">
+                    <p>
+                        <p width="75">
                             <img src="/web/image/res.users/${object.user_id.id}/image_small" alt="Avatar" style="vertical-align:baseline;max-width:64px;" />
-                        </td><td style="font-size:15px;">
+                        </p><p style="font-size:15px;">
                             <strong>${object.user_id.name}</strong><br/>
                             <span>Email: ${object.user_id.email or ''}</span><br/>
                             <span>Phone: ${object.user_id.phone or ''}</span>
-                        </td>
-                    </tr>
-                    </table>
+                        </p>
+                    </p>
+                    </div>
                     % endif
                     <p style="font-size:16px;margin:24px 0;">
                         See you soon,
@@ -214,9 +214,9 @@
                         % set location = '%s, %s' % (location, object.job_id.address_id.country_id.name)
                     % endif
 
-                </td>
-            </tr>
-            </table>
+                </p>
+            </p>
+            </div>
 
             % if object.job_id.address_id:
             <div style="width:598px;margin:0px auto;border-left:1px solid #dddddd;border-right:1px solid #dddddd;border-bottom:1px solid #dddddd;">
@@ -225,20 +225,20 @@
                 </a>
             </div>
             % endif
-            <table style="width:600px;margin:0px auto;text-align:center;">
-                <tbody>
-                    <tr>
-                        <td style="padding-top:10px;font-size: 12px;">
+            <div style="width:600px;margin:0px auto;text-align:center;">
+                <div>
+                    <p>
+                        <p style="padding-top:10px;font-size: 12px;">
                             <div>Sent by ${object.company_id.name}</div>
                             % if 'website_url' in object.job_id and object.job_id.website_url:
                             <div>
                                 Discover <a href="/jobs" style="text-decoration:none;color:#717188;">all our jobs</a>.
                             </div>
                             % endif
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                        </p>
+                    </p>
+                </div>
+            </div>
 
 
           </div>
@@ -255,25 +255,25 @@
         <field name="user_signature" eval="False"/>
         <field name="body_html"><![CDATA[
           <div style="background-color:#F3F5F6;color:#515166;font-family:Arial,Helvetica,sans-serif;font-size:14px;">
-            <table style="width:600px;margin:10px auto;">
-                <tbody>
-                    <tr>
-                        <td>
+            <div style="width:600px;margin:10px auto;">
+                <div>
+                    <p>
+                        <p>
                             <a href="/">
                                 <img src="/logo" alt="${object.company_id.name}" style="vertical-align:baseline;max-width:100px;" />
                             </a>
-                        </td>
-                        <td style="text-align:right;vertical-align:middle;">
+                        </p>
+                        <p style="text-align:right;vertical-align:middle;">
                             % if 'website_url' in object.job_id and object.job_id.website_url:
                                 <a href="${object.job_id.website_url}" style="background-color: #1cc1a9; padding: 12px; font-weight: 12px; text-decoration: none; color: #fff; border-radius: 5px; font-size:16px;">Job Description</a>
                             % endif
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <table style="width:600px;margin:0px auto;background-color:white;padding:8px;border:1px solid #e1e1e1;">
-            <tr>
-                <td style="font-size:16px; font-weight:300;">
+                        </p>
+                    </p>
+                </div>
+            </div>
+            <div style="width:600px;margin:0px auto;background-color:white;padding:8px;border:1px solid #e1e1e1;">
+            <p>
+                <p style="font-size:16px; font-weight:300;">
                     <p style="font-size:16px;">
                         Hi,
                     </p><p style="font-size:16px;">
@@ -289,17 +289,17 @@
                     <hr style="margin: 30px 0"/>
                     % if object.user_id:
                     <h3 style="color:#9A6C8E;"><strong>Your Contact:</strong></h3>
-                    <table style="width:100%; border:0px solid white;">
-                    <tr>
-                        <td width="75">
+                    <div style="width:100%; border:0px solid white;">
+                    <p>
+                        <p width="75">
                             <img src="/web/image/res.users/${object.user_id.id}/image_small" alt="Avatar" style="vertical-align:baseline;max-width:64px;" />
-                        </td><td style="font-size:15px;">
+                        </p><p style="font-size:15px;">
                             <strong>${object.user_id.name}</strong><br/>
                             <span>Email: ${object.user_id.email or ''}</span><br/>
                             <span>Phone: ${object.user_id.phone or ''}</span>
-                        </td>
-                    </tr>
-                    </table>
+                        </p>
+                    </p>
+                    </div>
                     % endif
 
                     <hr style="margin: 30px 0"/>
@@ -353,9 +353,9 @@
                         % set location = '%s, %s' % (location, object.job_id.address_id.country_id.name)
                     % endif
 
-                </td>
-            </tr>
-            </table>
+                </p>
+            </p>
+            </div>
 
             % if object.job_id.address_id:
             <div style="width:598px;margin:0px auto;border-left:1px solid #dddddd;border-right:1px solid #dddddd;border-bottom:1px solid #dddddd;">
@@ -364,20 +364,20 @@
                 </a>
             </div>
             % endif
-            <table style="width:600px;margin:0px auto;text-align:center;">
-                <tbody>
-                    <tr>
-                        <td style="padding-top:10px;font-size: 12px;">
+            <div style="width:600px;margin:0px auto;text-align:center;">
+                <div>
+                    <p>
+                        <p style="padding-top:10px;font-size: 12px;">
                             <div>Sent by ${object.company_id.name}</div>
                             % if 'website_url' in object.job_id and object.job_id.website_url:
                             <div>
                                 Discover <a href="/jobs" style="text-decoration:none;color:#717188;">all our jobs</a>.
                             </div>
                             % endif
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                        </p>
+                    </p>
+                </div>
+            </div>
 
 
           </div>
