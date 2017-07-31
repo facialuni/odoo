@@ -89,6 +89,16 @@ class Http(models.AbstractModel):
         return super(Http, cls)._get_default_lang()
 
     @classmethod
+    def _dispatch(cls):
+        # locate the controller method
+        try:
+            rule, arguments = cls._find_handler(return_rule=True)
+        except werkzeug.exceptions.NotFound:
+            request.website_enabled = True
+
+        return super(Http, cls)._dispatch()
+
+    @classmethod
     def _handle_exception(cls, exception, code=500):
         is_website_request = bool(getattr(request, 'website_enabled', False) and getattr(request, 'website', False))
         if not is_website_request:

@@ -297,8 +297,8 @@ class IrHttp(models.AbstractModel):
         except werkzeug.exceptions.NotFound as e:
             # either we have a language prefixed route, either a real 404
             # in all cases, website processes them
-            request.website_enabled = True
-            # return cls._handle_exception(e)
+            # request.website_enabled = True
+            return cls._handle_exception(e)
 
         request.website_multilang = (
             request.website_enabled and
