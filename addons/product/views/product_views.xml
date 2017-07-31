@@ -153,6 +153,9 @@
             <field name="mode">primary</field>
             <field name="inherit_id" ref="product.product_template_search_view"/>
             <field name="arch" type="xml">
+                <field name="default_code" position="replace">
+                    <field name="default_code" filter_domain="[('default_code','ilike',self)]"/>
+                </field>
                 <field name="attribute_line_ids" position="replace">
                     <field name="attribute_value_ids" groups="product.group_product_variant"/>
                     <field name="product_tmpl_id" string="Product Template"/>
