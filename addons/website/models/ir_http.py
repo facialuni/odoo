@@ -56,7 +56,7 @@ class Http(models.AbstractModel):
         return (cls._name, "cache", request.uid, request.lang, request.httprequest.full_path)
 
     @classmethod
-    def _add_dispatch_parameters(cls, first_pass, func):
+    def _add_dispatch_parameters(cls, func):
         if request.website_enabled:
             context = dict(request.context)
             if not context.get('tz'):
@@ -65,9 +65,9 @@ class Http(models.AbstractModel):
             request.website = request.env['website'].get_current_website()  # can use `request.env` since auth methods are called
             context['website_id'] = request.website.id
 
-        super(Http, cls)._add_dispatch_parameters(first_pass, func)
+        super(Http, cls)._add_dispatch_parameters(func)
 
-        if request.website_enabled and first_pass:
+        if request.website_enabled and request.routing_iteration == 1:
             request.website = request.website.with_context(request.context)
 
     @classmethod
@@ -94,7 +94,7 @@ class Http(models.AbstractModel):
     #     try:
     #         resp = super(Http, cls)._dispatch()
     #     except Exception as e:
-            
+
 
     @classmethod
     def _handle_exception(cls, exception, code=500):

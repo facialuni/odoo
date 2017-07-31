@@ -246,7 +246,7 @@ class IrHttp(models.AbstractModel):
             request.session['geoip'] = record
 
     @classmethod
-    def _add_dispatch_parameters(cls, func, first_pass):
+    def _add_dispatch_parameters(cls, func):
         if request.website_enabled:
             request.redirect = lambda url, code=302: werkzeug.utils.redirect(url_for(url), code)
             context = dict(request.context)
@@ -255,7 +255,7 @@ class IrHttp(models.AbstractModel):
                 context['tz'] = request.session.get('geoip', {}).get('time_zone')
 
             path = request.httprequest.path.split('/')
-            if first_pass:
+            if request.routing_iteration == 1:
                 langs = [lg.code for lg in cls._get_languages()]
                 is_a_bot = cls.is_a_bot()
                 cook_lang = request.httprequest.cookies.get('website_lang')
@@ -282,11 +282,10 @@ class IrHttp(models.AbstractModel):
             Reminder :  Do not use `request.env` before authentication phase, otherwise the env
                         set on request will be created with uid=None (and it is a lazy property)
         """
-        first_pass = not hasattr(request, 'website_enabled')
+        request.routing_iteration = getattr(request, 'routing_iteration', 0) + 1
         request.pager = pager
 
         func = None
-        prout = False
         # locate the controller method
         try:
             if request.httprequest.method == 'GET' and '//' in request.httprequest.path:
@@ -299,8 +298,7 @@ class IrHttp(models.AbstractModel):
             # either we have a language prefixed route, either a real 404
             # in all cases, website processes them
             request.website_enabled = True
-            prout = True
-            # return cls._handle_exception(e)
+            request.routing_failed = True
 
         request.website_multilang = (
             request.website_enabled and
@@ -324,10 +322,10 @@ class IrHttp(models.AbstractModel):
         if request.website_enabled:
             request.redirect = lambda url, code=302: werkzeug.utils.redirect(url_for(url), code)
 
-            cls._add_dispatch_parameters(func, first_pass)
+            cls._add_dispatch_parameters(func)
 
             path = request.httprequest.path.split('/')
-            if first_pass:
+            if request.routing_iteration == 1:
                 is_a_bot = cls.is_a_bot()
                 nearest_lang = not func and cls.get_nearest_lang(path[1])
                 url_lang = nearest_lang and path[1]
@@ -346,6 +344,7 @@ class IrHttp(models.AbstractModel):
                         path.insert(1, request.lang)
                     path = '/'.join(path) or '/'
                     # request.context = context
+                    request.routing_failed = False
                     redirect = request.redirect(path + '?' + request.httprequest.query_string)
                     redirect.set_cookie('website_lang', request.lang)
                     return redirect
@@ -353,6 +352,7 @@ class IrHttp(models.AbstractModel):
                     request.uid = None
                     path.pop(1)
                     # request.context = context
+                    request.routing_failed = False
                     return cls.reroute('/'.join(path) or '/')
 
             context = dict(request.context)
@@ -360,7 +360,7 @@ class IrHttp(models.AbstractModel):
                 context['edit_translations'] = False
             request.context = context
 
-        if prout:
+        if getattr(request, 'routing_failed', False):
             return cls._handle_exception(e)
 
         # removed cache for auth public
