@@ -29,10 +29,15 @@ class TestStockDropshippingCommon(common.SavepointCase):
         cls.Product = cls.env['product.product']
 
         cls.Partner = cls.env['res.partner']
+        cls.PurchaseOrder = cls.env['purchase.order']
+        cls.Picking = cls.env['stock.picking']
 
+        # Useful Reference.
         cls.partner_id = cls.env.ref('base.res_partner_3').id
         cls.uom_unit = cls.env.ref('product.product_uom_unit')
+        cls.category_all = cls.env.ref('product.product_category_1')
 
+        # Creating partner with name of cross docking supplier.
         cls.partner = cls.env['res.partner'].create({'name': "Cross dock supplier"})
 
         # Creating Warehouse
