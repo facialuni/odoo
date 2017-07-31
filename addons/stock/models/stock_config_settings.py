@@ -17,8 +17,6 @@ class StockConfigSettings(models.TransientModel):
         help="Reserving products manually in delivery orders or by running the scheduler is advised to better manage priorities in case of long customer lead times or/and frequent stock-outs.")
     module_product_expiry = fields.Boolean("Expiration Dates",
         help="Track following dates on lots & serial numbers: best before, removal, end of life, alert. \n Such dates are set automatically at lot/serial number creation based on values set on the product (in days).")
-    group_stock_packaging = fields.Boolean('Product Packages',
-        implied_group='product.group_stock_packaging')
     group_stock_production_lot = fields.Boolean("Lots & Serial Numbers",
         implied_group='stock.group_production_lot')
     group_stock_tracking_lot = fields.Boolean("Delivery Packages",
@@ -43,8 +41,6 @@ class StockConfigSettings(models.TransientModel):
     module_delivery_ups = fields.Boolean("UPS")
     module_delivery_usps = fields.Boolean("USPS")
     module_delivery_bpost = fields.Boolean("bpost")
-    group_uom = fields.Boolean("Units of Measure", implied_group='product.group_uom')
-    group_product_variant = fields.Boolean("Attributes & Variants", implied_group='product.group_product_variant')
     group_stock_multi_locations = fields.Boolean('Storage Locations', implied_group='stock.group_stock_multi_locations',
         help="Store products in specific locations of your warehouse (e.g. bins, racks) and to track inventory accordingly.")
     group_stock_multi_warehouses = fields.Boolean('Multi-Warehouses', implied_group='stock.group_stock_multi_warehouses')

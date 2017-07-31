@@ -11,8 +11,6 @@ class MrpConfigSettings(models.TransientModel):
         default=lambda self: self.env.user.company_id)
     manufacturing_lead = fields.Float(related='company_id.manufacturing_lead', string="Manufacturing Lead Time")
     use_manufacturing_lead = fields.Boolean(string="Default Manufacturing Lead Time", oldname='default_use_manufacturing_lead')
-    group_product_variant = fields.Boolean("Attributes & Variants",
-        implied_group='product.group_product_variant')
     module_mrp_byproduct = fields.Boolean("By-Products")
     module_mrp_mps = fields.Boolean("Master Production Schedule")
     module_mrp_plm = fields.Boolean("Product Lifecycle Management")

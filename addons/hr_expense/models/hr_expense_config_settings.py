@@ -11,9 +11,6 @@ class HrExpenseConfigSettings(models.TransientModel):
     group_analytic_accounting = fields.Boolean(
         string='Analytic Accounting',
         implied_group='analytic.group_analytic_accounting')
-    group_uom = fields.Boolean(
-        string="Units of Measure",
-        implied_group='product.group_uom')
     use_mailgateway = fields.Boolean(string='Let your employees record expenses by email')
     module_project = fields.Boolean(string="Project")
     module_sale = fields.Boolean(string="Customer Billing")

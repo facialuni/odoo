@@ -7,15 +7,6 @@ class PosConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
     group_multi_currency = fields.Boolean("Multi-Currencies", implied_group='base.group_multi_currency')
-    group_product_variant = fields.Boolean("Attributes & Variants", implied_group='product.group_product_variant')
-    group_product_pricelist = fields.Boolean("Show pricelists On Products",
-        implied_group='product.group_product_pricelist')
-    group_pricelist_item = fields.Boolean("Show pricelists to customers",
-         implied_group='product.group_pricelist_item')
-    group_sale_pricelist = fields.Boolean("Use pricelists to adapt your price per customers",
-         implied_group='product.group_sale_pricelist',
-         help="""Allows to manage different prices based on rules per category of customers.
-                Example: 10% for retailers, promotion of 5 EUR on this product, etc.""")
     use_pos_sale_price = fields.Boolean("A single sale price per product", oldname='default_sale_price')
     pos_pricelist_setting = fields.Selection([
         ('percentage', 'Multiple prices per product (e.g. quantity, shop-specific)'),
