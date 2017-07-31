@@ -3,3 +3,4 @@
 
 from . import test_crossdock
 from . import test_cancellation_propagated
+from . import test_dropship

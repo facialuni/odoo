@@ -34,6 +34,7 @@ class TestStockDropshippingCommon(common.SavepointCase):
 
         # Useful Reference.
         cls.partner_id = cls.env.ref('base.res_partner_3').id
+        cls.customer_location_id = cls.env.ref('stock.stock_location_customers').id
         cls.uom_unit = cls.env.ref('product.product_uom_unit')
         cls.category_all = cls.env.ref('product.product_category_1')
 
