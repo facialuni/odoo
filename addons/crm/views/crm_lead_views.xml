@@ -289,7 +289,7 @@
                     <field name="activity_date_deadline"/>
                     <field name="user_email"/>
                     <field name="user_id"/>
-                    <field name="partner_address_email"/>
+                    <field name="email_from"/>
                     <field name="message_needaction_counter"/>
                     <field name="partner_id"/>
                     <field name="activity_summary"/>
@@ -474,9 +474,10 @@
                                         'default_country_id': country_id, 'default_function': function,
                                         'default_phone': phone, 'default_mobile': mobile,
                                         'default_email': email_from,
-                                        'default_user_id': user_id, 'default_team_id': team_id, 'default_website': website}"/>
-                                <field name="email_from" string="Email" widget="email"/>
-                                <field name="phone" widget="phone"/>
+                                        'default_user_id': user_id, 'default_team_id': team_id, 'default_website': website, 'show_address': 1}"
+                                        options='{"always_reload": True}'/>
+                                <field name="email_from" attrs="{'readonly': [('partner_id', '!=', False)]}" string="Email" widget="email"/>
+                                <field name="phone" attrs="{'readonly': [('partner_id', '!=', False)]}" widget="phone"/>
                             </group>
 
                             <group>
@@ -499,9 +500,9 @@
                         <page string="Internal Notes">
                             <field name="description"/>
                         </page>
-                        <page name="lead" string="Contact Information">
+                        <page name="lead" string="Other">
                             <group>
-                                <group>
+                                <group string="Contact Details">
                                     <field name="partner_name"/>
                                     <label for="street" string="Address"/>
                                     <div class="o_address_format">
@@ -515,7 +516,7 @@
                                     <field name="website" widget="url" placeholder="e.g. www.odoo.com"/>
                                 </group>
 
-                                <group>
+                                <group attrs="{'invisible': [('partner_id', '!=', False)]}">
                                     <label for="contact_name"/>
                                     <div class="o_row">
                                         <field name="contact_name"/>
@@ -523,7 +524,6 @@
                                     </div>
                                     <field name="function"/>
                                     <field name="mobile"/>
-                                    <field name="opt_out"/>
                                 </group>
                                 <group string="Marketing">
                                     <field name="campaign_id" />
@@ -534,6 +534,7 @@
                                     <field name="day_open" groups="base.group_no_one"/>
                                     <field name="day_close" groups="base.group_no_one"/>
                                     <field name="referred"/>
+                                    <field name="opt_out"/>
                                     <field name="type" invisible="1"/>
                                 </group>
                             </group>
