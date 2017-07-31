@@ -2063,7 +2063,7 @@
 
         <menuitem id="product_configuration_menu" name="Products" parent="account.menu_finance_configuration" sequence="1"/>
         
-        <menuitem id="menu_product_product_action" name="Products" action="product_product_action" parent="product_configuration_menu" sequence="1"/>
+        <menuitem id="menu_product_product_action" name="Products" action="product_product_action" parent="product_configuration_menu" sequence="1" groups="base.group_no_one"/>
 
         <menuitem id="menu_account_supplier" name="Vendors"
             parent="menu_finance_payables"
