@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from odoo import api, fields, models
+from datetime import datetime
 
 
 class History(models.Model):
@@ -15,37 +16,27 @@ class History(models.Model):
 
     @api.multi
     def calculate_moves(self, start_date, end_date, stages, user_id, team_id):
-        select_clause = 'SELECT'
-        for stage in stages[1:]:
-            select_clause += " COUNT(DISTINCT CASE WHEN stage_name = '" + stage + "' THEN res_id END) as " + stage + ","
+        new_deals = self.env['crm.lead'].search_count([('create_date', '>=', start_date), ('create_date', '<=', end_date), ('type', '=', 'opportunity')])
+        deals_left = self.env['crm.lead'].search_count(['|', ('date_deadline', '<', datetime.today().strftime('%Y-%m-%d')), '&', ('date_deadline', '=', None), '&', ('date_closed', '=', None), ('type', '=', 'opportunity')])
+        won_deals = self.env['crm.lead'].search_count([('probability', '=', 100), ('date_closed', '<=', end_date), ('date_closed', '>=', start_date), ('type', '=', 'opportunity')])
+        lost_deals = self.env['crm.lead'].search_count([('active', '=', False), ('date_closed', '<=', end_date), ('date_closed', '>=', start_date), ('type', '=', 'opportunity')])
 
-        from_clause = """
-            FROM crm_opportunity_history
-        """
-        where_clause = "WHERE create_date BETWEEN %(start_date)s AND %(end_date)s "
-        condition = ''
-        if team_id and user_id:
-            condition = "AND user_id = '" + user_id + "' AND team_id = '" + team_id + "'"
-        elif user_id:
-            condition = "AND user_id = '" + user_id + "'"
-        elif team_id:
-            condition = "AND team_id = '" + team_id + "'"
-        if condition:
-            where_clause += condition
-        query = select_clause[:-1] + from_clause + where_clause
-        self.env.cr.execute(query, {
-                    'start_date': start_date,
-                    'end_date': end_date,
-            })
-        query_result = self.env.cr.dictfetchone()
-        arguments = {'start_date': start_date,
-                     'end_date': end_date,
-                     'user_id': user_id,
-                     'team_id': team_id}
-        self.env['crm.pipeline.report'].init(arguments)
-        result = self.env['crm.pipeline.report'].search_read([])[0]
-        return {'stages_moves': query_result,
-                'new_deals': result['new_deals'],
-                'left_deals': result['deals_left'],
-                'won_deals': result['won_deals'],
-                'lost_deals': result['lost_deals']}
+        records = self.env['crm.lead'].search_read([('type', '=', 'opportunity')], ['day_close'])
+        total_days = sum(record['day_close'] for record in records)
+        average_days = round(total_days / len(records), 3)
+
+        stage_moves = []
+        for stage in stages:
+            result = self.env['crm.opportunity.history'].search_count([('stage_name', '=', stage)])
+            stage_moves.append({stage: result})
+
+        total_revenue = self.env['crm.lead'].read_group([('create_date', '>=', start_date), ('create_date', '<=', end_date)], ['stage_id', 'planned_revenue'], ['stage_id'])
+        expected_revenues = {revenue['stage_id'][1]: revenue['planned_revenue'] for revenue in total_revenue}
+
+        return {'stages_moves': stage_moves,
+                'new_deals': new_deals,
+                'left_deals': deals_left,
+                'won_deals': won_deals,
+                'lost_deals': lost_deals,
+                'average_days': average_days,
+                'expected_revenues': expected_revenues}

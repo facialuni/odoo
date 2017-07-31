@@ -34,7 +34,6 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
     },
     // Updates the control panel and render the elements that have yet to be rendered
     update_cp: function() {
-        console.log("update_cp");
         var status = {
             breadcrumbs: this.actionManager.get_breadcrumbs(),
             cp_content: {$searchview_buttons: this.$searchview_buttons, $pager: this.$pager, $searchview: this.$searchview},
@@ -45,30 +44,8 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
         this._super.apply(this, arguments);
         this.update_cp();
     },
-    render_searchview_buttons: function () {
-        var self = this;
-        var $datetimepickers = this.$searchview_buttons.find('.js_report_datetimepicker');
-        var options = { // Set the options for the datetimepickers
-            locale : moment.locale(),
-            format : 'L',
-            icons: {
-                date: "fa fa-calendar",
-            },
-        };
-        // attach datepicker
-        $datetimepickers.each(function () {
-            $(this).datetimepicker(options);
-            var date = new datepicker.DateWidget(options);
-            date.replace($(this));
-            date.$el.find('input').attr('name', $(this).find('input').attr('name'));
-            if($(this).data('default-value')) {
-                date.setValue(moment($(this).data('default-value')));
-            }
-        });
-        this.$searchview_buttons.find('.js_foldable_trigger').click(function (event) {
-            $(this).toggleClass('o_closed_menu o_open_menu');
-            self.$searchview_buttons.find('.o_foldable_menu[data-filter="'+$(this).data('filter')+'"]').toggleClass('o_closed_menu o_open_menu');
-        });
+    _get_options: function () {
+        var date = this.$searchview_buttons.find('.oe_crm_opportunity_report_date_filter.selected')
     },
     get_stages: function () {
         this.stages = [];
@@ -119,6 +96,31 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
 
         nv.utils.windowResize(pieChart.update);
         return pieChart;
+        });
+    },
+    render_searchview_buttons: function () {
+        var self = this;
+        var $datetimepickers = this.$searchview_buttons.find('.js_report_datetimepicker');
+        var options = { // Set the options for the datetimepickers
+            locale : moment.locale(),
+            format : 'L',
+            icons: {
+                date: "fa fa-calendar",
+            },
+        };
+        // attach datepicker
+        $datetimepickers.each(function () {
+            $(this).datetimepicker(options);
+            var date = new datepicker.DateWidget(options);
+            date.replace($(this));
+            date.$el.find('input').attr('name', $(this).find('input').attr('name'));
+            if($(this).data('default-value')) {
+                date.setValue(moment($(this).data('default-value')));
+            }
+        });
+        this.$searchview_buttons.find('.js_foldable_trigger').click(function (event) {
+            $(this).toggleClass('o_closed_menu o_open_menu');
+            self.$searchview_buttons.find('.o_foldable_menu[data-filter="'+$(this).data('filter')+'"]').toggleClass('o_closed_menu o_open_menu');
         });
     },
 })
