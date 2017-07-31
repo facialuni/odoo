@@ -84,7 +84,7 @@ class View(models.Model):
     def render(self, values=None, engine='ir.qweb'):
         """ Render the template. If website is enabled on request, then extend rendering context with website values. """
         new_context = dict(self._context)
-        if request and getattr(request, 'website_enabled', False):
+        if request and getattr(request, 'is_frontend', False):
 
             editable = request.website.is_publisher()
             translatable = editable and self._context.get('lang') != request.website.default_lang_code
@@ -108,7 +108,7 @@ class View(models.Model):
         """
         qcontext = super(View, self)._prepare_qcontext()
 
-        if request and getattr(request, 'website_enabled', False):
+        if request and getattr(request, 'is_frontend', False):
             editable = request.website.is_publisher()
             translatable = editable and self._context.get('lang') != request.env['ir.http']._get_default_lang().code
             editable = not translatable and editable

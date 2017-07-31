@@ -57,8 +57,8 @@ class Http(models.AbstractModel):
         return (cls._name, "cache", request.uid, request.lang, request.httprequest.full_path)
 
     @classmethod
-    def _add_dispatch_parameters(cls, first_pass, func):
-        if request.website_enabled:
+    def _add_dispatch_parameters(cls, func):
+        if request.is_frontend:
             context = dict(request.context)
             if not context.get('tz'):
                 context['tz'] = request.session.get('geoip', {}).get('time_zone')
@@ -66,9 +66,9 @@ class Http(models.AbstractModel):
             request.website = request.env['website'].get_current_website()  # can use `request.env` since auth methods are called
             context['website_id'] = request.website.id
 
-        super(Http, cls)._add_dispatch_parameters(first_pass, func)
+        super(Http, cls)._add_dispatch_parameters(func)
 
-        if request.website_enabled and first_pass:
+        if request.is_frontend and request.routing_iteration == 1:
             request.website = request.website.with_context(request.context)
 
     @classmethod
@@ -102,7 +102,7 @@ class Http(models.AbstractModel):
 
     @classmethod
     def _handle_exception(cls, exception, code=500):
-        is_website_request = bool(getattr(request, 'website_enabled', False) and getattr(request, 'website', False))
+        is_website_request = bool(getattr(request, 'is_frontend', False) and getattr(request, 'website', False))
         if not is_website_request:
             # Don't touch non website requests exception handling
             return super(Http, cls)._handle_exception(exception)
