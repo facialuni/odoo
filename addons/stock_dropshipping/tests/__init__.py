@@ -4,3 +4,4 @@
 from . import test_crossdock
 from . import test_cancellation_propagated
 from . import test_dropship
+from . import test_lifo_price

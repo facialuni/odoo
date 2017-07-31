@@ -33,7 +33,10 @@ class TestStockDropshippingCommon(common.SavepointCase):
         cls.Picking = cls.env['stock.picking']
 
         # Useful Reference.
+        cls.uom_kg_id = cls.env.ref('product.product_uom_kgm').id
         cls.partner_id = cls.env.ref('base.res_partner_3').id
+        cls.pick_type_out_id = cls.env.ref('stock.picking_type_out').id
+        cls.stock_location_id = cls.env.ref('stock.stock_location_stock').id
         cls.customer_location_id = cls.env.ref('stock.stock_location_customers').id
         cls.uom_unit = cls.env.ref('product.product_uom_unit')
         cls.category_all = cls.env.ref('product.product_category_1')
