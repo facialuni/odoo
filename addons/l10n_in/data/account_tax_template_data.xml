@@ -335,6 +335,7 @@
         <field name="amount">0</field>
         <field name="chart_template_id" ref="indian_chart_template_standard"/>
         <field name="children_tax_ids" eval="[(6, 0, [ref('cess_sale_5'),ref('cess_sale_1591'),])]"/>
+        <field name="tag_ids" eval="[(6,0,[ref('cess_tag_tax'),])]"/>
     </record>
 
     <record id="cess_21_4170_higer_sale" model="account.tax.template">
