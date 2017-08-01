@@ -113,9 +113,3 @@ class TestStockCommon(common.TestProductCommon):
 
         # Inventory
         cls.product_1.type = 'product'
-        inventory_wizard = cls.env['stock.change.product.qty'].create({
-            'product_id': cls.product_1.id,
-            'new_quantity': 50.0,
-            'location_id': cls.warehouse_1.lot_stock_id.id,
-        })
-        inventory_wizard.change_product_qty()
