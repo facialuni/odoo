@@ -292,6 +292,7 @@ var SearchMobile = Widget.extend({
     events: {
         "click .o_search_mobile": "_onSearchClick",
         "click .o_ls_arrow": "_onleftArrowClick",
+        "click .o_dropdown": "_onDropdownClick",
     },
     init: function() {
         this._super.apply(this, arguments);
@@ -301,13 +302,18 @@ var SearchMobile = Widget.extend({
         this.$Searchtray = this.$(".o_search_mobile_navbar_dropdown_tray");
     },
 
+    _onDropdownClick: function(event) {
+        var $dropDown = $(event.currentTarget)
+        $dropDown.find('.fa-chevron-right').toggleClass('fa-chevron-down fa-chevron-rigth');
+    },
+
     _onSearchClick: function() {
         var self = this;
         this.$searchDropdown.toggleClass('hidden');
         this.$Searchtray.html(QWeb.render('SearchViewMobile.body'));
         var options = {
             hidden: this.searchview_data.action.flags.search_view === false,
-            disable_custom_filters: this.searchview_data.action.flags.search_disable_custom_filters,
+            disable_custom_filters: this.searchview_data.action.    flags.search_disable_custom_filters,
             $buttons:$('<div/>').addClass('o_search_options').appendTo(this.$Searchtray.find('.o_search_mobile_buttons')),
             action: this.searchview_data.action,
             search_defaults: this.searchview_data.search_defaults,
@@ -320,6 +326,8 @@ var SearchMobile = Widget.extend({
             self.searchview_elements.$searchview_buttons = self.searchview.$buttons.contents();
         });
         this.searchview.do_show();
+        this.$('.o_searchview_more').toggleClass('hidden');
+        this.$('.o_search_options').css('display', 'block');
     },
 
     _onleftArrowClick: function() {
@@ -328,6 +336,7 @@ var SearchMobile = Widget.extend({
 
      update: function (tag, descriptor, widget) {
         this.searchview_data = widget;
+
         if (widget && widget.action && widget.action.flags.search_view) {
              $(this.el).removeClass('hidden');
         } else {
@@ -344,10 +353,11 @@ if (config.isMobile) {
 
     WebClient.include({
         current_action_updated: function(action) {
+            console.log("widget.action.flags.search_viewxyz");
             this._super.apply(this, arguments);
             var action_descr = action && action.action_descr;
             var action_widget = action && action.widget;
-            var search_mobile = _.find(this.systray_menu.widgets, function(item) {return item instanceof SearchMobile; });
+            var search_mobile = _.find(this.menu.systray_menu.widgets, function(item) {return item instanceof SearchMobile; });
             search_mobile.update('action', action_descr, action_widget);
         },
     });

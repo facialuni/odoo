@@ -506,12 +506,18 @@ var SearchView = Widget.extend({
     renderFacets: function (collection, model, options) {
         var self = this;
         var started = [];
+        var smf = $(core.qweb.render('SearchViewMobileFacet'));
         _.invoke(this.input_subviews, 'destroy');
         this.input_subviews = [];
 
         this.query.each(function (facet) {
             var f = new FacetView(this, facet);
-            started.push(f.appendTo(self.$el));
+            if (config.isMobile) {
+                smf.appendTo(self.$el)
+                started.push(f.appendTo(smf));
+            } else {
+                started.push(f.appendTo(self.$el));
+            }
             self.input_subviews.push(f);
         }, this);
         var i = new InputView(this);

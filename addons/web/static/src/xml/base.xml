@@ -1043,6 +1043,7 @@
 <span t-name="SearchView.FacetView.Value">
     <t t-esc="widget.model.get('label')"/>
 </span>
+<div t-name="SearchViewMobileFacet" class="o_searchview_mobile_facet"/>
 <t t-name="SearchView.autocomplete">
     <ul class="dropdown-menu o_searchview_autocomplete" role="menu"></ul>
 </t>

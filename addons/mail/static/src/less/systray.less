@@ -150,6 +150,15 @@
 
 .o_search_on_mobile {
     color:@gray-light;
+    .o_searchview {
+        width: 90%;
+        margin:20px 24px;
+        .o_searchview_mobile_facet {
+            display: flex;
+            position: absolute;
+            margin: 40px 0px;
+        }
+    }
 }
 .o_search_navbar {
     background-color: #875A7B;
@@ -161,9 +170,10 @@
     padding-left: 15px;
 }
 .o_search_mobile_buttons {
-    width:100%;
+    width:90%;
+    margin: 55px 15px;
     .o_dropdown {
-        margin: 0px;
+        margin: 5px;
         width: 100%;
         border: solid 1px #e0d7d7;
     }
