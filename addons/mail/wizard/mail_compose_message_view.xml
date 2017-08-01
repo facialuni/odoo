@@ -7,7 +7,26 @@
             <field name="groups_id" eval="[(4,ref('base.group_user'))]"/>
             <field name="arch" type="xml">
                 <form string="Compose Email">
-                    <group>
+                    <field name="is_alias_domain"/>
+                    <field name="is_email_server"/>
+                    <group attrs="{'invisible': [('is_alias_domain', '=', True)]}">
+                        <field name="alias_domain"/>
+                    </group>
+                    <group attrs="{'invisible': ['|', ('is_alias_domain', '=', False), ('is_email_server', '=', True)]}">
+                        <div class="row">
+                            <div>
+                                <button type="object"
+                                name="action_email_server_from"
+                                string="Incoming Email Servers" icon="fa-arrow-right" class="btn-link"/>
+                            </div>
+                            <div>
+                                <button type="object"
+                                name="action_ir_mail_server_from"
+                                string="Outgoing Email Servers" icon="fa-arrow-right" class="btn-link"/>
+                            </div>
+                        </div>
+                    </group>
+                    <group attrs="{'invisible': ['|', ('is_alias_domain', '=', False), ('is_email_server', '=', False)]}">
                         <!-- truly invisible fields for control and options -->
                         <field name="composition_mode" invisible="1"/>
                         <field name="model" invisible="1"/>
@@ -67,19 +86,21 @@
                             attrs="{'invisible':['|', ('no_auto_thread', '=', False), ('composition_mode', '!=', 'mass_mail')],
                                     'required':[('no_auto_thread', '=', True), ('composition_mode', '=', 'mass_mail')]}"/>
                     </group>
-                    <field name="body" options="{'style-inline': true}"/>
-                    <group col="4">
+                    <field name="body" options="{'style-inline': true}" attrs="{'invisible': ['|', ('is_alias_domain', '=', False), ('is_email_server', '=', False)]}"/>
+                    <group col="4" attrs="{'invisible': ['|', ('is_alias_domain', '=', False), ('is_email_server', '=', False)]}">
                         <field name="attachment_ids" widget="many2many_binary" string="Attach a file" nolabel="1" colspan="2"/>
                         <field name="template_id" options="{'no_create': True}"
                                context="{'default_model': model, 'default_body_html': body, 'default_subject': subject}"/>
                     </group>
                     <footer>
-                        <button string="Send" attrs="{'invisible': [('is_log', '=', True)]}" name="send_mail_action" type="object" class="btn-primary o_mail_send"/>
-                        <button string="Log" attrs="{'invisible': [('is_log', '=', False)]}" name="send_mail_action" type="object" class="btn-primary"/>
+                        <button string="Send" attrs="{'invisible': ['|', '|', ('is_log', '=', True), ('is_alias_domain', '=', False), ('is_email_server', '=', False)]}" name="send_mail_action" type="object" class="btn-primary o_mail_send"/>
+                        <button string="Log" attrs="{'invisible': ['|', '|', ('is_log', '=', False), ('is_alias_domain', '=', False), ('is_email_server', '=', False)]}" name="send_mail_action" type="object" class="btn-primary"/>
+                        <button string="Save" attrs="{'invisible': [('is_alias_domain', '=', True)]}" name="set_domain_name" type="object" class="btn-primary o_mail_send"/>
+                        <button string="Ok" attrs="{'invisible': ['|', ('is_alias_domain', '=', False), ('is_email_server', '=', True)]}" name="set_email_server" type="object" class="btn-primary o_mail_send"/>
                         <button string="Cancel" class="btn-default" special="cancel" />
 
                         <button icon="fa-lg fa-save" type="object" name="save_as_template" string="Save as new template"
-                                class="pull-right btn-default" help="Save as a new template"/>
+                                class="pull-right btn-default" help="Save as a new template" attrs="{'invisible': ['|', ('is_alias_domain', '=', False), ('is_email_server', '=', False)]}"/>
                     </footer>
                 </form>
             </field>

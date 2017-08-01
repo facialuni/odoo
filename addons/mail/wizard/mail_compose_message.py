@@ -92,6 +92,12 @@ class MailComposer(models.TransientModel):
             result['model'] = 'res.partner'
             result['res_id'] = self.env.user.partner_id.id
 
+        alias_domain = self.env["ir.config_parameter"].get_param("mail.catchall.domain", default=None)
+        is_alias_domain = True
+        if alias_domain == 'localhost' or alias_domain is None:
+            is_alias_domain = False
+        result['is_alias_domain'] = is_alias_domain
+
         if fields is not None:
             [result.pop(field, None) for field in list(result) if field not in fields]
         return result
@@ -124,6 +130,61 @@ class MailComposer(models.TransientModel):
     # mail_message updated fields
     message_type = fields.Selection(default="comment")
     subtype_id = fields.Many2one(default=lambda self: self.sudo().env.ref('mail.mt_comment', raise_if_not_found=False).id)
+    alias_domain = fields.Char('Domain Name')
+    is_alias_domain = fields.Boolean('Check Domain Name')
+    is_email_server = fields.Boolean('Check mail server')
+
+    def action_mail_compose_message(self):
+        try:
+            compose_form_id = self.env['ir.model.data'].get_object_reference('mail', 'email_compose_message_wizard_form')[1]
+        except ValueError:
+            compose_form_id = False
+        return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'mail.compose.message',
+            'views': [(compose_form_id, 'form')],
+            'view_id': compose_form_id,
+            'target': 'new',
+            'res_id': self.id,
+        }
+
+    def set_domain_name(self):
+        self.is_alias_domain = True
+        self.env['ir.config_parameter'].set_param("base_setup.default_external_email_server", True)
+        self.env['ir.config_parameter'].set_param("mail.catchall.domain", self.alias_domain)
+        # email_server = self.env['fetchmail.server'].search([('state', '=', 'done')])[0]
+        # if not email_server:
+        return self.action_mail_compose_message()
+
+    def set_email_server(self):
+        self.is_email_server = True
+        return self.action_mail_compose_message()
+
+    def action_ir_mail_server_from(self):
+        email_form_id = self.env['ir.model.data'].get_object_reference('base', 'ir_mail_server_form')[1]
+        return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'ir.mail_server',
+            'views': [(email_form_id, 'form')],
+            'view_id': email_form_id,
+            'target': 'new',
+        }
+
+    def action_email_server_from(self):
+        email_form_id = self.env['ir.model.data'].get_object_reference('fetchmail', 'view_email_server_form')[1]
+        return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'fetchmail.server',
+            'views': [(email_form_id, 'form')],
+            'view_id': email_form_id,
+            'target': 'new',
+        }
 
     @api.multi
     def check_access_rule(self, operation):

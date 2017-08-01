@@ -33,10 +33,10 @@
         </record>
 
         <!-- Catchall Email Alias -->
-        <record id="icp_mail_catchall_alias" model="ir.config_parameter">
+        <!-- <record id="icp_mail_catchall_alias" model="ir.config_parameter">
             <field name="key">mail.catchall.alias</field>
             <field name="value">catchall</field>
-        </record>
+        </record> -->
 
         <!-- Bounce Email Alias -->
         <record id="icp_mail_bounce_alias" model="ir.config_parameter">
