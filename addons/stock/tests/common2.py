@@ -6,6 +6,7 @@ from odoo.addons.product.tests import common
 class TestStockCommon(common.TestProductCommon):
 
     def _create_pack_operation(self, product, product_qty, picking_id, **values):
+
         StockMoveLine = self.StockMoveLine.sudo(self.user_stock_manager)
         vals = {
             'picking_id': picking_id.id,
