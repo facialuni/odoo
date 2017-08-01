@@ -1,4 +1,4 @@
-odoo.define('globle.settings', function (require) {
+odoo.define('base.globle_settings', function (require) {
 "use strict";
 
 var core = require('web.core');

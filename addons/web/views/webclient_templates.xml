@@ -458,7 +458,7 @@
                 <script type="text/javascript" src="/web/static/tests/views/basic_model_tests.js"></script>
                 <script type="text/javascript" src="/web/static/tests/views/kanban_model_tests.js"></script>
                 <script type="text/javascript" src="/web/static/tests/views/view_dialogs_tests.js"></script>
-
+                <script type="text/javascript" src="/base/static/src/tests/globle_setting_test.js"></script>
                 <script type="text/javascript" src="/web/static/tests/core/registry_tests.js"></script>
                 <script type="text/javascript" src="/web/static/tests/core/pyeval_tests.js"></script>
                 <script type="text/javascript" src="/web/static/tests/core/class_tests.js"></script>
