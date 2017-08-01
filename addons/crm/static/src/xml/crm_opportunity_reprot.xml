@@ -2,48 +2,49 @@
 <templates id="template" xml:space="preserve">
     <t t-name="crm.pipelineReview">
         <div class="container-fluid oe_pipeline">
-            <div class="row pipeline">
-                <t t-if="widget.stages">
-                    <t t-foreach="widget.stages" t-as="stage">
-                        <t t-call="crm_pipeline_stage"/>
+            <t t-if="widget.data" >
+                <div class="row pipeline">
+                    <t t-if="widget.stages">
+                        <t t-foreach="widget.stages" t-as="stage">
+                            <t t-call="crm_pipeline_stage"/>
+                        </t>
                     </t>
-                </t>
-            </div>
-            <div class="row">
-                <t t-if="widget.data" >
-                    <div class="col-sm-3">
-                        <div class="oe_pipeline_side_box">
-                            <strong><t t-esc="widget.data.left_deals"/></strong>
-                            <br/>Deals left open in pipeline at the end of period.
-                        </div>
-                        <div class="oe_pipeline_side_box">
-                            <strong><t t-esc="widget.data.average_days"/></strong>
-                            <br/>average time to close a deal
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="oe_chart">
-                            <div class="col-sm-4">
-                                <div  class="oe_won_deals">
-                                    <strong>
-                                        <t t-esc="widget.data.won_deals"/>
-                                    </strong>
-                                    <br />Deals Won
-                                </div>
-                                <div class="oe_lost_deals">
-                                    <strong>
-                                        <t t-esc="widget.data.lost_deals"/>
-                                    </strong>
-                                    <br />Deals Lost
-                                </div>
+                </div>
+                <div class="row">
+                        <div class="col-sm-3">
+                            <div class="oe_pipeline_side_box">
+                                <strong><t t-esc="widget.data.left_deals"/></strong>
+                                <br/>Deals left open in pipeline at the end of period.
                             </div>
-                            <div class="oe_piechart col-sm-8" />
+                            <div class="oe_pipeline_side_box">
+                                <strong><t t-esc="widget.data.average_days"/></strong>
+                                <br/>average time to close a deal
+                            </div>
                         </div>
-                    </div>
-                </t>
-            </div>
+                        <div class="col-sm-4">
+                            <div class="oe_chart">
+                                <div class="col-sm-4">
+                                    <div  class="oe_won_deals">
+                                        <strong>
+                                            <t t-esc="widget.data.won_deals"/>
+                                        </strong>
+                                        <br />Deals Won
+                                    </div>
+                                    <div class="oe_lost_deals">
+                                        <strong>
+                                            <t t-esc="widget.data.lost_deals"/>
+                                        </strong>
+                                        <br />Deals Lost
+                                    </div>
+                                </div>
+                                <div class="oe_piechart col-sm-8" />
+                            </div>
+                        </div>
+                </div>
+            </t>
         </div>
     </t>
+
     <t t-name="crm_pipeline_stage">
         <div class="col-sm-3 oe_pipeline_box">
             <div class="oe_pipeline_stage_name">
@@ -53,6 +54,15 @@
             <t t-if="stage == 'New'">
                 <strong class="oe_new_deals"><t t-esc="widget.data.new_deals" /></strong>
                 <br/> New Deals
+            </t>
+            <t t-else="">
+                <div class="oe_pipeline_stage_moves">
+                    <t t-foreach="widget.data.stage_moves" t-as="move">
+                        <t t-if="move[0] == stage">
+                            <t t-esc="move[1]"/>
+                        </t>
+                    </t>Deals<span class="chevron"/>
+                </div>
             </t>
         </div>
     </t>
@@ -64,7 +74,7 @@
                 <span class="caret"/>
             </a>
             <ul class="dropdown-menu o_filters_menu" role="menu">
-                <li title="This Week" data-filter="this_week" class="oe_crm_opportunity_report_date_filter selected"><a>This Week</a></li>
+                <li title="This Week" data-filter="this_week" class="oe_crm_opportunity_report_date_filter"><a>This Week</a></li>
                 <li title="This Month" data-filter="this_month" class="oe_crm_opportunity_report_date_filter"><a>This Month</a></li>
                 <li title="This Quarter" data-filter="this_quarter" class="oe_crm_opportunity_report_date_filter"><a>This Quarter</a></li>
                 <li title="This Financial Year" data-filter="this_year" class="oe_crm_opportunity_report_date_filter"><a>This Year</a></li>
@@ -74,15 +84,14 @@
                     <label class="custom-date" for="date_from">Start Date :</label>
                     <div class="form-group custom-date">
                         <div class='o_datepicker js_report_datetimepicker'>
-                            <input type='text' class="o_datepicker_input" name="date_from" />
+                            <input type='text' class="o_datepicker_input" name="date_from" default-value=""/>
                             <span class="o_datepicker_button"/>
                         </div>
                     </div>
                     <label class="custom-date" for="date_to">End Date :</label>
-                    <label class="custom-date" for="date_to">Date :</label>
                     <div class="form-group custom-date">
                         <div class='o_datepicker js_report_datetimepicker'>
-                            <input type='text' class="o_datepicker_input" name="date_to" />
+                            <input type='text' class="o_datepicker_input" name="date_to" default-value=""/>
                             <span class="o_datepicker_button"/>
                         </div>
                     </div>

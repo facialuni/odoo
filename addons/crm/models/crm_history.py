@@ -28,12 +28,12 @@ class History(models.Model):
         stage_moves = []
         for stage in stages:
             result = self.env['crm.opportunity.history'].search_count([('stage_name', '=', stage)])
-            stage_moves.append({stage: result})
+            stage_moves.append((stage, result))
 
         total_revenue = self.env['crm.lead'].read_group([('create_date', '>=', start_date), ('create_date', '<=', end_date)], ['stage_id', 'planned_revenue'], ['stage_id'])
         expected_revenues = {revenue['stage_id'][1]: revenue['planned_revenue'] for revenue in total_revenue}
 
-        return {'stages_moves': stage_moves,
+        return {'stage_moves': stage_moves,
                 'new_deals': new_deals,
                 'left_deals': deals_left,
                 'won_deals': won_deals,
