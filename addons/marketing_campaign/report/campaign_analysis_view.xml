@@ -18,6 +18,7 @@
             <graph string="Marketing Reports">
                 <field name="segment_id"/>
                 <field name="month"/>
+                <field name="res_id" groups="base.group_no_one"/>
             </graph>
         </field>
     </record>
