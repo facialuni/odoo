@@ -434,6 +434,7 @@ var RTE = Widget.extend({
             this.__saved[key] = true;
         }
         var markup = this.getEscapedElement($el).prop('outerHTML');
+        
         return ajax.jsonRpc('/web/dataset/call', 'call', {
             model: 'ir.ui.view',
             method: 'save',
