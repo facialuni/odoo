@@ -2,6 +2,7 @@
 
 from . import test_stock_flow
 from . import test_product
+from . import test_packing
 from . import test_warehouse
 from . import test_shipment
 from . import test_stock_location_search
