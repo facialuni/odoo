@@ -15,6 +15,7 @@ Shows you a list of applications features to install from.
     'data': [
         'views/base_config_settings_views.xml',
         'views/res_partner_views.xml',
+        'views/base_config_template.xml',
     ],
     'demo': [],
     'installable': True,

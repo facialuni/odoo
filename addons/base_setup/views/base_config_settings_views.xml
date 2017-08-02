@@ -26,6 +26,21 @@
                                                 <field name="paperformat_id" class="oe_inline"/>
                                             </div>
                                         </div>
+                                        <label string="Address Justification / Justimication mode"/>
+                                        <div class="row">
+                                            <div class="col-md-2 o_light_label">
+                                                <field name="address_type" widget="radio" />
+                                            </div>
+                                            <div class="col-md-4 justification_bar" attrs="{'invisible': [('address_type', '!=', 'left')]} ">
+                                                <i class="fa fa-minus fa-4x"/>
+                                            </div>
+                                            <div class="col-md-4 justification_bar" attrs="{'invisible': [('address_type', '!=', 'center')]} ">
+                                                <i class="fa fa-minus fa-4x ml48"/>
+                                            </div>
+                                            <div class="col-md-4 justification_bar" attrs="{'invisible': [('address_type', '!=', 'right')]} ">
+                                                <i class="fa fa-minus fa-4x ml96"/>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-xs-12 col-md-6 o_setting_box">
