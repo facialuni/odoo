@@ -4,11 +4,14 @@ odoo.define('crm.opportunity_report', function (require) {
 var ActionManager = require('web.ActionManager');
 var ControlPanelMixin = require('web.ControlPanelMixin');
 var core = require('web.core');
+var crash_manager = require('web.crash_manager');
 var datepicker = require('web.datepicker');
-var Widget = require('web.Widget');
 var rpc = require('web.rpc');
+var session = require('web.session');
+var Widget = require('web.Widget');
 
 var QWeb = core.qweb;
+var _t = core._t;
 
 var OpportunityReport = Widget.extend(ControlPanelMixin, {
     template: 'crm.pipelineReview',
@@ -19,11 +22,6 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
     },
     start: function () {
         this._super.apply(this, arguments);
-        this.start_date = '07/01/2017';
-        this.end_date = '07/31/2017';
-        this.user_id = '1';
-        this.team_id = '1';
-        this.$searchview_buttons = $(QWeb.render('crm.searchView'));
         this.reload();
     },
     willStart: function () {
@@ -43,37 +41,39 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
         return this.update_control_panel(status, {clear: true});
     },
     reload: function () {
-        this.update_cp();
         this.options = this._get_options();
+        this.$searchview_buttons = $(QWeb.render('crm.searchView', {
+            date: {start_date: this.options.date.start_date,
+                   end_date: this.options.date.end_date,
+                   filter: this.options.date.filter},
+            stages: this.stages,
+        }));
+        this.parse_data();
+        this.update_cp();
         this.render_searchview_buttons();
-        this.calculation();
-        this.renderElement();
     },
     _get_options: function () {
-        this.options = this.options || {
+        var options = this.options || {
                     date: {filter: 'this_week'},
                     my_channel: true,
                     my_pipeline: true,
+                    stages: this.stages,
         };
-        var date = new Date()
-        var year = date.getFullYear();
-        var month = date.getMonth();
-        var date_filter = this.options.date.filter;
+        var date_filter = options.date.filter;
         if (date_filter === 'this_week') {
-            var date_from = moment().startOf('week').format('MM-DD-YYYY');
-            var date_to = moment().endOf('week').format('MM-DD-YYYY');
+            options.date.start_date = moment().startOf('week').format('MM-DD-YYYY');
+            options.date.end_date = moment().endOf('week').format('MM-DD-YYYY');
         } else if (date_filter === 'this_month') {
-            var date_from = moment().startOf('month').format('MM-DD-YYYY');
-            var date_to = moment().endOf('month').format('MM-DD-YYYY');
+            options.date.start_date = moment().startOf('month').format('MM-DD-YYYY');
+            options.date.end_date = moment().endOf('month').format('MM-DD-YYYY');
+        } else if (date_filter === 'this_quarter') {
+            options.date.start_date = moment().startOf('quarter').format('MM-DD-YYYY');
+            options.date.end_date = moment().endOf('quarter').format('MM-DD-YYYY');
         } else if (date_filter === 'this_year') {
-            var date_from = moment().startOf('year').format('MM-DD-YYYY');
-            var date_to = moment().endOf('year').format('MM-DD-YYYY');
+            options.date.start_date = moment().startOf('year').format('MM-DD-YYYY');
+            options.date.end_date = moment().endOf('year').format('MM-DD-YYYY');
         }
-        return {
-            date: { start_date: date_from,
-                    end_date: date_to,
-                    filter: date_filter}
-        };
+        return options
     },
     get_stages: function () {
         this.stages = [];
@@ -83,19 +83,34 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
                 method: 'search_read',
             }).then(function (result) {
                 _.each(result, function (stage) {
-                    self.stages.push(stage.name);
-                })
+                    self.stages.push({id: stage.id,
+                        name: stage.name});
+                });
         });
     },
-    calculation: function () {
+    parse_data: function () {
         var self = this;
-        rpc.query({
+        var filter = {start_date: this.options.date.start_date,
+                      end_date: this.options.date.end_date}
+        if (this.options.my_pipeline) {
+            filter.user_id = session.uid;
+        };
+        if (this.options.my_channel) {
+            filter.user_channel = session.uid;
+        }
+        var stages = _.filter(this.options.stages, function (el) { return el.selected === true });
+        if (stages.length === 0){
+            stages = this.stages;
+        }
+        return rpc.query({
             model: 'crm.opportunity.history',
             method: 'calculate_moves',
-            args: [null, this.options.date.start_date, this.options.date.end_date, this.stages, this.user_id, this.team_id],
+            args: [null, stages, filter],
         }).then(function (result) {
             self.data = result;
-            self.render_graph();
+            if (self.data.lost_deals !== 0 || self.data.won_deals !== 0) {
+                self.render_graph();
+            }
             self.renderElement();
         });
     },
@@ -127,10 +142,9 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
     },
     render_searchview_buttons: function () {
         var self = this;
-        var $datetimepickers = this.$searchview_buttons.find('.js_report_datetimepicker');
+        var $datetimepickers = this.$searchview_buttons.find('.oe_report_datetimepicker');
         var options = { // Set the options for the datetimepickers
             locale : moment.locale(),
-            format : 'L',
             icons: {
                 date: "fa fa-calendar",
             },
@@ -141,9 +155,6 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
             var date = new datepicker.DateWidget(options);
             date.replace($(this));
             date.$el.find('input').attr('name', $(this).find('input').attr('name'));
-            if($(this).data('default-value')) {
-                date.setValue(moment($(this).data('default-value')));
-            }
         });
         this.$searchview_buttons.find('.js_foldable_trigger').click(function (event) {
             $(this).toggleClass('o_closed_menu o_open_menu');
@@ -151,6 +162,14 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
         });
         _.each(this.$searchview_buttons.find('.oe_crm_opportunity_report_date_filter'), function(k) {
             $(k).toggleClass('selected', self.options.date.filter === $(k).data('filter'));
+        });
+        _.each(this.$searchview_buttons.find('.oe_crm_opportunity_report_filter_extra'), function(k) {
+            $(k).toggleClass('selected', self.options[$(k).data('filter')]);
+        });
+        _.each(this.$searchview_buttons.find('.oe_crm_opportunity_report_stage_filter'), function(k) {
+            $(k).toggleClass('selected', (_.filter(self.options[$(k).data('filter')], function(el){
+                    return el.id == $(k).data('id') && el.selected === true;
+                })).length > 0);
         });
         this.$searchview_buttons.find('.oe_crm_opportunity_report_date_filter').click(function (event) {
             self.options.date.filter = $(this).data('filter');
@@ -160,12 +179,11 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
                 var date_to = self.$searchview_buttons.find('.o_datepicker_input[name="date_to"]');
                 if (date_from.length > 0){
                     error = date_from.val() === "" || date_to.val() === "";
-                    self.options.date.date_from = new moment(date_from.val(), 'L').format('MM-DD-YYYY');
-                    self.options.date.date_to = new moment(date_to.val(), 'L').format('MM-DD-YYYY');
+                    self.options.date.start_date = new moment(date_from.val(), 'L').format('MM-DD-YYYY');
+                    self.options.date.end_date = new moment(date_to.val(), 'L').format('MM-DD-YYYY');
                 }
                 else {
                     error = date_to.val() === "";
-                    self.options.date.date = self.format_date(new moment(date_to.val(), 'L'));
                 }
             }
             if (error) {
@@ -174,6 +192,24 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
                 self.reload();
             }
         });
+        this.$searchview_buttons.find('.oe_crm_opportunity_report_filter_extra').click(function (event) {
+            var option_value = $(this).data('filter');
+            self.options[option_value] = !self.options[option_value];
+            self.reload();
+        });
+        this.$searchview_buttons.find('.oe_crm_opportunity_report_stage_filter').click(function (event) {
+            var option_value = $(this).data('filter');
+            var option_id = $(this).data('id');
+            _.filter(self.options[option_value], function(el) {
+                if (el.id == option_id){
+                    if (el.selected === undefined || el.selected === null){el.selected = false;}
+                    el.selected = !el.selected;
+                }
+                return el;
+            });
+            self.reload();
+        });
+
     },
 })
 
