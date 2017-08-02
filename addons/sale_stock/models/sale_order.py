@@ -147,8 +147,6 @@ class SaleOrderLine(models.Model):
                     if float_compare(product.virtual_available, self.product_id.virtual_available, precision_digits=precision) == -1:
                         message += _('\nThere are %s %s available accross all warehouses.') % \
                                 (self.product_id.virtual_available, product.uom_id.name)
-                    A = '<a target="_blank" href="/web#menu_id=%s&amp;action=%s">click here to view it </a>'
-                    message += A
                     warning_mess = {
                         'title': _('Not enough inventory!'),
                         'message' : message
