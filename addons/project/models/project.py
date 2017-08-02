@@ -20,6 +20,15 @@ class ProjectTaskType(models.Model):
         default_project_id = self.env.context.get('default_project_id')
         return [default_project_id] if default_project_id else None
 
+    @api.multi
+    def unlink(self):
+        # if type share between projects
+        project_id = self.env.context.get('default_project_id')
+        if len(self.project_ids) > 1 and project_id:
+            self.write({'project_ids': [(3, project_id)]})
+        else:
+            super(ProjectTaskType, self).unlink()
+
     name = fields.Char(string='Stage Name', required=True, translate=True)
     description = fields.Text(translate=True)
     sequence = fields.Integer(default=1)
