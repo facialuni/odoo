@@ -1655,6 +1655,36 @@ QUnit.module('Views', {
             "the add button should still be visible");
         kanban.destroy();
     });
+
+    QUnit.test('kanban globle context test on delete record', function (assert) {
+        assert.expect(1);
+
+        var kanban = createView({
+            View: KanbanView,
+            model: 'partner',
+            data: this.data,
+            arch: '<kanban>' +
+                        '<templates><t t-name="kanban-box">' +
+                        '<div><field name="foo"/>' +
+                        '<a class="delete_me" type="delete">Delete</a>' +
+                        '</div>' +
+                    '</t></templates></kanban>',
+            groupBy: ['product_id'],
+            viewOptions: {
+                context: {'my_context': 'true'},
+            },
+            mockRPC: function (route, args) {
+                if (args.method === 'unlink') {
+                    assert.strictEqual(args.kwargs.context.my_context, "true",
+                        "should have send the correct context");
+                }
+                return this._super.apply(this, arguments);
+            },
+        });
+        kanban.$('.o_kanban_record:first .delete_me').click();
+        $('.modal .modal-footer .btn-primary').click();
+        kanban.destroy();
+    });
 });
 
 });
