@@ -631,6 +631,16 @@ class IrTranslation(models.Model):
         self._modified_model(field.model_name)
 
     @api.model
+    def is_remaining_translate_fields(self, model, id, field):
+        action = self.translate_fields(model=model, id=id, field=field)
+        domain = action['domain'] + [('name', '=', "%s,%s" % (model, field))]
+        translate = self.env[action['res_model']].search(domain)
+        for record in translate:
+            if not record.state or record.state != 'translated':
+                return False
+        return field
+
+    @api.model
     def translate_fields(self, model, id, field=None):
         """ Open a view for translating the field(s) of the record (model, id). """
         main_lang = 'en_US'

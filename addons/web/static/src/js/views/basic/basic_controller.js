@@ -578,7 +578,22 @@ var BasicController = AbstractController.extend(FieldManagerMixin, {
         }).then(function (result) {
             self.do_action(result, {
                 on_reverse_breadcrumb: function () {
-                    self.renderer.displayTranslationAlert();
+                    // If the term is translated in all the languages, do not show the Link into the translation alert info
+                    self._rpc({
+                        model: 'ir.translation',
+                        method: 'is_remaining_translate_fields',
+                        args: [record.model, record.res_id, event.data.fieldName, record.getContext()],
+                    }).then(function (field) {
+                        if (result) {
+                            self.renderer.alertFields = _.filter(self.renderer.alertFields, function(alertField) {
+                                return alertField.name != field
+                            });
+                        }
+                        if (self.renderer.alertFields.length) {
+                            self.renderer.displayTranslationAlert();
+                        }
+                        return false
+                    });
                 },
             })
         });
