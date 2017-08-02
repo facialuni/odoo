@@ -108,6 +108,7 @@
         </div>
         <div class="o_search_on_mobile"/>
         <div class="o_search_mobile_buttons"/>
+        <div class="btn btn-primary o_search_result_button">SEE RESULT</div>
     </t>
 </templates>
 

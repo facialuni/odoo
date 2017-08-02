@@ -282,6 +282,9 @@ var SearchView = Widget.extend({
         this.search_fields = [];
         this.filters = [];
         this.groupbys = [];
+        if (config.isMobile) {
+            this.smf = $(core.qweb.render('SearchViewMobileFacet'));
+        }
         var visibleSearchMenu = this.call('local_storage', 'getItem', 'visible_search_menu');
         this.visible_filters = (visibleSearchMenu === 'true');
         this.input_subviews = []; // for user input in searchbar
@@ -506,15 +509,17 @@ var SearchView = Widget.extend({
     renderFacets: function (collection, model, options) {
         var self = this;
         var started = [];
-        var smf = $(core.qweb.render('SearchViewMobileFacet'));
+        
         _.invoke(this.input_subviews, 'destroy');
         this.input_subviews = [];
 
         this.query.each(function (facet) {
             var f = new FacetView(this, facet);
+            // var aa = facet.get('field');
+            // var bb = aa.get_domain(facet);
             if (config.isMobile) {
-                smf.appendTo(self.$el)
-                started.push(f.appendTo(smf));
+                self.$el.after(self.smf);
+                started.push(f.appendTo(self.smf));
             } else {
                 started.push(f.appendTo(self.$el));
             }

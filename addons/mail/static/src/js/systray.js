@@ -291,7 +291,7 @@ var SearchMobile = Widget.extend({
     template: 'SearchViewMobile',
     events: {
         "click .o_search_mobile": "_onSearchClick",
-        "click .o_ls_arrow": "_onleftArrowClick",
+        "click .o_ls_arrow, .o_search_result_button": "_onleftArrowClick",
         "click .o_dropdown": "_onDropdownClick",
     },
     init: function() {
@@ -319,7 +319,6 @@ var SearchMobile = Widget.extend({
             search_defaults: this.searchview_data.search_defaults,
         };
         this.searchview = new SearchView(this.searchview_data, this.searchview_data.dataset, this.searchview_data.search_fields_view, options);
-
         $.when(this.searchview.appendTo(this.$Searchtray.find('.o_search_on_mobile'))).done(function() {
             self.searchview_elements = {};
             self.searchview_elements.$searchview = self.searchview.$el;
@@ -353,7 +352,6 @@ if (config.isMobile) {
 
     WebClient.include({
         current_action_updated: function(action) {
-            console.log("widget.action.flags.search_viewxyz");
             this._super.apply(this, arguments);
             var action_descr = action && action.action_descr;
             var action_widget = action && action.widget;
