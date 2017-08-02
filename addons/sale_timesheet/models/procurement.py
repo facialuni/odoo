@@ -67,7 +67,12 @@ class ProcurementOrder(models.Model):
                 account = self.sale_line_id.order_id.analytic_account_id
             project = Project.search([('analytic_account_id', '=', account.id)], limit=1)
             if not project:
-                project_id = account.project_create({'name': account.name, 'use_tasks': True, 'allow_timesheets': self.product_id.service_type == 'timesheet'})
+                project_name = '%s (%s)' % (account.name, self.sale_line_id.order_partner_id.ref) if self.sale_line_id.order_partner_id.ref else account.name
+                project_id = account.project_create({
+                    'name': project_name,
+                    'use_tasks': True,
+                    'allow_timesheets': self.product_id.service_type == 'timesheet'
+                })
                 project = Project.browse(project_id)
                 # set the SO line origin if product should create project
                 if not project.sale_line_id and self.product_id.service_tracking in ['task_new_project', 'project_only']:
@@ -80,7 +85,7 @@ class ProcurementOrder(models.Model):
         project = self._timesheet_find_project()
         planned_hours = self._convert_qty_company_hours()
         return {
-            'name': '%s:%s' % (self.origin or '', self.product_id.name),
+            'name': '%s:%s' % (self.origin or '', self.sale_line_id.name.split('\n')[0] or self.product_id.name),
             'date_deadline': self.date_planned,
             'planned_hours': planned_hours,
             'remaining_hours': planned_hours,
