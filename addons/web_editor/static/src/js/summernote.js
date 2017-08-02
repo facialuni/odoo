@@ -445,11 +445,6 @@ dom.node = function (node) {
     return node.tagName ? node : node.parentNode;
 };
 dom.removeBetween = function (sc, so, ec, eo, towrite) {
-    debugger;
-    console.log("sc", sc);
-    console.log("so", so);
-    console.log("ec", ec);
-    console.log("eo", eo);
     if (ec.tagName) {
         if (ec.childNodes[eo]) {
             ec = ec.childNodes[eo];
@@ -865,7 +860,6 @@ range.WrappedRange.prototype.isOnImg = function () {
 };
 range.WrappedRange.prototype.deleteContents = function (towrite) {
     var prevBP = dom.removeBetween(this.sc, this.so, this.ec, this.eo, towrite);
-    debugger;
     $(dom.node(prevBP.sc)).trigger("click"); // trigger click to disable and reanable editor and image handler
     return new range.WrappedRange(
       prevBP.sc,
@@ -1386,9 +1380,7 @@ $.summernote.pluginEvents.delete = function (event, editor, layoutInfo) {
 $.summernote.pluginEvents.backspace = function (event, editor, layoutInfo) {
     var $editable = layoutInfo.editable();
     $editable.data('NoteHistory').recordUndo($editable, "backspace");
-    debugger;
     var r = range.create();
-    console.log("r -", r);
     if (!r) return;
     if (!r.isContentEditable()) {
         event.preventDefault();
@@ -1532,7 +1524,6 @@ $.summernote.pluginEvents.backspace = function (event, editor, layoutInfo) {
         $(dom.node(r.sc)).trigger("click"); // trigger click to disable and reanable editor and image handler
         dom.scrollIntoViewIfNeeded(r.sc.parentNode.previousElementSibling || r.sc);
     }
-    debugger;
     event.preventDefault();
     return false;
 };
