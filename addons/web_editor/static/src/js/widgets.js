@@ -974,6 +974,7 @@ var LinkDialog = Dialog.extend({
             this.data.className = this.data.iniClassName.replace(/(^|\s+)btn(-[a-z0-9_-]*)?/gi, ' ');
 
             var is_link = this.data.range.isOnAnchor();
+            // var is_link = $(this.data.range).hasElement('a');
             var r = this.data.range;
 
             var sc = r.sc;
@@ -1000,6 +1001,7 @@ var LinkDialog = Dialog.extend({
                     eo = ec.textContent.length;
                 } else if (eo !== ec.textContent.length) {
                     ec.splitText(eo);
+                    // ec = ec.splitText(eo);
                 }
 
                 nodes = dom.listBetween(sc, ec);
@@ -1102,20 +1104,16 @@ var LinkDialog = Dialog.extend({
             self.data.url = url;
             self.data.isNewWindow = new_window;
             self.data.text = label;
-            self.data.className = classes.replace(/\s+/gi, ' ').replace(/^\s+|\s+$/gi, '');
-                if (classes.replace(/(^|[ ])(btn-default|btn-success|btn-primary|btn-info|btn-warning|btn-danger)([ ]|$)/gi, ' ')) {
-                    self.data.style = {'background-color': '', 'color': ''};
-                }
+            self.data.className = classes
             self.final_data = self.data;
         }).then(_super);
     },
     bind_data: function () {
         var href = this.data.url;
         var new_window = this.data.isNewWindow;
-        var text = this.data.text;
         var classes = this.data.iniClassName;
 
-        this.$('input#o_link_dialog_label_input').val(text);
+        this.$('input#o_link_dialog_label_input').val(this.data.text);
         this.$('input.window-new').prop('checked', new_window);
         this.$('input.link-style[value="btn-alpha"]').prop('checked', true);
 
