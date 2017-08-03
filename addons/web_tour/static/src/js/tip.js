@@ -4,6 +4,8 @@ odoo.define('web_tour.Tip', function(require) {
 var core = require('web.core');
 var Widget = require('web.Widget');
 
+var _t = core._t;
+
 var Tip = Widget.extend({
     template: "Tip",
     events: {
@@ -38,6 +40,19 @@ var Tip = Widget.extend({
             top: "50%",
             left: "50%",
         };
+
+        // set tip position for langauge direction RTL
+        var isRTL = _t.database.parameters.direction == 'rtl';
+        var position = this.info.position;
+        if (isRTL) {
+            if (this.info.position == "right" ) {
+                position= "left";
+            }
+            if (this.info.position == "left" ) {
+                position = "right";
+            }
+        }
+        this.info.position = position;
     },
     /**
      * @param {$anchor} [JQuery] the node on which the tip should be placed
