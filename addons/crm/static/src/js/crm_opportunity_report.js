@@ -4,7 +4,7 @@ odoo.define('crm.opportunity_report', function (require) {
 var ActionManager = require('web.ActionManager');
 var ControlPanelMixin = require('web.ControlPanelMixin');
 var core = require('web.core');
-var crash_manager = require('web.crash_manager');
+var crashManager = require('web.crash_manager');
 var datepicker = require('web.datepicker');
 var rpc = require('web.rpc');
 var session = require('web.session');
@@ -15,24 +15,39 @@ var _t = core._t;
 
 var OpportunityReport = Widget.extend(ControlPanelMixin, {
     template: 'crm.pipelineReview',
-
+    /**
+     * @override
+     * @constructor
+    **/
     init: function (parent) {
         this.actionManager = parent;
         this._super.apply(this, arguments);
     },
+    /**
+     * @override
+     */
+    willStart: function () {
+        return $.when(this._super.apply(this, arguments), this._getInitiatValues());
+    },
+    /**
+     * @override
+     */
     start: function () {
         this._super.apply(this, arguments);
         this.reload();
     },
-    willStart: function () {
-        return $.when(this._super.apply(this, arguments), this.get_stages());
-    },
     // We need this method to rerender the control panel when going back in the breadcrumb
+    /**
+     * @override
+     */
     do_show: function () {
         this._super.apply(this, arguments);
         this.update_cp();
     },
     // Updates the control panel and render the elements that have yet to be rendered
+    /**
+     * @override
+     */
     update_cp: function () {
         var status = {
             breadcrumbs: this.actionManager.get_breadcrumbs(),
@@ -41,67 +56,75 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
         return this.update_control_panel(status, {clear: true});
     },
     reload: function () {
-        this.options = this._get_options();
-        this.$searchview_buttons = $(QWeb.render('crm.searchView', {
-            date: {start_date: this.options.date.start_date,
-                   end_date: this.options.date.end_date,
-                   filter: this.options.date.filter},
-            stages: this.stages,
-        }));
-        this.parse_data();
+        this.options = this._getOptions();
+        this.$searchview_buttons = $(QWeb.render('crm.searchView', {options: this.options,
+            users: this.users,
+            salesTeam: this.salesTeam}));
+        this._parseData();
         this.update_cp();
-        this.render_searchview_buttons();
+        this._renderSearchviewButtons();
     },
-    _get_options: function () {
+    /**
+     * @private
+     */
+    _getInitiatValues: function () {
+        this.stages = [];
+        var self = this;
+        return this._rpc({
+                model: 'crm.opportunity.history',
+                method: 'get_value',
+                args: [null],
+            }).then(function (result) {
+                self.stages = result.stages;
+                self.users = result.users;
+                self.salesTeam = result.sales_team;
+        });
+    },
+    /**
+     * @private
+     */
+    _getOptions: function () {
         var options = this.options || {
                     date: {filter: 'this_week'},
                     my_channel: true,
                     my_pipeline: true,
                     stages: this.stages,
         };
-        var date_filter = options.date.filter;
-        if (date_filter === 'this_week') {
+        var dateFilter = options.date.filter;
+        if (dateFilter === 'this_week') {
             options.date.start_date = moment().startOf('week').format('MM-DD-YYYY');
             options.date.end_date = moment().endOf('week').format('MM-DD-YYYY');
-        } else if (date_filter === 'this_month') {
+        } else if (dateFilter === 'this_month') {
             options.date.start_date = moment().startOf('month').format('MM-DD-YYYY');
             options.date.end_date = moment().endOf('month').format('MM-DD-YYYY');
-        } else if (date_filter === 'this_quarter') {
+        } else if (dateFilter === 'this_quarter') {
             options.date.start_date = moment().startOf('quarter').format('MM-DD-YYYY');
             options.date.end_date = moment().endOf('quarter').format('MM-DD-YYYY');
-        } else if (date_filter === 'this_year') {
+        } else if (dateFilter === 'this_year') {
             options.date.start_date = moment().startOf('year').format('MM-DD-YYYY');
             options.date.end_date = moment().endOf('year').format('MM-DD-YYYY');
         }
         return options
     },
-    get_stages: function () {
-        this.stages = [];
-        var self = this;
-        return this._rpc({
-                model: 'crm.stage',
-                method: 'search_read',
-            }).then(function (result) {
-                _.each(result, function (stage) {
-                    self.stages.push({id: stage.id,
-                        name: stage.name});
-                });
-        });
-    },
-    parse_data: function () {
+    /**
+     * @private
+     */
+    _parseData: function () {
         var self = this;
         var filter = {start_date: this.options.date.start_date,
-                      end_date: this.options.date.end_date}
+                      end_date: this.options.date.end_date,
+                      users: this.options.users,
+                      teams: this.options.salesTeam}
         if (this.options.my_pipeline) {
             filter.user_id = session.uid;
         };
         if (this.options.my_channel) {
             filter.user_channel = session.uid;
-        }
+        };
         var stages = _.filter(this.options.stages, function (el) { return el.selected === true });
         if (stages.length === 0){
             stages = this.stages;
-        }
+        };
         return rpc.query({
             model: 'crm.opportunity.history',
             method: 'calculate_moves',
@@ -109,16 +132,19 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
         }).then(function (result) {
             self.data = result;
             if (self.data.lost_deals !== 0 || self.data.won_deals !== 0) {
-                self.render_graph();
+                self._renderGraph();
             }
             self.renderElement();
         });
     },
-    render_graph: function () {
-        var total_deals = this.data.lost_deals + this.data.won_deals;
-        var won_percent = this.data.won_deals * 100 / total_deals;
-        var lost_percent = 100 - won_percent
-        var graphData = [won_percent, lost_percent];
+    /**
+     * @private
+     */
+    _renderGraph: function () {
+        var totalDeals = this.data.lost_deals + this.data.won_deals;
+        var wonPercent = this.data.won_deals * 100 / totalDeals;
+        var lostPercent = 100 - wonPercent
+        var graphData = [wonPercent, lostPercent];
         nv.addGraph(function() {
             var pieChart = nv.models.pieChart()
                 .x(function(d) { return d; })
@@ -140,7 +166,10 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
         return pieChart;
         });
     },
-    render_searchview_buttons: function () {
+    /**
+     * @private
+     */
+    _renderSearchviewButtons: function () {
         var self = this;
         var $datetimepickers = this.$searchview_buttons.find('.oe_report_datetimepicker');
         var options = { // Set the options for the datetimepickers
@@ -156,6 +185,8 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
             date.replace($(this));
             date.$el.find('input').attr('name', $(this).find('input').attr('name'));
         });
+        // add select2 for multiple filter on salesmen and sales channel
+        this.$searchview_buttons.find('.oe_auto_complete').select2();
         this.$searchview_buttons.find('.js_foldable_trigger').click(function (event) {
             $(this).toggleClass('o_closed_menu o_open_menu');
             self.$searchview_buttons.find('.o_foldable_menu[data-filter="'+$(this).data('filter')+'"]').toggleClass('o_closed_menu o_open_menu');
@@ -171,42 +202,54 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
                     return el.id == $(k).data('id') && el.selected === true;
                 })).length > 0);
         });
+
+        // click events for filter
         this.$searchview_buttons.find('.oe_crm_opportunity_report_date_filter').click(function (event) {
             self.options.date.filter = $(this).data('filter');
             var error = false;
             if ($(this).data('filter') === 'custom') {
-                var date_from = self.$searchview_buttons.find('.o_datepicker_input[name="date_from"]');
-                var date_to = self.$searchview_buttons.find('.o_datepicker_input[name="date_to"]');
-                if (date_from.length > 0){
-                    error = date_from.val() === "" || date_to.val() === "";
-                    self.options.date.start_date = new moment(date_from.val(), 'L').format('MM-DD-YYYY');
-                    self.options.date.end_date = new moment(date_to.val(), 'L').format('MM-DD-YYYY');
+                var dateFrom = self.$searchview_buttons.find('.o_datepicker_input[name="date_from"]');
+                var dateTo = self.$searchview_buttons.find('.o_datepicker_input[name="date_to"]');
+                if (dateFrom.length > 0){
+                    error = dateFrom.val() === "" || dateTo.val() === "";
+                    self.options.date.start_date = new moment(dateFrom.val(), 'L').format('MM-DD-YYYY');
+                    self.options.date.end_date = new moment(dateTo.val(), 'L').format('MM-DD-YYYY');
                 }
                 else {
-                    error = date_to.val() === "";
+                    error = dateTo.val() === "";
                 }
             }
             if (error) {
-                crash_manager.show_warning({data: {message: _t('Date cannot be empty')}});
+                crashManager.show_warning({data: {message: _t('Date cannot be empty')}});
             } else {
                 self.reload();
             }
         });
         this.$searchview_buttons.find('.oe_crm_opportunity_report_filter_extra').click(function (event) {
-            var option_value = $(this).data('filter');
-            self.options[option_value] = !self.options[option_value];
+            var optionValue = $(this).data('filter');
+            self.options[optionValue] = !self.options[optionValue];
             self.reload();
         });
         this.$searchview_buttons.find('.oe_crm_opportunity_report_stage_filter').click(function (event) {
-            var option_value = $(this).data('filter');
-            var option_id = $(this).data('id');
-            _.filter(self.options[option_value], function(el) {
-                if (el.id == option_id){
+            var optionValue = $(this).data('filter');
+            var optionId = $(this).data('id');
+            _.filter(self.options[optionValue], function(el) {
+                if (el.id == optionId){
                     if (el.selected === undefined || el.selected === null){el.selected = false;}
                     el.selected = !el.selected;
                 }
                 return el;
             });
+            self.reload();
+        });
+        // custom filter on salesmen and sales channels
+        self.$searchview_buttons.find('[data-filter="salesmen"]').select2("val", self.options.users);
+        self.$searchview_buttons.find('[data-filter="sales_channel"]').select2("val", self.options.salesTeam);
+        this.$searchview_buttons.find('.oe_opportunity_button_custom').click(function(event) {
+            var users = self.$searchview_buttons.find('[data-filter="salesmen"]').val();
+            self.options.users = _.map(users, function(num){ return parseInt(num)})
+            var salesTeam = self.$searchview_buttons.find('[data-filter="sales_channel"]').val();
+            self.options.salesTeam = _.map(salesTeam, function(num){ return parseInt(num)})
             self.reload();
         });
 

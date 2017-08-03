@@ -22,9 +22,13 @@ class History(models.Model):
         domain = []
         if filter_domain.get('user_id'):
             domain = expression.AND([domain, [('user_id', '=', filter_domain['user_id'])]])
+        if filter_domain.get('users'):
+            domain = expression.AND([domain, [('user_id', 'in', filter_domain['users'])]])
         if filter_domain.get('user_channel'):
             team_id = self.env['res.users'].search([('id', '=', filter_domain['user_channel'])]).sale_team_id
             domain = expression.AND([domain, [('team_id', '=', team_id.id)]])
+        if filter_domain.get('teams'):
+            domain = expression.AND([domain, [('team_id', 'in', filter_domain['teams'])]])
 
         new_deals = self.env['crm.lead'].search_count(expression.AND([domain, [('type', '=', 'opportunity'), ('create_date', '>=', start_date), ('create_date', '<=', end_date)]]))
         deals_left = self.env['crm.lead'].search_count(expression.AND([domain, ['|', ('date_deadline', '<', datetime.today().strftime('%Y-%m-%d')), '&', ('date_deadline', '=', None), ('date_closed', '=', None), ('type', '=', 'opportunity')]]))
@@ -54,3 +58,14 @@ class History(models.Model):
                 'lost_deals': lost_deals,
                 'average_days': average_days,
                 'expected_revenues': expected_revenues}
+
+    def get_value(self):
+        list_of_stages = self.env['crm.stage'].search([])
+        stages = [{'name': stage.name, 'id': stage.id} for stage in list_of_stages]
+        list_of_users = self.env['res.users'].search([('sale_team_id', '!=', None)])
+        users = [{'name': user.name, 'id': user.id} for user in list_of_users]
+        list_of_sale_team = self.env['crm.team'].search([])
+        sales_team = [{'name': team.name, 'id': team.id} for team in list_of_sale_team]
+        return {'stages': stages,
+                'users': users,
+                'sales_team': sales_team}
