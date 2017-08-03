@@ -18,6 +18,7 @@ var Domain = require('web.Domain');
 var DomainSelector = require('web.DomainSelector');
 var DomainSelectorDialog = require('web.DomainSelectorDialog');
 var framework = require('web.framework');
+var lazyLibs = require('web.lazyLibs');
 var session = require('web.session');
 var utils = require('web.utils');
 var view_dialogs = require('web.view_dialogs');
@@ -1886,6 +1887,14 @@ var FieldToggleBoolean = AbstractField.extend({
 
 var JournalDashboardGraph = AbstractField.extend({
     className: "o_dashboard_graph",
+    js_libs: [[
+        '/web/static/lib/nvd3/d3.v3.js',
+        '/web/static/lib/nvd3/nv.d3.js',
+        '/web/static/src/js/libs/nvd3.js'
+    ]],
+    css_libs: [
+        '/web/static/lib/nvd3/nv.d3.css'
+    ],
     init: function () {
         this._super.apply(this, arguments);
         this.graph_type = this.attrs.graph_type;
@@ -2006,8 +2015,9 @@ var JournalDashboardGraph = AbstractField.extend({
             this._customizeChart();
         }
     },
-
 });
+JournalDashboardGraph.include(lazyLibs('willStart'));
+
 
 /**
  * The "Domain" field allows the user to construct a technical-prefix domain

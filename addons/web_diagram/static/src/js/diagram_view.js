@@ -17,14 +17,14 @@ var DiagramView = BasicView.extend({
     icon: 'fa-code-fork',
     multi_record: false,
     searchable: false,
+    js_libs: [
+        '/web_diagram/static/lib/js/jquery.mousewheel.js',
+        '/web_diagram/static/lib/js/raphael.js',
+    ],
     config: {
         Model: DiagramModel,
         Renderer: DiagramRenderer,
         Controller: DiagramController,
-        js_libs: [
-            '/web_diagram/static/lib/js/jquery.mousewheel.js',
-            '/web_diagram/static/lib/js/raphael.js',
-        ],
     },
     /**
      * @override

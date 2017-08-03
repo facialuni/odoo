@@ -21,6 +21,8 @@ var fieldsToGather = [
 var CalendarView = AbstractView.extend({
     display_name: _lt('Calendar'),
     icon: 'fa-calendar',
+    js_libs: ['/web/static/lib/fullcalendar/js/fullcalendar.js'],
+    css_libs: ['/web/static/lib/fullcalendar/css/fullcalendar.css'],
     config: {
         Model: CalendarModel,
         Controller: CalendarController,

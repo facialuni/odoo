@@ -427,6 +427,66 @@ return {
 
 });
 
+odoo.define('web.lazyLibs', function (require) {
+"use strict";
+
+var ajax = require('web.ajax');
+
+function makeLazy (method) {
+    var lazy = {
+        // js_libs: [],
+        // css_libs: [],
+    };
+    /**
+     * Makes sure that the js_libs and css_libs are properly loaded. Note that
+     * the ajax loadJS and loadCSS methods don't do anything if the given file
+     * is already loaded.
+     *
+     * @returns {Deferred}
+     */
+    lazy[method] = function loadLibs () {
+        var self = this;
+        var args = arguments;
+        var _super = self._super;
+        var defs = [];
+        _.each(this.js_libs || [], function (urls) {
+            if (typeof(urls) === 'string') {
+                // js_libs is an array of urls: those urls can be loaded in
+                // parallel
+                defs.push(ajax.loadJS(urls));
+            } else {
+                // js_libs is an array of arrays of urls: those arrays of urls
+                // can be loaded in parallel, but the urls inside each
+                // sub-array must be loaded sequentially
+                var jsDef = new $.Deferred();
+                var urlDef = $.when();
+                _.each(urls, function (url) {
+                    urlDef = urlDef.then(function () {
+                        return ajax.loadJS(url).then(function () {
+                            if (urls[urls.length-1] === url) {
+                                jsDef.resolve();
+                            }
+                        });
+                    });
+                });
+                defs.push(jsDef);
+            }
+        });
+        _.each(this.css_libs || [], function (url) {
+            defs.push(ajax.loadCSS(url));
+        });
+
+        return $.when.apply($, defs).then(function () {
+            return _super.apply(self, args);
+        });
+    };
+    return lazy;
+}
+
+return makeLazy;
+
+});
+
 odoo.define('web.ServicesMixin', function (require) {
 "use strict";
 
