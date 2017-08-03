@@ -310,21 +310,6 @@ var SearchMobile = Widget.extend({
     _onSearchClick: function() {
         var self = this;
         this.$searchDropdown.toggleClass('hidden');
-        this.$Searchtray.html(QWeb.render('SearchViewMobile.body'));
-        var options = {
-            hidden: this.searchview_data.action.flags.search_view === false,
-            disable_custom_filters: this.searchview_data.action.    flags.search_disable_custom_filters,
-            $buttons:$('<div/>').addClass('o_search_options').appendTo(this.$Searchtray.find('.o_search_mobile_buttons')),
-            action: this.searchview_data.action,
-            search_defaults: this.searchview_data.search_defaults,
-        };
-        this.searchview = new SearchView(this.searchview_data, this.searchview_data.dataset, this.searchview_data.search_fields_view, options);
-        $.when(this.searchview.appendTo(this.$Searchtray.find('.o_search_on_mobile'))).done(function() {
-            self.searchview_elements = {};
-            self.searchview_elements.$searchview = self.searchview.$el;
-            self.searchview_elements.$searchview_buttons = self.searchview.$buttons.contents();
-        });
-        this.searchview.do_show();
         this.$('.o_searchview_more').toggleClass('hidden');
         this.$('.o_search_options').css('display', 'block');
     },
@@ -333,8 +318,32 @@ var SearchMobile = Widget.extend({
         this.$searchDropdown.toggleClass('hidden');
     },
 
-     update: function (tag, descriptor, widget) {
-        this.searchview_data = widget;
+     update: function (descriptor, widget) {
+        var self = this;
+        this.$Searchtray.html(QWeb.render('SearchViewMobile.body'));
+        var search_defaults = {};
+        debugger;
+        var context = descriptor.context || [];
+        _.each(context, function (value, key) {
+            var match = /^search_default_(.*)$/.exec(key);
+            if (match) {
+                search_defaults[match[1]] = value;
+            }
+        });
+        var options = {
+            // hidden: widget.flags.search_view === false,
+            disable_custom_filters: widget.flags.search_disable_custom_filters,
+            $buttons: $('<div/>').addClass('o_search_options').appendTo(this.$Searchtray.find('.o_search_mobile_buttons')),
+            action: widget.action,
+            search_defaults: search_defaults,
+        };
+        this.searchview = new SearchView(widget, widget.dataset, widget.search_fields_view, options);
+        $.when(this.searchview.appendTo(this.$Searchtray.find('.o_search_on_mobile'))).done(function() {
+            self.searchview_elements = {};
+            self.searchview_elements.$searchview = self.searchview.$el;
+            self.searchview_elements.$searchview_buttons = self.searchview.$buttons.contents();
+        });
+        this.searchview.do_show();
 
         if (widget && widget.action && widget.action.flags.search_view) {
              $(this.el).removeClass('hidden');
@@ -356,7 +365,7 @@ if (config.isMobile) {
             var action_descr = action && action.action_descr;
             var action_widget = action && action.widget;
             var search_mobile = _.find(this.menu.systray_menu.widgets, function(item) {return item instanceof SearchMobile; });
-            search_mobile.update('action', action_descr, action_widget);
+            search_mobile.update(action_descr, action_widget);
         },
     });
 }

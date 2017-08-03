@@ -509,14 +509,10 @@ var SearchView = Widget.extend({
     renderFacets: function (collection, model, options) {
         var self = this;
         var started = [];
-        
         _.invoke(this.input_subviews, 'destroy');
         this.input_subviews = [];
-
         this.query.each(function (facet) {
             var f = new FacetView(this, facet);
-            // var aa = facet.get('field');
-            // var bb = aa.get_domain(facet);
             if (config.isMobile) {
                 self.$el.after(self.smf);
                 started.push(f.appendTo(self.smf));
