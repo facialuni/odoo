@@ -1,6 +1,7 @@
 odoo.define('web.ViewManager', function (require) {
 "use strict";
 
+var config = require('web.config');
 var Context = require('web.Context');
 var ControlPanelMixin = require('web.ControlPanelMixin');
 var core = require('web.core');
@@ -152,7 +153,7 @@ var ViewManager = Widget.extend(ControlPanelMixin, {
         var self = this;
         var _super = this._super.bind(this, arguments);
         var def;
-        if (this.flags.search_view) {
+        if (this.flags.search_view && !config.isMobile) {
             def = this.setup_search_view().then(function() {
                 // udpate domain, context and groupby in the env
                 var d = self.searchview.build_search_data();
