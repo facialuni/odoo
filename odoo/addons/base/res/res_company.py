@@ -72,6 +72,9 @@ class Company(models.Model):
         ('clean', 'Clean'),
         ('standard', 'Standard'),
     ], string='Document Template')
+    address_type = fields.Selection([('left', 'Left'),
+                                        ('right', 'Right')
+                                    ], string="Address Justification", default='left')
 
     _sql_constraints = [
         ('name_uniq', 'unique (name)', 'The company name must be unique !')

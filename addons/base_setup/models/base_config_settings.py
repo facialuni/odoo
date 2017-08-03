@@ -35,10 +35,7 @@ class BaseConfigSettings(models.TransientModel):
             help="Allows to work in a multi currency environment")
     paperformat_id = fields.Many2one(related="company_id.paperformat_id", string='Paper format')
     external_report_layout = fields.Selection(related="company_id.external_report_layout")
-    address_type = fields.Selection([('left', 'Left'),
-                                        ('center', 'Center'),
-                                        ('right', 'Right')
-                                      ], string="Address Format", default='left')
+    address_type = fields.Selection(related="company_id.address_type", string='Address Justification', help="Sales Orders,Purchase Orders,Customer Statement,Invoices  customer Address Justification in reports.")
 
     @api.model
     def get_values(self):
