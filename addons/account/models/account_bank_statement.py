@@ -82,7 +82,13 @@ class AccountBankStatement(models.Model):
     def _is_difference_zero(self):
         for bank_stmt in self:
             bank_stmt.is_difference_zero = float_is_zero(bank_stmt.difference, precision_digits=bank_stmt.currency_id.decimal_places)
-
+    
+    @api.multi
+    def _is_validate_start_balance(self):
+        for bank_stmt_record in self:
+            last_bank_stmt = self.search([['date','<', bank_stmt_record.date]], limit=1,order='date desc')
+            bank_stmt_record.is_validate = True if bank_stmt_record.balance_start == last_bank_stmt.balance_end_real else False
+    
     @api.one
     @api.depends('journal_id')
     def _compute_currency(self):
@@ -158,6 +164,11 @@ class AccountBankStatement(models.Model):
     cashbox_start_id = fields.Many2one('account.bank.statement.cashbox', string="Starting Cashbox")
     cashbox_end_id = fields.Many2one('account.bank.statement.cashbox', string="Ending Cashbox")
     is_difference_zero = fields.Boolean(compute='_is_difference_zero', string='Is zero', help="Check if difference is zero.")
+    is_validate = fields.Boolean(compute='_is_validate_start_balance', string="Is Validate")
+    
+    @api.onchange('balance_start')
+    def onchange_is_validate_start_balance(self):
+        self._is_validate_start_balance()
 
     @api.onchange('journal_id')
     def onchange_journal_id(self):
