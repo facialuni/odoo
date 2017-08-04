@@ -16,7 +16,7 @@ class History(models.Model):
     res_id = fields.Many2one('crm.lead', string='related document')
 
     @api.multi
-    def calculate_moves(self, stages, filter_domain):
+    def action_pipeline_analysis(self, stages, filter_domain):
         start_date = filter_domain['start_date']
         end_date = filter_domain['end_date']
         domain = []
@@ -48,9 +48,8 @@ class History(models.Model):
             stage_moves.append({'name': stage['name'],
                                 'id': stage['id'],
                                 'data': result})
-        total_revenue = self.env['crm.lead'].read_group(expression.AND([domain, [('create_date', '>=', start_date), ('create_date', '<=', end_date), ('type', '=', 'opportunity')]]), ['stage_id', 'planned_revenue'], ['stage_id'])
-        expected_revenues = {revenue['stage_id'][1]: revenue['planned_revenue'] for revenue in total_revenue}
-
+        total_revenue = self.env['crm.lead'].read_group([('type', '=', 'opportunity')], ['stage_id', 'planned_revenue'], ['stage_id'])
+        expected_revenues = [(revenue['stage_id'][1], revenue['planned_revenue']) for revenue in total_revenue]
         return {'stage_moves': stage_moves,
                 'new_deals': new_deals,
                 'left_deals': deals_left,

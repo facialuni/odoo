@@ -127,15 +127,29 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
         };
         return rpc.query({
             model: 'crm.opportunity.history',
-            method: 'calculate_moves',
+            method: 'action_pipeline_analysis',
             args: [null, stages, filter],
         }).then(function (result) {
             self.data = result;
+            self.renderElement();
             if (self.data.lost_deals !== 0 || self.data.won_deals !== 0) {
                 self._renderGraph();
             }
-            self.renderElement();
+            self._stageStyle();
+            self._renderFunnelchart();
         });
+    },
+    /**
+     * @private
+     */
+    _renderFunnelchart: function () {
+        var funnelchart = new FunnelChart({
+                        data: this.data.expected_revenues,
+                        height: 350,
+                        width: 350,
+                        bottomPct: 1/8
+                    });
+        funnelchart.draw('.o_funnelchart');
     },
     /**
      * @private
@@ -155,10 +169,10 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
                 .showLegend(false)
                 .margin({ "left": 0, "right": 0, "top": 0, "bottom": 0 })
                 .color(['#00ff00', '#ff0000']);
-        var svg = d3.select(".oe_piechart").append("svg");
+        var svg = d3.select(".o_piechart").append("svg");
 
         svg
-            .attr("height", "15em")
+            .attr("height", "20em")
             .datum(graphData)
             .call(pieChart);
 
@@ -171,7 +185,7 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
      */
     _renderSearchviewButtons: function () {
         var self = this;
-        var $datetimepickers = this.$searchview_buttons.find('.oe_report_datetimepicker');
+        var $datetimepickers = this.$searchview_buttons.find('.o_report_datetimepicker');
         var options = { // Set the options for the datetimepickers
             locale : moment.locale(),
             icons: {
@@ -186,25 +200,25 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
             date.$el.find('input').attr('name', $(this).find('input').attr('name'));
         });
         // add select2 for multiple filter on salesmen and sales channel
-        this.$searchview_buttons.find('.oe_auto_complete').select2();
+        this.$searchview_buttons.find('.o_auto_complete').select2();
         this.$searchview_buttons.find('.js_foldable_trigger').click(function (event) {
             $(this).toggleClass('o_closed_menu o_open_menu');
             self.$searchview_buttons.find('.o_foldable_menu[data-filter="'+$(this).data('filter')+'"]').toggleClass('o_closed_menu o_open_menu');
         });
-        _.each(this.$searchview_buttons.find('.oe_crm_opportunity_report_date_filter'), function(k) {
+        _.each(this.$searchview_buttons.find('.o_crm_opportunity_report_date_filter'), function(k) {
             $(k).toggleClass('selected', self.options.date.filter === $(k).data('filter'));
         });
-        _.each(this.$searchview_buttons.find('.oe_crm_opportunity_report_filter_extra'), function(k) {
+        _.each(this.$searchview_buttons.find('.o_crm_opportunity_report_filter_extra'), function(k) {
             $(k).toggleClass('selected', self.options[$(k).data('filter')]);
         });
-        _.each(this.$searchview_buttons.find('.oe_crm_opportunity_report_stage_filter'), function(k) {
+        _.each(this.$searchview_buttons.find('.o_crm_opportunity_report_stage_filter'), function(k) {
             $(k).toggleClass('selected', (_.filter(self.options[$(k).data('filter')], function(el){
                     return el.id == $(k).data('id') && el.selected === true;
                 })).length > 0);
         });
 
         // click events for filter
-        this.$searchview_buttons.find('.oe_crm_opportunity_report_date_filter').click(function (event) {
+        this.$searchview_buttons.find('.o_crm_opportunity_report_date_filter').click(function (event) {
             self.options.date.filter = $(this).data('filter');
             var error = false;
             if ($(this).data('filter') === 'custom') {
@@ -225,12 +239,12 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
                 self.reload();
             }
         });
-        this.$searchview_buttons.find('.oe_crm_opportunity_report_filter_extra').click(function (event) {
+        this.$searchview_buttons.find('.o_crm_opportunity_report_filter_extra').click(function (event) {
             var optionValue = $(this).data('filter');
             self.options[optionValue] = !self.options[optionValue];
             self.reload();
         });
-        this.$searchview_buttons.find('.oe_crm_opportunity_report_stage_filter').click(function (event) {
+        this.$searchview_buttons.find('.o_crm_opportunity_report_stage_filter').click(function (event) {
             var optionValue = $(this).data('filter');
             var optionId = $(this).data('id');
             _.filter(self.options[optionValue], function(el) {
@@ -245,7 +259,7 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
         // custom filter on salesmen and sales channels
         self.$searchview_buttons.find('[data-filter="salesmen"]').select2("val", self.options.users);
         self.$searchview_buttons.find('[data-filter="sales_channel"]').select2("val", self.options.salesTeam);
-        this.$searchview_buttons.find('.oe_opportunity_button_custom').click(function(event) {
+        this.$searchview_buttons.find('.o_opportunity_button_custom').click(function(event) {
             var users = self.$searchview_buttons.find('[data-filter="salesmen"]').val();
             self.options.users = _.map(users, function(num){ return parseInt(num)})
             var salesTeam = self.$searchview_buttons.find('[data-filter="sales_channel"]').val();
@@ -254,6 +268,13 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
         });
 
     },
+    /**
+     * @private
+     */
+    _stageStyle: function () {
+        var stage_width = 100 / this.data.stage_moves.length;
+        this.$('.o_pipeline_box').css({'width': stage_width + '%'});
+    }
 })
 
 core.action_registry.add('crm_opportunity_report', OpportunityReport);

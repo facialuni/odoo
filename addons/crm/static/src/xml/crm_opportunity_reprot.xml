@@ -1,62 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
     <t t-name="crm.pipelineReview">
-        <div class="container-fluid oe_pipeline">
+        <div class="container-fluid o_pipeline">
             <t t-if="widget.data" >
-                <div class="row pipeline">
+                <div class="o_pipeline_stages">
                     <t t-if="widget.stages">
                         <t t-foreach="widget.data.stage_moves" t-as="stage">
                             <t t-call="crm_pipeline_stage"/>
                         </t>
                     </t>
                 </div>
-                <div class="row">
-                        <div class="col-sm-3">
-                            <div class="oe_pipeline_side_box">
-                                <strong><t t-esc="widget.data.left_deals"/></strong>
-                                <br/>Deals left open in pipeline at the end of period.
-                            </div>
-                            <div class="oe_pipeline_side_box">
-                                <strong><t t-esc="widget.data.average_days"/></strong>
-                                <br/>average time to close a deal
-                            </div>
+                <div>
+                    <div class="col-sm-3">
+                        <div class="o_pipeline_side_box">
+                            <strong><t t-esc="widget.data.left_deals"/></strong>
+                            <br/>Deals left open in pipeline at the end of period.
                         </div>
-                        <div class="col-sm-4">
-                            <div class="oe_chart">
-                                <div class="col-sm-4">
-                                    <div  class="oe_won_deals">
-                                        <strong>
-                                            <t t-esc="widget.data.won_deals"/>
-                                        </strong>
-                                        <br />Deals Won
-                                    </div>
-                                    <div class="oe_lost_deals">
-                                        <strong>
-                                            <t t-esc="widget.data.lost_deals"/>
-                                        </strong>
-                                        <br />Deals Lost
-                                    </div>
+                        <div class="o_pipeline_side_box">
+                            <strong><t t-esc="widget.data.average_days"/></strong>
+                            <br/>average time to close a deal
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="o_chart">
+                            <div class="col-sm-4">
+                                <div  class="o_won_deals">
+                                    <strong>
+                                        <t t-esc="widget.data.won_deals"/>
+                                    </strong>
+                                    <br />Deals Won
                                 </div>
-                                <div class="oe_piechart col-sm-8" />
+                                <div class="o_lost_deals">
+                                    <strong>
+                                        <t t-esc="widget.data.lost_deals"/>
+                                    </strong>
+                                    <br />Deals Lost
+                                </div>
                             </div>
+                            <div class="o_piechart col-sm-8" />
                         </div>
+                    </div>
+                    <div class="o_funnelchart col-sm-4" />
                 </div>
             </t>
         </div>
     </t>
 
     <t t-name="crm_pipeline_stage">
-        <div class="col-sm-3 oe_pipeline_box">
-            <div class="oe_pipeline_stage_name">
+        <div class="o_pipeline_box">
+            <div class="o_pipeline_stage_name">
                 <b><t t-esc="stage.name" /></b>
                 <span class="chevron"/>
             </div>
             <t t-if="stage.id === 1">
-                <strong class="oe_new_deals"><t t-esc="widget.data.new_deals" /></strong>
+                <strong class="o_new_deals"><t t-esc="widget.data.new_deals" /></strong>
                 <br/> New Deals
             </t>
             <t t-else="">
-                <div class="oe_pipeline_stage_moves">
+                <div class="o_pipeline_stage_moves">
                     <t t-esc="stage.data"/> Deals<span class="chevron"/>
                 </div>
             </t>
@@ -64,63 +65,63 @@
     </t>
 
     <t t-name="crm.searchView">
-        <div class="btn-group o_dropdown oe_crm_opportunity_reports_filter_date">
+        <div class="btn-group o_dropdown o_crm_opportunity_reports_filter_date">
             <a type="button" class="dropdown-toggle" data-toggle="dropdown">
                 <span class="fa fa-calendar"/> <t t-esc="options.date.filter"/>
                 <span class="caret"/>
             </a>
             <ul class="dropdown-menu o_filters_menu" role="menu">
-                <li title="This Week" data-filter="this_week" class="oe_crm_opportunity_report_date_filter"><a>This Week</a></li>
-                <li title="This Month" data-filter="this_month" class="oe_crm_opportunity_report_date_filter"><a>This Month</a></li>
-                <li title="This Quarter" data-filter="this_quarter" class="oe_crm_opportunity_report_date_filter"><a>This Quarter</a></li>
-                <li title="This Financial Year" data-filter="this_year" class="oe_crm_opportunity_report_date_filter"><a>This Year</a></li>
+                <li title="This Week" data-filter="this_week" class="o_crm_opportunity_report_date_filter"><a>This Week</a></li>
+                <li title="This Month" data-filter="this_month" class="o_crm_opportunity_report_date_filter"><a>This Month</a></li>
+                <li title="This Quarter" data-filter="this_quarter" class="o_crm_opportunity_report_date_filter"><a>This Quarter</a></li>
+                <li title="This Financial Year" data-filter="this_year" class="o_crm_opportunity_report_date_filter"><a>This Year</a></li>
                 <li class="divider"></li>
                 <li class="js_foldable_trigger o_closed_menu" data-filter='custom_filter_date'><a>Custom</a></li>
                 <li class="o_foldable_menu o_closed_menu" data-filter='custom_filter_date' style='margin-left: 10px; margin-right: 10px;'>
                     <label class="custom-date" for="date_from">Start Date :</label>
                     <div class="form-group custom-date">
-                        <div class='o_datepicker oe_report_datetimepicker'>
+                        <div class='o_datepicker o_report_datetimepicker'>
                             <input type='text' class="o_datepicker_input" name="date_from"/>
                             <span class="o_datepicker_button"/>
                         </div>
                     </div>
                     <label class="custom-date" for="date_to">End Date :</label>
                     <div class="form-group custom-date">
-                        <div class='o_datepicker oe_report_datetimepicker'>
+                        <div class='o_datepicker o_report_datetimepicker'>
                             <input type='text' class="o_datepicker_input" name="date_to"/>
                             <span class="o_datepicker_button"/>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-primary oe_crm_opportunity_report_date_filter" data-filter="custom">Apply</button>
+                    <button type="button" class="btn btn-primary o_crm_opportunity_report_date_filter" data-filter="custom">Apply</button>
                 </li>
             </ul>
         </div>
 
-        <div class="btn-group o_dropdown oe_crm_opportunity_reports_filter_stage">
+        <div class="btn-group o_dropdown o_crm_opportunity_reports_filter_stage">
             <a type="button" class="dropdown-toggle" data-toggle="dropdown">
             <span class="fa fa-bars"/>  Stages <span class="caret"/>
             </a>
             <ul class="dropdown-menu o_filters_menu" role="menu">
                 <t t-foreach="options.stages" t-as="stage">
-                    <li t-att-title="stage.name" data-filter="stages" t-att-data-id="stage.id" class="oe_crm_opportunity_report_stage_filter"><a><t t-esc="stage.name"/></a></li>
+                    <li t-att-title="stage.name" data-filter="stages" t-att-data-id="stage.id" class="o_crm_opportunity_report_stage_filter"><a><t t-esc="stage.name"/></a></li>
                 </t>
             </ul>
         </div>
 
-        <div class="btn-group o_dropdown oe_crm_opportunity_reports_filter">
+        <div class="btn-group o_dropdown o_crm_opportunity_reports_filter">
             <a type="button" class="dropdown-toggle" data-toggle="dropdown">
                 <span class="fa fa-filter"/>  Filters <span class="caret"/>
             </a>
             <ul class="dropdown-menu o_filters_menu" role="menu">
-                <li title="My Pipeline" data-filter="my_pipeline" class="oe_crm_opportunity_report_filter_extra"><a>My Pipeline</a></li>
-                <li title="My Channel" data-filter="my_channel" class="oe_crm_opportunity_report_filter_extra"><a>My Channel</a></li>
+                <li title="My Pipeline" data-filter="my_pipeline" class="o_crm_opportunity_report_filter_extra"><a>My Pipeline</a></li>
+                <li title="My Channel" data-filter="my_channel" class="o_crm_opportunity_report_filter_extra"><a>My Channel</a></li>
                 <li class="divider"></li>
 
                 <li class="js_foldable_trigger o_closed_menu" data-filter="custom_filter"><a>Custom</a></li>
                 <li class="o_foldable_menu o_closed_menu" data-filter="custom_filter" style='margin-left: 10px; margin-right: 10px;'>
                     <div>
                         <b>Users</b><br />
-                        <select class="oe_auto_complete" data-filter="salesmen" multiple="multiple" style="min-width: 130px;">
+                        <select class="o_auto_complete" data-filter="salesmen" multiple="multiple" style="min-width: 130px;">
                             <t t-foreach="users" t-as="user">
                                 <option t-att-value="user.id"><t t-esc="user.name" /></option>
                             </t>
@@ -128,13 +129,13 @@
                     </div><br />
                     <div>
                         <b>Channel</b><br />
-                        <select class="oe_auto_complete" data-filter="sales_channel" multiple="multiple" style="min-width: 130px;">
+                        <select class="o_auto_complete" data-filter="sales_channel" multiple="multiple" style="min-width: 130px;">
                             <t t-foreach="salesTeam" t-as="team">
                                 <option t-att-value="team.id"><t t-esc="team.name" /></option>
                             </t>
                         </select>
                     </div><br />
-                    <button type="button" class="btn btn-primary oe_opportunity_button_custom">Apply</button>
+                    <button type="button" class="btn btn-primary o_opportunity_button_custom">Apply</button>
                 </li>
             </ul>
         </div>
