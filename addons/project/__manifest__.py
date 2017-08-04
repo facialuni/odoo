@@ -14,6 +14,7 @@
         'analytic',
         'mail',
         'portal',
+        'rating',
         'resource',
         'web',
         'web_planner',

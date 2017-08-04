@@ -34,7 +34,7 @@
 
         <!-- add the email template as value for the project stage 2 -->
         <record id="project.project_stage_2" model="project.task.type">
-            <field name="rating_template_id" ref="rating_project_request_email_template"/>
+            <field name="rating_template_id" ref="project.project_task_mail_template_rating_request"/>
         </record>
         <record id="project.project_project_3" model="project.project">
             <field name="rating_status">stage</field>

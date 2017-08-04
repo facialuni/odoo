@@ -13,13 +13,13 @@ class ProjectConfiguration(models.TransientModel):
     module_pad = fields.Boolean("Collaborative Pads")
     module_hr_timesheet = fields.Boolean("Timesheets")
     module_project_timesheet_synchro = fields.Boolean("Awesome Timesheet")
-    module_rating_project = fields.Boolean(string="Rating on Tasks")
     module_project_forecast = fields.Boolean(string="Forecasts")
     module_hr_holidays = fields.Boolean("Leave Management")
     module_hr_timesheet_attendance = fields.Boolean("Attendances")
     module_sale_timesheet = fields.Boolean("Time Billing")
     module_hr_expense = fields.Boolean("Expenses")
     group_subtask_project = fields.Boolean("Sub-tasks", implied_group="project.group_subtask_project")
+    group_project_rating = fields.Boolean(string="Use Rating on Project", implied_group='project.group_project_rating')
 
     @api.onchange('module_sale_timesheet')
     def _onchange_module_sale_timesheet(self):
