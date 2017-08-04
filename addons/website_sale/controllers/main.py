@@ -242,8 +242,13 @@ class WebsiteSale(http.Controller):
         product_count = Product.search_count(domain)
         pager = request.website.pager(url=url, total=product_count, page=page, step=ppg, scope=7, url_args=post)
         products = Product.search(domain, limit=ppg, offset=pager['offset'], order=self._get_search_order(post))
-        for product in products:
-            product_categ_id = product.public_categ_ids
+
+        product_categ_ids = []
+        if search:
+            products = Product.search(domain)
+            if products:
+                for product in products:
+                    product_categ_ids = product.public_categ_ids
 
         ProductAttribute = request.env['product.attribute']
         if products:
@@ -269,7 +274,7 @@ class WebsiteSale(http.Controller):
             'compute_currency': compute_currency,
             'keep': keep,
             'parent_category_ids': parent_category_ids,
-            'product_categ_id': product_categ_id
+            'product_categ_ids': product_categ_ids
         }
         if category:
             values['main_object'] = category
