@@ -24,9 +24,10 @@ class CrmTeam(models.Model):
         # and the recovery mail was not yet sent
         website_teams = self.filtered(lambda team: team.team_type == 'website')
         if website_teams:
+            abandoned_delay = self.env['ir.values'].get_default('sale.order', 'abandoned_delay')
             abandoned_carts_data = self.env['sale.order'].read_group([
                 ('team_id', 'in', website_teams.ids),
-                ('date_order', '<', fields.Datetime.to_string(datetime.now() - relativedelta(hours=1))),
+                ('date_order', '<', fields.Datetime.to_string(datetime.now() - relativedelta(hours=abandoned_delay))),
                 ('state', '=', 'draft'),
                 ('partner_id', '!=', self.env.ref('base.public_partner').id),
                 ('order_line', '!=', False),
@@ -45,7 +46,8 @@ class CrmTeam(models.Model):
 
     def get_abandoned_carts(self):
         self.ensure_one()
-        time_constraint = fields.Datetime.to_string(fields.datetime.now() - relativedelta(hours=1))
+        abandoned_delay = self.env['ir.values'].get_default('sale.order', 'abandoned_delay')
+        time_constraint = fields.Datetime.to_string(fields.datetime.now() - relativedelta(hours=abandoned_delay))
         return {
             'name': _('Abandoned Carts'),
             'type': 'ir.actions.act_window',

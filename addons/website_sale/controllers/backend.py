@@ -78,6 +78,7 @@ class WebsiteSaleBackend(WebsiteBackend):
             fields=['team_id', 'price_subtotal'],
             groupby=['team_id'],
         )
+        abandoned_delay = request.env['ir.values'].get_default('sale.order', 'abandoned_delay')
         sales_values['summary'].update(
             order_to_invoice_count=request.env['sale.order'].search_count(sale_order_domain + [
                 ('state', 'in', ['sale', 'done']),
@@ -89,7 +90,7 @@ class WebsiteSaleBackend(WebsiteBackend):
                 ('state', '=', 'draft'),
                 ('order_line', '!=', False),
                 ('partner_id', '!=', request.env.ref('base.public_partner').id),
-                ('date_order', '<=', fields.Datetime.to_string(datetime.utcnow() - timedelta(hours=1))),
+                ('date_order', '<=', fields.Datetime.to_string(datetime.utcnow() - timedelta(hours=abandoned_delay))),
                 ('cart_recovery_email_sent', '=', False)
             ]),
             payment_to_capture_count=request.env['payment.transaction'].search_count([

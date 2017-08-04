@@ -23,13 +23,24 @@ class SaleOrder(models.Model):
     )
     cart_quantity = fields.Integer(compute='_compute_cart_info', string='Cart Quantity')
     only_services = fields.Boolean(compute='_compute_cart_info', string='Only Services')
-    is_abandoned_cart = fields.Boolean(compute='_compute_abandoned_cart', string='Abandoned Cart')
+    is_abandoned_cart = fields.Boolean(compute='_compute_abandoned_cart', search='_search_abandoned_cart', string='Abandoned Cart')
+    abandoned_delay = fields.Float(string='Delay for a cart to be considered abandoned', default=1.0)
     cart_recovery_email_sent = fields.Boolean(
         string='Cart recovery email already sent')
     can_directly_mark_as_paid = fields.Boolean(compute='_compute_can_directly_mark_as_paid',
         string="Can be directly marked as paid", store=True,
         help="""Checked if the sales order can directly be marked as paid, i.e. if the quotation
                 is sent or confirmed and if the payment acquire is of the type transfer or manual""")
+
+    def _search_abandoned_cart(self, operator, value):
+        time_constraint = fields.Datetime.to_string(datetime.utcnow() - relativedelta(hours=self.env['ir.values'].get_default('sale.order', 'abandoned_delay')))
+        domain = [('date_order', '<=', time_constraint),
+                  ('team_id.team_type', '=', 'website'),
+                  ('state', '=', 'draft'),
+                  ('partner_id.id', '!=', self.env.ref('base.public_partner').id),
+                  ('order_line', '!=', False)]
+        abandoned_ids = self.search(domain)
+        return [('id', 'in', abandoned_ids.ids)]
 
     @api.depends('state', 'payment_tx_id', 'payment_tx_id.state',
                  'payment_acquirer_id', 'payment_acquirer_id.provider')
@@ -47,7 +58,7 @@ class SaleOrder(models.Model):
     @api.multi
     @api.depends('team_id.team_type', 'date_order', 'order_line', 'state', 'partner_id')
     def _compute_abandoned_cart(self):
-        time_constraint = fields.Datetime.to_string(datetime.utcnow() - relativedelta(hours=1))
+        time_constraint = fields.Datetime.to_string(datetime.utcnow() - relativedelta(hours=self.abandoned_delay))
         for order in self:
             domain = order.date_order <= time_constraint and order.team_id.team_type == 'website' and order.state == 'draft' and order.partner_id.id != self.env.ref('base.public_partner').id and order.order_line
             order.is_abandoned_cart = bool(domain)
@@ -190,7 +201,10 @@ class SaleOrder(models.Model):
     @api.multi
     def action_recovery_email_send(self):
         compose_form_id = self.env.ref('mail.email_compose_message_wizard_form').id
-        template_id = self.env.ref('website_sale.mail_template_sale_cart_recovery').id
+        try:
+            template_id = int(self.env['ir.config_parameter'].sudo().get_param('website_sale.cart_recovery_mail_template_id', default=self.env.ref('website_sale.mail_template_sale_cart_recovery').id))
+        except:
+            template_id = False
         ctx = {
             'default_composition_mode': 'mass_mail' if len(self) > 1 else 'comment',
             'default_res_id': self.ids[0],

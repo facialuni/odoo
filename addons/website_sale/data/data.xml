@@ -66,5 +66,9 @@
                 'vat', 'company_name'
             ]"/>
         </function>
+        <function id="ir_values_set_sale_order_default_abandoned_delay_id"
+            model="ir.values" name="set_default"
+            eval="('sale.order', 'abandoned_delay', 1.0)">
+        </function>
     </data>
 </odoo>
