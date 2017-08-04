@@ -860,6 +860,7 @@ range.WrappedRange.prototype.isOnImg = function () {
 };
 range.WrappedRange.prototype.deleteContents = function (towrite) {
     var prevBP = dom.removeBetween(this.sc, this.so, this.ec, this.eo, towrite);
+
     $(dom.node(prevBP.sc)).trigger("click"); // trigger click to disable and reanable editor and image handler
     return new range.WrappedRange(
       prevBP.sc,
@@ -1380,6 +1381,7 @@ $.summernote.pluginEvents.delete = function (event, editor, layoutInfo) {
 $.summernote.pluginEvents.backspace = function (event, editor, layoutInfo) {
     var $editable = layoutInfo.editable();
     $editable.data('NoteHistory').recordUndo($editable, "backspace");
+
     var r = range.create();
     if (!r) return;
     if (!r.isContentEditable()) {
@@ -1524,6 +1526,7 @@ $.summernote.pluginEvents.backspace = function (event, editor, layoutInfo) {
         $(dom.node(r.sc)).trigger("click"); // trigger click to disable and reanable editor and image handler
         dom.scrollIntoViewIfNeeded(r.sc.parentNode.previousElementSibling || r.sc);
     }
+
     event.preventDefault();
     return false;
 };
