@@ -661,7 +661,7 @@ dom.isNotBreakable = function (node) {
 };
 
 dom.isContentEditable = function (node) {
-    return $(node).closest('[contenteditable]').is('[contenteditable="true"]');
+    return $(node).closest('[contenteditable]').prop('contenteditable') === 'true';
 };
 
 dom.isPre = function (node) {
@@ -1875,7 +1875,7 @@ eventHandler.modules.toolbar.button.updateRecentColor = function (elBtn, sEvent,
     var $recentcolor = $.find('.note-recent-color i');
     var $recentcolorbtn = $.find('.note-recent-color');
 
-    //find last used color for fonts or for icons 
+    //find last used color for fonts or for icons
     //set this color into recentcolor button of both font and icon
     for (var i in $recentcolor) {
         var $font = $recentcolor[i];

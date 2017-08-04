@@ -498,7 +498,7 @@ var RTE = Widget.extend({
         var $target = $(event.target);
         var $editable = $target.closest('.o_editable');
 
-        if (!$editable.length) {
+        if (!$editable.length || !$.summernote.core.dom.isContentEditable($target)) {
             return;
         }
 
@@ -533,8 +533,7 @@ var RTE = Widget.extend({
             }, 150); // setTimeout to remove flickering when change to editable zone (re-create an editor)
             this.$last = null;
         }
-        if ($editable.length && (!this.$last || this.$last[0] !== $editable[0]) &&
-                ($target.closest('[contenteditable]').attr('contenteditable') || "").toLowerCase() !== 'false') {
+        if ($editable.length && (!this.$last || this.$last[0] !== $editable[0])) {
             $editable.summernote(this.config($editable));
 
             $editable.data('NoteHistory', history);
