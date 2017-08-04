@@ -13,6 +13,7 @@
                     <field name="res_id" class="oe_inline" style="margin-left: 8px;"/>
                     <group>
                         <field name="subject" readonly="1"/>
+                        <field name="language" widget="selection"/>
                         <field name="email_from" readonly="1"
                                 attrs="{'invisible':[('email_from','=',False)]}"/>
                         <field name="partner_ids" widget="many2many_tags" readonly="1"/>

@@ -382,7 +382,9 @@ class MailTemplate(models.Model):
         for res_id, record in pycompat.items(res_to_rec):
             variables['object'] = record
             try:
+                print '>>>>>>>>>>>', variables
                 render_result = template.render(variables)
+                print '#############:',render_result
             except Exception:
                 _logger.info("Failed to render template %r using values %r" % (template, variables), exc_info=True)
                 raise UserError(_("Failed to render template %r using values %r")% (template, variables))
@@ -482,6 +484,7 @@ class MailTemplate(models.Model):
             Template = self.env['mail.template']
             # generate fields value for all res_ids linked to the current template
             if template.lang:
+                # print "should be in ---->", template._context.get('lang')
                 Template = Template.with_context(lang=template._context.get('lang'))
             for field in fields:
                 Template = Template.with_context(safe=field in {'subject'})
