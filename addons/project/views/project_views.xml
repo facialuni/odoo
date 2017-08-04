@@ -922,4 +922,11 @@ action = model.activate_sample_project()
             parent="menu_project_report"
             sequence="10"/>
 
+        <menuitem id="rating_rating_menu_project"
+            name="Customer Ratings"
+            action="rating_rating_action_project_report"
+            parent="menu_project_report"
+            groups="project.group_project_rating"
+            sequence="40"/>
+
 </odoo>

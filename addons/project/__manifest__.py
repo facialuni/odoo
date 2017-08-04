@@ -26,6 +26,7 @@
         'security/ir.model.access.csv',
         'data/project_data.xml',
         'report/project_report_views.xml',
+        'views/rating_views.xml',
         'views/project_views.xml',
         'views/res_partner_views.xml',
         'views/project_config_settings_views.xml',
@@ -36,7 +37,10 @@
         'wizard/project_task_merge_wizard_views.xml',
     ],
     'qweb': ['static/src/xml/project.xml'],
-    'demo': ['data/project_demo.xml'],
+    'demo': [
+        'data/project_demo.xml',
+        'data/rating_demo.xml'
+    ],
     'test': [
     ],
     'installable': True,
