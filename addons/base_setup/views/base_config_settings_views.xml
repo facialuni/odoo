@@ -25,17 +25,17 @@
                                                 <label for="paperformat_id" string="Format" class="col-xs-3 col-md-3 o_light_label"/>
                                                 <field name="paperformat_id" class="oe_inline"/>
                                             </div>
-                                        </div>
-                                        <label string="Address Justification / Justimication mode"/>
-                                        <div class="row">
-                                            <div class="col-md-2 o_light_label">
-                                                <field name="address_type" widget="radio" />
-                                            </div>
-                                            <div class="col-md-4 justification_bar" attrs="{'invisible': [('address_type', '!=', 'left')]} ">
-                                                <i class="fa fa-minus fa-4x"/>
-                                            </div>
-                                            <div class="col-md-4 justification_bar" attrs="{'invisible': [('address_type', '!=', 'right')]} ">
-                                                <i class="fa fa-minus fa-4x ml96"/>
+                                            <label string="Address Justification / Justification mode"/>
+                                            <div class="row">
+                                                <div class="col-md-2 col-xs-2 o_light_label">
+                                                    <field name="address_justification" widget="radio" />
+                                                </div>
+                                                <div class="col-md-4 col-xs-4 ml16 justification_bar" attrs="{'invisible': [('address_justification', '!=', 'left')]} ">
+                                                    <i class="fa fa-minus fa-4x"/>
+                                                </div>
+                                                <div class="col-md-4 col-xs-4 ml16 justification_bar" attrs="{'invisible': [('address_justification', '!=', 'right')]} ">
+                                                    <i class="fa fa-minus fa-4x pull-right"/>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
