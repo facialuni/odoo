@@ -12,3 +12,4 @@ from . import test_packing
 # from . import test_move
 # from . import test_move2
 from . import test_wiseoperator
+from . import test_procrule
