@@ -208,7 +208,7 @@ var DebugManager = Widget.extend({
  */
 DebugManager.include({
     /**
-
+     * Updates current action (action descriptor) on tag = action,
      */
     update: function (tag, descriptor) {
         if (tag === 'action') {

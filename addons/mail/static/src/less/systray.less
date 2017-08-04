@@ -158,7 +158,12 @@
 .o_search_navbar {
     background-color: #875A7B;
     height: 46px;
-    padding:15px;
+    .o_search_navigation {
+        height: inherit;
+        line-height: 46px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
 }
 
 .o_content_tray {
@@ -216,5 +221,9 @@
             border-bottom-left-radius: 2em;
         }
     }
+}
+
+.o_search_active {
+    color: #21b799;
 }
 

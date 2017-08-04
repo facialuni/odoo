@@ -34,13 +34,9 @@ odoo.define('web.ControlPanel', function (require) {
 var Bus = require('web.Bus');
 var data = require('web.data');
 var Widget = require('web.Widget');
-var config = require('web.config');
 
 var ControlPanel = Widget.extend({
     template: 'ControlPanel',
-    events: {
-           'click .o_search_mobile_button': '_onButtonClick',
-        },
     /**
      * @param {String} [template] the QWeb template to render the ControlPanel.
      * By default, the template 'ControlPanel' will be used
@@ -60,14 +56,6 @@ var ControlPanel = Widget.extend({
      */
     start: function() {
         // Exposed jQuery nodesets
-        config.isMobile ? this.nodes = {
-            $breadcrumbs: this.$('.breadcrumb'),
-            $buttons: this.$('.o_cp_buttons'),
-            $searchview: this.$('.o_cp_searchview'),
-            $searchview_buttons: this.$('.o_search_options'),
-            $sidebar: this.$('.o_cp_sidebar'),
-            $switch_buttons: this.$('.o_cp_switch_buttons'),
-        } :
         this.nodes = {
             $breadcrumbs: this.$('.breadcrumb'),
             $buttons: this.$('.o_cp_buttons'),
@@ -253,11 +241,6 @@ var ControlPanel = Widget.extend({
         this.nodes.$searchview.toggle(!is_hidden);
         this.$el.toggleClass('o_breadcrumb_full', !!is_hidden);
     },
-
-    _onButtonClick: function() {
-        console.log(this.el)
-        $(this.el).addClass('hidden');
-    }
 });
 
 return ControlPanel;

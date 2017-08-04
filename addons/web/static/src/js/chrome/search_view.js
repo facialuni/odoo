@@ -609,7 +609,7 @@ var SearchView = Widget.extend({
             }
             current_category = filter.category;
         });
-    },
+    }
 });
 
 _.extend(SearchView, {

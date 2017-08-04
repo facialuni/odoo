@@ -102,9 +102,11 @@
 
     <t t-name="SearchViewMobile.body">
         <div class="o_search_navbar">
-            <span class="o_ls_arrow pull-left"><i class="fa fa-arrow-left"/></span>
-            <span class="o_content_tray pull-left">Filter</span>
-            <span class="pull-right">Empty All</span>
+            <div class="o_search_navigation">
+                <span class="o_ls_arrow pull-left"><i class="fa fa-arrow-left"/></span>
+                <span class="o_content_tray pull-left">Filter</span>
+                <span class="pull-right o_empty_facets">Empty All</span>
+            </div>
         </div>
         <div class="o_search_on_mobile"/>
         <div class="o_search_mobile_buttons"/>
