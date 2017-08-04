@@ -5,4 +5,5 @@ from . import account_invoice
 from . import chart_template
 from . import product_template
 from . import res_company
+from . import res_country_state
 from . import res_partner
