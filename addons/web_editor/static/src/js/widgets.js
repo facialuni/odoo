@@ -373,7 +373,6 @@ var ImageDialog = Widget.extend({
         this.push(attachment);
         this.$('input.url').val('');
         this.search();
-        this.images = [];
     },
     form_submit: function (event) {
         var self = this;
