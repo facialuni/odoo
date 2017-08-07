@@ -78,3 +78,8 @@ class ProjectTask(models.Model):
     def onchange_parent_id(self):
         self.procurement_id = self.parent_id.procurement_id.id
         self.sale_line_id = self.parent_id.sale_line_id.id
+
+    def rating_get_partner_id(self):
+        if self.partner_id or self.sale_line_id.order_id.partner_id:
+            return self.partner_id or self.sale_line_id.order_id.partner_id
+        return super(ProjectTask, self).rating_get_partner_id()

@@ -347,7 +347,7 @@ class Project(models.Model):
 
     def action_view_all_rating(self):
         """ return the action to see all the rating of the project, and activate default filters """
-        action = self.env['ir.actions.act_window'].for_xml_id('rating_project', 'rating_rating_action_view_project_rating')
+        action = self.env['ir.actions.act_window'].for_xml_id('project', 'rating_rating_action_view_project_rating')
         action['name'] = _('Ratings of %s') % (self.name,)
         action_context = safe_eval(action['context']) if action['context'] else {}
         action_context.update(self._context)
@@ -959,7 +959,7 @@ class Task(models.Model):
 
     @api.multi
     def rating_apply(self, rate, token=None, feedback=None, subtype=None):
-        return super(Task, self).rating_apply(rate, token=token, feedback=feedback, subtype="rating_project.mt_task_rating")
+        return super(Task, self).rating_apply(rate, token=token, feedback=feedback, subtype="project.mt_task_rating")
 
     def rating_get_parent_model_name(self, vals):
         return 'project.project'
