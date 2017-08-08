@@ -46,9 +46,9 @@
                                     <field name="user" attrs="{'required' : [('type', '!=', 'local')]}"/>
                                     <field name="password" password="True" attrs="{'required' : [('type', '!=', 'local')]}"/>
                                 </group>
-                                <group string="Actions to Perform on Incoming Mails">
+                                <group string="Actions to Perform on Incoming Mails" groups="base.group_no_one">
                                     <field name="object_id"/>
-                                    <field name="action_id" groups="base.group_no_one"/>
+                                    <field name="action_id"/>
                                 </group>
                                 <group attrs="{'invisible' : [('type', '!=', 'local')]}" string="Configuration">
                                     <field name="configuration" colspan="4"/>

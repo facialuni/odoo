@@ -25,7 +25,7 @@ class FetchmailServer(models.Model):
     _description = "POP/IMAP Server"
     _order = 'priority'
 
-    name = fields.Char('Name', required=True)
+    name = fields.Char('Name', required=True, default='Incoming Mail Server')
     active = fields.Boolean('Active', default=True)
     state = fields.Selection([
         ('draft', 'Not Confirmed'),

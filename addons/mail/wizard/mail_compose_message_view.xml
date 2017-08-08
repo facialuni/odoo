@@ -7,8 +7,8 @@
             <field name="groups_id" eval="[(4,ref('base.group_user'))]"/>
             <field name="arch" type="xml">
                 <form string="Compose Email">
-                    <field name="is_alias_domain"/>
-                    <field name="is_email_server"/>
+                    <field name="is_alias_domain" invisible="1"/>
+                    <field name="is_email_server" invisible="1"/>
                     <group attrs="{'invisible': [('is_alias_domain', '=', True)]}">
                         <field name="alias_domain"/>
                     </group>
@@ -17,7 +17,7 @@
                             <div>
                                 <button type="object"
                                 name="action_email_server_from"
-                                string="Incoming Email Servers" icon="fa-arrow-right" class="btn-link"/>
+                                string="Incoming Email Servers" icon="fa-arrow-right" class="btn-link"/><i class="fa fa-check" attrs="{'invisible': [('is_email_server', '=', False)]}"/>
                             </div>
                             <div>
                                 <button type="object"

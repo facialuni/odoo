@@ -92,11 +92,16 @@ class MailComposer(models.TransientModel):
             result['model'] = 'res.partner'
             result['res_id'] = self.env.user.partner_id.id
 
-        alias_domain = self.env["ir.config_parameter"].get_param("mail.catchall.domain", default=None)
+        alias_domain = self.env["ir.config_parameter"].sudo().get_param("mail.catchall.domain", default=None)
         is_alias_domain = True
         if alias_domain == 'localhost' or alias_domain is None:
             is_alias_domain = False
         result['is_alias_domain'] = is_alias_domain
+        email_server = self.env['fetchmail.server'].sudo().search([('state', '=', 'done')])
+        is_email_server = False
+        if email_server:
+            is_email_server = True
+        result['is_email_server'] = is_email_server
 
         if fields is not None:
             [result.pop(field, None) for field in list(result) if field not in fields]
@@ -152,14 +157,11 @@ class MailComposer(models.TransientModel):
 
     def set_domain_name(self):
         self.is_alias_domain = True
-        self.env['ir.config_parameter'].set_param("base_setup.default_external_email_server", True)
-        self.env['ir.config_parameter'].set_param("mail.catchall.domain", self.alias_domain)
-        # email_server = self.env['fetchmail.server'].search([('state', '=', 'done')])[0]
-        # if not email_server:
+        self.env['ir.config_parameter'].sudo().set_param("base_setup.default_external_email_server", True)
+        self.env['ir.config_parameter'].sudo().set_param("mail.catchall.domain", self.alias_domain)
         return self.action_mail_compose_message()
 
     def set_email_server(self):
-        self.is_email_server = True
         return self.action_mail_compose_message()
 
     def action_ir_mail_server_from(self):
