@@ -403,36 +403,6 @@ var FormRenderer = BasicRenderer.extend({
             this.tabindexButtons[this.state.id].push(widget);
         }
         return widget.$el;
-        /*
-        var $button = $('<button>')
-                        .text(node.attrs.string)
-                        .addClass('btn btn-sm btn-default');
-        this._addOnClickAction($button, node);
-        this._addOnFocusAction($button, node);
-        this._addOnEnterAction($button, node);
-        this._handleAttributes($button, node);
-        this._registerModifiers(node, this.state, $button);
-
-        // Display tooltip
-        if (config.debug || node.attrs.help) {
-            $button.tooltip({
-                delay: { show: 1000, hide: 0 },
-                title: function () {
-                    return qweb.render('WidgetButton.tooltip', {
-                        debug: config.debug,
-                        state: self.state,
-                        node: node,
-                    });
-                },
-            });
-        }
-        if (node.attrs.class && (node.attrs.class.indexOf('btn-primary') != -1
-            || node.attrs.class.indexOf('oe_highlight') != -1
-            || node.attrs.class.indexOf('oe_stat_button') != -1)) {
-            this.tabindexButtons[this.state.id].push({'$el': $button, activate: this._activateButton($button)});
-        }
-        return $button;
-        */
     },
     /**
      * @private

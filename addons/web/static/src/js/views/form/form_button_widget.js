@@ -1,6 +1,7 @@
 odoo.define('web.ButtonWidget', function (require) {
 "use strict";
 
+var config = require('web.config');
 var core = require('web.core');
 var ViewWidget = require('web.ViewWidget');
 
@@ -56,6 +57,19 @@ var ButtonWidget = ViewWidget.extend({
                 enterPressed = true;
             }
         });
+        // Display tooltip
+        if (config.debug || node.attrs.help) {
+            $button.tooltip({
+                delay: { show: 1000, hide: 0 },
+                title: function () {
+                    return qweb.render('WidgetButton.tooltip', {
+                        debug: config.debug,
+                        state: self.state,
+                        node: node,
+                    });
+                },
+            });
+        }
         this._addOnFocusAction();
     },
     /**
