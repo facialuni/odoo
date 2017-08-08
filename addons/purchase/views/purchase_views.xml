@@ -602,6 +602,7 @@
             <field name="domain">[('product_id.product_tmpl_id','in',active_ids), ('state', 'in', ['purchase', 'done'])]</field>
             <field name="name">Purchases</field>
             <field name="res_model">purchase.order.line</field>
+            <field name="view_mode">tree</field>
             <field name="view_id" ref="purchase_order_line_tree"/>
         </record>
 
