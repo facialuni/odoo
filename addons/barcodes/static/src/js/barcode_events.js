@@ -77,13 +77,7 @@ var BarcodeEvents = core.Class.extend(mixins.PropertiesMixin, {
                     'bubbles': old_event.bubbles,
                     'cancelable': old_event.cancelable,
                 };
-                try {
-                    new_event = new Event("keypress", params);
-                } catch(error) {
-                    // For IE >= 9, use new CustomEvent(), instead of new Event()
-                    new_event = new CustomEvent("keypress", params);
-                }
-
+                new_event = $.Event('keypress', params);
                 new_event.viewArg = old_event.viewArg;
                 new_event.ctrl = old_event.ctrl;
                 new_event.alt = old_event.alt;
@@ -96,7 +90,7 @@ var BarcodeEvents = core.Class.extend(mixins.PropertiesMixin, {
                 new_event.which = old_event.which;
                 new_event.dispatched_by_barcode_reader = true;
 
-                old_event.target.dispatchEvent(new_event);
+                $(old_event.target).trigger(new_event);
             }
         }
     },
