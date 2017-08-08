@@ -2,32 +2,6 @@
 <odoo>
     <data>
 
-<menuitem name="Sales"
-    id="menu_base_partner"
-    groups="group_sale_salesman,group_sale_manager" sequence="6"/>
-
-    <menuitem id="menu_sales" name="Sales" parent="menu_base_partner" sequence="5"/>
-        <menuitem id="menu_partner_form" parent="menu_sales" action="base.action_partner_form" sequence="3"/>
-
-    <menuitem id="menu_sale_config" name="Configuration" parent="menu_base_partner"
-    sequence="100" groups="group_sale_manager"/>
-        <menuitem id="menu_sale_general_settings" name="Settings" parent="menu_sale_config"
-            sequence="0" action="action_sale_config" groups="base.group_system"/>
-
-        <menuitem id="menu_config_address_book" parent="menu_sale_config" name="Contacts" sequence="4" groups="base.group_system"/>
-            <menuitem action="base.action_partner_category_form" id="menu_partner_category_form" name="Contact Tags" sequence="1" parent="menu_config_address_book" groups="base.group_no_one"/>
-            <menuitem action="base.action_partner_title_contact" id="menu_partner_title_contact" name="Contact Titles" parent="menu_config_address_book" sequence="3" groups="base.group_no_one"/>
-            <menuitem id="res_partner_industry_menu" name="Sectors of Activity" action="base.res_partner_industry_action" parent="sales_team.menu_config_address_book" sequence="4" groups="base.group_no_one"/> 
-            <menuitem id="menu_localisation" name="Localization" parent="menu_config_address_book" sequence="5" groups="base.group_no_one"/>
-
-                <menuitem action="base.action_country" id="menu_country_partner" parent="menu_localisation" sequence="1" groups="base.group_no_one"/>
-                <menuitem action="base.action_country_group" id="menu_country_group" name="Country Group" parent="menu_localisation" sequence="3" groups="base.group_no_one"/>
-                <menuitem action="base.action_country_state" id="menu_country_state_partner" parent="menu_localisation" sequence="2" groups="base.group_no_one"/>
-                <menuitem action="base.action_currency_form" id="menu_action_currency_form" parent="menu_localisation" sequence="3" groups="base.group_multi_currency"/>
-            <menuitem id="menu_config_bank_accounts" name="Bank Accounts" parent="menu_config_address_book" sequence="6" groups="base.group_no_one"/>
-                <menuitem action="base.action_res_bank_form" id="menu_action_res_bank_form" parent="menu_config_bank_accounts" sequence="1" groups="base.group_no_one"/>
-                <menuitem action="base.action_res_partner_bank_account_form" id="menu_action_res_partner_bank_form" parent="menu_config_bank_accounts" groups="base.group_no_one" sequence="2"/>
-
         <!-- Cateamions Search view -->
         <record id="crm_team_salesteams_search" model="ir.ui.view">
             <field name="name">Case Teams - Search</field>
