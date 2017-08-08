@@ -296,6 +296,8 @@ var SearchMobile = Widget.extend({
         "click .o_search_result_button": "_onSearchResult",
         "click .o_empty_facets": "_onEmpty",
     },
+
+
     init: function() {
         this._super.apply(this, arguments);
     },
@@ -319,8 +321,10 @@ var SearchMobile = Widget.extend({
     _onleftArrowClick: function() {
         this.$searchDropdown.toggleClass('hidden');
         var $searchIcon = $(this.el).find('.o_search_mobile');
-        if ($searchIcon.hasClass('o_search_active')) {
-                $searchIcon.removeClass('o_search_active');
+        if (this.searchview.query.length && !$searchIcon.hasClass('o_search_active')) {
+            $searchIcon.addClass('o_search_active');
+        } else if (!this.searchview.query.length && $searchIcon.hasClass('o_search_active')) {
+            $searchIcon.removeClass('o_search_active');
         }
     },
 
@@ -335,8 +339,10 @@ var SearchMobile = Widget.extend({
     _onSearchResult: function() {
         this.$searchDropdown.toggleClass('hidden');
         var $searchIcon = $(this.el).find('.o_search_mobile');
-        if (!$searchIcon.hasClass('o_search_active')) {
-            $searchIcon.toggleClass('o_search_active');
+        if (this.searchview.query.length && !$searchIcon.hasClass('o_search_active')) {
+            $searchIcon.addClass('o_search_active');
+        } else if (!this.searchview.query.length && $searchIcon.hasClass('o_search_active')) {
+            $searchIcon.removeClass('o_search_active');
         }
     },
     /**
@@ -344,13 +350,12 @@ var SearchMobile = Widget.extend({
      */
      update: function (descriptor, widget) {
         var self = this;
-
         if (!widget) {
             return;
         }
         this.$Searchtray.html(QWeb.render('SearchViewMobile.body'));
         if (widget.searchview && !widget.active_view) {
-            $(this.el).removeClass('hidden');
+            $(this.el).removeClass('o_hidden');
             var options = {
                 $buttons: $('<div/>').addClass('o_search_options').appendTo(this.$Searchtray.find('.o_search_mobile_buttons')),
                 action: this.action,
@@ -365,7 +370,7 @@ var SearchMobile = Widget.extend({
             });
         }
         else if (widget && widget.action && widget.active_view.searchable) {
-            $(this.el).removeClass('hidden');
+            $(this.el).removeClass('o_hidden');
             var search_defaults = {};
             this.flags = widget.flags || {};
             var context = descriptor.context || [];
@@ -390,7 +395,7 @@ var SearchMobile = Widget.extend({
             });
             this.searchview.do_show();
         } else {
-            $(this.el).addClass('hidden');
+            $(this.el).addClass('o_hidden');
         }
     },
 
