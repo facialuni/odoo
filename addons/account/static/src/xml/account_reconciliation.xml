@@ -25,7 +25,8 @@
             <div class="notification_area"/>
         </div>
         <div class="o_reconciliation_lines"/>
-        <div class="pull-right text-muted">Tip: Hit CTRL-Enter to reconcile all the balanced items in the sheet.</div>
+        <div class="pull-right text-muted">Tip: Hit CTRL-Enter to reconcile all the balanced items in the sheet.</div><br/>
+        <div class="pull-right text-muted">Tip: The blue lines represent payments to reconcile.</div>
     </div>
     <div t-else="" class="o_view_nocontent">
         <p><b>Good Job!</b> Bank statements are fully reconciled.</p>
