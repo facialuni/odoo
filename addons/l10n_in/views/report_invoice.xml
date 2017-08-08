@@ -12,8 +12,8 @@
                 </div>
             </div>
         </xpath>
-        <xpath expr="//tbody[contains(@class, 'invoice_tbody')]/tr/td[1]" position="replace">
-            <td><span t-field="l.name"/><t t-if="l.product_id.hsn_code"><h6><strong class="ml16">HSN Code:</strong> <span t-field="l.product_id.hsn_code"/></h6></t></td>
+        <xpath expr="//tbody[hasclass('invoice_tbody')]/tr/td[1]" position="replace">
+            <td><span t-field="l.name"/><t t-if="l.product_id.hsn_code"><h6><strong class="ml16">HSN/SAC Code:</strong> <span t-field="l.product_id.hsn_code"/></h6></t></td>
         </xpath>
         <xpath expr="//div[@name='invoice_address']//div[@t-if='o.partner_id.vat']" position="replace">
             <div t-if="o.partner_id.gstin">GSTIN: <span t-field="o.partner_id.gstin"/></div>
@@ -21,7 +21,7 @@
         <xpath expr="//table//thead/tr/th[6]" position="attributes">
             <attribute name="t-if">len(o.tax_line_ids) > 0</attribute>
         </xpath>
-        <xpath expr="//tbody[contains(@class, 'invoice_tbody')]/tr/td[6]" position="attributes">
+        <xpath expr="//tbody[hasclass('invoice_tbody')]/tr/td[6]" position="attributes">
             <attribute name="t-if">len(o.tax_line_ids) > 0</attribute>
         </xpath>
         <xpath expr="//h2" position="replace">

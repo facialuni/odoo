@@ -7,4 +7,4 @@ from odoo import models, fields
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    hsn_code = fields.Char(string="HSN Code", help="Harmonized System Nomenclature")
+    hsn_code = fields.Char(string="HSN/SAC Code", help="Harmonized System Nomenclature/Services Accounting Code")

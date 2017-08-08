@@ -8,7 +8,7 @@
     </template>
 
     <template id="l10n_in_external_layout_standard" inherit_id="web.external_layout_standard">
-        <xpath expr="//div[contains(@class, 'footer')]//li[@t-if='company.vat']" position="replace">
+        <xpath expr="//div[hasclass('footer')]//li[@t-if='company.vat']" position="replace">
             <li t-if="company.gstin">GSTIN: <span t-field="company.gstin"/></li>
         </xpath>
     </template>
