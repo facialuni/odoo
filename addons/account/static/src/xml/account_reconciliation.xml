@@ -93,6 +93,7 @@
             <t t-call="reconciliation.line.match"/>
         </div>
         <div class="create"></div>
+        <div class="col-md-12 text-center">Show more</div>
     </div>
 </t>
 
@@ -136,8 +137,6 @@
 <div t-name="reconciliation.line.match">
     <div class="match_controls">
         <input class="filter" placeholder="Filter..." type="text" value=""/>
-        <span class="pull-right fa fa-chevron-right disabled"></span>
-        <span class="pull-right fa fa-chevron-left disabled"></span>
     </div>
     <table>
         <tbody>
