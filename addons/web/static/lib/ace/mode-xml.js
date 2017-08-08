@@ -1,4 +1,4 @@
-define("ace/mode/xml_highlight_rules", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text_highlight_rules"], function(e, t, n) {
+ace.define("ace/mode/xml_highlight_rules", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text_highlight_rules"], function(e, t, n) {
     "use strict";
     var r = e("../lib/oop"),
         i = e("./text_highlight_rules").TextHighlightRules,
@@ -237,7 +237,7 @@ define("ace/mode/xml_highlight_rules", ["require", "exports", "module", "ace/lib
             }])
         }
     }).call(i.prototype), r.inherits(s, i), t.XmlHighlightRules = s
-}), define("ace/mode/behaviour/xml", ["require", "exports", "module", "ace/lib/oop", "ace/mode/behaviour", "ace/token_iterator", "ace/lib/lang"], function(e, t, n) {
+}), ace.define("ace/mode/behaviour/xml", ["require", "exports", "module", "ace/lib/oop", "ace/mode/behaviour", "ace/token_iterator", "ace/lib/lang"], function(e, t, n) {
     "use strict";
 
     function u(e, t) {
@@ -339,7 +339,7 @@ define("ace/mode/xml_highlight_rules", ["require", "exports", "module", "ace/lib
             })
         };
     r.inherits(a, i), t.XmlBehaviour = a
-}), define("ace/mode/folding/xml", ["require", "exports", "module", "ace/lib/oop", "ace/lib/lang", "ace/range", "ace/mode/folding/fold_mode", "ace/token_iterator"], function(e, t, n) {
+}), ace.define("ace/mode/folding/xml", ["require", "exports", "module", "ace/lib/oop", "ace/lib/lang", "ace/range", "ace/mode/folding/fold_mode", "ace/token_iterator"], function(e, t, n) {
     "use strict";
 
     function l(e, t) {
@@ -473,7 +473,7 @@ define("ace/mode/xml_highlight_rules", ["require", "exports", "module", "ace/lib
             }
         }
     }).call(a.prototype)
-}), define("ace/mode/xml", ["require", "exports", "module", "ace/lib/oop", "ace/lib/lang", "ace/mode/text", "ace/mode/xml_highlight_rules", "ace/mode/behaviour/xml", "ace/mode/folding/xml", "ace/worker/worker_client"], function(e, t, n) {
+}), ace.define("ace/mode/xml", ["require", "exports", "module", "ace/lib/oop", "ace/lib/lang", "ace/mode/text", "ace/mode/xml_highlight_rules", "ace/mode/behaviour/xml", "ace/mode/folding/xml", "ace/worker/worker_client"], function(e, t, n) {
     "use strict";
     var r = e("../lib/oop"),
         i = e("../lib/lang"),

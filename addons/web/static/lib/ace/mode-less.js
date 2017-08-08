@@ -1,4 +1,4 @@
-define("ace/mode/less", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text", "ace/tokenizer", "ace/mode/less_highlight_rules", "ace/mode/matching_brace_outdent", "ace/mode/folding/cstyle"], function(e, t) {
+ace.define("ace/mode/less", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text", "ace/tokenizer", "ace/mode/less_highlight_rules", "ace/mode/matching_brace_outdent", "ace/mode/folding/cstyle"], function(e, t) {
     var r = e("../lib/oop"),
         o = e("./text").Mode,
         n = e("../tokenizer").Tokenizer,
@@ -22,7 +22,7 @@ define("ace/mode/less", ["require", "exports", "module", "ace/lib/oop", "ace/mod
                 this.$outdent.autoOutdent(t, r)
             }
         }.call(s.prototype), t.Mode = s
-}), define("ace/mode/less_highlight_rules", ["require", "exports", "module", "ace/lib/oop", "ace/lib/lang", "ace/mode/text_highlight_rules"], function(e, t) {
+}), ace.define("ace/mode/less_highlight_rules", ["require", "exports", "module", "ace/lib/oop", "ace/lib/lang", "ace/mode/text_highlight_rules"], function(e, t) {
     var r = e("../lib/oop"),
         o = e("../lib/lang"),
         n = e("./text_highlight_rules").TextHighlightRules,
@@ -111,7 +111,7 @@ define("ace/mode/less", ["require", "exports", "module", "ace/lib/oop", "ace/mod
             }
         };
     r.inherits(i, n), t.LessHighlightRules = i
-}), define("ace/mode/matching_brace_outdent", ["require", "exports", "module", "ace/range"], function(e, t) {
+}), ace.define("ace/mode/matching_brace_outdent", ["require", "exports", "module", "ace/range"], function(e, t) {
     var r = e("../range").Range,
         o = function() {};
     (function() {
@@ -134,7 +134,7 @@ define("ace/mode/less", ["require", "exports", "module", "ace/lib/oop", "ace/mod
             return t ? t[1] : ""
         }
     }).call(o.prototype), t.MatchingBraceOutdent = o
-}), define("ace/mode/folding/cstyle", ["require", "exports", "module", "ace/lib/oop", "ace/range", "ace/mode/folding/fold_mode"], function(e, t) {
+}), ace.define("ace/mode/folding/cstyle", ["require", "exports", "module", "ace/lib/oop", "ace/range", "ace/mode/folding/fold_mode"], function(e, t) {
     var r = e("../../lib/oop"),
         o = e("../../range").Range,
         n = e("./fold_mode").FoldMode,
@@ -169,7 +169,7 @@ define("ace/mode/less", ["require", "exports", "module", "ace/lib/oop", "ace/mod
                 }
             }
         }.call(i.prototype)
-}), define("ace/mode/folding/fold_mode", ["require", "exports", "module", "ace/range"], function(e, t) {
+}), ace.define("ace/mode/folding/fold_mode", ["require", "exports", "module", "ace/range"], function(e, t) {
     var r = e("../../range").Range,
         o = t.FoldMode = function() {};
     (function() {
