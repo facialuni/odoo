@@ -58,14 +58,14 @@ var ButtonWidget = ViewWidget.extend({
             }
         });
         // Display tooltip
-        if (config.debug || node.attrs.help) {
-            $button.tooltip({
+        if (config.debug || this.node.attrs.help) {
+            this.$el.tooltip({
                 delay: { show: 1000, hide: 0 },
                 title: function () {
                     return qweb.render('WidgetButton.tooltip', {
                         debug: config.debug,
-                        state: self.state,
-                        node: node,
+                        state: self.record,
+                        node: self.node,
                     });
                 },
             });
