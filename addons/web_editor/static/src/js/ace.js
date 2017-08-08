@@ -4,6 +4,7 @@ odoo.define('web_editor.ace', function (require) {
 var ajax = require('web.ajax');
 var core = require('web.core');
 var Dialog = require("web.Dialog");
+var lazyLibs = require('web.lazyLibs');
 var Widget = require('web.Widget');
 var base = require('web_editor.base');
 var local_storage = require('web.local_storage');
@@ -85,6 +86,12 @@ function formatLESS(less) {
  */
 var ViewEditor = Widget.extend({
     template: 'web_editor.ace_view_editor',
+    js_libs: [[
+        '/web/static/lib/ace/ace.odoo-custom.js',
+        '/web/static/lib/ace/mode-xml.js',
+        '/web/static/lib/ace/mode-less.js',
+        '/web/static/lib/ace/theme-monokai.js'
+    ]],
     events: {
         "click .o_ace_type_switcher_choice": function (e) {
             e.preventDefault();
@@ -147,18 +154,13 @@ var ViewEditor = Widget.extend({
         this.less = this.resources.less;
     },
     /**
-     * The willStart method is in charge of loading everything the ace library needs to work.
-     * It also loads the resources to visualize. See @loadResources.
+     * Loads the resources to visualize.
+     *
+     * @see loadResources
+     * @overwrite
      */
     willStart: function () {
-        var js_def = ajax.loadJS('/web/static/lib/ace/ace.odoo-custom.js').then(function () {
-            return $.when(
-                ajax.loadJS('/web/static/lib/ace/mode-xml.js'),
-                ajax.loadJS('/web/static/lib/ace/mode-less.js'),
-                ajax.loadJS('/web/static/lib/ace/theme-monokai.js')
-            );
-        });
-        return $.when(this._super.apply(this, arguments), js_def, this.loadResources());
+        return $.when(this._super.apply(this, arguments), this.loadResources());
     },
     /**
      * The start method is in charge of initializing the library and initial view once the DOM is
@@ -688,6 +690,7 @@ var ViewEditor = Widget.extend({
         }
     },
 });
+ViewEditor.include(lazyLibs('willStart'));
 
 return ViewEditor;
 });

@@ -2229,25 +2229,12 @@ var FieldDomain = AbstractField.extend({
  */
 var AceEditor = DebouncedField.extend({
     template: "AceEditor",
+    js_libs: [[
+        '/web/static/lib/ace/ace.odoo-custom.js',
+        '/web/static/lib/ace/mode-python.js',
+        '/web/static/lib/ace/mode-xml.js',
+    ]],
     events: {}, // events are triggered manually for this debounced widget
-    /**
-     * @override willStart from AbstractField (Widget)
-     * Loads the ace library if not already loaded.
-     *
-     * @returns {Deferred}
-     */
-    willStart: function () {
-        var loadJSDef;
-        if (!window.ace) {
-            loadJSDef = ajax.loadJS('/web/static/lib/ace/ace.odoo-custom.js').then(function () {
-                return $.when(
-                    ajax.loadJS('/web/static/lib/ace/mode-python.js'),
-                    ajax.loadJS('/web/static/lib/ace/mode-xml.js')
-                );
-            });
-        }
-        return $.when(this._super.apply(this, arguments), loadJSDef);
-    },
     /**
      * @override start from AbstractField (Widget)
      *
@@ -2332,6 +2319,7 @@ var AceEditor = DebouncedField.extend({
         }
     },
 });
+AceEditor.include(lazyLibs('willStart'));
 
 return {
     TranslatableFieldMixin: TranslatableFieldMixin,
