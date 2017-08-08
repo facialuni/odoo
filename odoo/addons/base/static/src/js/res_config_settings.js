@@ -1,4 +1,4 @@
-odoo.define('base.globle_settings', function (require) {
+odoo.define('base.settings', function (require) {
 "use strict";
 
 var core = require('web.core');
@@ -15,7 +15,7 @@ var QWeb = core.qweb;
 var _t = core._t;
 var _lt = core._lt;
 
-var GlobleSettingRenderer = FormRenderer.extend({
+var BaseSettingRenderer = FormRenderer.extend({
     events: _.extend({}, FormRenderer.prototype.events, {
         'click .appContainer': '_onAppContainerClicked',
         'keyup .searchInput': '_onKeyUpSearch',
@@ -133,7 +133,7 @@ var GlobleSettingRenderer = FormRenderer.extend({
 
 });
 
-var GlobleSettingController = FormController.extend({
+var BaseSettingController = FormController.extend({
     custom_events: _.extend({}, FormController.prototype.custom_events, {
     }),
 
@@ -143,20 +143,20 @@ var GlobleSettingController = FormController.extend({
     },
 });
 
-var GlobleSettingView = FormView.extend({
+var BaseSettingView = FormView.extend({
     config: _.extend({}, FormView.prototype.config, {
-        Renderer: GlobleSettingRenderer,
-        Controller: GlobleSettingController,
+        Renderer: BaseSettingRenderer,
+        Controller: BaseSettingController,
     }),
     init: function () {
         this._super.apply(this, arguments);
     },
 });
 
-view_registry.add('globle_settings', GlobleSettingView);
+view_registry.add('base_settings', BaseSettingView);
 
 return {
-    Renderer: GlobleSettingRenderer,
-    Controller: GlobleSettingController,
+    Renderer: BaseSettingRenderer,
+    Controller: BaseSettingController,
 };
 });

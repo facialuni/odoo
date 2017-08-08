@@ -1,16 +1,15 @@
-odoo.define('web.globle_setting_test', function (require) {
+odoo.define('web.base_setting_test', function (require) {
 "use strict";
 
 var core = require('web.core');
 var FormView = require('web.FormView');
 var testUtils = require('web.test_utils');
-var GlobleSetting = require('base.globle_settings');
-console.log("GlobleSetting", GlobleSetting);
+var BaseSetting = require('base.settings');
 
 var createView = testUtils.createView;
 var _t = core._t;
 
-QUnit.module('globle_settings_tests', {
+QUnit.module('base_settings_tests', {
     beforeEach: function () {
         this.data = {
             project: {
@@ -23,16 +22,16 @@ QUnit.module('globle_settings_tests', {
     }
 }, function () {
 
-    QUnit.module('GlobleSetting');
+    QUnit.module('BaseSetting');
 
-    QUnit.test('change setting on nav bar click in globle settings', function (assert) {
+    QUnit.test('change setting on nav bar click in base settings', function (assert) {
         assert.expect(5);
 
         var form = createView({
             View: FormView,
             model: 'project',
             data: this.data,
-            arch: '<form string="Settings" class="oe_form_configuration globleSettings" js_class="globle_settings">' +
+            arch: '<form string="Settings" class="oe_form_configuration baseSettings" js_class="base_settings">' +
                     '<div class="o_panel">' + 
                         '<div class="setting_search">' + 
                             '<input type="text" class="searchInput" placeholder="Search..."/>' +

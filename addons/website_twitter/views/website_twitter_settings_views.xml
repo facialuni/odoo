@@ -28,7 +28,7 @@
                     </div>
                 </div>
             </div>
-            <form class="oe_form_configuration globleSettings">
+            <form class="oe_form_configuration baseSettings">
                 <div id="twitter_tutorial" class="modal fade" role="dialog" tabindex="-1">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
