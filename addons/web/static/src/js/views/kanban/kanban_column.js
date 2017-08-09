@@ -8,6 +8,8 @@ var kanban_quick_create = require('web.kanban_quick_create');
 var KanbanRecord = require('web.KanbanRecord');
 var view_dialogs = require('web.view_dialogs');
 var Widget = require('web.Widget');
+var ProgressBar = require('kanban.progressBar');
+var session = require('web.session');
 
 var _t = core._t;
 var QWeb = core.qweb;
@@ -19,6 +21,12 @@ var KanbanColumn = Widget.extend({
         cancel_quick_create: '_onCancelQuickCreate',
         kanban_record_delete: '_onDeleteRecord',
         quick_create_add_record: '_onQuickCreateAddRecord',
+
+        highlightSuccess: '_onHightLightSuccess',
+        highlightBlocked: '_onHightLightBlocked',
+        highlightWarning: '_onHightLightWarning',
+        updateProgressBar: '_updateProgressBar',
+        setProgressCounter: '_setProgressCounter',
     },
     events: {
         'click .o_column_edit': '_onEditColumn',
@@ -57,6 +65,7 @@ var KanbanColumn = Widget.extend({
         this.relation = options.relation;
         this.offset = 0;
         this.remaining = this.size - this.data_records.length;
+        this.barOptions = options.progressbar;
 
         this.record_options = _.clone(recordOptions);
 
@@ -128,6 +137,10 @@ var KanbanColumn = Widget.extend({
                 self._onToggleFold(event);
             }
         });
+        if (this.barOptions) {
+            this.progressBar = new ProgressBar.ColumnProgressBar(this);
+            this.progressBar.insertAfter(this.$header);
+        }
         this._update();
 
         return this._super.apply(this, arguments);
@@ -147,13 +160,18 @@ var KanbanColumn = Widget.extend({
         var self = this;
         var width = this.records.length ? this.records[0].$el.innerWidth() : this.$el.width() - 8;
         this.quickCreateWidget = new RecordQuickCreate(this, width);
-        this.quickCreateWidget.insertAfter(this.$header);
+        if (this.barOptions) {
+            this.quickCreateWidget.insertAfter(this.progressBar.$el);
+        } else {
+            this.quickCreateWidget.insertAfter(this.$header);
+        }
         this.quickCreateWidget.$el.focusout(function () {
             var taskName = self.quickCreateWidget.$('[type=text]')[0].value;
             if (!taskName && self.quickCreateWidget) {
                 self._cancelQuickCreate();
             }
         });
+
     },
     /**
      * Adds a record in the column.
@@ -165,7 +183,7 @@ var KanbanColumn = Widget.extend({
      * @params {Boolean} options.no_update set to true not to update the column
      */
     addRecord: function (recordState, options) {
-        var record = new KanbanRecord(this, recordState, this.record_options);
+        var record = this.createKanbanRecord(recordState, this.record_options);
         this.records.push(record);
         if (options.position === 'before') {
             record.insertAfter(this.quickCreateWidget ? this.quickCreateWidget.$el : this.$header);
@@ -181,6 +199,9 @@ var KanbanColumn = Widget.extend({
             this._update();
         }
     },
+    createKanbanRecord: function(record, recordOptions){
+        return new KanbanRecord(this, record, recordOptions);
+    },
     /**
      * @returns {Boolean} true iff the column is empty
      */
@@ -190,6 +211,40 @@ var KanbanColumn = Widget.extend({
 
     //--------------------------------------------------------------------------
     // Private
+    //--------------------------------------------------------------------------
+
+
+    //-----------Kanban ProgressBar Envents-------------------------------------
+    _setProgressCounter: function (counter) {
+        session.total_counter_value = session.total_counter_value || [];
+        session.active_column = this.db_id;
+        if (counter.data.value >= 0) {
+            session.total_counter_value[this.db_id] = counter.data.value;
+        } else {
+            session.total_counter_value[this.db_id] = session.total_counter_value[this.db_id] || 0;
+        }
+        if (this.data.data[0] && this.modelName === 'crm.lead') {
+            session.active_currency_id = this.data.data[0].data.company_currency.res_id;
+        }
+    },
+    _onHightLightSuccess: function () {
+        $('.o_content').scrollTop(0);
+        this.$el.removeClass('o_kanban_group_show_blocked o_kanban_group_show_warning');
+        this.$el.toggleClass('o_kanban_group_show_success');
+    },
+    _onHightLightBlocked: function () {
+        $('.o_content').scrollTop(0);
+        this.$el.removeClass('o_kanban_group_show_success o_kanban_group_show_warning');
+        this.$el.toggleClass('o_kanban_group_show_blocked');
+    },
+    _onHightLightWarning: function () {
+        $('.o_content').scrollTop(0);
+        this.$el.removeClass('o_kanban_group_show_blocked o_kanban_group_show_success');
+        this.$el.toggleClass('o_kanban_group_show_warning');
+    },
+    _updateProgressBar: function () {
+        this.progressBar._update(this.records, this.remaining);
+    },
     //--------------------------------------------------------------------------
 
     /**
@@ -227,6 +282,9 @@ var KanbanColumn = Widget.extend({
             this.$('.o_kanban_load_more').remove();
         } else {
             this.$('.o_kanban_load_more').html(QWeb.render('KanbanView.LoadMore', {widget: this}));
+        }
+        if (!this.folded && this.progressBar) {
+            this._updateProgressBar();
         }
     },
 
