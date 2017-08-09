@@ -226,7 +226,7 @@
     </t>
 </template>
 
-<template id="website.403">
+<template id="error_403">
     <t t-call="website_forum.layout">
         <div class="text-center text-muted">
             <p class="css_editable_hidden" groups="!base.group_erp_manager">

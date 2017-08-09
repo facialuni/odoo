@@ -82,7 +82,7 @@ class WebsiteForum(http.Controller):
     def forum(self, **kwargs):
         forums = request.env['forum.forum'].search([])
         if not forums:
-            return request.render("website.403")
+            return request.render("website_forum.error_403")
         return request.render("website_forum.forum_all", {'forums': forums})
 
     @http.route('/forum/new', type='json', auth="user", methods=['POST'], website=True)
@@ -111,7 +111,7 @@ class WebsiteForum(http.Controller):
         Post = request.env['forum.post']
 
         if not forum.active:
-            return request.render("website.403")
+            return request.render("website_forum.error_403")
 
         domain = [('forum_id', '=', forum.id), ('parent_id', '=', False), ('state', '=', 'active')]
         if search:
