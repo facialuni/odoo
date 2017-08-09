@@ -158,6 +158,7 @@ class IrMailServer(models.Model):
     sequence = fields.Integer(string='Priority', default=10, help="When no specific mail server is requested for a mail, the highest priority one "
                                                                   "is used. Default priority is 10 (smaller number = higher priority)")
     active = fields.Boolean(default=True)
+    check_connection = fields.Boolean(string='Test Connection')
 
     @api.multi
     def name_get(self):
@@ -178,6 +179,9 @@ class IrMailServer(models.Model):
                 except Exception:
                     # ignored, just a consequence of the previous exception
                     pass
+
+        self.check_connection = True
+        self.env.cr.commit()
         raise UserError(_("Connection Test Succeeded! Everything seems properly set up!"))
 
     def connect(self, host=None, port=None, user=None, password=None, encryption=None,
