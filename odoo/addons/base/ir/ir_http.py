@@ -234,7 +234,9 @@ class IrHttp(models.AbstractModel):
         return content_disposition(filename)
 
     @classmethod
-    def binary_content(cls, xmlid=None, model='ir.attachment', id=None, field='datas', unique=False, filename=None, filename_field='datas_fname', download=False, mimetype=None, default_mimetype='application/octet-stream', env=None):
+    def binary_content(cls, xmlid=None, model='ir.attachment', id=None, field='datas', unique=False, filename=None,
+            filename_field='datas_fname', download=False, mimetype=None, default_mimetype='application/octet-stream',
+            env=None, public_key=None):
         """ Get file, attachment or downloadable content
 
         If the ``xmlid`` and ``id`` parameter is omitted, fetches the default value for the
@@ -270,7 +272,11 @@ class IrHttp(models.AbstractModel):
         try:
             last_update = obj['__last_update']
         except AccessError:
-            return (403, [], None)
+            if not public_key:
+                return (403, [], None)
+            obj = env.sudo().search([['id', '=', obj.id], ['public_key', '=', public_key]])
+            if not obj:
+                return (403, [], None)
 
         status, headers, content = None, [], None
 

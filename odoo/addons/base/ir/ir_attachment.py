@@ -8,6 +8,7 @@ import mimetypes
 import os
 import re
 from collections import defaultdict
+import uuid
 
 from odoo import api, fields, models, tools, SUPERUSER_ID, _
 from odoo.exceptions import AccessError
@@ -287,6 +288,7 @@ class IrAttachment(models.Model):
     checksum = fields.Char("Checksum/SHA1", size=40, index=True, readonly=True)
     mimetype = fields.Char('Mime Type', readonly=True)
     index_content = fields.Text('Indexed Content', readonly=True, prefetch=False)
+    public_key = fields.Char("Public key", size=36, readonly=True)
 
     @api.model_cr_context
     def _auto_init(self):
@@ -301,6 +303,11 @@ class IrAttachment(models.Model):
         In the 'document' module, it is overriden to relax this hard rule, since
         more complex ones apply there.
         """
+        if self._context.get('public_key'):
+            self._cr.execute('SELECT id FROM ir_attachment WHERE id IN %s AND public_key = %s', [tuple(self.ids), self._context.get('public_key')])
+            if set(self.ids) == set([id for [id] in self._cr.fetchall()]):
+                return True
+
         # collect the records to check (by model)
         model_ids = defaultdict(set)            # {model_name: set(ids)}
         require_employee = False
@@ -433,6 +440,7 @@ class IrAttachment(models.Model):
             values.pop(field, False)
         values = self._check_contents(values)
         self.browse().check('write', values=values)
+        values['public_key'] = str(uuid.uuid4())
         return super(IrAttachment, self).create(values)
 
     @api.model
