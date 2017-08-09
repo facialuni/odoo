@@ -4,13 +4,15 @@
     <record id="sale_config_settings_view_form" model="ir.ui.view">
         <field name="name">sale.config.settings.view.form</field>
         <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_setting_form" />
         <field name="arch" type="xml">
-            <form string="Configure Sales" class="oe_form_configuration" name="sale_config_form">
-                <header>
-                    <button string="Save" type="object" name="execute" class="oe_highlight"/>
-                    <button string="Cancel" type="object" name="cancel" class="oe_link"/>
-                </header>
-                <sheet>
+            <xpath expr="//div[@class='apps']" position="inside">
+                <div class="appContainer" setting="sales" groups="sales_team.group_sale_manager">
+                    <div class="logo sales"/> <span class="app_name">Sales</span>
+                </div>
+            </xpath>
+            <xpath expr="//div[@class='settings']" position="inside">
+                <div class="sales_setting_view o_hidden" groups="sales_team.group_sale_manager">
                     <field name="company_id" invisible="1"/>
                     <h2>Product Catalog</h2>
                     <div class="row mt16 o_settings_container">
@@ -371,18 +373,19 @@
                         </div>
                     </div>
                     <div id="sale_ebay"/>
-                </sheet>
-            </form>
+                </div>
+            </xpath>
         </field>
     </record>
 
     <record id="action_sale_config_settings" model="ir.actions.act_window">
         <field name="name">Configure Sales</field>
         <field name="type">ir.actions.act_window</field>
-        <field name="res_model">sale.config.settings</field>
+        <field name="res_model">res.config.settings</field>
         <field name="view_id" ref="sale_config_settings_view_form"/>
         <field name="view_mode">form</field>
         <field name="target">inline</field>
+        <field name="context">{'module' : 'sales'}</field>
     </record>
 
     <menuitem id="menu_sale_general_settings"
