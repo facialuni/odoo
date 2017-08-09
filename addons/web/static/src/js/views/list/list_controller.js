@@ -400,6 +400,7 @@ var ListController = BasicController.extend({
      * @param {OdooEvent} event
      */
     _onResequence: function (event) {
+        var self = this;
         var data = this.model.get(this.handle);
         var resIDs = _.map(event.data.rowIDs, function(rowID) {
             return _.findWhere(data.data, {id: rowID}).res_id;
@@ -416,7 +417,8 @@ var ListController = BasicController.extend({
             data.data = _.sortBy(data.data, function (d) {
                 return _.indexOf(resIDs, d.res_id);
             });
-            return this.handle;
+            self.update({});
+            return self.handle;
         });
     },
     /**
