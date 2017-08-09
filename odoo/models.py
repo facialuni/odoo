@@ -5001,12 +5001,6 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
                         todo.append(name)
                         dirty.add(name)
 
-        # At the moment, the client does not support updates on a *2many field
-        # while this one is modified by the user.
-        if isinstance(field_name, basestring) and \
-                self._fields[field_name].type in ('one2many', 'many2many'):
-            dirty.discard(field_name)
-
         # collect values from dirty fields
         result['value'] = {
             name: self._fields[name].convert_to_onchange(record[name], record, subfields[name])
@@ -5014,6 +5008,7 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
         }
 
         return result
+
 collections.Set.register(BaseModel)
 # not exactly true as BaseModel doesn't have __reversed__, index or count
 collections.Sequence.register(BaseModel)
