@@ -334,11 +334,10 @@ var SelectCreateDialog = ViewDialog.extend({
                         in_DOM: true,
                     });
                     self.set_buttons(self.__buttons);
+                }).then(function() {
+                    self.searchview.$('.o_searchview_input').focus(); //Set focus to search input  by default when dialog is opened
                 });
                 _super();
-            })
-            .then(function() {
-                self.searchview.$('.o_searchview_input').focus(); //Set focus to search input  by default when dialog is opened
             });
         return this;
     },

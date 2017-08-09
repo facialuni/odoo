@@ -598,10 +598,9 @@ var ListRenderer = BasicRenderer.extend({
             return this._super();
         }
 
-        var $table = $('<table>').addClass('o_list_view table table-condensed table-striped');
+        var $table = $('<table>').addClass('o_list_view table table-condensed table-striped').attr('tabindex', '0');
         this.$el
             .addClass('table-responsive')
-            .attr('tabindex', '0')
             .append($table);
         var is_grouped = !!this.state.groupedBy.length;
         this._computeAggregates();
