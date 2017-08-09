@@ -346,6 +346,58 @@ var FieldChar = InputField.extend(TranslatableFieldMixin, {
     },
 });
 
+
+var LinkButton = FieldChar.extend({
+    events: {
+        'click': '_onClick'
+    },
+    //--------------------------------------------------------------------------
+    // Private
+    //--------------------------------------------------------------------------
+
+    /**
+     * @override
+     * @private
+     */
+    _render: function () {
+        this._super.apply(this, arguments);
+        if (this.value) {
+            this._renderLinkButton();
+        }
+    },
+
+    /**
+     * Display button
+     *
+     * @private
+     */
+    _renderLinkButton: function () {
+        var className = this.attrs.icon || 'fa-globe';
+
+        this.$el.html("<span />");
+        this.$el.addClass("fa "+ className);
+        this.$el.attr('title', this.value);
+    },
+
+    //--------------------------------------------------------------------------
+    // Handlers
+    //--------------------------------------------------------------------------
+
+    /**
+     * Open link button
+     *
+     * @private
+     * @param {MouseEvent} event
+     */
+    _onClick: function (event) {
+        event.stopPropagation();
+        window.open(this.value, '_blank');
+    },
+
+});
+
+
+
 var FieldDate = InputField.extend({
     className: "o_field_date",
     tagName: "span",
@@ -2385,6 +2437,7 @@ return {
     FieldBooleanButton: FieldBooleanButton,
     BooleanToggle: BooleanToggle,
     FieldChar: FieldChar,
+    LinkButton: LinkButton,
     FieldDate: FieldDate,
     FieldDateTime: FieldDateTime,
     FieldDomain: FieldDomain,
