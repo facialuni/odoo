@@ -5,13 +5,8 @@
             <field name="model">res.config.settings</field>
             <field name="inherit_id" ref="base.res_config_setting_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//div[@class='apps']" position="inside">
-                    <div class="appContainer" setting="massmailing" groups="mass_mailing.group_mass_mailing_user">
-                        <div class="logo massmailing"/> <span class="app_name">Email Marketing</span>
-                    </div>
-                </xpath>
                 <xpath expr="//div[@class='settings']" position="inside">
-                    <div class="massmailing_setting_view o_hidden" groups="mass_mailing.group_mass_mailing_user">
+                    <div class="setting_view o_hidden" data-string="Email Marketing" data-key="mass_mailing" groups="mass_mailing.group_mass_mailing_user">
                       <h2>Design</h2>
                         <div class="row mt16 o_settings_container">
                             <div class="col-md-6 o_setting_box col-xs-12">
@@ -80,7 +75,7 @@
             <field name="res_model">res.config.settings</field>
             <field name="view_mode">form</field>
             <field name="target">inline</field>
-            <field name="context">{'module' : 'massmailing'}</field>
+            <field name="context">{'module' : 'mass_mailing'}</field>
         </record>
 
         <menuitem id="menu_mass_mailing_configuration" name="Configuration" parent="mass_mailing_menu_root"

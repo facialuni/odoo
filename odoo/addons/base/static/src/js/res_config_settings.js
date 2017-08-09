@@ -21,12 +21,27 @@ var BaseSettingRenderer = FormRenderer.extend({
         'keyup .searchInput': '_onKeyUpSearch',
     }),
 
-    init: function () {
-        this._super.apply(this, arguments);
-    },
-
     start: function() {
         this._super.apply(this, arguments);
+
+        var self = this;
+        this.navBarDatas = {};
+        this.$('.setting_view').each(function() {
+            var string = $(this).attr('data-string');
+            var key = $(this).attr('data-key');
+            var group = !$(this).hasClass('o_invisible_modifier');
+            $(this).toggleClass('setting_view ' + key+'_setting_view')
+            self.navBarDatas[key] = {
+                key: key,
+                string: string,
+                group: group,
+                currentModule: self.currentModule === key,
+                imgurl: key==="generalsettings" ? "/base/static/description/settings.png" : "/"+key+"/static/description/icon.png"
+            };
+        });
+        this.$('.apps').append(QWeb.render('basesetting.appContainer',{navBarDatas : _.values(this.navBarDatas)}));
+
+
         $.expr[':'].contains = function(a, i, m) {
             return jQuery(a).text().toUpperCase()
                 .indexOf(m[3].toUpperCase()) >= 0;
@@ -50,11 +65,6 @@ var BaseSettingRenderer = FormRenderer.extend({
             }
             settingDiv.prepend($("<div>").html('<div class="logos '+settingName+'"></div><span class="appName">'+appName+'</span>').addClass('settingSearchHeader o_hidden'));
         });
-
-        if(this.currentModule) {
-            this.$("div[setting='"+this.currentModule+"']").click();
-            this.$("div[setting='generalsettings']").after(this.selectedApp);
-        }
     },
 
     _onAppContainerClicked: function(event) {
@@ -148,9 +158,6 @@ var BaseSettingView = FormView.extend({
         Renderer: BaseSettingRenderer,
         Controller: BaseSettingController,
     }),
-    init: function () {
-        this._super.apply(this, arguments);
-    },
 });
 
 view_registry.add('base_settings', BaseSettingView);

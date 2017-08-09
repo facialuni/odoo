@@ -1394,4 +1394,22 @@
     </div>
 </t>
 
+
+<t t-name="basesetting.appContainer">
+    <t t-foreach="navBarDatas" t-as="navBarData">
+        <t t-if="navBarData.group">
+            <t t-if="navBarData.currentModule">
+                <div class="appContainer selected" t-attf-setting="#{navBarData.key}">
+                    <div t-attf-class="logo" t-attf-style="background : url('#{imgurl}') no-repeat center;background-size:contain;"/> <span class="app_name"><t t-esc="navBarData.string"/></span>
+                </div>
+            </t>
+            <t t-else="">
+                <div class="appContainer" t-attf-setting="#{navBarData.key}">
+                    <div t-attf-class="logo" t-attf-style="background : url('#{imgurl}') no-repeat center;background-size:contain;"/> <span class="app_name"><t t-esc="navBarData.string"/></span>
+                </div>
+            </t>
+        </t>
+    </t>
+</t>
+
 </templates>

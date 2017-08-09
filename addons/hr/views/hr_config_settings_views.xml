@@ -5,13 +5,8 @@
         <field name="model">res.config.settings</field>
         <field name="inherit_id" ref="base.res_config_setting_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[@class='apps']" position="inside">
-                <div class="appContainer" setting="employee" groups="hr.group_hr_manager">
-                    <div class="logo employee"/> <span class="app_name">Employee</span>
-                </div>
-            </xpath>
             <xpath expr="//div[@class='settings']" position="inside">
-                <div class="employee_setting_view o_hidden" groups="hr.group_hr_manager">
+                <div class="setting_view o_hidden" data-string="Employee" data-key="hr" groups="hr.group_hr_manager">
                     <field name="company_id" invisible="1"/>
                     <h2>Work Organization</h2>
                     <div class="row mt16 o_settings_container" title="Prout prout prout">
@@ -58,7 +53,7 @@
         <field name="res_model">res.config.settings</field>
         <field name="view_mode">form</field>
         <field name="target">inline</field>
-        <field name="context">{'module' : 'employee'}</field>
+        <field name="context">{'module' : 'hr'}</field>
     </record>
 
     <menuitem id="hr_menu_configuration"

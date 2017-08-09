@@ -13,13 +13,8 @@
             <field name="model">res.config.settings</field>
             <field name="inherit_id" ref="base.res_config_setting_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//div[@class='apps']" position="inside">
-                    <div class="appContainer" setting="hrpayroll" groups="hr_payroll.group_hr_payroll_manager">
-                        <div class="logo hrpayroll"/> <span class="app_name">Payroll</span>
-                    </div>
-                </xpath>
                 <xpath expr="//div[@class='settings']" position="inside">
-                    <div class="hrpayroll_setting_view o_hidden" groups="hr_payroll.group_hr_payroll_manager">
+                    <div class="setting_view o_hidden" data-string="Payroll" data-key="hr_payroll" groups="hr_payroll.group_hr_payroll_manager">
                     <field name="module_l10n_fr_hr_payroll" invisible="1"/>
                     <field name="module_l10n_be_hr_payroll" invisible="1"/>
                     <field name="module_l10n_in_hr_payroll" invisible="1"/>
@@ -87,7 +82,7 @@
             <field name="res_model">res.config.settings</field>
             <field name="view_mode">form</field>
             <field name="target">inline</field>
-            <field name="context">{'module' : 'hrpayroll'}</field>
+            <field name="context">{'module' : 'hr_payroll'}</field>
         </record>
 
         <menuitem id="menu_hr_payroll_global_settings" name="Settings" 

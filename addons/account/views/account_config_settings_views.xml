@@ -14,13 +14,8 @@
             <field name="model">res.config.settings</field>
             <field name="inherit_id" ref="base.res_config_setting_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//div[@class='apps']" position="inside">
-                    <div class="appContainer" setting="account" groups="account.group_account_manager">
-                        <div class="logo account"/> <span class="app_name">Accounting</span>
-                    </div>
-                </xpath>
                 <xpath expr="//div[@class='settings']" position="inside">
-                    <div class="account_setting_view o_hidden" groups="account.group_account_manager">
+                    <div class="setting_view o_hidden" data-string="Accounts" data-key="account_accountant" groups="account.group_account_manager">
                         <field name="company_id" invisible="1"/>
                         <field name="has_chart_of_accounts" invisible="1"/>
                         <field name="has_accounting_entries" invisible="1"/>
@@ -447,7 +442,7 @@
             <field name="res_model">res.config.settings</field>
             <field name="view_mode">form</field>
             <field name="target">inline</field>
-            <field name="context">{'module' : 'account'}</field>
+            <field name="context">{'module' : 'account_accountant'}</field>
         </record>
 
         <menuitem id="menu_account_config" name="Settings" parent="menu_finance_configuration"

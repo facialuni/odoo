@@ -6,13 +6,8 @@
         <field name="model">res.config.settings</field>
         <field name="inherit_id" ref="base.res_config_setting_form" />
         <field name="arch" type="xml">
-            <xpath expr="//div[@class='apps']" position="inside">
-                <div class="appContainer" setting="sales" groups="sales_team.group_sale_manager">
-                    <div class="logo sales"/> <span class="app_name">Sales</span>
-                </div>
-            </xpath>
             <xpath expr="//div[@class='settings']" position="inside">
-                <div class="sales_setting_view o_hidden" groups="sales_team.group_sale_manager">
+                <div class="setting_view o_hidden" data-string="Sales" data-key="sale_management" groups="sales_team.group_sale_manager">
                     <field name="company_id" invisible="1"/>
                     <h2>Product Catalog</h2>
                     <div class="row mt16 o_settings_container">
@@ -385,7 +380,7 @@
         <field name="view_id" ref="sale_config_settings_view_form"/>
         <field name="view_mode">form</field>
         <field name="target">inline</field>
-        <field name="context">{'module' : 'sales'}</field>
+        <field name="context">{'module' : 'sale_management'}</field>
     </record>
 
     <menuitem id="menu_sale_general_settings"

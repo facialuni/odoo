@@ -6,13 +6,8 @@
             <field name="model">res.config.settings</field>
             <field name="inherit_id" ref="base.res_config_setting_form" />
             <field name="arch" type="xml">
-                <xpath expr="//div[@class='apps']" position="inside">
-                    <div class="appContainer" setting="inventory" groups="stock.group_stock_manager">
-                        <div class="logo inventory"/> <span class="app_name">Inventory</span>
-                    </div>
-                </xpath>
                 <xpath expr="//div[@class='settings']" position="inside" >
-                    <div class="inventory_setting_view o_hidden" groups="stock.group_stock_manager">
+                    <div class="setting_view o_hidden" data-string="Inventory" data-key="stock" groups="stock.group_stock_manager">
                         <field name="company_id" invisible="1"/>
                         <h2>Operations</h2>
                         <div class="row mt16 o_settings_container">
@@ -367,7 +362,7 @@
             <field name="res_model">res.config.settings</field>
             <field name="view_mode">form</field>
             <field name="target">inline</field>
-            <field name="context">{'module' : 'inventory'}</field>
+            <field name="context">{'module' : 'stock'}</field>
         </record>
 
         <menuitem id="menu_stock_config_settings" name="Configuration" parent="menu_stock_root"

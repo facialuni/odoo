@@ -6,13 +6,8 @@
             <field name="model">res.config.settings</field>
             <field name="inherit_id" ref="base.res_config_setting_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//div[@class='apps']" position="inside">
-                    <div class="appContainer" setting="hrexpense" groups="hr_expense.group_hr_expense_manager">
-                        <div class="logo hrexpense"/> <span class="app_name">Expense</span>
-                    </div>
-                </xpath>
                 <xpath expr="//div[@class='settings']" position="inside">
-                    <div class="hrexpense_setting_view o_hidden" groups="hr_expense.group_hr_expense_manager">
+                    <div class="setting_view o_hidden" data-string="Expense" data-key="hr_expense" groups="hr_expense.group_hr_expense_manager">
                         <h2>Recording</h2>
                         <div class="row mt16 o_settings_container">
                             <div class="col-xs-12 col-md-6 o_setting_box" title="You can setup a generic email alias to create incoming expenses easily. Write an email with the receipt in attachment to create an expense line in one click. If the mail subject contains the product's internal reference between brackets, the product will be set automatically. Type the expense amount in the mail subject to set it on the expense too.">
@@ -107,7 +102,7 @@
             <field name="res_model">res.config.settings</field>
             <field name="view_mode">form</field>
             <field name="target">inline</field>
-            <field name="context">{'module' : 'hrexpense'}</field>
+            <field name="context">{'module' : 'hr_expense'}</field>
         </record>
 
         <menuitem id="menu_hr_expense_global_settings" name="Settings" 
