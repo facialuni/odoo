@@ -4036,9 +4036,9 @@ QUnit.module('relational_fields', {
             res_id: 1,
             intercepts: {
                 execute_action: function (event) {
-                    assert.deepEqual(event.data.res_ids, [2],
+                    assert.deepEqual(event.data.env.currentID, 2,
                         'should call with correct id');
-                    assert.strictEqual(event.data.model, 'partner',
+                    assert.strictEqual(event.data.env.model, 'partner',
                         'should call with correct model');
                     assert.strictEqual(event.data.action_data.name, 'method_name',
                         "should call correct method");
@@ -4080,9 +4080,9 @@ QUnit.module('relational_fields', {
             res_id: 1,
             intercepts: {
                 execute_action: function (event) {
-                    assert.deepEqual(event.data.res_ids, [2],
+                    assert.deepEqual(event.data.env.currentID, 2,
                         'should call with correct id');
-                    assert.strictEqual(event.data.model, 'partner',
+                    assert.strictEqual(event.data.env.model, 'partner',
                         'should call with correct model');
                     assert.strictEqual(event.data.action_data.name, 'method_name',
                         "should call correct method");
