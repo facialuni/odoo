@@ -107,12 +107,12 @@ class Lead(models.Model):
 
     # Only used for type opportunity
     probability = fields.Float('Probability', group_operator="avg", default=lambda self: self._default_probability())
-    planned_revenue = fields.Float('Expected Revenue', track_visibility='always')
+    planned_revenue = fields.Monetary('Expected Revenue', currency_field='company_currency', track_visibility='always')
     date_deadline = fields.Date('Expected Closing', help="Estimate of the date on which the opportunity will be won.")
     color = fields.Integer('Color Index', default=0)
     partner_address_name = fields.Char('Partner Contact Name', related='partner_id.name', readonly=True)
     partner_address_email = fields.Char('Partner Contact Email', related='partner_id.email', readonly=True)
-    company_currency = fields.Many2one(string='Currency', related='company_id.currency_id', readonly=True, relation="res.currency")
+    company_currency = fields.Many2one(string='Currency', related='company_id.currency_id', readonly=True, relation="res.currency", default=lambda self: self.env.user.company_id.currency_id)
     user_email = fields.Char('User Email', related='user_id.email', readonly=True)
     user_login = fields.Char('User Login', related='user_id.login', readonly=True)
 
