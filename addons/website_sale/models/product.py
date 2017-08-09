@@ -51,6 +51,7 @@ class ProductPricelist(models.Model):
 
 
 class ProductPublicCategory(models.Model):
+    _parent_store = True
     _name = "product.public.category"
     _inherit = ["website.seo.metadata"]
     _description = "Website Product Category"
@@ -65,6 +66,8 @@ class ProductPublicCategory(models.Model):
     # category, then we display a default image on the other, so that the
     # buttons have consistent styling.
     # In this case, the default image is set by the js code.
+    parent_left = fields.Integer('Left Parent', index=1)
+    parent_right = fields.Integer('Right Parent', index=1)
     image = fields.Binary(attachment=True, help="This field holds the image used as image for the category, limited to 1024x1024px.")
     image_medium = fields.Binary(string='Medium-sized image', attachment=True,
                                  help="Medium-sized image of the category. It is automatically "
