@@ -93,15 +93,9 @@ class MailComposer(models.TransientModel):
             result['res_id'] = self.env.user.partner_id.id
 
         alias_domain = self.env["ir.config_parameter"].sudo().get_param("mail.catchall.domain", default=None)
-        is_alias_domain = True
-        if alias_domain == 'localhost' or alias_domain is None:
-            is_alias_domain = False
-        result['is_alias_domain'] = is_alias_domain
-        email_server = self.env['fetchmail.server'].sudo().search([('state', '=', 'done')])
-        is_email_server = False
-        if email_server:
-            is_email_server = True
-        result['is_email_server'] = is_email_server
+        result['is_alias_domain'] = False if alias_domain == 'localhost' or alias_domain is None else True
+        result['is_incoming_server'] = True if self.env['fetchmail.server'].sudo().search([('state', '=', 'done')]) else False
+        result['is_outgoing_server'] = True if self.env['ir.mail_server'].sudo().search([('check_connection', '=', True)]) else False
 
         if fields is not None:
             [result.pop(field, None) for field in list(result) if field not in fields]
@@ -137,7 +131,8 @@ class MailComposer(models.TransientModel):
     subtype_id = fields.Many2one(default=lambda self: self.sudo().env.ref('mail.mt_comment', raise_if_not_found=False).id)
     alias_domain = fields.Char('Domain Name')
     is_alias_domain = fields.Boolean('Check Domain Name')
-    is_email_server = fields.Boolean('Check mail server')
+    is_incoming_server = fields.Boolean('Check Incoming mail server')
+    is_outgoing_server = fields.Boolean('Check Outgoing mail server')
 
     def action_mail_compose_message(self):
         try:
