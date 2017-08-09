@@ -1302,7 +1302,9 @@ var PriorityWidget = AbstractField.extend({
         if (newValue === this.value) {
             newValue = this.empty_value;
         }
-        this._setValue(newValue);
+        if (!Boolean(Number(this.attrs.readonly))){
+            this._setValue(newValue);
+        }
     },
 
     /**
