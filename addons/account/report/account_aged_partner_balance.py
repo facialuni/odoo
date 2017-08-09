@@ -18,11 +18,11 @@ class ReportAgedPartnerBalance(models.AbstractModel):
         for i in range(5)[::-1]:
             stop = start - relativedelta(days=period_length)
             periods[str(i)] = {
-                'name': (i!=0 and (str((5-(i+1)) * period_length + 1) + '-' + str((5-i) * period_length)) or ('+'+str(4 * period_length))),
+                'name': (i!=0 and (str((5-(i+1)) * period_length) + '-' + str((5-i) * period_length)) or ('+'+str(4 * period_length))),
                 'stop': start.strftime('%Y-%m-%d'),
                 'start': (i!=0 and stop.strftime('%Y-%m-%d') or False),
             }
-            start = stop
+            start = stop - relativedelta(days=1)
 
         res = []
         total = []
@@ -73,11 +73,11 @@ class ReportAgedPartnerBalance(models.AbstractModel):
                 WHERE (l.account_id = account_account.id) AND (l.move_id = am.id)
                     AND (am.state IN %s)
                     AND (account_account.internal_type IN %s)
-                    AND (COALESCE(l.date_maturity,l.date) >= %s)\
+                    AND (COALESCE(l.date_maturity,l.date) > %s)\
                     AND ((l.partner_id IN %s) OR (l.partner_id IS NULL))
                 AND (l.date <= %s)
                 AND l.company_id = %s'''
-        cr.execute(query, (tuple(move_state), tuple(account_type), date_from, tuple(partner_ids), date_from, user_company))
+        cr.execute(query, (tuple(move_state), tuple(account_type), datetime.strftime(start, '%Y-%m-%d'), tuple(partner_ids), date_from, user_company))
         aml_ids = cr.fetchall()
         aml_ids = aml_ids and [x[0] for x in aml_ids] or []
         for line in self.env['account.move.line'].browse(aml_ids):
@@ -109,10 +109,10 @@ class ReportAgedPartnerBalance(models.AbstractModel):
             dates_query = '(COALESCE(l.date_maturity,l.date)'
 
             if periods[str(i)]['start'] and periods[str(i)]['stop']:
-                dates_query += ' > %s AND COALESCE(l.date_maturity,l.date) <= %s)'
+                dates_query += ' BETWEEN %s AND %s)'
                 args_list += (periods[str(i)]['start'], periods[str(i)]['stop'])
             elif periods[str(i)]['start']:
-                dates_query += ' > %s)'
+                dates_query += ' >= %s)'
                 args_list += (periods[str(i)]['start'],)
             else:
                 dates_query += ' <= %s)'
