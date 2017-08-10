@@ -6,7 +6,7 @@
             <field name="inherit_id" ref="base.res_config_setting_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[@class='settings']" position="inside">
-                    <div class="setting_view o_hidden" data-string="Purchase" data-key="purchase" groups="purchase.group_purchase_manager">
+                    <div class="setting_view" data-string="Purchase" data-key="purchase" groups="purchase.group_purchase_manager">
                         <field name="po_double_validation" invisible="1"/>
                         <field name="company_id" invisible="1"/>
                         <field name="company_currency_id" invisible="1"/>

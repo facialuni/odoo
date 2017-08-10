@@ -7,7 +7,7 @@
             <field name="inherit_id" ref="base.res_config_setting_form" />
             <field name="arch" type="xml">
             <xpath expr="//div[@class='settings']" position="inside">
-                <div class="setting_view o_hidden" data-string="Project" data-key="project" groups="project.group_project_manager">
+                <div class="setting_view" data-string="Project" data-key="project" groups="project.group_project_manager">
                         <h2>Task Management</h2>
                         <div class="row mt16 o_settings_container" title="This replaces task's description text field by a collaborative rich text pad. This is advised if tasks involve several people.">
                             <div id="use_collaborative_pad" class="col-xs-12 col-md-6 o_setting_box" title="Lets the company customize which Pad installation should be used to link to new pads (for example: http://ietherpad.com/).">

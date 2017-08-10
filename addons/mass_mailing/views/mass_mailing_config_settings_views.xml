@@ -6,7 +6,7 @@
             <field name="inherit_id" ref="base.res_config_setting_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[@class='settings']" position="inside">
-                    <div class="setting_view o_hidden" data-string="Email Marketing" data-key="mass_mailing" groups="mass_mailing.group_mass_mailing_user">
+                    <div class="setting_view" data-string="Email Marketing" data-key="mass_mailing" groups="mass_mailing.group_mass_mailing_user">
                       <h2>Design</h2>
                         <div class="row mt16 o_settings_container">
                             <div class="col-md-6 o_setting_box col-xs-12">

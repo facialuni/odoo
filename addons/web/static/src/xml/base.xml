@@ -1395,19 +1395,12 @@
 </t>
 
 
-<t t-name="basesetting.appContainer">
-    <t t-foreach="navBarDatas" t-as="navBarData">
-        <t t-if="navBarData.group">
-            <t t-if="navBarData.currentModule">
-                <div class="appContainer selected" t-attf-setting="#{navBarData.key}">
-                    <div t-attf-class="logo" t-attf-style="background : url('#{imgurl}') no-repeat center;background-size:contain;"/> <span class="app_name"><t t-esc="navBarData.string"/></span>
-                </div>
-            </t>
-            <t t-else="">
-                <div class="appContainer" t-attf-setting="#{navBarData.key}">
-                    <div t-attf-class="logo" t-attf-style="background : url('#{imgurl}') no-repeat center;background-size:contain;"/> <span class="app_name"><t t-esc="navBarData.string"/></span>
-                </div>
-            </t>
+<t t-name="BaseSetting.Tabs">
+    <t t-foreach="tabItems" t-as="tab">
+        <t t-if="tab.group">
+            <div class="tab" t-attf-data-key="#{tab.key}">
+                <div class="icon hidden-xs" t-attf-style="background : url('#{imgurl}') no-repeat center;background-size:contain;"/> <span class="app_name"><t t-esc="tab.string"/></span>
+            </div>
         </t>
     </t>
 </t>

@@ -15,7 +15,7 @@
             <field name="inherit_id" ref="base.res_config_setting_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[@class='settings']" position="inside">
-                    <div class="setting_view o_hidden" data-string="Accounts" data-key="account_accountant" groups="account.group_account_manager">
+                    <div class="setting_view" data-string="Accounts" data-key="account_accountant" groups="account.group_account_manager">
                         <field name="company_id" invisible="1"/>
                         <field name="has_chart_of_accounts" invisible="1"/>
                         <field name="has_accounting_entries" invisible="1"/>

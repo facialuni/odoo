@@ -7,7 +7,7 @@
             <field name="inherit_id" ref="base.res_config_setting_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[@class='settings']" position="inside">
-                    <div class="setting_view show" data-string="General Settings" data-key="generalsettings">
+                    <div class="setting_view" data-string="General Settings" data-key="generalsettings">
                         <div id="business_documents">
                             <h2>Business Documents</h2>
                             <div class="row mt16 o_settings_container">

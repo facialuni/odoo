@@ -7,7 +7,7 @@
             <field name="inherit_id" ref="base.res_config_setting_form" />
             <field name="arch" type="xml">
                 <xpath expr="//div[@class='settings']" position="inside">
-                    <div class="setting_view o_hidden" data-string="Manufacturing" data-key="mrp" groups="mrp.group_mrp_manager">
+                    <div class="setting_view" data-string="Manufacturing" data-key="mrp" groups="mrp.group_mrp_manager">
                         <h2>Operations</h2>
                         <field name="company_id" invisible="1"/>
                         <div class="row mt16 o_settings_container">

@@ -145,11 +145,12 @@ function createAsyncView(params) {
 
     _.extend(viewOptions, params.viewOptions);
 
-    var view = new params.View(viewInfo, viewOptions);
 
     if (viewInfo.arch.attrs.js_class) {
         var jsClsssView = view_registry.get(viewInfo.arch.attrs.js_class);
-        view = new jsClsssView(viewInfo, viewOptions);
+        var view = new jsClsssView(viewInfo, viewOptions);
+    } else{
+        var view = new params.View(viewInfo, viewOptions);
     }
 
     // make sure images do not trigger a GET on the server
