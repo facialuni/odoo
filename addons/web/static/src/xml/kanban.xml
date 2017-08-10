@@ -48,18 +48,21 @@
             <span class="o_kanban_title">Add new Column</span>
         </div>
         <div class="o_kanban_quick_create">
-            <input type="text" placeholder="Add"/>
-            <button class="btn btn-sm btn-primary o_kanban_add">Add</button>
-            <button class="btn btn-sm btn-default o_kanban_cancel">Discard</button>
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="Column title"/>
+              <span class="input-group-btn">
+                <button class="btn btn-primary o_kanban_add" type="button">Add</button>
+              </span>
+            </div>
         </div>
     </div>
 </t>
 
 <t t-name="KanbanView.QuickCreate">
     <div class="o_kanban_quick_create">
-        <input type="text" placeholder="Add"/>
+        <input type="text" placeholder="Title"/>
         <button class="btn btn-sm btn-primary o_kanban_add">Add</button>
-        <button class="btn btn-sm btn-default o_kanban_cancel">Discard</button>
+        <button class="btn btn-sm btn-default o_kanban_cancel ml8">Discard</button>
     </div>
 </t>
 
