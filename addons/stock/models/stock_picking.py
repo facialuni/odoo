@@ -285,6 +285,8 @@ class Picking(models.Model):
         states={'done': [('readonly', True)], 'cancel': [('readonly', True)]},
         help="Default Owner")
     printed = fields.Boolean('Printed')
+    delivery_note = fields.Text('Note for Delivery Slip', translate=True)
+    picking_note = fields.Text('Note for Picking Operations', translate=True)
     # Used to search on pickings
     product_id = fields.Many2one('product.product', 'Product', related='move_lines.product_id')
     show_operations = fields.Boolean(related='picking_type_id.show_operations')

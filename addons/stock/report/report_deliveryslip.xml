@@ -137,6 +137,7 @@
                             All items couldn't be shipped, the remaining ones will be shipped as soon as they become available.
                         </t>
                     </p>
+                    <p t-field="o.delivery_note"/>
                 </div>
             </t>
          </t>

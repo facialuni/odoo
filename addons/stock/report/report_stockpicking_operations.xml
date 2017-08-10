@@ -135,6 +135,7 @@
                                 to check if products are available.
                             </p>
                             <p t-field="o.note"/>
+                            <p t-field="o.picking_note"/>
                         </div>
                     </t>
                  </t>
