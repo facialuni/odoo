@@ -57,7 +57,7 @@ class WebsiteConfigSettings(models.TransientModel):
         ('fixed', 'A single sales price per product'),
         ('percentage', 'Multiple prices per product (e.g. customer segments, currencies)'),
         ('formula', 'Price computed from formulas (discounts, margins, roundings)')
-        ], string="Pricelists")
+        ], string="Pricelists",)
     group_sale_pricelist = fields.Boolean("Use pricelists to adapt your price per customers",
         implied_group='product.group_sale_pricelist')
 
@@ -106,6 +106,7 @@ class WebsiteConfigSettings(models.TransientModel):
         sale_pricelist_setting = self.env['ir.config_parameter'].sudo().get_param('sale.sale_pricelist_setting')
 
         res.update(
+            # TODO check if something can be cleaned here
             automatic_invoice=params.get_param('website_sale.automatic_invoice', default=False),
             sale_delivery_settings=sale_delivery_settings,
             multi_sales_price=sale_pricelist_setting in ['percentage', 'formula'],

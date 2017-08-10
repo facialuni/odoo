@@ -9,13 +9,14 @@ class HrExpenseConfigSettings(models.TransientModel):
 
     alias_prefix = fields.Char('Default Alias Name for Expenses')
     alias_domain = fields.Char('Alias Domain', default=lambda self: self.env["ir.config_parameter"].sudo().get_param("mail.catchall.domain"))
+    # TODO check this
     group_analytic_accounting = fields.Boolean(
         string='Analytic Accounting',
         implied_group='analytic.group_analytic_accounting')
     group_uom = fields.Boolean(
         string="Units of Measure",
         implied_group='product.group_uom')
-    use_mailgateway = fields.Boolean(string='Let your employees record expenses by email')
+    use_mailgateway = fields.Boolean(string='Let your employees record expenses by email', config_parameter='hr_expense.use_mailgateway')
     module_project = fields.Boolean(string="Project")
     module_sale = fields.Boolean(string="Customer Billing")
 
@@ -24,7 +25,6 @@ class HrExpenseConfigSettings(models.TransientModel):
         res = super(HrExpenseConfigSettings, self).get_values()
         res.update(
             alias_prefix=self.env.ref('hr_expense.mail_alias_expense').alias_name,
-            use_mailgateway=self.env['ir.config_parameter'].sudo().get_param('hr_expense.use_mailgateway'),
         )
         return res
 
@@ -32,7 +32,6 @@ class HrExpenseConfigSettings(models.TransientModel):
     def set_values(self):
         super(HrExpenseConfigSettings, self).set_values()
         self.env.ref('hr_expense.mail_alias_expense').write({'alias_name': self.alias_prefix})
-        self.env['ir.config_parameter'].sudo().set_param('hr_expense.use_mailgateway', self.use_mailgateway)
 
     @api.onchange('use_mailgateway')
     def _onchange_use_mailgateway(self):

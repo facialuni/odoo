@@ -34,6 +34,7 @@ class BaseConfigSettings(models.TransientModel):
         set_param('auth_signup.reset_password', repr(self.auth_signup_reset_password))
         set_param('auth_signup.allow_uninvited', repr(self.auth_signup_uninvited == 'b2c'))
         set_param('auth_signup.template_user_id', repr(self.auth_signup_template_user_id.id))
+        # TODO fix this stuff
 
     @api.multi
     def open_template_user(self):

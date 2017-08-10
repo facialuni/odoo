@@ -16,6 +16,7 @@ class BaseConfigSettings(models.TransientModel):
         set_param = self.env['ir.config_parameter'].set_param
         set_param('google_calendar_client_id', (self.cal_client_id or '').strip())
         set_param('google_calendar_client_secret', (self.cal_client_secret or '').strip())
+        # TODO fix this shit
 
     @api.model
     def get_values(self):

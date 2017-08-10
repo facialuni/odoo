@@ -70,6 +70,7 @@ class AccountConfigSettings(models.TransientModel):
         res.update(
             default_purchase_tax_id=int(params.get_param('account.default_purchase_tax_id', default=False)) or False,
             default_sale_tax_id=int(params.get_param('account.default_sale_tax_id', default=False)) or False
+            # TODO add support for m2o and int conversion
         )
         return res
 

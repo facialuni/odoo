@@ -49,10 +49,10 @@ class WebsiteConfigSettings(models.TransientModel):
     favicon = fields.Binary('Favicon', related='website_id.favicon')
     # Set as global config parameter since methods using it are not website-aware. To be changed
     # when multi-website is implemented
-    google_maps_api_key = fields.Char(string='Google Maps API Key')
-    has_google_analytics = fields.Boolean("Google Analytics")
-    has_google_analytics_dashboard = fields.Boolean("Google Analytics in Dashboard")
-    has_google_maps = fields.Boolean("Google Maps")
+    google_maps_api_key = fields.Char(string='Google Maps API Key', config_parameter='google_maps_api_key', default='')
+    has_google_analytics = fields.Boolean("Google Analytics", config_parameter='website.has_google_analytics')
+    has_google_analytics_dashboard = fields.Boolean("Google Analytics in Dashboard", config_parameter='website.has_google_analytics_dashboard')
+    has_google_maps = fields.Boolean("Google Maps", config_parameter='website.has_google_maps')
     auth_signup_uninvited = fields.Selection([
         ('b2b', 'On invitation (B2B)'),
         ('b2c', 'Free sign up (B2C)'),
@@ -83,11 +83,8 @@ class WebsiteConfigSettings(models.TransientModel):
         res = super(WebsiteConfigSettings, self).get_values()
         get_param = self.env['ir.config_parameter'].sudo().get_param
         res.update(
+            # TODO check this
             auth_signup_uninvited='b2c' if get_param('auth_signup.allow_uninvited', 'False').lower() == 'true' else 'b2b',
-            has_google_analytics=get_param('website.has_google_analytics'),
-            has_google_analytics_dashboard=get_param('website.has_google_analytics_dashboard'),
-            has_google_maps=get_param('website.has_google_maps'),
-            google_maps_api_key=get_param('google_maps_api_key', default=''),
         )
         return res
 
@@ -97,7 +94,3 @@ class WebsiteConfigSettings(models.TransientModel):
         super(WebsiteConfigSettings, self).set_values()
         set_param = self.env['ir.config_parameter'].sudo().set_param
         set_param('auth_signup.allow_uninvited', repr(self.auth_signup_uninvited == 'b2c'))
-        set_param('website.has_google_analytics', self.has_google_analytics)
-        set_param('website.has_google_analytics_dashboard', self.has_google_analytics_dashboard)
-        set_param('website.has_google_maps', self.has_google_maps)
-        set_param('google_maps_api_key', (self.google_maps_api_key or '').strip())

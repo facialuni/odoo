@@ -10,6 +10,7 @@ class StockConfigSettings(models.TransientModel):
     security_lead = fields.Float(related='company_id.security_lead')
     use_security_lead = fields.Boolean(
         string="Security Lead Time for Sales",
+        config_parameter='sale_stock.use_security_lead',
         oldname='default_new_security_lead',
         help="Margin of error for dates promised to customers. Products will be scheduled for procurement and delivery that many days earlier than the actual promised date, to cope with unexpected delays in the supply chain.")
     default_picking_policy = fields.Selection([
@@ -21,14 +22,3 @@ class StockConfigSettings(models.TransientModel):
     def _onchange_use_security_lead(self):
         if not self.use_security_lead:
             self.security_lead = 0.0
-
-    def get_values(self):
-        res = super(StockConfigSettings, self).get_values()
-        res.update(
-            use_security_lead=self.env['ir.config_parameter'].sudo().get_param('sale_stock.use_security_lead')
-        )
-        return res
-
-    def set_values(self):
-        super(StockConfigSettings, self).set_values()
-        self.env['ir.config_parameter'].sudo().set_param('sale_stock.use_security_lead', self.use_security_lead)
