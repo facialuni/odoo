@@ -62,6 +62,8 @@ Core mechanisms for the accounting modules. To display the menuitems, install th
         'views/account_portal_templates.xml',
         'report/account_report_payment_receipt_templates.xml',
         'data/payment_receipt_data.xml',
+        'wizard/account_report_tax_view.xml',
+        'views/report_tax.xml',
     ],
     'demo': [
         'demo/account_demo.xml',
