@@ -640,8 +640,8 @@ QUnit.module('Views', {
         $view.remove();
     });
 
-    QUnit.test('create all day event', function (assert) {
-        assert.expect(2);
+    QUnit.test('create all day event in week mode', function (assert) {
+        assert.expect(3);
 
         this.data.event.records = [];
 
@@ -690,6 +690,8 @@ QUnit.module('Views', {
 
         assert.strictEqual($newevent.text().replace(/[\s\n\r]+/g, ''), "newevent",
             "should display the new event with time and title");
+        assert.strictEqual($newevent.parent().attr('colspan'), "2",
+            "should appear over two days.");
 
         assert.deepEqual($newevent.data('fcSeg').event.record,
             {
@@ -697,6 +699,83 @@ QUnit.module('Views', {
                 start: fieldUtils.parse.datetime("2016-12-14 00:00:00", this.data.event.fields.start, {isUTC: true}),
                 stop: fieldUtils.parse.datetime("2016-12-15 00:00:00", this.data.event.fields.stop, {isUTC: true}),
                 allday: true,
+                name: "new event",
+                id: 1
+            },
+            "the new record should have the utc datetime (quickCreate)");
+
+        calendar.destroy();
+        $view.remove();
+    });
+
+    QUnit.test('create event in month mode', function (assert) {
+        assert.expect(4);
+
+        this.data.event.records = [];
+
+        var calendar = createView({
+            View: CalendarView,
+            model: 'event',
+            data: this.data,
+            arch:
+            '<calendar class="o_calendar_test" '+
+                'event_open_popup="true" '+
+                'date_start="start" '+
+                'date_stop="stop" '+
+                'mode="month" '+
+                'readonly_form_view_id="1">'+
+                    '<field name="name"/>'+
+            '</calendar>',
+            archs: archs,
+            viewOptions: {
+                initialDate: initialDate,
+            },
+            session: {
+                tzOffset: 120
+            },
+            mockRPC: function (route, args) {
+                if (args.method === "create") {
+                    assert.deepEqual(args.args[0], {
+                        "name": "new event",
+                        "start": "2016-12-14 05:00:00",
+                        "stop": "2016-12-15 17:00:00",
+                    },
+                    "should send the correct data to create events");
+                }
+                return this._super(route, args);
+            },
+        });
+
+        var $view = $('#qunit-fixture').contents();
+        $view.prependTo('body'); // => select with click position
+
+
+        var pos = calendar.$('.fc-bg td:eq(20)').offset();
+        try {
+            testUtils.triggerPositionalMouseEvent(pos.left+15, pos.top+15, "mousedown");
+        } catch (e) {
+            calendar.destroy();
+            $view.remove();
+            throw new Error('The test fails to simulate a click in the screen. Your screen is probably too small or your dev tools is open.');
+        }
+        pos = calendar.$('.fc-bg td:eq(21)').offset();
+        testUtils.triggerPositionalMouseEvent(pos.left+15, pos.top+15, "mousemove");
+        testUtils.triggerPositionalMouseEvent(pos.left+15, pos.top+15, "mouseup");
+
+        $('.modal input:first').val('new event').trigger('input');
+        $('.modal button.btn:contains(Create)').trigger('click');
+        var $newevent = calendar.$('.fc-event:contains(new event)');
+
+        assert.strictEqual($newevent.text().replace(/[\s\n\r]+/g, ''), "newevent",
+            "should display the new event with time and title");
+        assert.strictEqual($newevent.parent().attr('colspan'), "2",
+            "should appear over two days.");
+
+        assert.deepEqual($newevent.data('fcSeg').event.record,
+            {
+                display_name: "new event",
+                start: fieldUtils.parse.datetime("2016-12-14 05:00:00", this.data.event.fields.start, {isUTC: true}),
+                stop: fieldUtils.parse.datetime("2016-12-15 17:00:00", this.data.event.fields.stop, {isUTC: true}),
                 name: "new event",
                 id: 1
             },
