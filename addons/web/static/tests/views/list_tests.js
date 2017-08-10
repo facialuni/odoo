@@ -2314,13 +2314,14 @@ QUnit.module('Views', {
         list.destroy();
     });
 
-    QUnit.test('list with handle widget', function (assert) {
+    QUnit.only('list with handle widget', function (assert) {
         assert.expect(11);
 
         var list = createView({
             View: ListView,
             model: 'foo',
             data: this.data,
+            debug: true,
             arch: '<tree>' +
                     '<field name="int_field" widget="handle"/>' +
                     '<field name="amount" widget="float" digits="[5,0]"/>' +
@@ -2333,6 +2334,16 @@ QUnit.module('Views', {
                         "should write the right field as sequence");
                     assert.deepEqual(args.ids, [1, 4, 2 , 3],
                         "should write the sequence in correct order");
+
+                    assert.strictEqual(list.$('tbody tr:eq(0) td:last').text(), '1200',
+                        "new first record should have amount 1200");
+                    assert.strictEqual(list.$('tbody tr:eq(1) td:last').text(), '0',
+                        "new second record should have amount 0");
+                    assert.strictEqual(list.$('tbody tr:eq(2) td:last').text(), '500',
+                        "new third record should have amount 500");
+                    assert.strictEqual(list.$('tbody tr:eq(3) td:last').text(), '300',
+                        "new third record should have amount 300");
+
                     return $.when();
                 }
                 return this._super.apply(this, arguments);
@@ -2355,16 +2366,7 @@ QUnit.module('Views', {
             {position: 'bottom'}
         );
 
-        assert.strictEqual(list.$('tbody tr:eq(0) td:last').text(), '1200',
-            "new first record should have amount 1200");
-        assert.strictEqual(list.$('tbody tr:eq(1) td:last').text(), '0',
-            "new second record should have amount 0");
-        assert.strictEqual(list.$('tbody tr:eq(2) td:last').text(), '500',
-            "new third record should have amount 500");
-        assert.strictEqual(list.$('tbody tr:eq(3) td:last').text(), '300',
-            "new third record should have amount 300");
-
-        list.destroy();
+        // list.destroy();
     });
 
     QUnit.test('multiple clicks on Add do not create invalid rows', function (assert) {

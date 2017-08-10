@@ -430,28 +430,15 @@ ListRenderer.include({
      */
     _resequence: function (event, ui) {
         var self = this;
-        // Sort state.data according to handleField so that we have rowIDs in right sequence
-        // otherwise resequencing multiple time will give wrong result.
-        var data = this.state.data;
-        data.sort(function (r1, r2) {
-            var data1 = r1.data;
-            var data2 = r2.data;
-            if (data1[self.handleField] < data2[self.handleField]) {
-                return -1;
-            }
-            if (data1[self.handleField] > data2[self.handleField]) {
-                return 1;
-            }
-            return 0;
-        });
 
         var movedRecordID = ui.item.data('id');
-        var rowIDs = _.pluck(data, 'id');
+        var rowIDs = _.pluck(this.state.data, 'id');
         rowIDs = _.without(rowIDs, movedRecordID);
         rowIDs.splice(ui.item.index(), 0, movedRecordID);
-        var sequences = _.map(data, function(record) {
+        var sequences = _.map(this.state.data, function(record) {
             return record.data[self.handleField];
-        })
+        });
+        console.log("rowIDs :::: ", rowIDs, sequences);
         this.trigger_up('resequence', {
             rowIDs: rowIDs,
             offset: _.min(sequences),
