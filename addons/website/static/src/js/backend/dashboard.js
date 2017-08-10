@@ -27,7 +27,7 @@ var Dashboard = Widget.extend(ControlPanelMixin, {
         this.date_from = moment().subtract(1, 'week');
         this.date_to = moment();
 
-        this.dashboards_templates = ['website.dashboard_visits'];
+        this.dashboards_templates = ['website.dashboard_header', 'website.dashboard_content'];
         this.graphs = [];
     },
 
@@ -44,7 +44,6 @@ var Dashboard = Widget.extend(ControlPanelMixin, {
         var self = this;
         return this._super().then(function() {
             self.update_cp();
-            self.render_dashboards();
             self.render_graphs();
             self.$el.parent().addClass('oe_background_grey');
         });
@@ -116,7 +115,7 @@ var Dashboard = Widget.extend(ControlPanelMixin, {
     render_dashboards: function() {
         var self = this;
         _.each(this.dashboards_templates, function(template) {
-            self.$('.o_website_dashboard_content').append(QWeb.render(template, {widget: self}));
+            self.$('.o_website_dashboard').append(QWeb.render(template, {widget: self}));
         });
     },
 
@@ -170,7 +169,7 @@ var Dashboard = Widget.extend(ControlPanelMixin, {
         var self = this;
         _.each(this.graphs, function(e) {
             if (self.groups[e.group]) {
-                self.render_graph('#o_graph_' + e.name, self.dashboards_data[e.name].graph);
+                self.render_graph('.o_graph_' + e.name, self.dashboards_data[e.name].graph);
             }
         });
         this.render_graph_analytics(this.dashboards_data.visits.ga_client_id);
@@ -223,7 +222,7 @@ var Dashboard = Widget.extend(ControlPanelMixin, {
 
         var self = this;
         $.when(this.fetch_data()).then(function() {
-            self.$('.o_website_dashboard_content').empty();
+            self.$('.o_website_dashboard').empty();
             self.render_dashboards();
             self.render_graphs();
         });
@@ -231,8 +230,14 @@ var Dashboard = Widget.extend(ControlPanelMixin, {
     },
 
     on_reverse_breadcrumb: function() {
+        var self = this;
         web_client.do_push_state({});
         this.update_cp();
+        this.fetch_data().then(function() {
+            self.$('.o_website_dashboard').empty();
+            self.render_dashboards();
+            self.render_graphs();
+        });
     },
 
     on_dashboard_action: function (ev) {
