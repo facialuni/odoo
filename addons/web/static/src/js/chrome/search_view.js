@@ -511,6 +511,7 @@ var SearchView = Widget.extend({
         var started = [];
         _.invoke(this.input_subviews, 'destroy');
         this.input_subviews = [];
+
         this.query.each(function (facet) {
             var f = new FacetView(this, facet);
             if (config.isMobile) {

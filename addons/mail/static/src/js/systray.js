@@ -6,9 +6,6 @@ var framework = require('web.framework');
 var session = require('web.session');
 var SystrayMenu = require('web.SystrayMenu');
 var Widget = require('web.Widget');
-var config = require('web.config');
-var WebClient = require('web.WebClient');
-var SearchView = require('web.SearchView');
 
 var chat_manager = require('mail.chat_manager');
 
@@ -287,135 +284,8 @@ var ActivityMenu = Widget.extend({
 
 });
 
-var SearchMobile = Widget.extend({
-    template: 'SearchViewMobile',
-    events: {
-        "click .o_search_mobile": "_onSearchClick",
-        "click .o_ls_arrow": "_onleftArrowClick",
-        "click .o_dropdown": "_onDropdownClick",
-        "click .o_search_result_button": "_onSearchResult",
-        "click .o_empty_facets": "_onEmpty",
-    },
-
-
-    init: function() {
-        this._super.apply(this, arguments);
-    },
-    start: function() {
-        this.$searchDropdown = this.$(".o_search_mobile_navbar_dropdown")
-        this.$Searchtray = this.$(".o_search_mobile_navbar_dropdown_tray");
-    },
-
-    _onDropdownClick: function(event) {
-        var $dropDown = $(event.currentTarget)
-        $dropDown.find('.fa-chevron-right').toggleClass('fa-chevron-down fa-chevron-rigth');
-    },
-
-    _onSearchClick: function() {
-        var self = this;
-        this.$searchDropdown.toggleClass('hidden');
-        this.$('.o_searchview_more').toggleClass('hidden');
-        this.$('.o_search_options').css('display', 'block');
-    },
-
-    _onleftArrowClick: function() {
-        this.$searchDropdown.toggleClass('hidden');
-        var $searchIcon = $(this.el).find('.o_search_mobile');
-        if (this.searchview.query.length && !$searchIcon.hasClass('o_search_active')) {
-            $searchIcon.addClass('o_search_active');
-        } else if (!this.searchview.query.length && $searchIcon.hasClass('o_search_active')) {
-            $searchIcon.removeClass('o_search_active');
-        }
-    },
-
-    _onEmpty: function() {
-        _.each(this.searchview.input_subviews,function(facets) {
-            if($(facets.el).hasClass('o_searchview_facet')) {
-                facets.model.destroy();
-            }
-        });
-    },
-
-    _onSearchResult: function() {
-        this.$searchDropdown.toggleClass('hidden');
-        var $searchIcon = $(this.el).find('.o_search_mobile');
-        if (this.searchview.query.length && !$searchIcon.hasClass('o_search_active')) {
-            $searchIcon.addClass('o_search_active');
-        } else if (!this.searchview.query.length && $searchIcon.hasClass('o_search_active')) {
-            $searchIcon.removeClass('o_search_active');
-        }
-    },
-    /**
-     * This method will called when the view will change
-     */
-     update: function (descriptor, widget) {
-        var self = this;
-        if (!widget) {
-            return;
-        }
-        this.$Searchtray.html(QWeb.render('SearchViewMobile.body'));
-        if (widget.searchview && !widget.active_view) {
-            $(this.el).removeClass('o_hidden');
-            var options = {
-                $buttons: $('<div/>').addClass('o_search_options').appendTo(this.$Searchtray.find('.o_search_mobile_buttons')),
-                action: this.action,
-                disable_groupby: true,
-            };
-            this.searchview = new SearchView(widget, widget.dataset, widget.fields_view, options);
-            $.when(this.searchview.appendTo(this.$Searchtray.find('.o_search_on_mobile'))).done(function() {
-                self.searchview_elements = {};
-                self.searchview_elements.$searchview = self.searchview.$el;
-                self.searchview_elements.$searchview_buttons = self.searchview.$buttons.contents();
-                self.searchview.do_show();
-            });
-        }
-        else if (widget && widget.action && widget.active_view.searchable) {
-            $(this.el).removeClass('o_hidden');
-            var search_defaults = {};
-            this.flags = widget.flags || {};
-            var context = descriptor.context || [];
-            _.each(context, function (value, key) {
-                var match = /^search_default_(.*)$/.exec(key);
-                if (match) {
-                    search_defaults[match[1]] = value;
-                }
-            });
-            var options = {
-                hidden: this.flags.search_view === false,
-                disable_custom_filters: this.flags.search_disable_custom_filters,
-                $buttons: $('<div/>').addClass('o_search_options').appendTo(this.$Searchtray.find('.o_search_mobile_buttons')),
-                action: widget.action,
-                search_defaults: search_defaults,
-            };
-            this.searchview = new SearchView(widget, widget.dataset, widget.search_fields_view, options);
-            $.when(this.searchview.appendTo(this.$Searchtray.find('.o_search_on_mobile'))).done(function() {
-                self.searchview_elements = {};
-                self.searchview_elements.$searchview = self.searchview.$el;
-                self.searchview_elements.$searchview_buttons = self.searchview.$buttons.contents();
-            });
-            this.searchview.do_show();
-        } else {
-            $(this.el).addClass('o_hidden');
-        }
-    },
-
-});
-
 SystrayMenu.Items.push(MessagingMenu);
 SystrayMenu.Items.push(ActivityMenu);
-if (config.isMobile) {
-    SystrayMenu.Items.push(SearchMobile);
-
-    WebClient.include({
-        current_action_updated: function(action) {
-            this._super.apply(this, arguments);
-            var action_descr = action && action.action_descr;
-            var action_widget = action && action.widget;
-            var search_mobile = _.find(this.menu.systray_menu.widgets, function(item) {return item instanceof SearchMobile; });
-            search_mobile.update(action_descr, action_widget);
-        },
-    });
-}
 
 // to test activity menu in qunit test cases we need it
 return {

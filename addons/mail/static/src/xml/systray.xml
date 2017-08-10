@@ -88,29 +88,5 @@
             </ul>
         </li>
     </t>
-
-    <t t-name="SearchViewMobile">
-        <li class='o_search_mobile_item o_hidden'>
-            <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" title="Activities" href="#">
-                <i class="fa fa-search o_search_mobile"/> <span class="o_notification_counter badge"/>
-            </a>
-            <div class="o_search_mobile_navbar_dropdown hidden">
-                <div class="o_search_mobile_navbar_dropdown_tray"/>
-            </div>
-        </li>
-    </t>
-
-    <t t-name="SearchViewMobile.body">
-        <div class="o_search_navbar">
-            <div class="o_search_navigation">
-                <span class="o_ls_arrow pull-left"><i class="fa fa-arrow-left"/></span>
-                <span class="o_content_tray pull-left">Filter</span>
-                <span class="pull-right o_empty_facets">Empty All</span>
-            </div>
-        </div>
-        <div class="o_search_on_mobile"/>
-        <div class="o_search_mobile_buttons"/>
-        <div class="btn btn-primary o_search_result_button">SEE RESULT</div>
-    </t>
 </templates>
 
