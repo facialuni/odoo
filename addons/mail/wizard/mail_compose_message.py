@@ -136,7 +136,7 @@ class MailComposer(models.TransientModel):
 
     def action_mail_compose_message(self):
         try:
-            compose_form_id = self.env['ir.model.data'].get_object_reference('mail', 'email_compose_message_wizard_form')[1]
+            compose_form_id = self.env.ref('mail.email_compose_message_wizard_form').id
         except ValueError:
             compose_form_id = False
         return {
@@ -160,7 +160,14 @@ class MailComposer(models.TransientModel):
         return self.action_mail_compose_message()
 
     def action_ir_mail_server_from(self):
-        email_form_id = self.env['ir.model.data'].get_object_reference('base', 'ir_mail_server_form')[1]
+        email_form_id = self.env.ref('base.ir_mail_server_form').id
+        ir_mail_server = self.env['ir.mail_server'].sudo().search([])
+        ir_mail_server_id = None
+        if ir_mail_server:
+            ir_mail_server_id = ir_mail_server[0].id
+            mail_server_confirm = ir_mail_server.filtered(lambda r: r.check_connection)
+            if mail_server_confirm:
+                ir_mail_server_id = mail_server_confirm[0].id
         return {
             'type': 'ir.actions.act_window',
             'view_type': 'form',
@@ -169,10 +176,18 @@ class MailComposer(models.TransientModel):
             'views': [(email_form_id, 'form')],
             'view_id': email_form_id,
             'target': 'new',
+            'res_id': ir_mail_server_id
         }
 
     def action_email_server_from(self):
-        email_form_id = self.env['ir.model.data'].get_object_reference('fetchmail', 'view_email_server_form')[1]
+        email_form_id = self.env.ref('fetchmail.view_email_server_form').id
+        fetchmail_server = self.env['fetchmail.server'].sudo().search([])
+        fetchmail_server_id = None
+        if fetchmail_server:
+            fetchmail_server_id = fetchmail_server[0].id
+            mail_server_confirm = fetchmail_server.filtered(lambda r: r.state == 'done')
+            if mail_server_confirm:
+                fetchmail_server_id = mail_server_confirm[0].id
         return {
             'type': 'ir.actions.act_window',
             'view_type': 'form',
@@ -181,6 +196,7 @@ class MailComposer(models.TransientModel):
             'views': [(email_form_id, 'form')],
             'view_id': email_form_id,
             'target': 'new',
+            'res_id': fetchmail_server_id
         }
 
     @api.multi
