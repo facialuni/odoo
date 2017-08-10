@@ -966,7 +966,7 @@ QUnit.module('relational_fields', {
                 obj.timmy,
                 [
                     [6, false, []],
-                    [0, false, {display_name: 'brandon is the new timmy', name: 'brandon'}]
+                    [0, obj.timmy[1][1], {display_name: 'brandon is the new timmy', name: 'brandon'}]
                 ],
                 "should have properly created the x2many command list");
             obj.int_field = obj.timmy.length;
@@ -2004,7 +2004,7 @@ QUnit.module('relational_fields', {
                                 "should send 46 commands (one for each record)");
                             assert.strictEqual(nbLinkCommands, 45,
                                 "should send a LINK_TO command for each existing record");
-                            assert.deepEqual(args.args[1].p[45], [0, false, {
+                            assert.deepEqual(args.args[1].p[45], [0, args.args[1].p[45][1], {
                                 display_name: 'new record',
                             }], "should sent a CREATE command for the new record");
                             break;
@@ -2022,10 +2022,10 @@ QUnit.module('relational_fields', {
                             assert.strictEqual(nbLinkCommands, 43,
                                 "should send a LINK_TO command for each existing record");
                             assert.deepEqual(args.args[1].p[43],
-                                [0, false, {display_name: 'new record page 1'}],
+                                [0, args.args[1].p[43][1], {display_name: 'new record page 1'}],
                                 "should sent correct CREATE command");
                             assert.deepEqual(args.args[1].p[44],
-                                [0, false, {display_name: 'new record page 2'}],
+                                [0, args.args[1].p[44][1], {display_name: 'new record page 2'}],
                                 "should sent correct CREATE command");
                             assert.deepEqual(args.args[1].p[45],
                                 [2, 11, false],
@@ -3221,7 +3221,7 @@ QUnit.module('relational_fields', {
             mockRPC: function (method, args) {
                 if (args.method === 'write') {
                     assert.deepEqual(args.args[1].p, [
-                        [0, false, {display_name: 'z'}],
+                        [0, args.args[1].p[0][1], {display_name: 'z'}],
                         [2, 2, false],
                     ], "correct commands should be sent");
                 }
@@ -3363,7 +3363,7 @@ QUnit.module('relational_fields', {
             },
             mockRPC: function (route, args) {
                 if (args.method === 'onchange') {
-                    assert.deepEqual(args.args[1].p, [[4, 2, false], [0, false, {product_id: 41}]],
+                    assert.deepEqual(args.args[1].p, [[4, 2, false], [0, args.args[1].p[1][1], {product_id: 41}]],
                         "should trigger onchange with correct parameters");
                 }
                 return this._super.apply(this, arguments);
@@ -3425,7 +3425,7 @@ QUnit.module('relational_fields', {
             mockRPC: function (route, args) {
                 rpcCount++;
                 if (args.method === 'write') {
-                    assert.deepEqual(args.args[1].p, [[0, false, {
+                    assert.deepEqual(args.args[1].p, [[0, args.args[1].p[0][1], {
                         display_name: false, int_field: 123, product_id: 41
                     }]]);
                 }
@@ -3663,7 +3663,7 @@ QUnit.module('relational_fields', {
                 if (args.method === 'default_get') {
                     var expected = counter === 0 ?
                         [[4, 2, false]] :
-                        [[4, 2, false], [0, false, {display_name: false, turtle_foo: 'hammer'}]];
+                        [[4, 2, false], [0, args.kwargs.context.turtles[1][1], {display_name: false, turtle_foo: 'hammer'}]];
                     assert.deepEqual(args.kwargs.context.turtles, expected,
                         "should have properly evaluated turtles key in context");
                     counter++;
@@ -4310,6 +4310,97 @@ QUnit.module('relational_fields', {
 
         // save (should correctly generate the commands)
         form.$buttons.find('.o_form_button_save').click();
+
+        form.destroy();
+    });
+
+    QUnit.test('onchange many2many in one2many list editable', function (assert) {
+        assert.expect(7);
+
+        this.data.turtle.onchanges = {
+            product_id: function (rec) {
+                if (rec.product_id) {
+                    rec.partner_ids = [
+                        [5],
+                        [4, rec.product_id === 41 ? 1 : 2]
+                    ];
+                }
+            },
+        };
+        this.data.partner.onchanges = {
+            int_field: function (rec) {
+                if (!rec.int_field) {
+                    return;
+                }
+                rec.turtles = [
+                    [5],
+                    [0, 0, {
+                        display_name: 'new line',
+                        product_id: [37, 'xphone'],
+                        partner_ids: [
+                            [5],
+                            [4, 1]
+                        ]
+                    }],
+                    [0, 0, {
+                        display_name: rec.turtles[0][2].display_name,
+                        product_id: [41, 'xpad'],
+                        partner_ids: [
+                            [5],
+                            [4, 2]
+                        ]
+                    }],
+                ];
+            },
+        };
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<group>' +
+                        '<field name="int_field"/>' +
+                        '<field name="turtles">' +
+                            '<tree editable="bottom">' +
+                                '<field name="display_name"/>' +
+                                '<field name="product_id"/>' +
+                                '<field name="partner_ids" widget="many2many_tags"/>' +
+                            '</tree>' +
+                        '</field>' +
+                    '</group>' +
+                '</form>',
+        });
+
+        form.$('.o_field_x2many_list_row_add a').click();
+        form.$('input[name="display_name"]').val('first').trigger('input');
+        form.$('div[name="product_id"] input').click();
+        $('li.ui-menu-item a').click();
+
+
+        assert.strictEqual(form.$('.o_field_many2manytags.o_input').length, 1,
+            'should display the line in editable mode');
+        assert.strictEqual(form.$('.o_field_many2one input').val(), "xpad",
+            'should display the product');
+        assert.strictEqual(form.$('.o_field_many2manytags.o_input .o_badge_text').text(), "first record",
+            'should display the tag from the onchange');
+
+        form.$('input.o_field_integer[name="int_field"]').click();
+
+        assert.strictEqual(form.$('.o_data_cell.o_required_modifier').text(), "xpad",
+            'should display the product');
+        assert.strictEqual(form.$('.o_field_many2manytags:not(.o_input) .o_badge_text').text(), "first record",
+            'should display the tag in readonly');
+
+        form.$('input.o_field_integer[name="int_field"]').val('10').trigger('input');
+
+        assert.strictEqual(form.$('.o_data_row').text().replace(/\s+/g, ' '), "new linexphone first record firstxpad second record ",
+            'should display the name, one2many and many2many value');
+
+        form.$buttons.find('.o_form_button_save').click();
+
+        assert.strictEqual(form.$('.o_data_row').text().replace(/\s+/g, ' '), "new linexphone first record firstxpad second record ",
+            'should display the name, one2many and many2many value after save');
 
         form.destroy();
     });
