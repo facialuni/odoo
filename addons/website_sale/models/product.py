@@ -56,6 +56,7 @@ class ProductPublicCategory(models.Model):
     _inherit = ["website.seo.metadata"]
     _description = "Website Product Category"
     _order = "sequence, name"
+    _order = 'parent_left'
 
     name = fields.Char(required=True, translate=True)
     parent_id = fields.Many2one('product.public.category', string='Parent Category', index=True)

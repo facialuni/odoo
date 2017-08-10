@@ -243,16 +243,18 @@ class WebsiteSale(http.Controller):
         pager = request.website.pager(url=url, total=product_count, page=page, step=ppg, scope=7, url_args=post)
         products = Product.search(domain, limit=ppg, offset=pager['offset'], order=self._get_search_order(post))
 
-        product_categ_ids = []
+        parent_categ_search_ids = []
         categ_recs = request.env['product.public.category']
+        parent_categ_recs = request.env['product.public.category']
         if search:
             products = Product.search(domain)
             if products:
                 for product in products:
-                    product_categ_ids += product.public_categ_ids
-                    for category in product_categ_ids:
-                        categ_recs |= category.search([('parent_left', '<=', category.parent_left), ('parent_right', '>=', category.parent_right)])
-                product_categ_ids = categ_recs
+                    parent_categ_search_ids += product.public_categ_ids
+                    for category in parent_categ_search_ids:
+                        categs = category.search([('parent_left', '<=', category.parent_left), ('parent_right', '>=', category.parent_right)])
+                        categ_recs |= categs
+                        parent_categ_recs |= categs[0]
         ProductAttribute = request.env['product.attribute']
         if products:
             # get all products without limit
@@ -277,7 +279,8 @@ class WebsiteSale(http.Controller):
             'compute_currency': compute_currency,
             'keep': keep,
             'parent_category_ids': parent_category_ids,
-            'product_categ_ids': product_categ_ids,
+            'parent_categ_search_ids': parent_categ_recs,
+            'categ_search_ids': categ_recs.ids,
         }
         if category:
             values['main_object'] = category
