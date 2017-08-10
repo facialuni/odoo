@@ -23,3 +23,9 @@ class MailMail(models.Model):
         if fetchmail_server_id:
             values['fetchmail_server_id'] = fetchmail_server_id
         return super(MailMail, self).write(values)
+
+class MailComposer(models.TransientModel):
+    _inherit = 'mail.compose.message'
+
+    def _is_config_in_server(self):
+        return True if self.env['fetchmail.server'].sudo().search([('state', '=', 'done')]) else False

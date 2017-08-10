@@ -43,6 +43,9 @@ class MailComposer(models.TransientModel):
     _log_access = True
     _batch_size = 500
 
+    def _is_config_in_server(self):
+        return False
+
     @api.model
     def default_get(self, fields):
         """ Handle composition mode. Some details about context keys:
@@ -94,7 +97,7 @@ class MailComposer(models.TransientModel):
 
         alias_domain = self.env["ir.config_parameter"].sudo().get_param("mail.catchall.domain", default=None)
         result['is_alias_domain'] = False if alias_domain == 'localhost' or alias_domain is None else True
-        result['is_incoming_server'] = True if self.env['fetchmail.server'].sudo().search([('state', '=', 'done')]) else False
+        result['is_incoming_server'] = self._is_config_in_server()
         result['is_outgoing_server'] = True if self.env['ir.mail_server'].sudo().search([('check_connection', '=', True)]) else False
 
         if fields is not None:
