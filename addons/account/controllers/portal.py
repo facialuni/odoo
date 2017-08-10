@@ -92,7 +92,7 @@ class PortalAccount(CustomerPortal):
             'page_name': 'invoice',
             'invoice': invoice.sudo(),
         }
-        return request.render("account.invoice_template_portal_page", values)
+        return request.render("account.portal_invoice_page", values)
 
     @http.route(['/my/invoices/pdf/<int:invoice_id>'], type='http', auth="public", website=True)
     def portal_my_invoice_report(self, invoice_id, access_token=None, **kw):
