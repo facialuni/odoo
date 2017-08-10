@@ -2332,7 +2332,7 @@ QUnit.module('Views', {
                         "should write the sequence starting from the lowest current one");
                     assert.strictEqual(args.field, 'int_field',
                         "should write the right field as sequence");
-                    assert.deepEqual(args.ids, [1, 4, 2 , 3],
+                    assert.deepEqual(args.ids, [2, 4, 1 , 3],
                         "should write the sequence in correct order");
 
                     assert.strictEqual(list.$('tbody tr:eq(0) td:last').text(), '1200',
