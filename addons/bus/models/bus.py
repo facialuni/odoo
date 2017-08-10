@@ -111,6 +111,9 @@ class ImDispatch(object):
         self.started = False
 
     def poll(self, dbname, channels, last, options=None, timeout=TIMEOUT):
+        if not self.started:
+            # Lazy start of events listening
+            self.start()
         if options is None:
             options = {}
         # Dont hang ctrl-c for a poll request, we need to bypass private
@@ -184,6 +187,9 @@ class ImDispatch(object):
             import gevent
             self.Event = gevent.event.Event
             gevent.spawn(self.run)
+        elif odoo.multi_process:
+            # disabled in prefork mode
+            return
         else:
             # threaded mode
             self.Event = threading.Event
@@ -193,7 +199,4 @@ class ImDispatch(object):
         self.started = True
         return self
 
-if odoo.multi_process:
-    dispatch = None
-else:
-    dispatch = ImDispatch()
+dispatch = ImDispatch()
