@@ -45,6 +45,7 @@ class AccountConfigSettings(models.TransientModel):
     default_purchase_tax_id = fields.Many2one('account.tax', string="Default Purchase Tax",
         company_dependent=True, oldname="default_purchase_tax")
     module_l10n_us_check_printing = fields.Boolean("Allow check printing and deposits")
+    module_l10n_ca_cheque_printing = fields.Boolean("Allow Canadian cheque printing and deposits", default=False)
     module_account_batch_deposit = fields.Boolean(string='Use batch deposit',
         help='This allows you to group received checks before you deposit them to the bank.\n'
              '-This installs the module account_batch_deposit.')
@@ -139,6 +140,16 @@ class AccountConfigSettings(models.TransientModel):
                              'Modify your taxes first before disabling this setting.')
             }
         return res
+
+    @api.onchange('module_l10n_ca_cheque_printing')
+    def _onchange_l10_ca_cheque_printing(self):
+        if self.module_l10n_ca_cheque_printing and self.module_l10n_us_check_printing:
+            self.module_l10n_us_check_printing = False
+
+    @api.onchange('module_l10n_us_check_printing')
+    def _onchange_l10_us_check_printing(self):
+        if self.module_l10n_ca_cheque_printing and self.module_l10n_us_check_printing:
+            self.module_l10n_ca_cheque_printing = False
 
     @api.model
     def create(self, values):
