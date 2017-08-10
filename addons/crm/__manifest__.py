@@ -46,8 +46,8 @@
         'data/web_planner_data.xml',
         'report/crm_activity_report_views.xml',
         'report/crm_opportunity_report_views.xml',
-        'views/crm_team_views.xml',
         'views/crm_opportunity_report_view.xml',
+        'views/crm_team_views.xml',
     ],
     'demo': [
         'data/crm_demo.xml',

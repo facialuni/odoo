@@ -35,8 +35,21 @@ class History(models.Model):
         won_deals = self.env['crm.lead'].search_count(expression.AND([domain, [('probability', '=', 100), ('date_closed', '<=', end_date), ('date_closed', '>=', start_date), ('type', '=', 'opportunity')]]))
         lost_deals = self.env['crm.lead'].search_count(expression.AND([domain, [('active', '=', False), ('date_closed', '<=', end_date), ('date_closed', '>=', start_date), ('type', '=', 'opportunity')]]))
 
-        records = self.env['crm.lead'].search_read(expression.AND([domain, [('create_date', '>=', start_date), ('create_date', '<=', end_date), ('type', '=', 'opportunity')]]), ['day_close'])
-        total_days = sum(record['day_close'] for record in records)
+        records = self.env['crm.lead'].search_read(expression.AND([domain, [('create_date', '>=', start_date), ('create_date', '<=', end_date), ('type', '=', 'opportunity')]]), ['day_close', 'stage_id', 'create_date', 'planned_revenue'])
+        total_days = 0
+        expected_revenues = {}
+
+        for record in records:
+            if record['day_close']:
+                total_days += record['day_close']
+            else:
+                day_close = datetime.today() - datetime.strptime(record['create_date'], '%Y-%m-%d %H:%M:%S')
+                total_days += day_close.days
+            if expected_revenues.get(record['stage_id'][1]):
+                expected_revenues[record['stage_id'][1]] += record['planned_revenue']
+            else:
+                expected_revenues[record['stage_id'][1]] = record['planned_revenue']
+
         if total_days != 0:
             average_days = round(total_days / len(records), 3)
         else:
@@ -48,19 +61,18 @@ class History(models.Model):
             stage_moves.append({'name': stage['name'],
                                 'id': stage['id'],
                                 'data': result})
-        total_revenue = self.env['crm.lead'].read_group([('type', '=', 'opportunity')], ['stage_id', 'planned_revenue'], ['stage_id'])
-        expected_revenues = [(revenue['stage_id'][1], revenue['planned_revenue']) for revenue in total_revenue]
+
         return {'stage_moves': stage_moves,
                 'new_deals': new_deals,
                 'left_deals': deals_left,
                 'won_deals': won_deals,
                 'lost_deals': lost_deals,
                 'average_days': average_days,
-                'expected_revenues': expected_revenues}
+                'expected_revenues': expected_revenues.items()}
 
     def get_value(self):
-        list_of_stages = self.env['crm.stage'].search([])
-        stages = [{'name': stage.name, 'id': stage.id} for stage in list_of_stages]
+        list_of_stages = self.env['crm.stage'].search([], order='sequence')
+        stages = [{'name': stage.name, 'id': stage.id, 'sequence': stage.sequence} for stage in list_of_stages]
         list_of_users = self.env['res.users'].search([('sale_team_id', '!=', None)])
         users = [{'name': user.name, 'id': user.id} for user in list_of_users]
         list_of_sale_team = self.env['crm.team'].search([])

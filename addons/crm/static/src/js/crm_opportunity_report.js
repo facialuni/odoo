@@ -19,8 +19,9 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
      * @override
      * @constructor
     **/
-    init: function (parent) {
+    init: function (parent, params) {
         this.actionManager = parent;
+        this.active_id = params.context.active_id;
         this._super.apply(this, arguments);
     },
     /**
@@ -86,10 +87,12 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
     _getOptions: function () {
         var options = this.options || {
                     date: {filter: 'this_week'},
-                    my_channel: true,
-                    my_pipeline: true,
+                    my_channel: this.active_id ? false : true,
+                    my_pipeline: this.active_id ? false : true,
                     stages: this.stages,
+                    salesTeam: this.active_id ? [this.active_id] : []
         };
+
         var dateFilter = options.date.filter;
         if (dateFilter === 'this_week') {
             options.date.start_date = moment().startOf('week').format('MM-DD-YYYY');
@@ -134,9 +137,10 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
             self.renderElement();
             if (self.data.lost_deals !== 0 || self.data.won_deals !== 0) {
                 self._renderGraph();
-            }
-            self._stageStyle();
-            self._renderFunnelchart();
+            };
+            if (self.data.expected_revenues.length > 0) {
+                self._renderFunnelchart();
+            };
         });
     },
     /**
@@ -146,7 +150,7 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
         var funnelchart = new FunnelChart({
                         data: this.data.expected_revenues,
                         height: 350,
-                        width: 350,
+                        width: 300,
                         bottomPct: 1/8
                     });
         funnelchart.draw('.o_funnelchart');
@@ -172,7 +176,7 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
         var svg = d3.select(".o_piechart").append("svg");
 
         svg
-            .attr("height", "20em")
+            .attr("height", "15em")
             .datum(graphData)
             .call(pieChart);
 
@@ -201,6 +205,7 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
         });
         // add select2 for multiple filter on salesmen and sales channel
         this.$searchview_buttons.find('.o_auto_complete').select2();
+        // fold all menu
         this.$searchview_buttons.find('.js_foldable_trigger').click(function (event) {
             $(this).toggleClass('o_closed_menu o_open_menu');
             self.$searchview_buttons.find('.o_foldable_menu[data-filter="'+$(this).data('filter')+'"]').toggleClass('o_closed_menu o_open_menu');
@@ -268,14 +273,7 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
         });
 
     },
-    /**
-     * @private
-     */
-    _stageStyle: function () {
-        var stage_width = 100 / this.data.stage_moves.length;
-        this.$('.o_pipeline_box').css({'width': stage_width + '%'});
-    }
-})
+});
 
 core.action_registry.add('crm_opportunity_report', OpportunityReport);
 return OpportunityReport;

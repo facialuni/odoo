@@ -10,37 +10,31 @@
                         </t>
                     </t>
                 </div>
-                <div>
-                    <div class="col-sm-3">
+                <div class="o_pipeline_content">
+                    <div class="o_pipeline_side">
                         <div class="o_pipeline_side_box">
                             <strong><t t-esc="widget.data.left_deals"/></strong>
                             <br/>Deals left open in pipeline at the end of period.
                         </div>
                         <div class="o_pipeline_side_box">
-                            <strong><t t-esc="widget.data.average_days"/></strong>
+                            <strong><t t-esc="widget.data.average_days"/> Days</strong>
                             <br/>average time to close a deal
                         </div>
                     </div>
-                    <div class="col-sm-4">
-                        <div class="o_chart">
-                            <div class="col-sm-4">
-                                <div  class="o_won_deals">
-                                    <strong>
-                                        <t t-esc="widget.data.won_deals"/>
-                                    </strong>
-                                    <br />Deals Won
-                                </div>
-                                <div class="o_lost_deals">
-                                    <strong>
-                                        <t t-esc="widget.data.lost_deals"/>
-                                    </strong>
-                                    <br />Deals Lost
-                                </div>
-                            </div>
-                            <div class="o_piechart col-sm-8" />
-                        </div>
+                    <div class="o_deals">
+                        <strong class="o_won_deals">
+                            <t t-esc="widget.data.won_deals"/>
+                        </strong>
+                        <br />Deals Won
                     </div>
-                    <div class="o_funnelchart col-sm-4" />
+                    <div class="o_piechart" />
+                    <div class="o_deals">
+                        <strong class="o_lost_deals">
+                            <t t-esc="widget.data.lost_deals"/>
+                        </strong>
+                        <br />Deals Lost
+                    </div>
+                    <div class="o_funnelchart" />
                 </div>
             </t>
         </div>
@@ -52,13 +46,15 @@
                 <b><t t-esc="stage.name" /></b>
                 <span class="chevron"/>
             </div>
-            <t t-if="stage.id === 1">
-                <strong class="o_new_deals"><t t-esc="widget.data.new_deals" /></strong>
-                <br/> New Deals
+            <t t-if="stage.id === widget.stages[0].id">
+                <div class="o_new_deals">
+                    <strong><t t-esc="widget.data.new_deals" /></strong>
+                    <br/> New Deals
+                </div>
             </t>
             <t t-else="">
                 <div class="o_pipeline_stage_moves">
-                    <t t-esc="stage.data"/> Deals<span class="chevron"/>
+                    <t t-esc="stage.data"/> Deals<i class="chevron"></i>
                 </div>
             </t>
         </div>
