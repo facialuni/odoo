@@ -9,8 +9,6 @@ var session = require('web.session');
 var web_client = require('web.web_client');
 var Widget = require('web.Widget');
 
-var local_storage = require('web.local_storage');
-
 var _t = core._t;
 var QWeb = core.qweb;
 
@@ -20,7 +18,6 @@ var Dashboard = Widget.extend(ControlPanelMixin, {
         'click .js_link_analytics_settings': 'on_link_analytics_settings',
         'click .o_dashboard_action': 'on_dashboard_action',
         'click .o_dashboard_action_form': 'on_dashboard_action_form',
-        'click .o_dashboard_hide_panel': 'on_dashboard_hide_panel',
     },
 
     init: function(parent, context) {
@@ -29,7 +26,6 @@ var Dashboard = Widget.extend(ControlPanelMixin, {
         this.date_range = 'week';  // possible values : 'week', 'month', year'
         this.date_from = moment().subtract(1, 'week');
         this.date_to = moment();
-        this.hidden_apps = JSON.parse(local_storage.getItem('website_dashboard_hidden_app_ids') || '[]');
 
         this.dashboards_templates = ['website.dashboard_visits'];
         this.graphs = [];
@@ -260,18 +256,6 @@ var Dashboard = Widget.extend(ControlPanelMixin, {
         }, {
             on_reverse_breadcrumb: this.on_reverse_breadcrumb
         });
-    },
-
-    on_dashboard_hide_panel: function (ev) {
-        ev.preventDefault();
-        ev.stopPropagation();
-        var $action = $(ev.currentTarget);
-        // update hidden module list
-        this.hidden_apps = JSON.parse(local_storage.getItem('website_dashboard_hidden_app_ids') || '[]');
-        this.hidden_apps.push(JSON.parse($action.data('module_id')));
-        local_storage.setItem('website_dashboard_hidden_app_ids', JSON.stringify(this.hidden_apps));
-        // remove box
-        $action.closest(".o_box_item").remove();
     },
 
     update_cp: function() {
