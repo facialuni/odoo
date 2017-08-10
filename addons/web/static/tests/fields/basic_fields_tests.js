@@ -2358,110 +2358,7 @@ QUnit.module('basic_fields', {
 
     QUnit.module('PhoneWidget');
 
-    //test case for partner
-    QUnit.test('phone field in form view on extra small screens', function (assert) {
-        assert.expect(7);
-
-        var form = createView({
-            View: FormView,
-            model: 'partner',
-            data: this.data,
-            arch:'<form string="Partners">' +
-                    '<sheet>' +
-                        '<group>' +
-                            '<field name="foo" widget="phone"/>' +
-                        '</group>' +
-                    '</sheet>' +
-                '</form>',
-            res_id: 1,
-            config: {
-                device: {
-                    size_class: 0, // Screen XS
-                    SIZES: { XS: 0, SM: 1, MD: 2, LG: 3 },
-                }
-            },
-        });
-
-        var $phoneLink = form.$('a.o_form_uri.o_field_widget.o_text_overflow');
-        assert.strictEqual($phoneLink.length, 1,
-            "should have a anchor with correct classes");
-        assert.strictEqual($phoneLink.text(), 'y\u00ADop',
-            "value should be displayed properly as text with the skype obfuscation");
-        assert.strictEqual($phoneLink.attr('href'), 'tel:yop',
-            "should have proper tel prefix");
-
-        // switch to edit mode and check the result
-        form.$buttons.find('.o_form_button_edit').click();
-        assert.strictEqual(form.$('input[type="text"].o_field_widget').length, 1,
-            "should have an input for the phone field");
-        assert.strictEqual(form.$('input[type="text"].o_field_widget').val(), 'yop',
-            "input should contain field value in edit mode");
-
-        // change value in edit mode
-        form.$('input[type="text"].o_field_widget').val('new').trigger('input');
-
-        // save
-        form.$buttons.find('.o_form_button_save').click();
-        $phoneLink = form.$('a.o_form_uri.o_field_widget.o_text_overflow');
-        assert.strictEqual($phoneLink.text(), 'n\u00ADew',
-            "new value should be displayed properly as text with the skype obfuscation");
-        assert.strictEqual($phoneLink.attr('href'), 'tel:new',
-            "should still have proper tel prefix");
-
-        form.destroy();
-    });
-
-    QUnit.test('phone field in editable list view on extra small screens', function (assert) {
-        assert.expect(10);
-
-        var list = createView({
-            View: ListView,
-            model: 'partner',
-            data: this.data,
-            arch: '<tree editable="bottom"><field name="foo"  widget="phone"/></tree>',
-            config: {
-                device: {
-                    size_class: 0, // Screen XS
-                    SIZES: { XS: 0, SM: 1, MD: 2, LG: 3 },
-                }
-            },
-        });
-
-        assert.strictEqual(list.$('tbody td:not(.o_list_record_selector)').length, 5,
-            "should have 5 cells");
-        assert.strictEqual(list.$('tbody td:not(.o_list_record_selector)').first().text(), 'y\u00ADop',
-            "value should be displayed properly as text with the skype obfuscation");
-
-        var $phoneLink = list.$('a.o_form_uri.o_field_widget.o_text_overflow');
-        assert.strictEqual($phoneLink.length, 5,
-            "should have anchors with correct classes");
-        assert.strictEqual($phoneLink.first().attr('href'), 'tel:yop',
-            "should have proper tel prefix");
-
-        // Edit a line and check the result
-        var $cell = list.$('tbody td:not(.o_list_record_selector)').first();
-        $cell.click();
-        assert.ok($cell.parent().hasClass('o_selected_row'), 'should be set as edit mode');
-        assert.strictEqual($cell.find('input').val(), 'yop',
-            'should have the corect value in internal input');
-        $cell.find('input').val('new').trigger('input');
-
-        // save
-        list.$buttons.find('.o_list_button_save').click();
-        $cell = list.$('tbody td:not(.o_list_record_selector)').first();
-        assert.ok(!$cell.parent().hasClass('o_selected_row'), 'should not be in edit mode anymore');
-        assert.strictEqual(list.$('tbody td:not(.o_list_record_selector)').first().text(), 'n\u00ADew',
-            "value should be properly updated");
-        $phoneLink = list.$('a.o_form_uri.o_field_widget.o_text_overflow');
-        assert.strictEqual($phoneLink.length, 5,
-            "should still have anchors with correct classes");
-        assert.strictEqual($phoneLink.first().attr('href'), 'tel:new',
-            "should still have proper tel prefix");
-
-        list.destroy();
-    });
-
-    QUnit.test('phone field in form view on normal screens', function (assert) {
+    QUnit.test('phone field in form view', function (assert) {
         // The behavior of this widget is completely altered by crm_voip so this
         // test is irrelevant and fails if crm_voip is installed. The enterprise
         // module is responsible for testing its own behavior in its own tests.
@@ -2484,19 +2381,13 @@ QUnit.module('basic_fields', {
                     '</sheet>' +
                 '</form>',
             res_id: 1,
-            config: {
-                device: {
-                    size_class: 1, // Screen SM
-                    SIZES: { XS: 0, SM: 1, MD: 2, LG: 3 },
-                }
-            },
         });
 
-        var $phone = form.$('a.o_form_uri.o_field_widget.o_text_overflow');
-        assert.strictEqual($phone.length, 1,
-            "should have a simple span rather than a link");
+        var $phone = form.$('a.o_field_widget.o_text_overflow');
+        assert.strictEqual($phone.attr('href'), 'tel:yop',
+            "should have a tel: a link");
         assert.strictEqual($phone.text(), 'y\u00ADop',
-            "value should be displayed properly as text without skype obfuscation");
+            "value should be displayed properly as text with skype obfuscation");
 
         // switch to edit mode and check the result
         form.$buttons.find('.o_form_button_edit').click();
@@ -2510,13 +2401,12 @@ QUnit.module('basic_fields', {
 
         // save
         form.$buttons.find('.o_form_button_save').click();
-        assert.strictEqual(form.$('a.o_form_uri.o_field_widget.o_text_overflow').text(), 'n\u00ADew',
-            "new value should be displayed properly as text without skype obfuscation");
-
+        assert.strictEqual(form.$('a.o_field_widget.o_text_overflow').text(), 'n\u00ADew',
+            "new value should be displayed properly as text with skype obfuscation");
         form.destroy();
     });
 
-    QUnit.test('phone field in editable list view on normal screens', function (assert) {
+    QUnit.test('phone field in editable list view', function (assert) {
         // The behavior of this widget is completely altered by crm_voip so this
         // test is irrelevant and fails if crm_voip is installed. The enterprise
         // module is responsible for testing its own behavior in its own tests.
@@ -2532,20 +2422,13 @@ QUnit.module('basic_fields', {
             model: 'partner',
             data: this.data,
             arch: '<tree editable="bottom"><field name="foo"  widget="phone"/></tree>',
-            config: {
-                device: {
-                    size_class: 1, // Screen SM
-                    SIZES: { XS: 0, SM: 1, MD: 2, LG: 3 },
-                }
-            },
         });
-
         assert.strictEqual(list.$('tbody td:not(.o_list_record_selector)').length, 5,
             "should have 5 cells");
         assert.strictEqual(list.$('tbody td:not(.o_list_record_selector)').first().text(), 'y\u00ADop',
-            "value should be displayed properly as text without skype obfuscation");
+            "value should be displayed properly as text with skype obfuscation");
 
-        assert.strictEqual(list.$('a.o_form_uri.o_field_widget.o_text_overflow').length, 5,
+        assert.strictEqual(list.$('a.o_field_widget.o_text_overflow[href^="tel"]').length, 5,
             "should have spans with correct classes");
 
         // Edit a line and check the result
@@ -2562,7 +2445,7 @@ QUnit.module('basic_fields', {
         assert.ok(!$cell.parent().hasClass('o_selected_row'), 'should not be in edit mode anymore');
         assert.strictEqual(list.$('tbody td:not(.o_list_record_selector)').first().text(), 'n\u00ADew',
             "value should be properly updated");
-        assert.strictEqual(list.$('a.o_form_uri.o_field_widget.o_text_overflow').length, 5,
+        assert.strictEqual(list.$('a.o_field_widget.o_text_overflow[href^="tel"]').length, 5,
             "should still have spans with correct classes");
 
         list.destroy();
