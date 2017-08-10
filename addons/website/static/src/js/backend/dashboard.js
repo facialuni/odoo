@@ -281,6 +281,7 @@ var Dashboard = Widget.extend(ControlPanelMixin, {
         this.update_control_panel({
             cp_content: {
                 $searchview: this.$searchview,
+                $buttons: QWeb.render("website.GoToButtons"),
             },
             breadcrumbs: this.getParent().get_breadcrumbs(),
         });

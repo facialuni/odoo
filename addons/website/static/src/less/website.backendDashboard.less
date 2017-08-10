@@ -11,7 +11,6 @@
             margin-bottom: @odoo-horizontal-padding;
             position: static;
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-            padding: 25px 16px;
 
             h2, h4 {
                 text-transform: uppercase;
@@ -123,7 +122,7 @@
                 display: flex;
                 flex-flow: row wrap;
                 justify-content: flex-start;
-                > .o_box_item {
+                > .o_inner_box {
                     @media (max-width: @screen-sm-min) {
                         flex: 1 1 200px;
                         display: block !important;
@@ -140,15 +139,12 @@
                 height: 80px;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                &.o_main {
-                    background-color: @odoo-brand-optional;
+                cursor: pointer;
+                color: white;
+                background-color: @odoo-brand-optional;
                     &:hover {
                         background-color: darken(@odoo-brand-optional, 10%);
                     }
-                    a {
-                        color: white;
-                    }
-                }
                 &.o_primary {
                     background-color: @odoo-brand-primary;
                     color: white;
