@@ -1,7 +1,7 @@
 /**************  rainbow  *****************/
 
 // Variables
-@reward-size: 400px;
+@reward-size: 310px; /* changed size of rainbow that creates scrollbar*/
 @reward-text-color: #727880;
 @reward-base-time: 1.4s;
 
@@ -9,7 +9,7 @@
 .o_reward {
     will-change: transform;
     z-index: @zindex-modal + 1;
-    padding: 50px;
+    padding: 30px;
     margin: -5% auto 0 -(@reward-size / 2);
     background-image: -webkit-radial-gradient(#EDEFF4 30%, transparent 70%, transparent);
     background-image: -o-radial-gradient(#EDEFF4 30%, transparent 70%, transparent);
@@ -125,7 +125,7 @@
         }
 
         .o_reward_msg {
-            margin-left: 7%;
+            margin-left: 0%; /* chaged to adjust the message*/
             margin-top: -9.5%;
             padding: 25px 15px 20px;
             background: white;
