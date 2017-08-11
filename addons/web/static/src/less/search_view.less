@@ -208,6 +208,17 @@
     }
 }
 
- .o_searchview_mobile_facet {
-    .o_searchview_facet();
- }
+.o_searchview_mobile_facet {
+    .o_searchview;
+    .o_searchview_facet {
+        border: 1px solid #ccc;
+        padding-left: 0px;
+        border-radius: 10px;
+        .o_searchview_facet_label {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            border-top-left-radius: 2em;
+            border-bottom-left-radius: 2em;
+        }
+    }
+}
