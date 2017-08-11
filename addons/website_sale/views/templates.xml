@@ -46,14 +46,23 @@
     </template>
 
     <template id="search" name="Search Box">
-        <form t-att-action="keep('/shop'+ ('/category/'+slug(category)) if category else None, search=0)" method="get" t-att-class="search_class">
+        <form t-att-action="keep('/shop', search=0)" method="get" t-att-class="search_class">
             <t t-if="attrib_values">
                 <t t-foreach="attrib_values" t-as="a">
                     <input type="hidden" name="attrib" t-att-value="'%s-%s' % (a[0], a[1])" />
                 </t>
             </t>
-            <t t-call="website.website_search_box" />
+            <t t-call="website_sale.search_clear"/>
         </form>
+    </template>
+
+    <template id="search_clear" name="Search Clear">
+        <t t-call="website.website_search_box"/>
+        <t t-if="search">
+            <xpath expr="//input[@class, 'search-query']" position="inside">
+                <a t-attf-href="/shop"><button name="searchclear" class="glyphicon glyphicon-remove-circle"/></a>
+            </xpath>
+        </t>
     </template>
 
     <template id="search count" inherit_id="website.website_search_box" active="False" customize_show="True" name="Show # found">
