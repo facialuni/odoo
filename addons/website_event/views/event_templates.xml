@@ -285,7 +285,8 @@
             <h4 class="text-center text-muted"
                 t-field="event.address_id" t-options='{
                 "widget": "contact",
-                "fields": ["city"]
+                "fields": ["city"],
+                "placeholder": "Select the place"
                 }'/>
             <div class="row mt32 mb32">
                 <t t-raw="0"/>
