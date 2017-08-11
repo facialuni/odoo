@@ -22,9 +22,6 @@ var KanbanColumn = Widget.extend({
         kanban_record_delete: '_onDeleteRecord',
         quick_create_add_record: '_onQuickCreateAddRecord',
 
-        highlightSuccess: '_onHightLightSuccess',
-        highlightBlocked: '_onHightLightBlocked',
-        highlightWarning: '_onHightLightWarning',
         updateProgressBar: '_updateProgressBar',
         setProgressCounter: '_setProgressCounter',
     },
@@ -138,7 +135,7 @@ var KanbanColumn = Widget.extend({
             }
         });
         if (this.barOptions) {
-            this.progressBar = new ProgressBar.ColumnProgressBar(this);
+            this.progressBar = new ProgressBar.ColumnProgressBar(this, this.barOptions, this.data.fieldsInfo.kanban, this.$header);
             this.progressBar.insertAfter(this.$header);
         }
         this._update();
@@ -226,21 +223,6 @@ var KanbanColumn = Widget.extend({
         if (this.data.data[0] && this.modelName === 'crm.lead') {
             session.active_currency_id = this.data.data[0].data.company_currency.res_id;
         }
-    },
-    _onHightLightSuccess: function () {
-        $('.o_content').scrollTop(0);
-        this.$el.removeClass('o_kanban_group_show_blocked o_kanban_group_show_warning');
-        this.$el.toggleClass('o_kanban_group_show_success');
-    },
-    _onHightLightBlocked: function () {
-        $('.o_content').scrollTop(0);
-        this.$el.removeClass('o_kanban_group_show_success o_kanban_group_show_warning');
-        this.$el.toggleClass('o_kanban_group_show_blocked');
-    },
-    _onHightLightWarning: function () {
-        $('.o_content').scrollTop(0);
-        this.$el.removeClass('o_kanban_group_show_blocked o_kanban_group_show_success');
-        this.$el.toggleClass('o_kanban_group_show_warning');
     },
     _updateProgressBar: function () {
         this.progressBar._update(this.records, this.remaining);
