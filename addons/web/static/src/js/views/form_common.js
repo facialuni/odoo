@@ -729,6 +729,12 @@ var AbstractField = FormWidget.extend(FieldInterface, {
     set_value: function(value_) {
         this.set({'value': value_});
     },
+    /**
+        Method to know that a set_value originate from loading the record
+    */
+    load_set_value: function() {
+        this.set_value.apply(this, arguments);
+    },
     get_value: function() {
         return this.get('value');
     },

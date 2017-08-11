@@ -434,7 +434,6 @@ var AbstractManyField = common.AbstractField.extend({
         this.set('value', []);
         this.starting_ids = [];
         this.mutex = new utils.Mutex();
-        this.view.on("load_record", this, this._on_load_record);
         this.dataset.on('dataset_changed', this, function() {
             var options = _.clone(_.last(arguments));
             if (!_.isObject(options) || _.isArray(options)) {
@@ -453,13 +452,9 @@ var AbstractManyField = common.AbstractField.extend({
         });
     },
 
-    _on_load_record: function (record) {
-        this.starting_ids = [];
-        // don't set starting_ids for the new record
-        if (record.id && record[this.name] && (!isNaN(record.id) || record.id.indexOf(this.dataset.virtual_id_prefix) === -1)) {
-            this.starting_ids =  this.get('value').slice();
-        }
-        this.trigger("load_record", record);
+    load_set_value: function () {
+        this._super.apply(this, arguments);
+        this.starting_ids =  this.get('value').slice();
     },
 
     set_value: function(ids) {
