@@ -679,6 +679,16 @@ class AccountTax(models.Model):
     ]
 
     @api.multi
+    @api.depends('name', 'type_tax_use')
+    def name_get(self):
+        res = []
+        for record in self:
+            name = record.name
+            name = record.type_tax_use + ' - ' + name
+            res.append((record.id, name))
+        return res
+
+    @api.multi
     def unlink(self):
         company_id = self.env.user.company_id.id
         ir_values = self.env['ir.values']
