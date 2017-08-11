@@ -79,7 +79,7 @@ class ProductProduct(models.Model):
     _description = "Product"
     _inherits = {'product.template': 'product_tmpl_id'}
     _inherit = ['mail.thread']
-    _order = 'default_code, name, id'
+    _order = 'active desc, default_code, name, id'
 
     price = fields.Float(
         'Price', compute='_compute_product_price',
