@@ -12,6 +12,7 @@ class ReportAgedPartnerBalance(models.AbstractModel):
 
     _name = 'report.account.report_agedpartnerbalance'
 
+
     def _get_partner_move_lines(self, account_type, date_from, target_move, period_length):
         periods = {}
         start = datetime.strptime(date_from, "%Y-%m-%d") - relativedelta(days=1)
@@ -73,11 +74,11 @@ class ReportAgedPartnerBalance(models.AbstractModel):
                 WHERE (l.account_id = account_account.id) AND (l.move_id = am.id)
                     AND (am.state IN %s)
                     AND (account_account.internal_type IN %s)
-                    AND (COALESCE(l.date_maturity,l.date) > %s)\
+                    AND (COALESCE(l.date_maturity,l.date) >= %s)\
                     AND ((l.partner_id IN %s) OR (l.partner_id IS NULL))
                 AND (l.date <= %s)
                 AND l.company_id = %s'''
-        cr.execute(query, (tuple(move_state), tuple(account_type), datetime.strftime(start, '%Y-%m-%d'), tuple(partner_ids), date_from, user_company))
+        cr.execute(query, (tuple(move_state), tuple(account_type), date_from, tuple(partner_ids), date_from, user_company))
         aml_ids = cr.fetchall()
         aml_ids = aml_ids and [x[0] for x in aml_ids] or []
         for line in self.env['account.move.line'].browse(aml_ids):
@@ -112,7 +113,7 @@ class ReportAgedPartnerBalance(models.AbstractModel):
                 dates_query += ' BETWEEN %s AND %s)'
                 args_list += (periods[str(i)]['start'], periods[str(i)]['stop'])
             elif periods[str(i)]['start']:
-                dates_query += ' >= %s)'
+                dates_query += ' > %s)'
                 args_list += (periods[str(i)]['start'],)
             else:
                 dates_query += ' <= %s)'
