@@ -9,6 +9,13 @@ var BaseSetting = require('base.settings');
 var createView = testUtils.createView;
 var _t = core._t;
 
+
+BaseSetting.Renderer.include({
+    _getAppIconUrl: function(app) {
+        return "#test:";
+    }
+});
+
 QUnit.module('base_settings_tests', {
     beforeEach: function () {
         this.data = {

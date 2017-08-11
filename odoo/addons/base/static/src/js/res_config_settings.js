@@ -32,7 +32,7 @@ var BaseSettingRenderer = FormRenderer.extend({
             var string = $(settingView).attr('data-string');
             var key = $(settingView).attr('data-key');
             var group = !$(settingView).hasClass('o_invisible_modifier');
-            var imgurl = key==="generalsettings" ? "/base/static/description/settings.png" : "/"+key+"/static/description/icon.png";
+            var imgurl = self._getAppIconUrl(key);
             var view = $(settingView);
             self.modules.push({
                 key: key,
@@ -64,6 +64,10 @@ var BaseSettingRenderer = FormRenderer.extend({
             if (!this.activeTab)
                 this._moveToTab(_.findIndex(this.modules,function(m){return m.key===self.activeSettingTab}));
         });
+    },
+
+    _getAppIconUrl: function(module) {
+        return module==="generalsettings" ? "/base/static/description/settings.png" : "/"+module+"/static/description/icon.png";
     },
 
     _moveToTab: function (index) {
