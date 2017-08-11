@@ -45,7 +45,7 @@ QUnit.module('base_settings_tests', {
                         '<div class="settings_tab"/>'+
                         '<div class="settings">' +
                             '<div class="notFound o_hidden">No Record Found</div>' +
-                            '<div class="setting_view" data-string="Project" data-key="project">' +
+                            '<div class="setting_view" data-string="CRM" data-key="crm">' +
                                 '<div class="row mt16 o_settings_container">'+
                                     '<div class="col-xs-12 col-md-6 o_setting_box">'+
                                         '<div class="o_setting_left_pane">' +
@@ -77,7 +77,7 @@ QUnit.module('base_settings_tests', {
         });
 
         form.$("div[setting='project']").click();
-        assert.strictEqual(form.$('.selected').attr('data-key'),"project","project setting selected");
+        assert.strictEqual(form.$('.selected').attr('data-key'),"crm","crm setting selected");
         assert.strictEqual(form.$(".settings .setting_view").hasClass('o_hidden'),false,"project settings show");
         form.$('.searchInput').val('b').trigger('keyup');
         assert.strictEqual($('.highlighter').html(),"B","b word hilited");
