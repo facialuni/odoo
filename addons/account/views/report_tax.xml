@@ -1,15 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="report_tax">
-        <t t-call="web.html_container">
-            <t t-set="data_report_margin_top" t-value="12"/>
-            <t t-set="data_report_header_spacing" t-value="9"/>
-            <t t-set="data_report_dpi" t-value="110"/>
-            <t t-call="web.internal_layout">
-                <div class="page">
-                    <h2><span t-esc="res_company.name"/>: Tax Report</h2>
+<template id="report_tax">
+    <t t-call="web.html_container">
+        <t t-call="web.internal_layout">
+            <div class="page">
+                <h2> Tax Report</h2>
+                <h4> <span t-esc="res_company.name"/> </h4>
+                <div class="row mt32">
+                    <div class="col-xs-offset-4 col-xs-4">
+                        <p>
+                            <t t-if="data['date_from']"><strong>Date from :</strong> <span t-esc="data['date_from']"/><br/></t>
+                            <t t-if="data['date_to']"><strong>Date to :</strong> <span t-esc="data['date_to']"/></t>
+                        </p>
+                    </div>
+                    <div class="col-xs-4">
+                        <strong>Target Moves:</strong>
+                        <p>
+                            <span t-if="data['target_move'] == 'cash_basis'">Cash Basis Method</span>
+                            <span t-if="data['target_move'] != 'cash_basis'">Accrual Basis</span>
+                        </p>
+                    </div>
                 </div>
-            </t>
+                <div class="row col-xs-12">
+                    <t t-if="sale_line == 'sale'"> Sale </t>
+                </div>
+                <div class="row col-xs-12 o_account_reports_level1">
+                    <t t-esc="purchase_tax"/>
+                </div>
+                <div class="row col-xs-12">
+                    <t t-if="purchase_line == 'purchase'"> Purchase </t>
+                </div>
+                <div class="row col-xs-12 o_account_reports_level1">
+                    <t t-esc="purchase_tax"/>
+                </div>
+            </div>
         </t>
-    </template>
+    </t>
+</template>
 </odoo>

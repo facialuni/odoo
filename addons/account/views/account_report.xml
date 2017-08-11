@@ -63,7 +63,7 @@
             id="action_report_trial_balance"
             model="account.balance.report"
             string="Trial Balance"
-            report_type="qweb-pdf"
+            report_type="qweb-html"
             name="account.report_trialbalance"
             file="account.report_trialbalance"
             />
@@ -123,5 +123,6 @@
             name="account.report_tax"
             file="account.report_tax"
             />
+
     </data>
 </odoo>
