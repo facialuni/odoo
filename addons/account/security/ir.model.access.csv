@@ -17,8 +17,6 @@ access_account_group,account.group,model_account_group,account.group_account_use
 access_account_tax,account.tax,model_account_tax,account.group_account_invoice,1,0,0,0
 access_account_account_template,account.account.template,model_account_account_template,account.group_account_manager,1,1,1,1
 access_account_chart_template,account.chart.template,model_account_chart_template,account.group_account_manager,1,1,1,1
-access_account_chart_template_user,account.chart.template.user,model_account_chart_template,account.group_account_user,1,0,0,0
-access_account_chart_template_user,account.chart.template.invoice,model_account_chart_template,account.group_account_invoice,1,0,0,0
 access_account_tax_template,account.tax.template,model_account_tax_template,account.group_account_manager,1,1,1,1
 access_account_bank_statement_group_invoice,account.bank.statement.group.invoice,model_account_bank_statement,account.group_account_invoice,1,0,0,0
 access_account_bank_statement_line_group_invoice,account.bank.statement.line.group.invoice,model_account_bank_statement_line,account.group_account_invoice,1,0,0,0

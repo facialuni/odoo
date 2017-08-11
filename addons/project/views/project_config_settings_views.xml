@@ -170,7 +170,6 @@
             <field name="context">{'module' : 'project'}</field>
         </record>
 
-    <menuitem id="project_config_settings_menu_action" name="Settings" parent="menu_project_config"
-        sequence="0" action="project_config_settings_action" groups="base.group_system"/>
-
+        <menuitem id="project_config_settings_menu_action" name="Settings" parent="menu_project_config"
+            sequence="0" action="project_config_settings_action" groups="base.group_system"/>
 </odoo>

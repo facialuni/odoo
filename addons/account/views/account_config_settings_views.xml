@@ -19,7 +19,7 @@
                         <field name="company_id" invisible="1"/>
                         <field name="has_chart_of_accounts" invisible="1"/>
                         <field name="has_accounting_entries" invisible="1"/>
-                            <h2>Fiscal Localization</h2>
+                        <h2>Fiscal Localization</h2>
                             <div class="row mt16 o_settings_container">
                                 <div class="col-xs-12 col-md-6 o_setting_box" attrs="{'invisible': [('has_chart_of_accounts','!=',False)]}">
                                     <div class="o_setting_left_pane"/>
@@ -28,6 +28,12 @@
                                         <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." groups="base.group_multi_company"/>
                                         <div class="text-muted">
                                             Taxes, fiscal positions, chart of accounts &amp; legal statements for your country
+                                    </div>
+                                    <div class="content-group">
+                                        <div class="row mt16">
+                                            <label string="Package" class="col-md-3 o_light_label"/>
+                                            <!-- TODO Fix Me -->
+                                            <!-- <field name="chart_template_id" widget="selection"/> -->
                                         </div>
                                         <div class="content-group">
                                             <div class="row mt16">
