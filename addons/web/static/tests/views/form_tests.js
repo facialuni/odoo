@@ -20,6 +20,7 @@ QUnit.module('Views', {
                 fields: {
                     display_name: { string: "Displayed name", type: "char" },
                     foo: {string: "Foo", type: "char", default: "My little Foo Value"},
+                    phone: {string: "Phone", type: "char", default: "Phone Number"},
                     bar: {string: "Bar", type: "boolean"},
                     int_field: {string: "int_field", type: "integer", sortable: true},
                     qux: {string: "Qux", type: "float", digits: [16,1] },
@@ -43,6 +44,7 @@ QUnit.module('Views', {
                     display_name: "first record",
                     bar: true,
                     foo: "yop",
+                    phone: "123456789",
                     int_field: 10,
                     qux: 0.44,
                     p: [],
@@ -56,6 +58,7 @@ QUnit.module('Views', {
                     display_name: "second record",
                     bar: true,
                     foo: "blip",
+                    phone: "123456789",
                     int_field: 9,
                     qux: 13,
                     p: [],
@@ -3505,7 +3508,7 @@ QUnit.module('Views', {
             return;
         }
 
-        assert.expect(3);
+        assert.expect(4);
 
         this.data.partner.records[1].product_id = 37;
 
@@ -3517,7 +3520,7 @@ QUnit.module('Views', {
                     '<sheet>' +
                         '<group>' +
                             '<field name="trululu"/>' +
-                            '<field name="foo"/>' +
+                            '<field name="phone"/>' +
                             '<field name="product_id"/>' +
                             '<field name="foo" widget="phone"/>' +
                             '<field name="display_name" widget="url"/>' +
@@ -3533,10 +3536,14 @@ QUnit.module('Views', {
         assert.strictEqual(form.$('[name="product_id"]')[0], document.activeElement,
             "product_id should be focused");
         form.$('[name="product_id"]').trigger($.Event('keydown', {which: $.ui.keyCode.TAB}));
+        assert.strictEqual(form.$('[name="foo"]')[0], document.activeElement,
+            "foo phone link should be focused");
+        form.$('[name="foo"]').trigger($.Event('keydown', {which: $.ui.keyCode.TAB}));
         assert.strictEqual(form.$('[name="display_name"]')[0], document.activeElement,
             "display_name should be focused (emails are focusable but phone aren't)");
 
         // simulate shift+tab on active element
+        $(document.activeElement).trigger($.Event('keydown', {which: $.ui.keyCode.TAB, shiftKey: true}));
         $(document.activeElement).trigger($.Event('keydown', {which: $.ui.keyCode.TAB, shiftKey: true}));
         $(document.activeElement).trigger($.Event('keydown', {which: $.ui.keyCode.TAB, shiftKey: true}));
         assert.strictEqual(document.activeElement, form.$('[name="trululu"]')[0],
