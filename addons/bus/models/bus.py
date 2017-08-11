@@ -187,9 +187,6 @@ class ImDispatch(object):
             import gevent
             self.Event = gevent.event.Event
             gevent.spawn(self.run)
-        elif odoo.multi_process:
-            # disabled in prefork mode
-            return
         else:
             # threaded mode
             self.Event = threading.Event
@@ -199,4 +196,6 @@ class ImDispatch(object):
         self.started = True
         return self
 
-dispatch = ImDispatch()
+dispatch = None
+if not odoo.multi_process or odoo.evented:
+    dispatch = ImDispatch()
