@@ -1,3 +1,7 @@
+.o_font_size{
+    font-size: 1.2em;
+}
+
 .o_foldable_menu {
     &.o_closed_menu {
         display: none;
@@ -51,11 +55,10 @@
 
             .o_pipeline_stage_moves {
                 background-color: #00cc00;
-                max-width: 37%;
-                height: 50px;
-                margin: 5% -21%;
+                max-width: 55%;
+                margin: 7% -21%;
                 padding-top: 5%;
-                font-size: 1.3em;
+                .o_font_size();
                 color: white;
                 text-align: center;
                 .chevron {
@@ -72,13 +75,19 @@
         display: inline-flex;
 
             .o_pipeline_side_box {
-                font-size: 1.2em;
+                .o_font_size();
                 padding: 20px 20px;
                 margin-top: 10%;
                 background-color: white;
                 box-shadow: 0px 0px 1px 0px #666666;
                 position: relative;
                 min-height: 100px;
+                a {
+                    cursor: pointer;
+                    b {
+                        font-size: 1.5em;
+                    }
+                }
             }
 
             .o_deals {
@@ -93,9 +102,12 @@
                 color: red;
             }
 
-        .o_funnelchart {
+        .o_funnel {
+            cursor: pointer;
             margin: 2% 0% 1% -5%;
             float: right;
+            text-align: center;
+            .o_font_size();
         }
     }
 }

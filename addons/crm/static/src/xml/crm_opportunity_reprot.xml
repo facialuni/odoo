@@ -4,17 +4,17 @@
         <div class="container-fluid o_pipeline">
             <t t-if="widget.data" >
                 <div class="o_pipeline_stages">
-                    <t t-if="widget.stages">
-                        <t t-foreach="widget.data.stage_moves" t-as="stage">
-                            <t t-call="crm_pipeline_stage"/>
-                        </t>
+                    <t t-foreach="widget.data.stage_moves" t-as="stage">
+                        <t t-call="crm_pipeline_stage"/>
                     </t>
                 </div>
                 <div class="o_pipeline_content">
-                    <div class="o_pipeline_side">
+                    <div>
                         <div class="o_pipeline_side_box">
-                            <strong><t t-esc="widget.data.left_deals"/></strong>
-                            <br/>Deals left open in pipeline at the end of period.
+                            <t t-set="opportunity_value" t-value="widget.data.opportunity" />
+                            <b><t t-esc="opportunity_value.open_opp" /></b> Open Opportunity <br />
+                            <a class="js_opportunity_to_close" data-name="Pipeline to Close"><b><t t-esc="opportunity_value.opp_to_close.length" /></b> opportunities to close by the end of <t t-esc="widget.options.date.end_date" />.</a><br />
+                            <a class="js_opportunity_overpassed" data-name="Overpassed Date" ><b><t t-esc="opportunity_value.opp_overpassed.length"/></b> opportunities with expected closing date overpassed; amount is <b><t t-esc="opportunity_value.opp_overpassed_amount" />.</b></a>
                         </div>
                         <div class="o_pipeline_side_box">
                             <strong><t t-esc="widget.data.average_days"/> Days</strong>
@@ -25,16 +25,19 @@
                         <strong class="o_won_deals">
                             <t t-esc="widget.data.won_deals"/>
                         </strong>
-                        <br />Deals Won
+                        <br />Won Opportunity
                     </div>
                     <div class="o_piechart" />
                     <div class="o_deals">
                         <strong class="o_lost_deals">
                             <t t-esc="widget.data.lost_deals"/>
                         </strong>
-                        <br />Deals Lost
+                        <br />Lost Opportunity
                     </div>
-                    <div class="o_funnelchart" />
+                    <div class="o_funnel">
+                        Probable Turnover
+                        <div class="o_funnelchart" data-type="action" data-name="%(crm.crm_opportunity_report_action_view)d"/>
+                    </div>
                 </div>
             </t>
         </div>
@@ -46,15 +49,16 @@
                 <b><t t-esc="stage.name" /></b>
                 <span class="chevron"/>
             </div>
-            <t t-if="stage.id === widget.stages[0].id">
+            <t t-if="stage === _.first(widget.data.stage_moves)">
                 <div class="o_new_deals">
                     <strong><t t-esc="widget.data.new_deals" /></strong>
-                    <br/> New Deals
+                    <br/> New Opportunity
                 </div>
             </t>
             <t t-else="">
                 <div class="o_pipeline_stage_moves">
-                    <t t-esc="stage.data"/> Deals<i class="chevron"></i>
+                    <t t-esc="stage.data"/> Opportunity <br />
+                    <t t-esc="stage.percentage" />% conversion
                 </div>
             </t>
         </div>
@@ -90,17 +94,6 @@
                     </div>
                     <button type="button" class="btn btn-primary o_crm_opportunity_report_date_filter" data-filter="custom">Apply</button>
                 </li>
-            </ul>
-        </div>
-
-        <div class="btn-group o_dropdown o_crm_opportunity_reports_filter_stage">
-            <a type="button" class="dropdown-toggle" data-toggle="dropdown">
-            <span class="fa fa-bars"/>  Stages <span class="caret"/>
-            </a>
-            <ul class="dropdown-menu o_filters_menu" role="menu">
-                <t t-foreach="options.stages" t-as="stage">
-                    <li t-att-title="stage.name" data-filter="stages" t-att-data-id="stage.id" class="o_crm_opportunity_report_stage_filter"><a><t t-esc="stage.name"/></a></li>
-                </t>
             </ul>
         </div>
 

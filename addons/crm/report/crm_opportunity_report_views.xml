@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-        <!-- Leads by user and team pivot View -->
+        <!-- opportunities by user and team pivot View -->
+        <record id="crm_opportunity_report_view_pivot" model="ir.ui.view">
+            <field name="name">crm.opportunity.report.pivot</field>
+            <field name="model">crm.opportunity.report</field>
+            <field name="arch" type="xml">
+                <pivot string="Pipeline Analysis" disable_linking="True">
+                    <field name="create_date" interval="month" type="col"/>
+                    <field name="stage_id" type="row"/>
+                    <field name="expected_revenue" type="measure"/>
+                    <field name="delay_close" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
         <record id="crm_opportunity_report_view_pivot_lead" model="ir.ui.view">
             <field name="name">crm.opportunity.report.view.pivot.lead</field>
             <field name="model">crm.opportunity.report</field>

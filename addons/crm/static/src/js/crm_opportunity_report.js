@@ -15,6 +15,10 @@ var _t = core._t;
 
 var OpportunityReport = Widget.extend(ControlPanelMixin, {
     template: 'crm.pipelineReview',
+    events: {
+        'click .o_funnelchart': '_onClickFunnelChart',
+        'click .js_opportunity_overpassed, .js_opportunity_to_close': '_onClickOpenOppBox',
+    },
     /**
      * @override
      * @constructor
@@ -69,14 +73,12 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
      * @private
      */
     _getInitiatValues: function () {
-        this.stages = [];
         var self = this;
         return this._rpc({
                 model: 'crm.opportunity.history',
                 method: 'get_value',
                 args: [null],
             }).then(function (result) {
-                self.stages = result.stages;
                 self.users = result.users;
                 self.salesTeam = result.sales_team;
         });
@@ -89,7 +91,6 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
                     date: {filter: 'this_week'},
                     my_channel: this.active_id ? false : true,
                     my_pipeline: this.active_id ? false : true,
-                    stages: this.stages,
                     salesTeam: this.active_id ? [this.active_id] : []
         };
 
@@ -124,14 +125,10 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
         if (this.options.my_channel) {
             filter.user_channel = session.uid;
         };
-        var stages = _.filter(this.options.stages, function (el) { return el.selected === true });
-        if (stages.length === 0){
-            stages = this.stages;
-        };
         return rpc.query({
             model: 'crm.opportunity.history',
             method: 'action_pipeline_analysis',
-            args: [null, stages, filter],
+            args: [null, filter],
         }).then(function (result) {
             self.data = result;
             self.renderElement();
@@ -216,11 +213,6 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
         _.each(this.$searchview_buttons.find('.o_crm_opportunity_report_filter_extra'), function(k) {
             $(k).toggleClass('selected', self.options[$(k).data('filter')]);
         });
-        _.each(this.$searchview_buttons.find('.o_crm_opportunity_report_stage_filter'), function(k) {
-            $(k).toggleClass('selected', (_.filter(self.options[$(k).data('filter')], function(el){
-                    return el.id == $(k).data('id') && el.selected === true;
-                })).length > 0);
-        });
 
         // click events for filter
         this.$searchview_buttons.find('.o_crm_opportunity_report_date_filter').click(function (event) {
@@ -249,18 +241,6 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
             self.options[optionValue] = !self.options[optionValue];
             self.reload();
         });
-        this.$searchview_buttons.find('.o_crm_opportunity_report_stage_filter').click(function (event) {
-            var optionValue = $(this).data('filter');
-            var optionId = $(this).data('id');
-            _.filter(self.options[optionValue], function(el) {
-                if (el.id == optionId){
-                    if (el.selected === undefined || el.selected === null){el.selected = false;}
-                    el.selected = !el.selected;
-                }
-                return el;
-            });
-            self.reload();
-        });
         // custom filter on salesmen and sales channels
         self.$searchview_buttons.find('[data-filter="salesmen"]').select2("val", self.options.users);
         self.$searchview_buttons.find('[data-filter="sales_channel"]').select2("val", self.options.salesTeam);
@@ -272,6 +252,44 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
             self.reload();
         });
 
+    },
+    /**
+     * @private
+     */
+    _onClickOpenOppBox: function (event) {
+        event.preventDefault();
+        var $target = $(event.currentTarget);
+        var name = $target.data('name');
+
+        if ($target.hasClass('js_opportunity_overpassed')) {
+            var ids = this.data.opportunity.opp_overpassed;
+        } else {
+            var ids = this.data.opportunity.opp_to_close;
+        }
+
+        if (ids.length !== 0) {
+            return this.do_action({
+                name: name,
+                type: 'ir.actions.act_window',
+                view_mode: 'kanban',
+                views: [[false, 'kanban']],
+                res_model: 'crm.lead',
+                domain: [['id', 'in', ids]],
+            });
+        }
+    },
+    /**
+     * @private
+     */
+    _onClickFunnelChart: function(event) {
+        event.preventDefault();
+        this.do_action({
+            name: 'pipeline',
+            type: 'ir.actions.act_window',
+            res_model: 'crm.opportunity.report',
+            views: [[false, 'pivot']],
+            view_id: 'crm.crm_opportunity_report_view_pivot',
+        });
     },
 });
 
