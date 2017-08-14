@@ -14,3 +14,8 @@ def check_with_xsd(tree_or_str, xsd_path):
         #import UserError only here to avoid circular import statements with tools.func being imported in exceptions.py
         from odoo.exceptions import UserError
         raise UserError('\n'.join(str(e) for e in xml_errors.error_log))
+
+def add_sub_element(Document, name, value):
+    element = etree.SubElement(Document, name)
+    if value is not None:
+        element.text = value
