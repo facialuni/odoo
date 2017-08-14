@@ -195,9 +195,9 @@ class ProductProduct(models.Model):
                 last_cumulated_value = product._get_latest_cumulated_value()
                 p_set.average_price = last_cumulated_value / product.qty_available
             else:
-                domain = [('product_id', '=', product.id), ('last_done_qty', '>', 0.0)] + self.env['stock.move']._get_all_base_domain()
+                domain = [('product_id', '=', product.id), ('available_qty', '>', 0.0)] + self.env['stock.move']._get_all_base_domain()
                 move = self.env['stock.move'].search(domain, order='date desc, id desc', limit=1)
-                p_set.average_price = move and move.cumulated_value / move.last_done_qty or product.standard_price
+                p_set.average_price = move and move.cumulated_value / move.available_qty or product.standard_price
 
     @api.multi
     def _compute_stock_value(self):

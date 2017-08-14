@@ -73,7 +73,7 @@ class StockMove(models.Model):
     remaining_qty = fields.Float()
     last_done_move_id = fields.Many2one('stock.move')
     last_done_remaining_qty = fields.Float()
-    last_done_qty = fields.Float()
+    available_qty = fields.Float()
 
     # TODO: add constraints remaining_qty > 0
     # TODO: add constrain price_unit = 0 on done move?
@@ -189,21 +189,21 @@ class StockMove(models.Model):
                      ('date', '>', start_move.date)], order='date') # filter on outgoing/incoming moves
         if start_move:
             last_cumulated_value = start_move.cumulated_value
-            last_done_qty_available = start_move.last_done_qty
+            last_available_qty = start_move.available_qty
         else:
             last_cumulated_value = 0.0
-            last_done_qty_available = 0.0
+            last_available_qty = 0.0
         if self.product_id.cost_method == 'average':
             for move in next_moves:
                 if move.location_id.usage in ('internal', 'transit') and move.location_dest_id.usage not in ('internal', 'transit'):
-                    if last_done_qty_available:
-                        move.value = - ((last_cumulated_value / last_done_qty_available) * move.product_qty)
-                    last_done_qty_available -= move.product_qty
+                    if last_available_qty:
+                        move.value = - ((last_cumulated_value / last_available_qty) * move.product_qty)
+                    last_available_qty -= move.product_qty
                 else:
-                    last_done_qty_available += move.product_qty
+                    last_available_qty += move.product_qty
                 move.cumulated_value = last_cumulated_value + move.value
                 last_cumulated_value = move.cumulated_value
-                move.last_done_qty = last_done_qty_available
+                move.available_qty = last_available_qty
         
         
         # FIFO: needs dict with qty_remaining to replay algorithm
@@ -251,7 +251,7 @@ class StockMove(models.Model):
                             candidate.cumulated_value -= move.price_unit * qty_taken_for_candidate
                             candidate._update_fifo_future_cumulated_value(move.price_unit * qty_taken_for_candidate)
                             candidate.price_unit = candidate.value / candidate.product_qty
-                    move.last_done_qty = move.product_id.qty_available
+                    move.available_qty = move.product_id.with_context(company_owned=True).qty_available
                 else:
                     move.price_unit = move.product_id.standard_price
                     move.value = move.price_unit * move.product_qty
@@ -279,14 +279,14 @@ class StockMove(models.Model):
                         move.remaining_qty = qty_to_take # In case there are no candidates to match, put standard price on it
                     move.value = -tmp_value
                     move.cumulated_value = move.product_id._get_latest_cumulated_value(exclude_move=move) + move.value
-                    move.last_done_qty = move.product_id.qty_available
+                    move.available_qty = move.product_id.with_context(company_owned=True).qty_available
                 elif move.product_id.cost_method == 'average':
                     curr_rounding = move.company_id.currency_id.rounding
                     avg_price_unit = average_price[move.product_id.id]
                     move.value = float_round(-avg_price_unit * move.product_qty, precision_rounding=curr_rounding)
                     move.remaining_qty = 0
                     move.cumulated_value = move.product_id._get_latest_cumulated_value(exclude_move=move) + move.value
-                    move.last_done_qty = move.product_id.qty_available
+                    move.available_qty = move.product_id.with_context(company_owned=True).qty_available
                 elif move.product_id.cost_method == 'standard':
                     move.value = - move.product_id.standard_price * move.product_qty
                 
