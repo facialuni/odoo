@@ -59,7 +59,7 @@ class StockMoveLine(models.Model):
         if 'qty_done' in vals:
             for move in self.mapped('move_id').filtered(lambda m: m.state == 'done'):
                 move.value = move.quantity_done * move.price_unit
-                move.replay()
+                move._replay()
 
 
 class StockMove(models.Model):
@@ -74,9 +74,6 @@ class StockMove(models.Model):
     last_done_move_id = fields.Many2one('stock.move')
     last_done_remaining_qty = fields.Float()
     available_qty = fields.Float()
-
-    # TODO: add constraints remaining_qty > 0
-    # TODO: add constrain price_unit = 0 on done move?
 
     @api.multi
     def _get_price_unit(self):
@@ -167,18 +164,18 @@ class StockMove(models.Model):
         """
         return self.location_id.company_id.id == self.company_id.id and not self.location_dest_id.company_id
 
-
-#     def change_move_value_in_the_past(self, value):
-#         self.ensure_one()
-#         if self.product_id.cost_method == 'fifo':
-#             moves = self.search([('state', '=', 'done'),
-#                          ('date', '>',  self.date), 
-#                          ('product_id', '=', self.product_id.id)])
-#             if self.location_id.usage not in ('internal', 'transit'):
-#                 if move.last_done_move_id and move.last_done_remaining_qty:
-
     @api.multi
-    def replay(self):
+    def _replay(self):
+        self.ensure_one()
+        if self.product_id.cost_method == 'fifo':
+            self._replay_fifo()
+        elif self.product_id.cost_method == 'average':
+            self._replay_average()
+
+    def _replay_fifo(self):
+        pass
+
+    def _replay_average(self):
         # Easy scenario: avergae /done
         # search last move before this one
         start_move = self.search([('product_id', '=', self.product_id.id), 
@@ -193,28 +190,16 @@ class StockMove(models.Model):
         else:
             last_cumulated_value = 0.0
             last_available_qty = 0.0
-        if self.product_id.cost_method == 'average':
-            for move in next_moves:
-                if move.location_id.usage in ('internal', 'transit') and move.location_dest_id.usage not in ('internal', 'transit'):
-                    if last_available_qty:
-                        move.value = - ((last_cumulated_value / last_available_qty) * move.product_qty)
-                    last_available_qty -= move.product_qty
-                else:
-                    last_available_qty += move.product_qty
-                move.cumulated_value = last_cumulated_value + move.value
-                last_cumulated_value = move.cumulated_value
-                move.available_qty = last_available_qty
-        
-        
-        # FIFO: needs dict with qty_remaining to replay algorithm
-        
-        
-        # update cumulated_value according to value
-        
-        # update outs according to values
-        
-        # update 
-
+        for move in next_moves:
+            if move.location_id.usage in ('internal', 'transit') and move.location_dest_id.usage not in ('internal', 'transit'):
+                if last_available_qty:
+                    move.value = - ((last_cumulated_value / last_available_qty) * move.product_qty)
+                last_available_qty -= move.product_qty
+            else:
+                last_available_qty += move.product_qty
+            move.cumulated_value = last_cumulated_value + move.value
+            last_cumulated_value = move.cumulated_value
+            move.available_qty = last_available_qty
 
     @api.multi
     def action_done(self):
