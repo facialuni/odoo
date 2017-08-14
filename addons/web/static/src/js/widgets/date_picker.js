@@ -124,7 +124,7 @@ var DateWidget = Widget.extend({
      * @returns {string}
      */
     _formatClient: function (v) {
-        return field_utils.format[this.type_of_date](v, null, {timezone: false});
+        return field_utils.format[this.type_of_date](v, null);
     },
     /**
      * @private
@@ -132,7 +132,7 @@ var DateWidget = Widget.extend({
      * @returns {Moment}
      */
     _parseClient: function (v) {
-        return field_utils.parse[this.type_of_date](v, null, {timezone: false});
+        return field_utils.parse[this.type_of_date](v);
     },
     /**
      * @private

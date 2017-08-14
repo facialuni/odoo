@@ -87,8 +87,6 @@ function formatChar(value, field, options) {
  * @param {Object} [field]
  *        a description of the field (note: this parameter is ignored)
  * @param {Object} [options] additional options
- * @param {boolean} [options.timezone=true] use the user timezone when formating the
- *        date
  * @returns {string}
  */
 function formatDate(value, field, options) {
@@ -109,17 +107,14 @@ function formatDate(value, field, options) {
  * @param {Object} [field]
  *        a description of the field (note: this parameter is ignored)
  * @param {Object} [options] additional options
- * @param {boolean} [options.timezone=true] use the user timezone when formating the
- *        date
  * @returns {string}
  */
 function formatDateTime(value, field, options) {
     if (value === false) {
         return "";
     }
-    if (!options || !('timezone' in options) || options.timezone) {
-        value = value.clone().add(session.tzOffset, 'minutes');
-    }
+
+    value = value.clone().local();
     var l10n = core._t.database.parameters;
     var date_format = time.strftime_to_moment_format(l10n.date_format);
     var time_format = time.strftime_to_moment_format(l10n.time_format);
@@ -339,8 +334,6 @@ function formatSelection(value, field, options) {
  *        a description of the field (note: this parameter is ignored)
  * @param {Object} [options] additional options
  * @param {boolean} [options.isUTC] the formatted date is utc
- * @param {boolean} [options.timezone=false] format the date after apply the timezone
- *        offset
  * @returns {Moment|false} Moment date object
  */
 function parseDate(value, field, options) {
@@ -353,7 +346,7 @@ function parseDate(value, field, options) {
     if (options && options.isUTC) {
         date = moment.utc(value);
     } else {
-        date = moment.utc(value, [datePattern, datePatternWoZero, moment.ISO_8601], true);
+        date = moment(value, [datePattern, datePatternWoZero, moment.ISO_8601], true);
     }
     if (date.isValid() && date.year() >= 1900) {
         if (date.year() === 0) {
@@ -361,7 +354,7 @@ function parseDate(value, field, options) {
         }
         if (date.year() >= 1900) {
             date.toJSON = function () {
-                return this.clone().locale('en').format('YYYY-MM-DD');
+                return this.clone().utc().locale('en').format('YYYY-MM-DD');
             };
             return date;
         }
@@ -378,8 +371,6 @@ function parseDate(value, field, options) {
  *        a description of the field (note: this parameter is ignored)
  * @param {Object} [options] additional options
  * @param {boolean} [options.isUTC] the formatted date is utc
- * @param {boolean} [options.timezone=false] format the date after apply the timezone
- *        offset
  * @returns {Moment|false} Moment date object
  */
 function parseDateTime(value, field, options) {
@@ -397,10 +388,7 @@ function parseDateTime(value, field, options) {
         // phatomjs crash if we don't use this format
         datetime = moment.utc(value.replace(' ', 'T') + 'Z');
     } else {
-        datetime = moment.utc(value, [pattern1, pattern2, moment.ISO_8601], true);
-        if (options && options.timezone) {
-            datetime.add(-session.tzOffset, 'minutes');
-        }
+        datetime = moment(value, [pattern1, pattern2, moment.ISO_8601], true);
     }
     if (datetime.isValid()) {
         if (datetime.year() === 0) {
@@ -408,7 +396,7 @@ function parseDateTime(value, field, options) {
         }
         if (datetime.year() >= 1900) {
             datetime.toJSON = function () {
-                return this.clone().locale('en').format('YYYY-MM-DD HH:mm:ss');
+                return this.clone().utc().locale('en').format('YYYY-MM-DD HH:mm:ss');
             };
             return datetime;
         }
