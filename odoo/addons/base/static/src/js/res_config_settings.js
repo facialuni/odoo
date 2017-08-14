@@ -29,24 +29,27 @@ var BaseSettingRenderer = FormRenderer.extend({
         this.modules = [];
 
         _.each(this.$('.setting_view'),function(settingView, index) {
-            var string = $(settingView).attr('data-string');
-            var key = $(settingView).attr('data-key');
             var group = !$(settingView).hasClass('o_invisible_modifier');
-            var imgurl = self._getAppIconUrl(key);
-            var view = $(settingView);
-            self.modules.push({
-                key: key,
-                string: string,
-                group: group,
-                settingView: view,
-                imgurl: imgurl,
-                order: key==="generalsettings" ? 1 : (key=== self.activeSettingTab ? 2 : 3)
-            });
-            if (config.isMobile) {
-                self._enableSwipeOnSettingView(view);
+            if(group) {
+                var string = $(settingView).attr('data-string');
+                var key = $(settingView).attr('data-key');
+                var imgurl = self._getAppIconUrl(key);
+                var view = $(settingView);
+                self.modules.push({
+                    key: key,
+                    string: string,
+                    settingView: view,
+                    imgurl: imgurl,
+                    order: key==="generalsettings" ? 1 : (key=== self.activeSettingTab ? 2 : 3)
+                });
+                if (config.isMobile) {
+                    self._enableSwipeOnSettingView(view);
+                }
+                view.addClass("o_hidden");
+                view.prepend($("<div>").html('<img class="icon" src="'+imgurl+'"><span class="appName">'+string+'</span>').addClass('settingSearchHeader o_hidden'));
+            } else {
+                $(settingView).remove();
             }
-            view.addClass("o_hidden");
-            view.prepend($("<div>").html('<img class="icon" src="'+imgurl+'"><span class="appName">'+string+'</span>').addClass('settingSearchHeader o_hidden'));       
         });
 
         this.modules = _.sortBy(this.modules,function(m){return m.order});
