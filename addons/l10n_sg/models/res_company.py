@@ -6,4 +6,4 @@ class ResCompany(models.Model):
     _name = 'res.company'
     _inherit = 'res.company'
     
-    unique_entity_number = fields.Char(string='UEN')
+    l10n_sg_unique_entity_number = fields.Char(string='UEN')

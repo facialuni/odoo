@@ -12,17 +12,10 @@
 Singapore accounting chart and localization.
 =======================================================
 
-After installing this module, the Configuration wizard for accounting is launched.
-    * The Chart of Accounts consists of the list of all the general ledger accounts
-      required to maintain the transactions of Singapore.
-    * On that particular wizard, you will be asked to pass the name of the company,
-      the chart template to follow, the no. of digits to generate, the code for your
-      account and bank account, currency to create journals.
-
-    * The Chart of Taxes would display the different types/groups of taxes such as
-      Standard Rates, Zeroed, Exempted, MES and Out of Scope.
-    * The tax codes are specified considering the Tax Group and for easy accessibility of
-      submission of GST Tax Report.
+This module add, for accounting:
+    * The Chart of Accounts of Singapore
+    * Field UEN (Unique Entity Number) to company and partner (used to generate IRAS Audit File)
+    * Field PermitNo and PermitNoDate to invoice (used to generate IRAS Audit File) 
 
     """,
     'depends': ['base', 'account'],
