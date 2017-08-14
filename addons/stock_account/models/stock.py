@@ -269,9 +269,9 @@ class StockMove(models.Model):
                         tmp_value += qty_taken_on_candidate * candidate.price_unit
                         candidate.remaining_qty -= qty_taken_on_candidate
                         qty_to_take -= qty_taken_on_candidate
+                        last_candidate = candidate
                         if qty_to_take == 0:
                             break
-                        last_candidate = candidate
                     if last_candidate:
                         move.last_done_move_id = last_candidate.id
                         move.last_done_remaining_qty = last_candidate.remaining_qty

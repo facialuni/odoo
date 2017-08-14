@@ -38,6 +38,7 @@ class TestStockValuation(TransactionCase):
 
         self.assertEqual(move1.value, 1020.0)
         self.assertEqual(move1.cumulated_value, 1020.0)
+        self.assertEqual(move1.last_done_move_id.id, False)  # unused in IN move
 
         self.assertEqual(move1.remaining_qty, 68.0)
 
@@ -58,6 +59,7 @@ class TestStockValuation(TransactionCase):
 
         self.assertEqual(move2.value, 2170.0)
         self.assertEqual(move2.cumulated_value, 3190.0)
+        self.assertEqual(move2.last_done_move_id.id, False)  # unused in IN move
 
         self.assertEqual(move1.remaining_qty, 68.0)
         self.assertEqual(move2.remaining_qty, 140.0)
@@ -82,6 +84,7 @@ class TestStockValuation(TransactionCase):
         # so its value should be -((68*15) + (26*15.5)) = -1423
         self.assertEqual(move3.value, -1423.0)
         self.assertEqual(move3.cumulated_value, 1767.0)
+        self.assertEqual(move3.last_done_move_id.id, move2.id)
 
         self.assertEqual(move1.remaining_qty, 0)
         self.assertEqual(move2.remaining_qty, 114)
@@ -104,6 +107,7 @@ class TestStockValuation(TransactionCase):
 
         self.assertEqual(move4.value, 640.0)
         self.assertEqual(move4.cumulated_value, 2407.0)
+        self.assertEqual(move4.last_done_move_id.id, False)  # unused in IN move
 
         self.assertEqual(move1.remaining_qty, 0)
         self.assertEqual(move2.remaining_qty, 114)
@@ -127,6 +131,7 @@ class TestStockValuation(TransactionCase):
 
         self.assertEqual(move5.value, 1287.0)
         self.assertEqual(move5.cumulated_value, 3694.0)
+        self.assertEqual(move5.last_done_move_id.id, False)  # unused in IN move
 
         self.assertEqual(move1.remaining_qty, 0)
         self.assertEqual(move2.remaining_qty, 114)
@@ -152,6 +157,7 @@ class TestStockValuation(TransactionCase):
         # so its value should be -((114*15.5) + (2*16)) = 1735
         self.assertEqual(move6.value, -1799.0)
         self.assertEqual(move6.cumulated_value, 1895.0)
+        self.assertEqual(move6.last_done_move_id.id, move4.id)  # unused in IN move
 
         self.assertEqual(move1.remaining_qty, 0)
         self.assertEqual(move2.remaining_qty, 0)
@@ -178,6 +184,7 @@ class TestStockValuation(TransactionCase):
         # so its value should be -((38*16) + (24*16.5)) = 608 + 396
         self.assertEqual(move7.value, -1004.0)
         self.assertEqual(move7.cumulated_value, 891.0)
+        self.assertEqual(move7.last_done_move_id.id, move5.id)  # unused in IN move
 
         self.assertEqual(move1.remaining_qty, 0)
         self.assertEqual(move2.remaining_qty, 0)
@@ -207,6 +214,7 @@ class TestStockValuation(TransactionCase):
 
         self.assertEqual(move8.value, 0.0)
         self.assertEqual(move8.cumulated_value, 0.0)
+        self.assertEqual(move8.last_done_move_id.id, False)  # unused in internal move
 
         self.assertEqual(move1.remaining_qty, 0)
         self.assertEqual(move2.remaining_qty, 0)
@@ -235,6 +243,7 @@ class TestStockValuation(TransactionCase):
         # be -(10*16.50) = -165
         self.assertEqual(move9.value, -165.0)
         self.assertEqual(move9.cumulated_value, 726.0)
+        self.assertEqual(move9.last_done_move_id.id, move5.id)
 
         self.assertEqual(move1.remaining_qty, 0)
         self.assertEqual(move2.remaining_qty, 0)
@@ -383,6 +392,7 @@ class TestStockValuation(TransactionCase):
         move1.action_assign()
         move1.move_line_ids.qty_done = 60.0
         move1.action_done()
+        self.assertEqual(move1.last_done_move_id.id, False)  # unused in average
 
         self.assertEqual(move1.value, 900.0)
         self.assertEqual(move1.cumulated_value, 900.0)
@@ -405,6 +415,7 @@ class TestStockValuation(TransactionCase):
 
         self.assertEqual(move2.value, 2170.0)
         self.assertEqual(move2.cumulated_value, 3070.0)
+        self.assertEqual(move2.last_done_move_id.id, False)  # unused in average
 
         # Sale 190 units @ 15.35 per unit
         move3 = self.env['stock.move'].create({
@@ -424,6 +435,7 @@ class TestStockValuation(TransactionCase):
 
         self.assertEqual(move3.value, -2916.5)
         self.assertEqual(move3.cumulated_value, 153.5)
+        self.assertEqual(move3.last_done_move_id.id, False)  # unused in average
 
         # Purchase 70 units @ $16.00 per unit
         move4 = self.env['stock.move'].create({
@@ -442,6 +454,7 @@ class TestStockValuation(TransactionCase):
 
         self.assertEqual(move4.value, 1120.0)
         self.assertEqual(move4.cumulated_value, 1273.5)
+        self.assertEqual(move4.last_done_move_id.id, False)  # unused in average
 
         # Sale 30 units @ $19.50 per unit
         move5 = self.env['stock.move'].create({
@@ -455,11 +468,12 @@ class TestStockValuation(TransactionCase):
         move5.action_confirm()
         move5.action_assign()
         move5.move_line_ids.qty_done = 30.0
-        move5.with_context(debug=True).action_done()
+        move5.action_done()
 
         self.assertEqual(move5.value, -477.6)
         self.assertEqual(move5.cumulated_value, 795.9)  # fuck you, rounding
         # self.assertEqual(move5.cumulated_value, 796)
+        self.assertEqual(move5.last_done_move_id.id, False)  # unused in average
 
     def test_fifo_negative_1(self):
         self.product1.product_tmpl_id.cost_method = 'fifo'
