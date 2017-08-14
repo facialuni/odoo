@@ -1563,9 +1563,6 @@ QUnit.module('basic_fields', {
             translateParameters: {  // Avoid issues due to localization formats
               date_format: '%m/%d/%Y',
             },
-            session: {
-                tzOffset: 120
-            },
         });
 
         assert.strictEqual(form.$('.o_field_date').text(), '02/03/2017',
@@ -1608,9 +1605,6 @@ QUnit.module('basic_fields', {
                   '</tree>',
             translateParameters: {  // Avoid issues due to localization formats
                 date_format: '%m/%d/%Y',
-            },
-            session: {
-                tzOffset: 0
             },
         });
 

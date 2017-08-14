@@ -95,9 +95,6 @@ function formatDate(value, field, options) {
     if (value === false) {
         return "";
     }
-    if (!options || !('timezone' in options) || options.timezone) {
-        value = value.clone().add(session.tzOffset < 0 ? -1 : 0, 'days');
-    }
     var l10n = core._t.database.parameters;
     var date_format = time.strftime_to_moment_format(l10n.date_format);
     return value.format(date_format);
@@ -357,9 +354,6 @@ function parseDate(value, field, options) {
         date = moment.utc(value);
     } else {
         date = moment.utc(value, [datePattern, datePatternWoZero, moment.ISO_8601], true);
-        if (options && options.timezone) {
-            date.add(session.tzOffset > 0 ? -1 : 0, 'days');
-        }
     }
     if (date.isValid() && date.year() >= 1900) {
         if (date.year() === 0) {
