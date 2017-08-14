@@ -15,11 +15,11 @@
             <field name="inherit_id" ref="base.res_config_setting_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[@class='settings']" position="inside">
-                    <div class="setting_view" data-string="Accounts" data-key="account_accountant" groups="account.group_account_manager">
+                    <div class="setting_view" data-string="Accounts" data-key="account_invoicing" groups="account.group_account_manager">
                         <field name="company_id" invisible="1"/>
                         <field name="has_chart_of_accounts" invisible="1"/>
                         <field name="has_accounting_entries" invisible="1"/>
-                        <h2>Fiscal Localization</h2>
+                            <h2>Fiscal Localization</h2>
                             <div class="row mt16 o_settings_container">
                                 <div class="col-xs-12 col-md-6 o_setting_box" attrs="{'invisible': [('has_chart_of_accounts','!=',False)]}">
                                     <div class="o_setting_left_pane"/>
@@ -28,17 +28,11 @@
                                         <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." groups="base.group_multi_company"/>
                                         <div class="text-muted">
                                             Taxes, fiscal positions, chart of accounts &amp; legal statements for your country
-                                    </div>
-                                    <div class="content-group">
-                                        <div class="row mt16">
-                                            <label string="Package" class="col-md-3 o_light_label"/>
-                                            <!-- TODO Fix Me -->
-                                            <!-- <field name="chart_template_id" widget="selection"/> -->
                                         </div>
                                         <div class="content-group">
                                             <div class="row mt16">
                                                 <label string="Package" class="col-md-3 o_light_label"/>
-                                                <field name="chart_template_id" widget="selection"/>
+                                                <!-- <field name="chart_template_id" widget="selection"/> -->
                                             </div>
                                             <div>
                                                 <button name="%(account.open_account_charts_modules)d" icon="fa-arrow-right" type="action" string="Install More Packages" class="btn-link"/>
@@ -448,7 +442,7 @@
             <field name="res_model">res.config.settings</field>
             <field name="view_mode">form</field>
             <field name="target">inline</field>
-            <field name="context">{'module' : 'account_accountant'}</field>
+            <field name="context">{'module' : 'account_invoicing'}</field>
         </record>
 
         <menuitem id="menu_account_config" name="Settings" parent="menu_finance_configuration"
