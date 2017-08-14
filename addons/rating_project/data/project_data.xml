@@ -33,6 +33,7 @@
             <field name="model_id" ref="project.model_project_task"/>
             <field name="partner_to" >${object.rating_get_partner_id().id}</field>
             <field name="auto_delete" eval="True"/>
+            <field name="use_default_layout" eval="False"/>
             <field name="body_html"><![CDATA[
 <div style="background:#F0F0F0;color:#515166;padding:10px 0px;font-family:Arial,Helvetica,sans-serif;font-size:14px;">
     % set access_token = object.rating_get_access_token()

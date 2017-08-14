@@ -217,35 +217,6 @@
                         % endif
                     </td></tr>
                 </table>
-                <table cellspacing="0" cellpadding="0" width="100%" style="padding: 15px; color: #666666;margin-bottom: 5px;">
-                    <tr>
-                        <td align="center" style="min-width: 590px;">
-                            <table width="580" border="0" cellpadding="0" style="min-width: 580px; font-size: 12px;">
-                                <tr>
-                                    <td valign="middle" align="left" style="padding-top: 10px; padding-bottom: 10px;">
-                                        ${company.name}<br/>
-                                        ${company.phone or ''}
-                                    </td>
-                                    <td valign="middle" align="right" style="padding-top: 10px; padding-bottom: 10px;">
-                                        % if company.email:
-                                            <a href="mailto:${company.email}" style="text-decoration:none; color: #666666;">${company.email}</a><br/>
-                                        % endif
-                                        % if company.website:
-                                            <a href="${company.website}" style="text-decoration:none; color: #666666;">
-                                               ${company.website}
-                                            </a>
-                                        % endif
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr> 
-                    <tr>
-                        <td align="center">
-                            Powered by <a target="_blank" href="https://www.odoo.com">Odoo</a>.
-                        </td>
-                    </tr>
-                </table>
             </td></tr>
         </table>
     </td>

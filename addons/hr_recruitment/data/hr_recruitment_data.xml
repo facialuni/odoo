@@ -16,6 +16,7 @@
         <field name="lang">${object.partner_id.lang or ''}</field>
         <field name="model_id" ref="hr_recruitment.model_hr_applicant"/>
         <field name="user_signature" eval="False"/>
+        <field name="use_default_layout" eval="False"/>
         <field name="body_html"><![CDATA[
           <div style="background-color:#F3F5F6;color:#515166;font-family:Arial,Helvetica,sans-serif;font-size:14px;">
             <table style="width:600px;margin:10px auto;">
@@ -100,6 +101,7 @@
         <field name="lang">${object.partner_id.lang or ''}</field>
         <field name="model_id" ref="hr_recruitment.model_hr_applicant"/>
         <field name="user_signature" eval="False"/>
+        <field name="use_default_layout" eval="False"/>
         <field name="body_html"><![CDATA[
           <div style="background-color:#F3F5F6;color:#515166;font-family:Arial,Helvetica,sans-serif;font-size:14px;">
             <table style="width:600px;margin:10px auto;">
@@ -243,6 +245,7 @@
         <field name="lang">${object.partner_id.lang or ''}</field>
         <field name="model_id" ref="hr_recruitment.model_hr_applicant"/>
         <field name="user_signature" eval="False"/>
+        <field name="use_default_layout" eval="False"/>
         <field name="body_html"><![CDATA[
           <div style="background-color:#F3F5F6;color:#515166;font-family:Arial,Helvetica,sans-serif;font-size:14px;">
             <table style="width:600px;margin:10px auto;">

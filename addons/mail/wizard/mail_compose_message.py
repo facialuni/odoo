@@ -4,6 +4,8 @@
 import base64
 import re
 
+import lxml
+
 from odoo import _, api, fields, models, SUPERUSER_ID, tools
 from odoo.tools import pycompat
 from odoo.tools.safe_eval import safe_eval
@@ -392,18 +394,16 @@ class MailComposer(models.TransientModel):
     def save_as_template(self):
         """ hit save as template button: current form value will be a new
             template attached to the current document. """
-        # strip all newline characters from html
-        st = self.body.replace('\n', '')
-        modified_text = re.findall(r'(?<=<main>)(.*)(?=</main>)', st)
-        original_text = modified_text and modified_text[0] or self.body
         for record in self:
+            body = record._etxract_body() or record.body or False
+
             model = self.env['ir.model']._get(record.model or 'mail.message')
             model_name = model.name or ''
             template_name = "%s: %s" % (model_name, tools.ustr(record.subject))
             values = {
                 'name': template_name,
                 'subject': record.subject or False,
-                'body_html': original_text or False,
+                'body_html': body,
                 'model_id': model.id or False,
                 'attachment_ids': [(6, 0, [att.id for att in record.attachment_ids])],
             }
@@ -509,3 +509,9 @@ class MailComposer(models.TransientModel):
     @api.model
     def render_template(self, template, model, res_ids, post_process=False):
         return self.env['mail.template'].render_template(template, model, res_ids, post_process=post_process)
+
+    def _etxract_body(self):
+        self.ensure_one()
+        root = lxml.html.fromstring(self.body)
+        html = root.xpath("//div[@summary='o_mail_template_body']//div")
+        return len(html) and lxml.html.tostring(html[0]) or False

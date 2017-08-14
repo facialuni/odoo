@@ -31,11 +31,11 @@
                                     Use your own email layout template
                                 </div>
                                 <div class="content-group">
-                                    <div class="mt16 row">
-                                        <label for="email_template_layout" class="col-xs-4 col-md-6 o_light_label"/>
-                                        <field name="email_template_layout" class="oe_inline col-xs-4 col-md-6" widget="selection"/>
-                                    </div>
                                     <div class="mt16">
+                                        <label for="email_template_layout" class="o_light_label"/>
+                                        <field name="email_template_layout" class="ml16 oe_inline" widget="selection"/>
+                                    </div>
+                                    <div class="mt16" groups="base.group_no_one">
                                          <button name="edit_email_header_footer" string="Edit Email Template Layout" type="object" class="oe_link" icon="fa-arrow-right" attrs="{'invisible':[('email_template_layout','=',False)]}"/>
                                     </div>
                                 </div>

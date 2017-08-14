@@ -339,6 +339,7 @@ class MailTemplate(models.Model):
         html = self._replace_local_links(html)
         return html
 
+
     @api.model
     def render_default_layout(self, custom_body, variables):
         """
@@ -352,7 +353,6 @@ class MailTemplate(models.Model):
         variables['body'] = custom_body
         email_template_layout_id = int(self.env['ir.config_parameter'].sudo().get_param('email_template_layout', default=False))
         if email_template_layout_id:
-            variables['layout'] = email_template_layout_id
             return self.env['ir.ui.view'].browse(email_template_layout_id).render(variables)
         return custom_body
 
