@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from ast import literal_eval
-
-from odoo import api, fields, models, tools
-from odoo.tools import pickle
+from odoo import api, models, tools
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -19,7 +16,7 @@ ACTION_SLOTS = [
 ]
 
 
-class IrValues(models.Model):
+class IrValues(models.AbstractModel):
     """Holds internal model-specific action bindings and user-defined default
        field values. definitions. This is a legacy internal model, mixing
        two different concepts, and will likely be updated or replaced in a
@@ -80,98 +77,6 @@ class IrValues(models.Model):
        or directly returned by explicit calls to :meth:`~.get_actions`.
     """
     _name = 'ir.values'
-
-    name = fields.Char(required=True)
-    model = fields.Char(string='Model Name', index=True, required=True,
-                        help="Model to which this entry applies")
-
-    # TODO: model_id and action_id should be read-write function fields
-    model_id = fields.Many2one('ir.model', string='Model (change only)',
-                               help="Model to which this entry applies - "
-                                    "helper field for setting a model, will "
-                                    "automatically set the correct model name")
-    action_id = fields.Many2one('ir.actions.actions', string='Action (change only)',
-                                help="Action bound to this entry - "
-                                     "helper field for binding an action, will "
-                                     "automatically set the correct reference")
-
-    value = fields.Text(help="Default value (pickled) or reference to an action")
-    value_unpickle = fields.Text(string='Default value or action reference',
-                                 compute='_value_unpickle', inverse='_value_pickle')
-    key = fields.Selection([('action', 'Action')],
-                           string='Type', index=True, required=True, default='action',
-                           help="- Action: an action attached to one slot of the given model")
-    key2 = fields.Char(string='Qualifier', index=True, default='tree_but_open',
-                       help="For actions, one of the possible action slots: \n"
-                            "  - client_action_multi\n"
-                            "  - client_print_multi\n"
-                            "  - client_action_relate\n"
-                            "  - tree_but_open\n"
-                            "For defaults, an optional condition")
-    res_id = fields.Integer(string='Record ID', index=True,
-                            help="Database identifier of the record to which this applies. "
-                                 "0 = for all records")
-    user_id = fields.Many2one('res.users', string='User', ondelete='cascade', index=True,
-                              help="If set, action binding only applies for this user.")
-    company_id = fields.Many2one('res.company', string='Company', ondelete='cascade', index=True,
-                                 help="If set, action binding only applies for this company")
-
-    @api.depends('key', 'value')
-    def _value_unpickle(self):
-        for record in self:
-            value = record.value
-            if record.key == 'default' and value:
-                # default values are pickled on the fly
-                with tools.ignore(Exception):
-                    value = str(pickle.loads(value))
-            record.value_unpickle = value
-
-    def _value_pickle(self):
-        context = dict(self._context)
-        context.pop(self.CONCURRENCY_CHECK_FIELD, None)
-        for record in self.with_context(context):
-            value = record.value_unpickle
-            # Only char-like fields should be written directly. Other types should be converted to
-            # their appropriate type first.
-            if record.model in self.env and record.name in self.env[record.model]._fields:
-                field = self.env[record.model]._fields[record.name]
-                if field.type not in ['char', 'text', 'html', 'selection']:
-                    value = literal_eval(value)
-            if record.key == 'default':
-                value = pickle.dumps(value)
-            record.value = value
-
-    @api.onchange('model_id')
-    def onchange_object_id(self):
-        if self.model_id:
-            self.model = self.model_id.model
-
-    @api.onchange('action_id')
-    def onchange_action_id(self):
-        if self.action_id:
-            self.value_unpickle = self.action_id
-
-    @api.model_cr_context
-    def _auto_init(self):
-        res = super(IrValues, self)._auto_init()
-        tools.create_index(self._cr, 'ir_values_key_model_key2_res_id_user_id_idx',
-                           self._table, ['key', 'model', 'key2', 'res_id', 'user_id'])
-        return res
-
-    @api.model
-    def create(self, vals):
-        self.clear_caches()
-        return super(IrValues, self).create(vals)
-
-    @api.multi
-    def write(self, vals):
-        self.clear_caches()
-        return super(IrValues, self).write(vals)
-
-    @api.multi
-    def unlink(self):
-        self.clear_caches()
-        return super(IrValues, self).unlink()
 
     @api.model
     @api.returns('self', lambda value: value.id)
