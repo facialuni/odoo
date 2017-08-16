@@ -139,8 +139,8 @@
                                         attrs="{'readonly':[('active','=',False)]}"/>
                                 <field name="project_type" widget="radio"/>
                                 <field name="subtask_project_id" groups="project.group_subtask_project"/>
-                                <field name="privacy_visibility" widget="radio"/>
                                 <field name="partner_id" string="Customer"/>
+                                <field name="privacy_visibility" widget="radio"/>
                             </group>
                             <group name="misc">
                                 <group string="Configuration" groups="base.group_no_one">
