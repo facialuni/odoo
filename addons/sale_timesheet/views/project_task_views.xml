@@ -29,7 +29,7 @@
                             string="Sales Order"/>
                 </xpath>
                 <field name="user_id" position="after">
-                    <field name="procurement_id" attrs="{'invisible': [('partner_id', '=', False)]}"/>
+                    <field name="procurement_id" attrs="{'invisible': [('partner_id', '=', False)]}" options='{"no_open": True, "no_create": True}'/>
                     <field name="sale_line_id" string="Order Line" invisible="1"/>
                 </field>
             </field>
