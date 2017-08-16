@@ -419,8 +419,8 @@ action = model.activate_sample_project()
                             <group>
                                 <group>
                                     <field name="sequence" groups="base.group_no_one"/>
-                                    <field name="email_from"/>
-                                    <field name="email_cc"/>
+                                    <field name="email_from" invisible="1"/>
+                                    <field name="email_cc" invisible="1"/>
                                     <field name="parent_id" groups="project.group_subtask_project"/>
                                     <field name="child_ids" invisible="1" />
                                     <field name="subtask_project_id" invisible="1" />
