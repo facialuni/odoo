@@ -915,7 +915,6 @@ class StockMove(models.Model):
         vals = {
             'product_uom_qty': uom_qty,
             'procure_method': 'make_to_stock',
-            'procurement_id': self.procurement_id.id,
             'move_dest_ids': [(4, x.id) for x in self.move_dest_ids if x.state not in ('done', 'cancel')],
             'move_orig_ids': [(4, x.id) for x in self.move_orig_ids],
             'origin_returned_move_id': self.origin_returned_move_id.id,

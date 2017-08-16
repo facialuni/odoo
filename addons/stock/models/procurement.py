@@ -154,6 +154,7 @@ class ProcurementGroup(models.Model):
             ('picking_type_id', '=', rule.picking_type_id.id),
             ('picking_id.printed', '=', False),
             ('picking_id.state', 'in', ['draft', 'confirmed', 'waiting', 'partially_available', 'assigned']),
+            ('picking_id.backorder_id', '=', False),
             ('product_id', '=', values['product_id'].id)]
 
     @api.multi
@@ -182,7 +183,7 @@ class ProcurementGroup(models.Model):
             elif rule.group_propagation_option == 'fixed':
                 group_id = rule.group_id.id
 
-            if rule.merge_moves:
+            if True: #rule.merge_moves:
                 moves = self.env['stock.move'].search(self._merge_domain(values, rule, group_id), limit=1)
 
                 if moves:
