@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 			<!--
-	            Add picking wave   
+	            Add batch picking
 	        -->
-		<record id="stock_picking_wave_dry_1" model="stock.picking.wave">
+		<record id="stock_batch_picking_dry_1" model="stock.batch.picking">
 	        <field name="name">Picking Dry for John</field>
 			<field name="state">in_progress</field>   
 	    </record>
 	        
-		<record id="stock_picking_wave_freeze_1" model="stock.picking.wave">
+		<record id="stock_batch_picking_freeze_1" model="stock.batch.picking">
 	        <field name="name">Picking Freeze for Mickael</field>
 			<field name="state">in_progress</field>
 	    </record>
@@ -22,7 +22,7 @@
 			<field name="move_type">one</field>
 			<field name="priority">2</field>	
 			<field name="picking_type_id" ref="stock.picking_type_internal"/>
-			<field name="wave_id" ref="stock_picking_wave_freeze_1"/>
+			<field name="batch_picking_id" ref="stock_batch_picking_freeze_1"/>
 			<field name="location_id" ref="stock.stock_location_stock"/>
 			<field name="location_dest_id" ref="stock.stock_location_output"/>
 		</record>
@@ -32,7 +32,7 @@
 			<field name="state">assigned</field>
 			<field name="priority">1</field>		
 			<field name="picking_type_id" ref="stock.picking_type_internal"/>
-			<field name="wave_id" ref="stock_picking_wave_dry_1"/>
+			<field name="batch_picking_id" ref="stock_batch_picking_dry_1"/>
 			<field name="location_id" ref="stock.stock_location_stock"/>
 			<field name="location_dest_id" ref="stock.stock_location_output"/>
 		</record>	
@@ -42,7 +42,7 @@
 			<field name="state">assigned</field>
 			<field name="priority">1</field>		
 			<field name="picking_type_id" ref="stock.picking_type_internal"/>	
-			<field name="wave_id" ref="stock_picking_wave_freeze_1"/>
+			<field name="batch_picking_id" ref="stock_batch_picking_freeze_1"/>
 			<field name="location_id" ref="stock.stock_location_stock"/>
 			<field name="location_dest_id" ref="stock.stock_location_output"/>
 		</record>	
