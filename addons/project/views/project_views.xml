@@ -139,7 +139,7 @@
                                         attrs="{'readonly':[('active','=',False)]}"/>
                                 <field name="project_type" widget="radio"/>
                                 <field name="subtask_project_id" groups="project.group_subtask_project"/>
-                                <field name="partner_id" string="Customer"/>
+                                <field name="partner_id" string="Customer" attrs="{'invisible': [('project_type', '!=', 'portal')]}"/>
                                 <field name="privacy_visibility" widget="radio"/>
                             </group>
                             <group name="misc">
