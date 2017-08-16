@@ -192,6 +192,12 @@ class Project(models.Model):
         'resource.calendar', string='Working Time',
         default=lambda self: self.env.user.company_id.resource_calendar_id.id,
         help="Timetable working hours to adjust the gantt diagram report")
+    project_type = fields.Selection([
+            ('internal', _('Internal Project')),
+            ('portal', _('Customer Project'))
+        ],
+        string='Type', required=True,
+        default='internal')
     type_ids = fields.Many2many('project.task.type', 'project_task_type_rel', 'project_id', 'type_id', string='Tasks Stages')
     task_count = fields.Integer(compute='_compute_task_count', string="Tasks")
     task_needaction_count = fields.Integer(compute='_compute_task_needaction_count', string="Tasks")
