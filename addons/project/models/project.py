@@ -513,7 +513,7 @@ class Task(models.Model):
                 self.stage_id = self.stage_find(self.project_id.id, [('fold', '=', False)])
             if not self.email_from:
                 self.email_from = self.partner_id.email
-        else:
+        elif default_partner:
             self.partner_id = default_partner
             self.email_from = default_partner.email
             self.stage_id = False
