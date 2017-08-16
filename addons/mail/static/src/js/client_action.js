@@ -532,13 +532,13 @@ var ChatAction = Widget.extend(ControlPanelMixin, {
         }
     },
 
-    load_more_messages: function () {
+    load_more_messages: function (options) {
         var self = this;
         var oldest_msg_id = this.$('.o_thread_message').first().data('messageId');
         var oldest_msg_selector = '.o_thread_message[data-message-id="' + oldest_msg_id + '"]';
         var offset = -dom.getPosition(document.querySelector(oldest_msg_selector)).top;
         return chat_manager
-            .get_messages({channel_id: this.channel.id, domain: this.domain, load_more: true})
+            .get_messages({channel_id: this.channel.id, domain: this.domain, load_more: true, last_message_id: options.last_message_id})
             .then(function(result) {
                 if (self.messages_separator_position === 'top') {
                     self.messages_separator_position = undefined; // reset value to re-compute separator position
@@ -627,7 +627,13 @@ var ChatAction = Widget.extend(ControlPanelMixin, {
             chat_manager.get_messages({channel_id: this.channel.id, domain: this.domain}).then(function (messages) {
                 var options = self.get_thread_rendering_options(messages);
                 self.thread.remove_message_and_render(message.id, messages, options).then(function () {
-                    self.update_button_status(messages.length === 0, type);
+                    // load more messages on if available
+                    options.last_message_id = message.id;
+                    if (options.display_load_more && messages.length === 0){
+                        self.load_more_messages(options);
+                    } else {
+                        self.update_button_status(messages.length === 0, type);
+                    }
                 });
             });
         } else if (_.contains(message.channel_ids, current_channel_id)) {
