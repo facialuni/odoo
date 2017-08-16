@@ -16,6 +16,7 @@ import threading
 import time
 import itertools
 import unittest
+import PyChromeDevTools
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 from lxml import etree
@@ -457,6 +458,60 @@ class HttpCase(TransactionCase):
         phantomtest = os.path.join(os.path.dirname(__file__), 'phantomtest.js')
         cmd = ['phantomjs', phantomtest, json.dumps(options)]
         self.phantom_run(cmd, timeout)
+
+    def chrome_headless(self, url_path, code, ready="window", login=None, timeout=60, **kw):
+        """ Test js code running in the chrome headless browser
+
+        To signal success test do:
+        console.log('ok')
+
+        To signal failure do:
+        console.log('error')
+
+        If neither are done before timeout test fails.
+        """
+        site_url = 'http://%s:%d' % (HOST, PORT)
+        result = ""
+        self.authenticate(login, login)
+        chrome = PyChromeDevTools.ChromeInterface(timeout=15)
+        chrome.Network.enable()
+        chrome.Runtime.enable()
+        chrome.Network.setCookie(url=site_url, name="session_id", value=self.session_id)
+        chrome.Page.navigate(url=site_url+url_path)
+        if code:
+            time.sleep(10)
+            chrome.Runtime.evaluate(expression=ready)
+            chrome.Runtime.evaluate(expression=code)
+        while True:
+            event, messages = chrome.wait_event("Runtime.consoleAPICalled", timeout=60)
+            if event:
+                if event['method'] == "Runtime.consoleAPICalled":
+                    temp_message = []
+                    for console in event['params']['args']:
+                        temp_message.append(console['value'])
+                    console_msg = " ".join(str(v) for v in temp_message)
+                    if ('failed' or 'error') in console_msg:
+                        result = False
+                        _logger.info(console_msg)
+                        break
+                    elif 'ok' in console_msg:
+                        result = True
+                        _logger.info(console_msg)
+                        break
+                    else:
+                        _logger.info(console_msg)
+                if event['method'] == "Runtime.exceptionThrown":
+                    result = False
+                    _logger.error(str(event['params']['exceptionDetails']['exception']['description']).replace("\n", ""))
+                    break
+            else:
+                break
+        chrome.wait_event("Page.frameStoppedLoading", timeout=60)
+        chrome.close()
+        return self.assertTrue(
+                result,
+                "Chrome Headless test completed without reporting success; "
+                "the log may contain errors or hints.")
 
 def can_import(module):
     """ Checks if <module> can be imported, returns ``True`` if it can be,

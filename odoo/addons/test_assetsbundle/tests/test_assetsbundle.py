@@ -306,7 +306,7 @@ class TestAssetsBundleInBrowser(HttpCase):
     def test_01_js_interpretation(self):
         """ Checks that the javascript of a bundle is correctly interpreted.
         """
-        self.phantom_js(
+        self.chrome_headless(
             "/test_assetsbundle/js",
             "a + b + c === 6 ? console.log('ok') : console.log('error')",
             login="admin"
@@ -332,11 +332,11 @@ class TestAssetsBundleInBrowser(HttpCase):
                 'inherit_id': self.browse_ref('test_assetsbundle.bundle1').id,
             })
 
-        self.phantom_js(
-            "/test_assetsbundle/js",
-            "a + b + c + d === 10 ? console.log('ok') : console.log('error')",
-            login="admin",
-        )
+            self.chrome_headless(
+                "/test_assetsbundle/js",
+                "a + b + c + d === 10 ? console.log('ok') : console.log('error')",
+                login="admin",
+            )
 
 
 class TestAssetsBundleWithIRAMock(TransactionCase):
