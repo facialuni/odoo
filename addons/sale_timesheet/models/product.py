@@ -62,6 +62,6 @@ class ProductProduct(models.Model):
     @api.multi
     def _need_procurement(self):
         for product in self:
-            if product.type == 'service' and product.service_tracking != 'no':
+            if product.type == 'service':
                 return True
         return super(ProductProduct, self)._need_procurement()
