@@ -15,6 +15,17 @@ class AccountInvoice(models.Model):
         help='Encoding help. When selected, the associated purchase order lines are added to the vendor bill. Several PO can be selected.'
     )
 
+    @api.model
+    def default_get(self,default_fields):
+        """ change the default currency in vindor bill, base on purchase order currency."""
+        res = super(AccountInvoice, self).default_get(default_fields)
+        if self._context.get('default_purchase_id'):
+            purchase_id = self.env['purchase.order'].browse(self._context.get('default_purchase_id'))
+            res['currency_id'] = purchase_id.currency_id.id
+            return res
+        else:
+            return res
+
     @api.onchange('state', 'partner_id', 'invoice_line_ids')
     def _onchange_allowed_purchase_ids(self):
         '''
@@ -113,6 +124,9 @@ class AccountInvoice(models.Model):
             default_journal_id = self.env['account.journal'].search(journal_domain, limit=1)
             if default_journal_id:
                 self.journal_id = default_journal_id
+            if self._context.get('default_purchase_id'):
+                purchase_id = self.env['purchase.order'].browse(self._context.get('default_purchase_id'))
+                self.currency_id = purchase_id.currency_id.id
         return res
 
     @api.model
