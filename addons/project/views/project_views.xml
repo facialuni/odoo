@@ -121,7 +121,7 @@
                             <field name="active" widget="boolean_button"
                                 options='{"terminology": "archive"}'/>
                         </button>
-                        <button name="%(rating_rating_action_view_project_rating_task)d" attrs="{'invisible': ['|', '|', ('rating_status', '=', 'no'), ('use_tasks','=', False), ('percentage_satisfaction_task', '=', -1)]}" class="oe_stat_button oe_percent" type="action" icon="fa-smile-o" groups="project.group_project_rating">
+                        <button name="action_view_all_rating" attrs="{'invisible': ['|', '|', ('rating_status', '=', 'no'), ('use_tasks','=', False), ('percentage_satisfaction_task', '=', -1)]}" class="oe_stat_button oe_percent" type="object" icon="fa-smile-o" groups="project.group_project_rating">
                             <field string="% On tasks" name="percentage_satisfaction_task" widget="statinfo"/>
                         </button>
                     </div>
