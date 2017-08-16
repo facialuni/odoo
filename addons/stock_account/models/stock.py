@@ -55,11 +55,27 @@ class StockMoveLine(models.Model):
     
     @api.multi
     def write(self, vals):
-        super(StockMoveLine, self).write(vals)
         if 'qty_done' in vals:
-            for move in self.mapped('move_id').filtered(lambda m: m.state == 'done'):
-                move.value = move.quantity_done * move.price_unit
-                move._replay()
+            # We need to update the `value`, `remaining_value` and `remaining_qty` on the linked
+            # stock move.
+            moves_to_update = {}
+            for move_line in self.filtered(lambda ml: ml.state == 'done'):
+                moves_to_update[move_line.move_id] = vals['qty_done'] - move_line.qty_done
+
+            for move_id, qty_difference in moves_to_update.items():
+                if qty_difference > 0:
+                    # more units are available, update `value`, `remaining_value` and
+                    # `remaining_qty` on the linked stock move.
+                    move_vals = {
+                        'value': move_id.value + qty_difference * move_id.price_unit,
+                        'remaining_value': move_id.remaining_value + qty_difference * move_id.price_unit,
+                        'remaining_qty': move_id.remaining_qty + qty_difference,
+                    }
+                    move_id.write(move_vals)
+                else:
+                    # Less units are available, get rid of the extra units at the value of today.
+                    pass
+        return super(StockMoveLine, self).write(vals)
 
 
 class StockMove(models.Model):
@@ -69,11 +85,8 @@ class StockMove(models.Model):
                                help='Trigger a decrease of the delivered/received quantity in the associated Sale Order/Purchase Order')
 
     value = fields.Float()
-    cumulated_value = fields.Float()
     remaining_qty = fields.Float()
-    last_done_move_id = fields.Many2one('stock.move')
-    last_done_remaining_qty = fields.Float()
-    available_qty = fields.Float()
+    remaining_value = fields.Float()
 
     @api.multi
     def _get_price_unit(self):
@@ -89,25 +102,7 @@ class StockMove(models.Model):
                 return move.price_unit or self.product_id.standard_price
         return self.product_id.standard_price
 
-    def _update_fifo_future_cumulated_value(self, value):
-        """ This method is intended to be called on an OUT move that was not valued in time because
-        of negative stock with `value` argument representing its new value.
-        """
-        self.ensure_one()
-        domain = self._get_all_domain()
-        domain += [
-            '|',
-                ('date', '>', self.date),
-                '&',
-                    ('date', '=', self.date),
-                    ('id', '>', self.id)
-        ]
-        moves = self.search(domain, order='date, id')
-        for move in moves:
-            # As `self` is always an out move, we decrease its value on the future moves.
-            move.cumulated_value -= value
-
-    @ api.model
+    @api.model
     def _get_in_base_domain(self, company_id=False):
         domain = [
             ('state', '=', 'done'),
@@ -116,7 +111,7 @@ class StockMove(models.Model):
         ]
         return domain
 
-    @ api.model
+    @api.model
     def _get_out_base_domain(self, company_id=False):
         domain = [
             ('state', '=', 'done'),
@@ -125,7 +120,7 @@ class StockMove(models.Model):
         ]
         return domain
 
-    @ api.model
+    @api.model
     def _get_all_base_domain(self, company_id=False):
         domain = [
             ('state', '=', 'done'),
@@ -165,43 +160,6 @@ class StockMove(models.Model):
         return self.location_id.company_id.id == self.company_id.id and not self.location_dest_id.company_id
 
     @api.multi
-    def _replay(self):
-        self.ensure_one()
-        if self.product_id.cost_method == 'fifo':
-            self._replay_fifo()
-        elif self.product_id.cost_method == 'average':
-            self._replay_average()
-
-    def _replay_fifo(self):
-        pass
-
-    def _replay_average(self):
-        # Easy scenario: avergae /done
-        # search last move before this one
-        start_move = self.search([('product_id', '=', self.product_id.id), 
-                     ('state', '=', 'done'), 
-                     ('date', '<', self.date)], limit=1, order='date desc') #filter on outgoing/incoming moves
-        next_moves = self.search([('product_id', '=', self.product_id.id), 
-                     ('state', '=', 'done'), 
-                     ('date', '>', start_move.date)], order='date') # filter on outgoing/incoming moves
-        if start_move:
-            last_cumulated_value = start_move.cumulated_value
-            last_available_qty = start_move.available_qty
-        else:
-            last_cumulated_value = 0.0
-            last_available_qty = 0.0
-        for move in next_moves:
-            if move.location_id.usage in ('internal', 'transit') and move.location_dest_id.usage not in ('internal', 'transit'):
-                if last_available_qty:
-                    move.value = - ((last_cumulated_value / last_available_qty) * move.product_qty)
-                last_available_qty -= move.product_qty
-            else:
-                last_available_qty += move.product_qty
-            move.cumulated_value = last_cumulated_value + move.value
-            last_cumulated_value = move.cumulated_value
-            move.available_qty = last_available_qty
-
-    @api.multi
     def action_done(self):
         average_price = {}
         for move in self.filtered(lambda m: m.product_id.cost_method == 'average'):
@@ -215,62 +173,34 @@ class StockMove(models.Model):
                     if not move.price_unit:
                         move.price_unit = move._get_price_unit()
                     move.value = move.price_unit * move.product_qty
-                    move.cumulated_value = move.product_id._get_latest_cumulated_value(exclude_move=move) + move.value
+                    move.remaining_value = move.price_unit * move.product_qty
                     if move.product_id.cost_method == 'fifo':
                         move.remaining_qty = move.product_qty
-
-                        # If there are some OUT moves that we could not value in time, find them
-                        # and value them now with this new IN move. After that, update the cumulated
-                        # value along the moves done after the newly valued move.
-                        candidates_out = move.product_id._get_fifo_candidates_out_move()
-                        qty_to_take = move.product_qty
-                        for candidate in candidates_out:
-                            if candidate.remaining_qty < qty_to_take:
-                                qty_taken_for_candidate = candidate.remaining_qty
-                            else:
-                                qty_taken_for_candidate = qty_to_take
-                            candidate.remaining_qty -= qty_taken_for_candidate
-                            move.remaining_qty -= qty_taken_for_candidate
-                            qty_to_take -= qty_taken_for_candidate
-                            candidate.value -= move.price_unit * qty_taken_for_candidate
-                            candidate.cumulated_value -= move.price_unit * qty_taken_for_candidate
-                            candidate._update_fifo_future_cumulated_value(move.price_unit * qty_taken_for_candidate)
-                            candidate.price_unit = candidate.value / candidate.product_qty
-                    move.available_qty = move.product_id.with_context(company_owned=True).qty_available
                 else:
                     move.price_unit = move.product_id.standard_price
                     move.value = move.price_unit * move.product_qty
             elif move._is_out():
                 if move.product_id.cost_method == 'fifo':
                     qty_to_take = move.product_qty
-                    tmp_value = 0
                     candidates = move.product_id._get_fifo_candidates_in_move()
-                    last_candidate = False
                     for candidate in candidates:
                         if candidate.remaining_qty <= qty_to_take:
                             qty_taken_on_candidate = candidate.remaining_qty
                         else:
                             qty_taken_on_candidate = qty_to_take
-                        tmp_value += qty_taken_on_candidate * candidate.price_unit
                         candidate.remaining_qty -= qty_taken_on_candidate
+                        candidate.remaining_value -= qty_taken_on_candidate * candidate.price_unit
                         qty_to_take -= qty_taken_on_candidate
-                        last_candidate = candidate
                         if qty_to_take == 0:
                             break
-                    if last_candidate:
-                        move.last_done_move_id = last_candidate.id
-                        move.last_done_remaining_qty = last_candidate.remaining_qty
                     if qty_to_take > 0:
-                        move.remaining_qty = qty_to_take # In case there are no candidates to match, put standard price on it
-                    move.value = -tmp_value
-                    move.cumulated_value = move.product_id._get_latest_cumulated_value(exclude_move=move) + move.value
-                    move.available_qty = move.product_id.with_context(company_owned=True).qty_available
+                        move.remaining_qty = -qty_to_take # In case there are no candidates to match, put standard price on it
+                        move.remaining_value = candidates[-1].price_unit * -qty_to_take  # FIXME just to go forward a little
                 elif move.product_id.cost_method == 'average':
                     curr_rounding = move.company_id.currency_id.rounding
                     avg_price_unit = average_price[move.product_id.id]
                     move.value = float_round(-avg_price_unit * move.product_qty, precision_rounding=curr_rounding)
                     move.remaining_qty = 0
-                    move.cumulated_value = move.product_id._get_latest_cumulated_value(exclude_move=move) + move.value
                     move.available_qty = move.product_id.with_context(company_owned=True).qty_available
                 elif move.product_id.cost_method == 'standard':
                     move.value = - move.product_id.standard_price * move.product_qty
@@ -278,6 +208,41 @@ class StockMove(models.Model):
         for move in res.filtered(lambda m: m.product_id.valuation == 'real_time'):
             move._account_entry_move()
         return res
+
+    @api.model
+    def _fifo_vacuum(self):
+        # FIXME: sort by date (does filtered lose the order?)
+        for move in self.filtered(lambda m: m._is_out() and m.remaining_qty < 0):
+            domain = [
+                '|',
+                    ('date', '>', move.date),
+                    '&',
+                        ('date', '=', move.date),
+                        ('id', '>', move.id)
+            ]
+            domain += self._get_in_domain()
+            candidates = self.search(domain, order='date, id')
+            qty_to_take = abs(move.remaining_qty)
+            tmp_value = 0
+            # !00% copy pasted from action_done. gai.
+            for candidate in candidates:
+                if candidate.remaining_qty <= qty_to_take:
+                    qty_taken_on_candidate = candidate.remaining_qty
+                else:
+                    qty_taken_on_candidate = qty_to_take
+                value_taken_on_candidate = qty_taken_on_candidate * candidate.price_unit
+                tmp_value += value_taken_on_candidate
+                candidate.remaining_qty -= qty_taken_on_candidate
+                candidate.remaining_value -= qty_taken_on_candidate * candidate.price_unit
+                qty_to_take -= qty_taken_on_candidate
+                if qty_to_take == 0:
+                    break
+            if qty_to_take > 0:
+                move.remaining_qty -= -qty_to_take  # In case there are no candidates to match, put standard price on it
+                move.remaining_value = candidates[-1].price_unit * -qty_to_take  # FIXME just to go forward a little
+            elif qty_to_take == 0:
+                move.remaining_value = 0
+                move.remaining_qty = 0
 
     @api.multi
     def _get_accounting_data_for_valuation(self):

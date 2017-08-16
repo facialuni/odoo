@@ -156,16 +156,6 @@ class ProductProduct(models.Model):
         self.write({'standard_price': new_price})
         return True
 
-    def _get_latest_cumulated_value(self, exclude_move=False):
-        self.ensure_one()
-        domain = [('product_id', '=', self.id)] + self.env['stock.move']._get_all_base_domain()
-        if exclude_move:
-            domain += [('id', '!=', exclude_move.id)]
-        latest = self.env['stock.move'].search(domain, order='date desc, id desc', limit=1)
-        if not latest:
-            return 0.0
-        return latest.cumulated_value
-
     def _get_fifo_candidates_out_move(self):
         """ Find OUT moves that were not valued in time because of negative stock.
         """
