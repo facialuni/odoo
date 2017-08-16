@@ -73,7 +73,6 @@
         'static/src/xml/stock_traceability_report_backend.xml',
     ],
     'test': [
-        'test/procrule.yml',
         'test/stock_users.yml',
         'test/packing.yml',
         'test/packingneg.yml',
