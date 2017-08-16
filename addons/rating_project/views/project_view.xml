@@ -125,8 +125,8 @@
                     </button>
                 </div>
                 <xpath expr="//field[@name='partner_id']" position="after">
-                    <label for="rating_status"/>
-                    <div>
+                    <label for="rating_status" attrs="{'invisible': [('project_type', '!=', 'portal')]}"/>
+                    <div attrs="{'invisible': [('project_type', '!=', 'portal')]}">
                         <field name="rating_status" widget="radio"/>
                         <p attrs="{'invisible': [('rating_status','not in',('periodic','stage'))]}" class="text-muted oe_edit_only">
                             Edit project's stages and set an email template
