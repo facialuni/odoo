@@ -493,7 +493,7 @@ QUnit.module('Views', {
         testUtils.intercept(form, 'execute_action', _.bind(function (event) {
             assert.strictEqual(event.data.action_data.name, "confirm",
                 "should trigger execute_action with correct method name");
-            assert.deepEqual(event.data.res_ids, [1], "should have correct id in event data");
+            assert.deepEqual(event.data.env.resIDs, [1], "should have correct id in event data");
             this.data.partner.records[0].state = "cd"; // Change state value to show next states based buttons
             event.data.on_success();
             event.data.on_closed();
