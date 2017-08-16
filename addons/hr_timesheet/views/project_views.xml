@@ -47,7 +47,7 @@
                 </button>
                 <xpath expr="//div[@name='options_active']" position="inside">
                     <div>
-                        <field name="allow_timesheets" class="oe_inline" string="Allow timesheets"/>
+                        <field name="allow_timesheets" class="oe_inline" string="Timesheets"/>
                         <label for="allow_timesheets"/>
                     </div>
                 </xpath>
