@@ -434,6 +434,7 @@ class Task(models.Model):
     partner_id = fields.Many2one('res.partner',
         string='Customer',
         default=_get_default_partner)
+    project_type = fields.Selection(related="project_id.project_type", string="Type", readonly=True)
     manager_id = fields.Many2one('res.users', string='Project Manager', related='project_id.user_id', readonly=True)
     company_id = fields.Many2one('res.company',
         string='Company',
