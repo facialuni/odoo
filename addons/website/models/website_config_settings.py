@@ -77,9 +77,6 @@ class WebsiteConfigSettings(models.TransientModel):
 
     @api.model
     def get_values(self):
-        # TODO Fix ME
-        # if not self.user_has_groups('website.group_website_designer'):
-        #     raise AccessDenied()
         res = super(WebsiteConfigSettings, self).get_values()
         get_param = self.env['ir.config_parameter'].sudo().get_param
         res.update(
