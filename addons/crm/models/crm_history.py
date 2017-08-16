@@ -6,7 +6,7 @@ from odoo.osv import expression
 
 
 class History(models.Model):
-    _name = "crm.opportunity.history"
+    _name = "crm.stage.history"
     _description = "crm stage History"
 
     user_id = fields.Integer(string='User')
@@ -17,9 +17,10 @@ class History(models.Model):
 
     @api.multi
     def action_pipeline_analysis(self, filter_domain):
-        start_date = filter_domain['start_date']
-        end_date = filter_domain['end_date']
-        domain = []
+        start_date = datetime.strptime(filter_domain['start_date'], "%m-%d-%Y").strftime('%Y-%m-%d')
+        end_date = datetime.strptime(filter_domain['end_date'], "%m-%d-%Y").strftime('%Y-%m-%d')
+        domain = [('type', '=', 'opportunity'), ('create_date', '>=', start_date), ('create_date', '<=', end_date)]
+
         if filter_domain.get('user_id'):
             domain = expression.AND([domain, [('user_id', '=', filter_domain['user_id'])]])
         if filter_domain.get('users'):
@@ -30,11 +31,11 @@ class History(models.Model):
         if filter_domain.get('teams'):
             domain = expression.AND([domain, [('team_id', 'in', filter_domain['teams'])]])
 
-        new_deals = self.env['crm.lead'].search_count(expression.AND([domain, [('type', '=', 'opportunity'), ('create_date', '>=', start_date), ('create_date', '<=', end_date)]]))
-        won_deals = self.env['crm.lead'].search_count(expression.AND([domain, [('probability', '=', 100), ('date_closed', '<=', end_date), ('date_closed', '>=', start_date), ('type', '=', 'opportunity')]]))
-        lost_deals = self.env['crm.lead'].search_count(expression.AND([domain, [('active', '=', False), ('date_closed', '<=', end_date), ('date_closed', '>=', start_date), ('type', '=', 'opportunity')]]))
+        won_opp = self.env['crm.lead'].search_count(expression.AND([domain, [('probability', '=', 100), ('date_closed', '<=', end_date), ('date_closed', '>=', start_date)]]))
+        lost_opp = self.env['crm.lead'].search_count(expression.AND([domain, [('active', '=', False), ('date_closed', '<=', end_date), ('date_closed', '>=', start_date)]]))
 
-        records = self.env['crm.lead'].search(expression.AND([domain, [('create_date', '>=', start_date), ('create_date', '<=', end_date), ('type', '=', 'opportunity')]]))
+        records = self.env['crm.lead'].search(domain)
+        total_opp = len(records)
         total_days = 0
         expected_revenues = {}
         opportunity = {
@@ -45,46 +46,48 @@ class History(models.Model):
         }
 
         for record in records:
-            if record['day_close']:
-                total_days += record['day_close']
+            if record.day_close:
+                total_days += record.day_close
             else:
-                day_close = datetime.today() - datetime.strptime(record['create_date'], '%Y-%m-%d %H:%M:%S')
+                day_close = datetime.today() - datetime.strptime(record.create_date, '%Y-%m-%d %H:%M:%S')
                 total_days += day_close.days
 
-            if expected_revenues.get(record['stage_id'].name):
-                expected_revenues[record['stage_id'].name] += record['planned_revenue']
+            if expected_revenues.get(record.stage_id.name):
+                expected_revenues[record.stage_id.name] += record.planned_revenue
             else:
-                expected_revenues[record['stage_id'].name] = record['planned_revenue']
+                expected_revenues[record.stage_id.name] = record.planned_revenue
 
-            if not record['date_closed']:
-                if not record['date_deadline']:
-                    opportunity['open_opp'] += 1
-                elif record['date_deadline'] <= start_date:
-                    opportunity['opp_overpassed'].append(record['id'])
-                    opportunity['opp_overpassed_amount'] += record['planned_revenue']
-                elif record['date_deadline'] <= end_date:
-                    opportunity['opp_to_close'].append(record['id'])
+            if not record.date_closed:
+                opportunity['open_opp'] += 1
+                if record.date_deadline and record.date_deadline <= start_date:
+                    opportunity['opp_overpassed'].append(record.id)
+                    opportunity['opp_overpassed_amount'] += record.planned_revenue
+                elif record.date_deadline and record.date_deadline <= end_date:
+                    opportunity['opp_to_close'].append(record.id)
 
         if total_days != 0:
-            average_days = round(total_days / len(records), 3)
+            average_days = round(total_days / total_opp, 3)
         else:
             average_days = 0
 
         stages = self.env['crm.stage'].search([], order='sequence')
         stage_moves = []
-        for index, stage in enumerate(stages):
-            result = self.env['crm.opportunity.history'].search_count(expression.AND([domain, [('stage_name', '=', stage['name']), ('create_date', '>=', start_date), ('create_date', '<=', end_date)]]))
-            stage_moves.append({'name': stage['name'],
-                                'sequence': stage['sequence'],
-                                'data': result})
+        for stage in stages:
+            result = self.env['crm.stage.history'].search_count([('res_id', 'in', records.ids), ('stage_name', '=', stage.name)])
+            percentage = (result * 100) / total_opp
+            stage_moves.append({'name': stage.name,
+                                'sequence': stage.sequence,
+                                'data': result,
+                                'percentage': percentage})
 
         return {'stage_moves': stage_moves,
-                'new_deals': new_deals,
-                'won_deals': won_deals,
-                'lost_deals': lost_deals,
+                'new_opp': len(records),
+                'won_opp': won_opp,
+                'lost_opp': lost_opp,
                 'opportunity': opportunity,
                 'average_days': average_days,
-                'expected_revenues': expected_revenues.items()}
+                'expected_revenues': expected_revenues.items(),
+                'domain': domain}
 
     def get_value(self):
         list_of_users = self.env['res.users'].search([('sale_team_id', '!=', None)])

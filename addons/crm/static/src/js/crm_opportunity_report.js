@@ -17,7 +17,7 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
     template: 'crm.pipelineReview',
     events: {
         'click .o_funnelchart': '_onClickFunnelChart',
-        'click .js_opportunity_overpassed, .js_opportunity_to_close': '_onClickOpenOppBox',
+        'click .o_pipeline_stage_moves, .js_opportunity_overpassed, .js_opportunity_to_close': '_onClickOpenOppBox',
     },
     /**
      * @override
@@ -75,7 +75,7 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
     _getInitiatValues: function () {
         var self = this;
         return this._rpc({
-                model: 'crm.opportunity.history',
+                model: 'crm.stage.history',
                 method: 'get_value',
                 args: [null],
             }).then(function (result) {
@@ -126,15 +126,16 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
             filter.user_channel = session.uid;
         };
         return rpc.query({
-            model: 'crm.opportunity.history',
+            model: 'crm.stage.history',
             method: 'action_pipeline_analysis',
             args: [null, filter],
         }).then(function (result) {
             self.data = result;
             self.renderElement();
-            if (self.data.lost_deals !== 0 || self.data.won_deals !== 0) {
+            if (self.data.lost_opp !== 0 || self.data.won_opp !== 0) {
                 self._renderGraph();
             };
+            console.log(self.data.expected_revenues);
             if (self.data.expected_revenues.length > 0) {
                 self._renderFunnelchart();
             };
@@ -156,8 +157,8 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
      * @private
      */
     _renderGraph: function () {
-        var totalDeals = this.data.lost_deals + this.data.won_deals;
-        var wonPercent = this.data.won_deals * 100 / totalDeals;
+        var totalOpp = this.data.lost_opp + this.data.won_opp;
+        var wonPercent = this.data.won_opp * 100 / totalOpp;
         var lostPercent = 100 - wonPercent
         var graphData = [wonPercent, lostPercent];
         nv.addGraph(function() {
@@ -165,7 +166,6 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
                 .x(function(d) { return d; })
                 .y(function(d) { return d; })
                 .showLabels(true)
-                .labelThreshold(0.2)
                 .labelType("percent")
                 .showLegend(false)
                 .margin({ "left": 0, "right": 0, "top": 0, "bottom": 0 })
@@ -256,31 +256,6 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
     /**
      * @private
      */
-    _onClickOpenOppBox: function (event) {
-        event.preventDefault();
-        var $target = $(event.currentTarget);
-        var name = $target.data('name');
-
-        if ($target.hasClass('js_opportunity_overpassed')) {
-            var ids = this.data.opportunity.opp_overpassed;
-        } else {
-            var ids = this.data.opportunity.opp_to_close;
-        }
-
-        if (ids.length !== 0) {
-            return this.do_action({
-                name: name,
-                type: 'ir.actions.act_window',
-                view_mode: 'kanban',
-                views: [[false, 'kanban']],
-                res_model: 'crm.lead',
-                domain: [['id', 'in', ids]],
-            });
-        }
-    },
-    /**
-     * @private
-     */
     _onClickFunnelChart: function(event) {
         event.preventDefault();
         this.do_action({
@@ -289,6 +264,33 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
             res_model: 'crm.opportunity.report',
             views: [[false, 'pivot']],
             view_id: 'crm.crm_opportunity_report_view_pivot',
+        });
+    },
+    /**
+     * @private
+     */
+    _onClickOpenOppBox: function (event) {
+        event.preventDefault();
+        var $target = $(event.currentTarget);
+        var name = $target.data('name');
+
+        if ($target.hasClass('o_pipeline_stage_moves')) {
+            var domain = this.data.domain;
+            name = _t('Pipeline');
+        } else if ($target.hasClass('js_opportunity_overpassed')) {
+            var domain = [['id', 'in', this.data.opportunity.opp_overpassed]];
+        } else {
+            var domain = [['id', 'in', this.data.opportunity.opp_to_close]];
+        }
+
+        return this.do_action({
+            name: name,
+            type: 'ir.actions.act_window',
+            res_model: 'crm.lead',
+            views: [[false, 'kanban'], [false, 'form'], [false, 'list']],
+            view_type: "kanban",
+            view_mode: "kanban",
+            domain: domain,
         });
     },
 });

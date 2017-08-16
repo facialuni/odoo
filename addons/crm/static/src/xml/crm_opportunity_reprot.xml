@@ -23,21 +23,23 @@
                     </div>
                     <div class="o_deals">
                         <strong class="o_won_deals">
-                            <t t-esc="widget.data.won_deals"/>
+                            <t t-esc="widget.data.won_opp"/>
                         </strong>
                         <br />Won Opportunity
                     </div>
                     <div class="o_piechart" />
                     <div class="o_deals">
                         <strong class="o_lost_deals">
-                            <t t-esc="widget.data.lost_deals"/>
+                            <t t-esc="widget.data.lost_opp"/>
                         </strong>
                         <br />Lost Opportunity
                     </div>
-                    <div class="o_funnel">
-                        Probable Turnover
-                        <div class="o_funnelchart" data-type="action" data-name="%(crm.crm_opportunity_report_action_view)d"/>
-                    </div>
+                    <t t-if="widget.data.expected_revenues.length > 0">
+                        <div class="o_funnel">
+                            <b>Probable Turnover</b>
+                            <div class="o_funnelchart" data-type="action" data-name="%(crm.crm_opportunity_report_action_view)d"/>
+                        </div>
+                    </t>
                 </div>
             </t>
         </div>
@@ -51,14 +53,17 @@
             </div>
             <t t-if="stage === _.first(widget.data.stage_moves)">
                 <div class="o_new_deals">
-                    <strong><t t-esc="widget.data.new_deals" /></strong>
+                    <strong><t t-esc="widget.data.new_opp" /></strong>
                     <br/> New Opportunity
                 </div>
             </t>
             <t t-else="">
                 <div class="o_pipeline_stage_moves">
-                    <t t-esc="stage.data"/> Opportunity <br />
-                    <t t-esc="stage.percentage" />% conversion
+                    <a>
+                        <t t-esc="stage.data"/> Opportunity <br />
+                        <t t-esc="stage.percentage" /> % Conversion
+                    </a>
+                    <i class="chevron"></i>
                 </div>
             </t>
         </div>

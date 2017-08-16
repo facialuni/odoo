@@ -28,10 +28,10 @@
         margin: 10px 0px 0px 0px;
         height: 12%;
         .o-flex-display();
+        justify-content: flex-start;
 
         .o_pipeline_box {
-            .o-flex(1, 1, auto);
-            max-width: 30%;
+            .o-flex(0, 0, 16.8%);
 
             .o_pipeline_stage_name {
                 background-color: #d8d8d8;
@@ -44,10 +44,11 @@
                 position: absolute;
                 top: 0;
                 right: 0px;
-                border: 1.1vw solid #8f8f8f;
+                border: 1vw solid #8f8f8f;
                 border-right: 0;
                 border-left-color: #d4d4d4;
             }
+
             background-color: white;
             box-shadow: 0px 0px 1px 0px #666666;
             position: relative;
@@ -55,17 +56,18 @@
 
             .o_pipeline_stage_moves {
                 background-color: #00cc00;
-                max-width: 55%;
-                margin: 7% -21%;
+                width: 60%;
+                margin: 7% -29%;
                 padding-top: 5%;
                 .o_font_size();
-                color: white;
                 text-align: center;
+                a {
+                    color: white;
+                    cursor: pointer;
+                }
                 .chevron {
-                    position: inherit;
-                    border: 1.6vw solid white;
-                    margin: 0 -40% 0 5%;
-                    border-color: white;
+                    margin: 15% 39%;
+                    border: 2.7vw solid white;
                     border-left-color: #00cc00;
                 }
             }
@@ -82,11 +84,11 @@
                 box-shadow: 0px 0px 1px 0px #666666;
                 position: relative;
                 min-height: 100px;
+                b {
+                    font-size: 1.5em;
+                }
                 a {
                     cursor: pointer;
-                    b {
-                        font-size: 1.5em;
-                    }
                 }
             }
 

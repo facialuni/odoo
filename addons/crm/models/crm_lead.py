@@ -335,7 +335,7 @@ class Lead(models.Model):
 
     @api.multi
     def create_crm_opportunity_history(self, vals):
-        self.env['crm.opportunity.history'].create({
+        self.env['crm.stage.history'].create({
             'stage_id': vals.get('stage_id') or self.stage_id.id,
             'res_id': self.id,
             'user_id': self.user_id.id,
