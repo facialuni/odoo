@@ -905,6 +905,7 @@ class AccountAnalyticAccount(models.Model):
                 'name': vals.get('name'),
                 'analytic_account_id': self.id,
                 'use_tasks': True,
+                'project_type': vals.get('project_type', 'internal'),
             }
             return Project.create(project_values).id
         return False
