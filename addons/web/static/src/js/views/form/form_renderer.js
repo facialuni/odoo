@@ -8,7 +8,6 @@ var dom = require('web.dom');
 
 var _t = core._t;
 var qweb = core.qweb;
-
 var FormRenderer = BasicRenderer.extend({
     className: "o_form_view",
     events: _.extend({}, BasicRenderer.prototype.events, {
@@ -294,7 +293,9 @@ var FormRenderer = BasicRenderer.extend({
 
             var $ul = $("<ul>", {'class': "dropdown-menu o_dropdown_more", role: "menu"});
             _.each(folded_buttons, function ($button) {
-                $('<li>').appendTo($ul).append($button);
+                if ($button.length) {
+                    $('<li>').appendTo($ul).append($button);
+                }
             });
             $ul.appendTo($result);
         }
