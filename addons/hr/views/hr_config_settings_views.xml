@@ -5,7 +5,7 @@
         <field name="model">res.config.settings</field>
         <field name="inherit_id" ref="base.res_config_setting_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[@class='settings']" position="inside">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
                 <div class="setting_view" data-string="Employee" data-key="hr" groups="hr.group_hr_manager">
                     <field name="company_id" invisible="1"/>
                     <h2>Work Organization</h2>
