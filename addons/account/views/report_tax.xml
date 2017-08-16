@@ -7,31 +7,61 @@
                 <h2> Tax Report</h2>
                 <h4> <span t-esc="res_company.name"/> </h4>
                 <div class="row mt32">
-                    <div class="col-xs-offset-4 col-xs-4">
-                        <p>
-                            <t t-if="data['date_from']"><strong>Date from :</strong> <span t-esc="data['date_from']"/><br/></t>
-                            <t t-if="data['date_to']"><strong>Date to :</strong> <span t-esc="data['date_to']"/></t>
-                        </p>
+                    <div class="col-xs-4">
+                        <t t-if="data['date_from']"><strong>Start Date:</strong> <span t-esc="data['date_from']"/><br/></t>
+                        <t t-if="data['date_to']"><strong>End Date: :</strong> <span t-esc="data['date_to']"/></t>
                     </div>
                     <div class="col-xs-4">
-                        <strong>Target Moves:</strong>
-                        <p>
-                            <span t-if="data['target_move'] == 'cash_basis'">Cash Basis Method</span>
-                            <span t-if="data['target_move'] != 'cash_basis'">Accrual Basis</span>
-                        </p>
+                        <strong>Options:</strong>
+                        <span t-if="data['options'] == 'cash_basis'">Cash Basis Method</span>
+                        <span t-if="data['options'] != 'cash_basis'">Accrual Basis</span>
+                    </div>
+                    <div class="col-xs-4">
+                        <strong>Companies:</strong>
+                        <t t-esc="res_company.name"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-offset-8 col-xs-2">
+                        <strong>Net</strong>
+                    </div>
+                    <div class="col-xs-2">
+                        <strong>Tax</strong>
                     </div>
                 </div>
                 <div class="row col-xs-12">
                     <t t-if="sale_line == 'sale'"> Sale </t>
-                </div>
-                <div class="row col-xs-12 o_account_reports_level1">
-                    <t t-esc="purchase_tax"/>
+                    <t t-if="all_sale_tax">
+                        <p style="border: 1px inset"></p>
+                        <div class="row">
+                            <div class="col-xs-2">
+                                <span class="ml16" t-esc="purchase_tax"/>
+                            </div>
+                            <div class="col-xs-offset-6 col-xs-2">
+                                <span t-esc="all_sale_price"/>
+                            </div>
+                            <div class="col-xs-2">
+                                <span t-esc="all_sale_tax"/>
+                            </div>
+                        </div>
+                    </t>
                 </div>
                 <div class="row col-xs-12">
                     <t t-if="purchase_line == 'purchase'"> Purchase </t>
-                </div>
-                <div class="row col-xs-12 o_account_reports_level1">
-                    <t t-esc="purchase_tax"/>
+                    <t t-if="all_purchase_tax">
+                        <p style="border: 1px inset"></p>
+                         <div class="row">
+                            <div class="col-xs-2">
+                                <span class="ml16" t-esc="purchase_tax"/>
+                            </div>
+                            <div class="col-xs-offset-6 col-xs-2">
+                                <span t-esc="all_purchase_price"/>
+                            </div>
+                             <div class="col-xs-2">
+                                <span t-esc="all_purchase_tax"/>
+                            </div>
+                        </div>
+                    </t>
                 </div>
             </div>
         </t>
