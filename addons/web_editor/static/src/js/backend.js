@@ -119,7 +119,7 @@ var FieldTextHtmlSimple = basic_fields.DebouncedField.extend(TranslatableFieldMi
     _renderEdit: function () {
         this.$textarea = $('<textarea>');
         this.$textarea.appendTo(this.$el);
-        this.$textarea.summernote(this._getSummernoteConfig());
+        this.$textarea.summernoteNew(this._getSummernoteConfig());
         this.$content = this.$('.note-editable:first');
         this.$content.html(this._textToHtml(this.value));
         // trigger a mouseup to refresh the editor toolbar

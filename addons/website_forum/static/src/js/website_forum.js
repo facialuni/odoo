@@ -408,7 +408,7 @@ if(!$('.website_forum').length) {
         if (parseInt($("#karma").val()) >= editor_karma) {
             toolbar.push(['insert', ['link', 'picture']]);
         }
-        $textarea.summernote({
+        $textarea.summernoteNew({
                 height: 150,
                 toolbar: toolbar,
                 styleWithSpan: false
