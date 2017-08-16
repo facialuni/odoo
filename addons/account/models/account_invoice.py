@@ -42,11 +42,11 @@ class AccountInvoice(models.Model):
     _order = "date_invoice desc, number desc, id desc"
 
     @api.one
-    @api.depends('invoice_line_ids.price_subtotal', 'tax_line_ids.amount', 'currency_id', 'company_id', 'date_invoice',
-                 'type')
+    @api.depends('invoice_line_ids.price_subtotal', 'tax_line_ids.amount', 'tax_line_ids.amount_rounding',
+                 'currency_id', 'company_id', 'date_invoice', 'type')
     def _compute_amount(self):
         self.amount_untaxed = sum(line.price_subtotal for line in self.invoice_line_ids)
-        self.amount_tax = sum(line.amount for line in self.tax_line_ids)
+        self.amount_tax = sum(line.amount_total for line in self.tax_line_ids)
         self.amount_total = self.amount_untaxed + self.amount_tax
         amount_total_company_signed = self.amount_total
         amount_untaxed_signed = self.amount_untaxed
@@ -649,6 +649,10 @@ class AccountInvoice(models.Model):
         if lines_to_remove:
             self.invoice_line_ids = self.invoice_line_ids - lines_to_remove
 
+        # Clear previous rounded amounts
+        for tax_line in self.tax_line_ids:
+            tax_line.amount_rounding = 0.0
+
         if self.cash_rounding_id:
             rounding_amount = self.cash_rounding_id.compute_difference(self.currency_id, self.amount_total)
             if not self.currency_id.is_zero(rounding_amount):
@@ -661,10 +665,10 @@ class AccountInvoice(models.Model):
                     for tax_line in self.tax_line_ids:
                         if not biggest_tax_line or tax_line.amount > biggest_tax_line.amount:
                             biggest_tax_line = tax_line
-                    biggest_tax_line.amount += rounding_amount
+                    biggest_tax_line.amount_rounding += rounding_amount
                 elif self.cash_rounding_id.strategy == 'add_invoice_line':
                     # Create a new invoice line to perform the rounding
-                    self.env['account.invoice.line'].new({
+                    line_to_add = self.env['account.invoice.line'].new({
                         'name': self.cash_rounding_id.name,
                         'invoice_id': self.id,
                         'account_id': self.cash_rounding_id.account_id.id,
@@ -673,6 +677,7 @@ class AccountInvoice(models.Model):
                         'is_rounding_line': True,
                         'sequence': 9999  # always last line
                     })
+                    self.invoice_line_ids = self.invoice_line_ids + line_to_add
 
     @api.multi
     def action_invoice_draft(self):
@@ -926,7 +931,7 @@ class AccountInvoice(models.Model):
         done_taxes = []
         # loop the invoice.tax.line in reversal sequence
         for tax_line in sorted(self.tax_line_ids, key=lambda x: -x.sequence):
-            if tax_line.amount:
+            if tax_line.amount_total:
                 tax = tax_line.tax_id
                 if tax.amount_type == "group":
                     for child_tax in tax.children_tax_ids:
@@ -936,9 +941,9 @@ class AccountInvoice(models.Model):
                     'tax_line_id': tax_line.tax_id.id,
                     'type': 'tax',
                     'name': tax_line.name,
-                    'price_unit': tax_line.amount,
+                    'price_unit': tax_line.amount_total,
                     'quantity': 1,
-                    'price': tax_line.amount,
+                    'price': tax_line.amount_total,
                     'account_id': tax_line.account_id.id,
                     'account_analytic_id': tax_line.account_analytic_id.id,
                     'invoice_id': self.id,
@@ -1603,13 +1608,18 @@ class AccountInvoiceTax(models.Model):
     account_id = fields.Many2one('account.account', string='Tax Account', required=True, domain=[('deprecated', '=', False)])
     account_analytic_id = fields.Many2one('account.analytic.account', string='Analytic account')
     amount = fields.Monetary()
+    amount_rounding = fields.Monetary()
+    amount_total = fields.Monetary(compute='_compute_amount_total')
     manual = fields.Boolean(default=True)
     sequence = fields.Integer(help="Gives the sequence order when displaying a list of invoice tax.")
     company_id = fields.Many2one('res.company', string='Company', related='account_id.company_id', store=True, readonly=True)
     currency_id = fields.Many2one('res.currency', related='invoice_id.currency_id', store=True, readonly=True)
     base = fields.Monetary(string='Base', compute='_compute_base_amount', store=True)
 
-
+    @api.depends('amount', 'amount_rounding')
+    def _compute_amount_total(self):
+        for tax_line in self:
+            tax_line.amount_total = tax_line.amount + tax_line.amount_rounding
 
 
 class AccountPaymentTerm(models.Model):

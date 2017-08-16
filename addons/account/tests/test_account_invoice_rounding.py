@@ -56,6 +56,7 @@ class TestAccountInvoiceRounding(AccountTestUsers):
             'invoice_line_tax_ids': [(6, 0, [tax_id.id])] if tax_id else None
         })
         invoice_id._onchange_invoice_line_ids() # create the tax_line_ids
+        invoice_id._onchange_cash_rounding_id()
         invoice_id.action_invoice_open()
         return invoice_id
 
@@ -69,7 +70,7 @@ class TestAccountInvoiceRounding(AccountTestUsers):
             tax_lines = inv.tax_line_ids
             self.assertEquals(len(tax_lines), len(exp_tax_values))
             for i in range(0, len(exp_tax_values)):
-                self.assertEquals(tax_lines[i].amount, exp_tax_values[i])
+                self.assertEquals(tax_lines[i].amount_total, exp_tax_values[i])
 
     def test_rounding_add_invoice_line(self):
         self._check_invoice_rounding(
