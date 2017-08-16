@@ -414,7 +414,7 @@ action = model.activate_sample_project()
                             <field name="description" type="html"/>
                             <div class="oe_clear"/>
                         </page>
-                        <page string="Extra Info">
+                        <page string="Extra Info" groups="base.group_no_one">
                             <group>
                                 <group>
                                     <field name="sequence" groups="base.group_no_one"/>
