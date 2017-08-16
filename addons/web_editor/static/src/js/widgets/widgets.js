@@ -534,9 +534,12 @@ var fontIconsDialog = Widget.extend({
         var final_classes = non_fa_classes.concat(this.get_fa_classes());
         if (this.media.tagName !== "SPAN") {
             var media = document.createElement('span');
+            media.innerHTML = dom.ZERO_WIDTH_NBSP_CHAR;
             $(media).data($(this.media).data());
             $(this.media).replaceWith(media);
             this.media = media;
+            $(media).after("&nbsp;");
+            $(media).before("&nbsp;");
             style = style.replace(/\s*width:[^;]+/, '');
         }
         $(this.media).attr("class", _.compact(final_classes).join(' ')).attr("style", style);
@@ -985,6 +988,9 @@ var LinkDialog = Dialog.extend({
             if (!is_link) {
                 if (sc.tagName) {
                     sc = dom.firstChild(so ? sc.childNodes[so] : sc);
+                    if (sc.data == dom.ZERO_WIDTH_NBSP_CHAR) {
+                        sc = sc.parentElement;
+                    }
                     so = 0;
                 } else if (so !== sc.textContent.length) {
                     if (sc === ec) {
@@ -1030,7 +1036,7 @@ var LinkDialog = Dialog.extend({
                 var text = "";
                 this.data.images = [];
                 for (var i=0; i<nodes.length; i++) {
-                    if (dom.ancestor(nodes[i], dom.isImg)) {
+                    if (dom.ancestor(nodes[i], dom.isImg) && nodes[i].data != dom.ZERO_WIDTH_NBSP_CHAR) {
                         this.data.images.push(dom.ancestor(nodes[i], dom.isImg));
                         text += '[IMG]';
                     } else if (!is_link && i===0) {

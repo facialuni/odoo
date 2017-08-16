@@ -211,6 +211,7 @@ eventHandler.modules.popover.button.update = function ($container, oStyle) {
     fn_boutton_update.call(this, $container, oStyle);
 
     $container.find('.note-color').removeClass("hidden");
+    $('#wrapwrap .fa').removeClass('o_icon_selected');
 
     if (oStyle.image) {
         $container.find('[data-event]').parent().removeClass("active");
@@ -223,6 +224,7 @@ eventHandler.modules.popover.button.update = function ($container, oStyle) {
 
         if (dom.isImgFont(oStyle.image)) {
 
+            $(oStyle.image).addClass('o_icon_selected');
             $container.find('.btn-group:not(.only_fa):has(button[data-event="resize"],button[data-value="img-thumbnail"])').addClass("hidden");
             $container.find('.only_fa').removeClass("hidden");
             $container.find('button[data-event="resizefa"][data-value="2"]').toggleClass("active", $(oStyle.image).hasClass("fa-2x"));
@@ -288,7 +290,9 @@ eventHandler.modules.popover.update = function ($popover, oStyle, isAirMode) {
         if (!oStyle.image.className.match(/(^|\s)media_iframe_video(\s|$)/i)) {
             target_node = dom.firstChild(target_node);
         }
-        range.createFromNode(target_node).select();
+        if (!oStyle.image.className.match(/(^|\s)fa(\s|$)/i)) {
+            range.createFromNode(target_node).select();
+        }
         // save range on the editor so it is not lost if restored
         eventHandler.modules.editor.saveRange(dom.makeLayoutInfo(target_node).editable());
     } else {
