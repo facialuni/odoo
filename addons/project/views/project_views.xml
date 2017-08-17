@@ -205,7 +205,7 @@
                     <field name="active" invisible="1"/>
                     <field name="name" string="Project Name"/>
                     <field name="user_id" string="Project Manager"/>
-                    <field name="partner_id" string="Contact"/>
+                    <field name="partner_id" string="Contact" invisible="1"/>
                 </tree>
             </field>
         </record>
