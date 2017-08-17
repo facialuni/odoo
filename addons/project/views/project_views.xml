@@ -545,21 +545,6 @@ action = model.activate_sample_project()
             </field>
         </record>
 
-        <record id="project_task_view_tree_activity" model="ir.ui.view">
-            <field name="name">project.task.tree.activity</field>
-            <field name="model">project.task</field>
-            <field name="arch" type="xml">
-                <tree string="Next Activities" decoration-danger="activity_date_deadline &lt; current_date" default_order="activity_date_deadline">
-                    <field name="name"/>
-                    <field name="project_id"/>
-                    <field name="activity_date_deadline"/>
-                    <field name="activity_type_id"/>
-                    <field name="activity_summary"/>
-                    <field name="stage_id"/>
-                </tree>
-            </field>
-        </record>
-
         <record id="view_task_calendar" model="ir.ui.view">
             <field name="name">project.task.calendar</field>
             <field name="model">project.task</field>
@@ -635,21 +620,6 @@ action = model.activate_sample_project()
             <field name="act_window_id" ref="action_view_task"/>
         </record>
 
-        <record id="project_task_action_activity" model="ir.actions.act_window">
-            <field name="name">My Next Activities</field>
-            <field name="res_model">project.task</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form,kanban,calendar</field>
-            <field name="view_id" ref="project_task_view_tree_activity"/>
-            <field name="context">{'search_default_activities_my':1}</field>
-            <field name="domain">[('activity_date_deadline', '!=', False)]</field>
-            <field name="help" type="html">
-                <p>
-                    Currently there are not any activity scheduled.
-                </p>
-            </field>
-        </record>
-
         <menuitem action="action_view_task" id="menu_action_view_task" parent="project.menu_project_management" sequence="5"/>
 
         <record id="project_task_action_from_partner" model="ir.actions.act_window">
@@ -658,12 +628,6 @@ action = model.activate_sample_project()
             <field name="view_mode">kanban,tree,form</field>
             <field name="search_view_id" ref="view_task_search_form"/>
         </record>
-
-        <menuitem id="project_task_menu_activity"
-            name="Next Activities"
-            parent="project.menu_project_management"
-            action="project_task_action_activity"
-            sequence="25"/>
 
         <!-- Activity types config -->
         <record id="mail_activity_type_action_config_project_types" model="ir.actions.act_window">
