@@ -617,7 +617,7 @@ class StockMove(models.Model):
             'move_dest_id': self,
             'group_id': group_id,
             'route_ids': self.route_ids,
-            'warehouse_id': self.warehouse_id or (self.picking_type_id and self.picking_type_id.warehouse_id or False),
+            'warehouse_id': self.warehouse_id or self.picking_id.picking_type_id.warehouse_id or self.picking_type_id.warehouse_id,
             'priority': self.priority,
         }
 
