@@ -2,6 +2,10 @@
 <templates xml:space="preserve">
 
      <div t-name="mail.ChatComposer" class="o_chat_composer">
+         <div class="o_file_drop_zone_container hidden hidden-xs">
+            <span class="fa fa-upload fa-2x drop_icon"/>
+            <p>Drop your files here</p>
+         </div>
          <div class="o_composer_attachments_list"/>
          <t t-if="widget.extended">
              <div class="o_composer_subject">
