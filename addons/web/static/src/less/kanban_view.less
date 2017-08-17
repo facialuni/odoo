@@ -238,8 +238,10 @@
             padding: @o-kanban-inside-vgutter @o-kanban-inside-hgutter-mobile;
         }
 
-        &:hover .o_dropdown_kanban {
-            visibility: visible;
+        @media (min-width: @screen-md-min) {
+            &:hover .o_dropdown_kanban {
+                visibility: visible;
+            }
         }
 
         &.oe_kanban_global_click, &.oe_kanban_global_click_edit {

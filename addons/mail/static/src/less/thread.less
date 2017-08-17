@@ -41,6 +41,9 @@
     .o_thread_message {
         .o-flex-display();
         padding: 4px @odoo-horizontal-padding;
+        @media (max-width: @screen-xs-max) {
+            padding: 4px 0px;
+        }
         margin-bottom: 0px;
 
         .o_thread_message_sidebar {
