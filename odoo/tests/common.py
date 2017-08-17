@@ -490,7 +490,19 @@ class HttpCase(TransactionCase):
         if browser_path is not None:
             options = ['--headless', '--disable-gpu',
                '--remote-debugging-port=%s' % REMOTE_DEBUG_PORT]
-            return subprocess.Popen([browser_path] + options, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            browser_proc = subprocess.Popen([browser_path] + options, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            wait_seconds = 5.0
+            sleep_step = 0.25
+            site_url = 'http://%s:%d' % (HOST, REMOTE_DEBUG_PORT)
+            # wait for start remote dev tool
+            while wait_seconds > 0:
+                try:
+                    requests.get(site_url)
+                    return browser_proc
+                except requests.exceptions.ConnectionError:
+                    time.sleep(sleep_step)
+                    wait_seconds -= sleep_step
+            _logger.error("Could not connect to Chrome Headless")
 
     def chrome_headless(self, url_path, code, ready="window", login=None, timeout=60, **kw):
         """ Test js code running in the chrome headless browser
@@ -499,7 +511,7 @@ class HttpCase(TransactionCase):
         console.log('ok')
 
         To signal failure do:
-        console.log('error')
+        console.error('error')
 
         If neither are done before timeout test fails.
         """
@@ -509,7 +521,7 @@ class HttpCase(TransactionCase):
             result = ""
             self.authenticate(login, login)
             try:
-                chrome = PyChromeDevTools.ChromeInterface(host='localhost', port=REMOTE_DEBUG_PORT, timeout=15)
+                chrome = PyChromeDevTools.ChromeInterface(host=HOST, port=REMOTE_DEBUG_PORT, timeout=15)
             except ConnectionError as e:
                 _logger.error("Could not connect to Chrome Headless: %s", str(e))
                 return
@@ -522,32 +534,49 @@ class HttpCase(TransactionCase):
                 chrome.Runtime.evaluate(expression=ready)
                 chrome.Runtime.evaluate(expression=code)
             while True:
-                event, messages = chrome.wait_event("Runtime.consoleAPICalled", timeout=60)
+                event, logs = chrome.wait_event("Runtime.consoleAPICalled", timeout=60)
                 if event:
                     if event['method'] == "Runtime.consoleAPICalled":
-                        temp_message = []
-                        for console in event['params']['args']:
-                            temp_message.append(console['value'])
-                        console_msg = " ".join(str(v) for v in temp_message)
-                        if ('failed' or 'error') in console_msg:
-                            result = False
+                        log_type = event['params']['type']
+                        messages = event['params']['args']
+                        console_msg = " ".join(unicode(message['value']) for message in messages)
+                        if log_type in ['log', 'info']:
                             _logger.info(console_msg)
-                            chrome.close()
-                            break
-                        elif 'ok' in console_msg:
+                        if log_type == 'error':
+                            _logger.error(console_msg)
+                        if log_type == 'warn':
+                            _logger.warn(console_msg)
+                        # TODO: find better way to exit loop
+                        if 'ok' == console_msg:
                             result = True
-                            _logger.info(console_msg)
-                            chrome.close()
                             break
-                        else:
-                            _logger.info(console_msg)
-                    if event['method'] == "Runtime.exceptionThrown":
-                        result = False
-                        _logger.error(str(event['params']['exceptionDetails']['exception']['description']).replace("\n", ""))
-                        break
-                else:
-                    break
-            chrome.wait_event("Page.frameStoppedLoading", timeout=60)
+                        if 'error' == console_msg:
+                            result = False
+                            break
+                        
+                    #     temp_message = []
+                    #     for console in event['params']['args']:
+                    #         temp_message.append(console['value'])
+                    #     console_msg = " ".join(str(v) for v in temp_message)
+                    #     if ('failed' or 'error') in console_msg:
+                    #         result = False
+                    #         _logger.error(console_msg)
+                    #         chrome.close()
+                    #         break
+                    #     elif 'ok' in console_msg:
+                    #         result = True
+                    #         _logger.info(console_msg)
+                    #         chrome.close()
+                    #         break
+                    #     else:
+                    #         _logger.info(console_msg)
+                    # if event['method'] == "Runtime.exceptionThrown":
+                    #     result = False
+                    #     _logger.error(str(event['params']['exceptionDetails']['exception']['description']).replace("\n", ""))
+                    #     break
+                # else:
+                #     break
+            # chrome.wait_event("Page.frameStoppedLoading", timeout=60)
             chrome.close()
             browser.terminate()
             return self.assertTrue(

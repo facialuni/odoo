@@ -50,7 +50,7 @@ QUnit.done(function(result) {
     if (!result.failed) {
         console.log('ok');
     } else {
-        console.log('error');
+        console.error('error');
     }
 
     if (!sortButtonAppended) {
@@ -72,7 +72,8 @@ QUnit.log(function (result) {
         if (result.expected !== null) {
             info += ', expected: "' + result.expected + '"';
         }
-        info += ']';
+        info += ']\n';
+        info += result.source;
         console.error(info);
     }
 });
@@ -84,7 +85,7 @@ QUnit.moduleDone(function(result) {
     if (!result.failed) {
         console.log('"' + result.name + '"', "passed", result.total, "tests.");
     } else {
-        console.log('"' + result.name + '"',
+        console.error('"' + result.name + '"',
                     "failed", result.failed,
                     "tests out of", result.total, ".");
     }
