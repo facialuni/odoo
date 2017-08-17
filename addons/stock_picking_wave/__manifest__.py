@@ -16,6 +16,8 @@ This module adds the picking wave option in warehouse management
         'views/stock_picking_wave_views.xml',
         'data/stock_picking_wave_data.xml',
         'wizard/stock_picking_to_wave_views.xml',
+        'report/stock_picking_wave_report_views.xml',
+        'report/report_picking_wave.xml',
     ],
     'demo': [
         'data/stock_picking_wave_demo.xml',

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <template id="stock_picking_wave.report_picking_wave">
+            <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="o">
+            <t t-set="locations" t-value="[]"/>
+            <t t-foreach="o.picking_ids" t-as="pick">
+                <t t-set="locations" t-value="locations+[pick.move_line_ids.mapped('location_id')]"/>
+            </t>
+
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h2>Batch Pickings: <span t-field="o.name"/></h2><br/>
+                    <h4>Responsible: <strong><span t-field="o.user_id"/></strong></h4><br/>
+                    <strong>Pickings</strong>
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th>Reference</th>
+                                <th>Status</th>
+                                <th>Commitment Date</th>
+                                <th>Scheduled Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="o.picking_ids" t-as="pick">
+                                <td t-if="pick.origin">
+                                    <span t-field="pick.origin"/>
+                                </td>
+                                <td>
+                                    <span t-field="pick.state"/>
+                                </td>
+                                <td>
+                                    <span t-field="pick.date"/>
+                                </td>
+                                <td >
+                                    <span t-field="pick.min_date"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p style="page-break-after: always;"/>
+
+                    <t t-foreach="set(locations)" t-as="loc">
+                        <t t-set="related_products" t-value="[]"/>
+                        <t t-foreach="o.picking_ids" t-as="pick">
+                            <t t-set="related_products" t-value="related_products+[pick.move_line_ids.filtered(lambda x: x.location_id==loc)]"/>
+                        </t>
+                        <h2>Batch Pickings: <span t-field="o.name"/></h2><br/>
+                        <h4>Responsible: <strong><span t-field="o.user_id"/></strong></h4><br/>
+
+                        <table class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th>Destination</th>
+                                    <th>Picking</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="related_products" t-as="line">
+                                    <tr t-if="line.id">
+                                        <td><span t-field="line.product_id"/></td>
+                                        <td><span t-field="line.product_qty"/></td>
+                                        <td><span t-field="line.location_dest_id"/></td>
+                                        <td><span t-field="line.picking_id"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                        <p style="page-break-after: always;"/>
+                     </t>
+                 </div>
+             </t>
+         </t>
+     </t>
+        </template>
+    </data>
+</odoo>
