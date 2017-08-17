@@ -205,7 +205,6 @@ class Inventory(models.Model):
         locations = self.env['stock.location'].search([('id', 'child_of', [self.location_id.id])])
         domain = ' location_id in %s'
         args = (tuple(locations.ids),)
-        print self.location_id.id, domain, args
 
         vals = []
         Product = self.env['product.product']
