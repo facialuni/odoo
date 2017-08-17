@@ -52,18 +52,19 @@
                     <input type="hidden" name="attrib" t-att-value="'%s-%s' % (a[0], a[1])" />
                 </t>
             </t>
-            <t t-call="website_sale.search_clear"/>
+            <t t-call="website.website_search_box"/>
+            <!-- <t t-call="website_sale.search_clear"/> -->
         </form>
     </template>
 
-    <template id="search_clear" name="Search Clear">
+    <!-- <template id="search_clear" name="Search Clear">
         <t t-call="website.website_search_box"/>
         <t t-if="search">
             <xpath expr="//input[@class, 'search-query']" position="inside">
                 <a t-attf-href="/shop"><button name="searchclear" class="glyphicon glyphicon-remove-circle"/></a>
             </xpath>
         </t>
-    </template>
+    </template> -->
 
     <template id="search count" inherit_id="website.website_search_box" active="False" customize_show="True" name="Show # found">
         <xpath expr="//button[contains(@class, 'oe_search_button')]" position="inside">
@@ -265,16 +266,19 @@
 
     <!-- Add to cart button-->
     <template id="categories_recursive" name="Category list">
-        <li t-att-class="'active' if c.id == int(category or 0) and not search else None">
-            <a t-att-href="keep('/shop/category/' + slug(c), category=0)" t-field="c.name"></a>
-            <ul t-if="c.child_id and c.id in categ_search_ids" class="nav nav-pills nav-stacked nav-hierarchy">
+
+        <li t-att-class="'active' if c.id == int(category or 0) else None">
+            <a t-att-href="keep('/shop/category/' + slug(c), category=0)">
+                <span t-field="c.name"/>
+            </a>
+            <!-- <ul t-if="c.child_id and c.id in categ_search_ids" class="nav nav-pills nav-stacked nav-hierarchy">
                 <t t-foreach="c.child_id" t-as="c">
                     <t t-if="c.id in categ_search_ids and search">
                         <t t-call="website_sale.categories_recursive"/>
                     </t>
                 </t>
-            </ul>
-            <ul t-else="" class="nav nav-pills nav-stacked nav-hierarchy">
+            </ul> -->
+            <ul class="nav nav-pills nav-stacked nav-hierarchy">
                 <t t-foreach="c.child_id" t-as="c">
                     <t t-call="website_sale.categories_recursive"/>
                 </t>
@@ -285,19 +289,20 @@
     <template id="products_categories" inherit_id="website_sale.products" active="False" customize_show="True" name="Product Categories">
         <xpath expr="//div[@id='products_grid_before']" position="inside">
             <ul class="nav nav-pills nav-stacked mt16">
-                <t t-if="search" class="nav nav-pills nav-stacked nav-hierarchy">
+                <!-- <t t-if="parent_categ_search_ids" class="nav nav-pills nav-stacked nav-hierarchy">
                     <t t-foreach="parent_categ_search_ids" t-as="c">
                         <t t-call="website_sale.categories_recursive" />
                     </t>
                 </t>
-                <t t-else=''>
-                    <li t-att-class=" '' if category else 'active' ">
-                        <a t-att-href="keep('/shop',category=0)" class="o_not_editable">All Products</a>
-                    </li>
-                    <t t-foreach="categories" t-as="c">
-                        <t t-call="website_sale.categories_recursive" />
-                    </t>
+                <t t-else=''> -->
+                <li t-att-class=" '' if category else 'active' ">
+                    <a t-att-href="keep('/shop',category=0)" class="o_not_editable">All Products</a>
+                </li>
+                <t t-esc="categories"/>
+                <t t-foreach="categories" t-as="c">
+                    <t t-call="website_sale.categories_recursive" />
                 </t>
+                <!-- </t> -->
             </ul>
         </xpath>
         <xpath expr="//div[@id='products_grid_before']" position="attributes">

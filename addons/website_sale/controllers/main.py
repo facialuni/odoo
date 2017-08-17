@@ -169,6 +169,12 @@ class WebsiteSale(http.Controller):
                     '|', '|', '|', ('name', 'ilike', srch), ('description', 'ilike', srch),
                     ('description_sale', 'ilike', srch), ('product_variant_ids.default_code', 'ilike', srch)]
 
+        # if search and category:
+        #     category = ''
+        #     if category:
+        #         domain += [('public_categ_ids', 'child_of', int(category))]
+        #         search = ''
+
         if category:
             domain += [('public_categ_ids', 'child_of', int(category))]
 
@@ -231,31 +237,54 @@ class WebsiteSale(http.Controller):
         categs = request.env['product.public.category'].search([('parent_id', '=', False)])
         Product = request.env['product.template']
 
-        parent_category_ids = []
-        if category:
-            parent_category_ids = [category.id]
-            current_category = category
-            while current_category.parent_id:
-                parent_category_ids.append(current_category.parent_id.id)
-                current_category = current_category.parent_id
-
         product_count = Product.search_count(domain)
         pager = request.website.pager(url=url, total=product_count, page=page, step=ppg, scope=7, url_args=post)
         products = Product.search(domain, limit=ppg, offset=pager['offset'], order=self._get_search_order(post))
 
-        parent_categ_search_ids = []
-        categ_recs = request.env['product.public.category']
-        parent_categ_recs = request.env['product.public.category']
+        parent_category_ids = []
+        # if category:
+        #     parent_category_ids = [category.id]
+        #     current_category = category
+        #     while current_category.parent_id:
+        #         parent_category_ids.append(current_category.parent_id.id)
+        #         current_category = current_category.parent_id
+
         if search:
-            products = Product.search(domain)
-            if products:
-                for product in products:
-                    parent_categ_search_ids += product.public_categ_ids
-                    for category in parent_categ_search_ids:
-                        categs = category.search([('parent_left', '<=', category.parent_left), ('parent_right', '>=', category.parent_right)])
-                        categ_recs |= categs
-                        parent_categ_recs |= categs[0]
+            categories = products.mapped('public_categ_ids')
+            for category in categories:
+                parent_category_ids = category
+                current_category = category
+                while current_category.parent_id:
+                    parent_category_ids = current_category.parent_id
+                    current_category = current_category.parent_id
+                    categs = parent_category_ids
+        parent_category_ids = request.env['product.public.category']
+
+        # categories = products.mapped('public_categ_ids')
+        # for category in categories:
+        #     parent_category_ids |= category
+        #     current_category = category
+        #     while current_category.parent_id:
+        #         parent_category_ids |= current_category.parent_id
+        #         current_category = current_category.parent_id
+        #     categs |= category
+
+        # parent_categ_search_ids = []
+        # categ_recs = request.env['product.public.category']
+        # parent_categ_recs = request.env['product.public.category']
+
+        # if search:
+        #     products = Product.search(domain)
+        #     if products:
+        #         for product in products:
+        #             if product:
+        #                 parent_categ_search_ids += product.public_categ_ids
+        #                 for category in parent_categ_search_ids:
+        #                     categs = category.search([('parent_left', '<=', category.parent_left), ('parent_right', '>=', category.parent_right)])
+        #                     categ_recs |= categs
+        #                     parent_categ_recs |= categs[0]
         ProductAttribute = request.env['product.attribute']
+
         if products:
             # get all products without limit
             selected_products = Product.search(domain, limit=False)
@@ -279,8 +308,8 @@ class WebsiteSale(http.Controller):
             'compute_currency': compute_currency,
             'keep': keep,
             'parent_category_ids': parent_category_ids,
-            'parent_categ_search_ids': parent_categ_recs,
-            'categ_search_ids': categ_recs.ids,
+            # 'parent_categ_search_ids': parent_categ_recs,
+            # 'categ_search_ids': categ_recs.ids,
         }
         if category:
             values['main_object'] = category
