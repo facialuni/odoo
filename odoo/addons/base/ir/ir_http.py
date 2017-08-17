@@ -269,14 +269,12 @@ class IrHttp(models.AbstractModel):
             return (404, [], None)
 
         # check read access
+        if public_key:
+            obj = obj.with_context(public_key=public_key).browse(obj.id)
         try:
             last_update = obj['__last_update']
         except AccessError:
-            if not public_key:
-                return (403, [], None)
-            obj = env.sudo().search([['id', '=', obj.id], ['public_key', '=', public_key]])
-            if not obj:
-                return (403, [], None)
+            return (403, [], None)
 
         status, headers, content = None, [], None
 

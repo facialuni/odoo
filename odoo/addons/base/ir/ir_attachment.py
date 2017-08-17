@@ -279,6 +279,7 @@ class IrAttachment(models.Model):
                             help="You can either upload a file from your computer or copy/paste an internet link to your file.")
     url = fields.Char('Url', index=True, size=1024)
     public = fields.Boolean('Is public document')
+    public_key = fields.Char("Public key", size=36, readonly=True)
 
     # the field 'datas' is computed and may use the other fields below
     datas = fields.Binary(string='File Content', compute='_compute_datas', inverse='_inverse_datas')
@@ -288,7 +289,6 @@ class IrAttachment(models.Model):
     checksum = fields.Char("Checksum/SHA1", size=40, index=True, readonly=True)
     mimetype = fields.Char('Mime Type', readonly=True)
     index_content = fields.Text('Indexed Content', readonly=True, prefetch=False)
-    public_key = fields.Char("Public key", size=36, readonly=True)
 
     @api.model_cr_context
     def _auto_init(self):

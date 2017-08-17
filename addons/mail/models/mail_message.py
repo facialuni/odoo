@@ -12,6 +12,7 @@ from odoo.osv import expression
 from odoo.tools import pycompat
 
 _logger = logging.getLogger(__name__)
+_image_odoourl = re.compile(r'( src=[\'"][a-z0-9+/:._-]*/web/image/([a-z0-9._-]+)(/[a-z0-9+/._-]+)?(\?[^\s\'"]+)?)([\'"])', re.I)
 _image_dataurl = re.compile(r'(data:image/[a-z]+?);base64,([a-z0-9+/]{3,}=*)([\'"])', re.I)
 
 
@@ -732,6 +733,14 @@ class Message(models.Model):
         if 'body' in values:
             Attachments = self.env['ir.attachment']
             data_to_url = {}
+
+            def add_web_image_key(match):
+                if match.group(4) and 'key=' in match.group(4):
+                    return match.group(0)
+                attachment = Attachments.browse(int(match.group(2)))
+                return '%s%skey=%s%s' % (match.group(1), match.group(4) and '&' or '?', attachment.public_key, match.group(5))
+            values['body'] = _image_odoourl.sub(add_web_image_key, values['body'])
+
             def base64_to_boundary(match):
                 key = match.group(2)
                 if not data_to_url.get(key):
@@ -743,7 +752,7 @@ class Message(models.Model):
                         'res_model': 'mail.message',
                     })
                     values['attachment_ids'].append((4, attachment.id))
-                    data_to_url[key] = '/web/image/%s' % attachment.id
+                    data_to_url[key] = '/web/image/%s?key=%s' % (attachment.id, attachment.public_key)
                 return '%s%s alt="%s"' % (data_to_url[key], match.group(3), name)
             values['body'] = _image_dataurl.sub(base64_to_boundary, values['body'])
 
