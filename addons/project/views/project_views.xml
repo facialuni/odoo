@@ -295,7 +295,7 @@
                                             <div t-if="record.alias_name.value and record.alias_domain.value">
                                                 <span><i class="fa fa-envelope"></i> <t t-esc="record.alias_id.value"/></span>
                                             </div>
-                                            <div t-if="record.rating_status.raw_value != 'no'" class="mt8 text-primary" title="Percentage of happy ratings over the past 30 days. Get rating details from the More menu.">
+                                            <div t-if="record.rating_status.raw_value != 'no'" class="mt8 text-primary" title="Percentage of happy ratings over the past 30 days. Get rating details from the More menu." groups="project.group_project_rating">
                                                 <b>
                                                     <t t-if="record.percentage_satisfaction_project.value == -1">
                                                         <i class="fa fa-smile-o"/> No rating yet
