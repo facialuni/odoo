@@ -596,6 +596,16 @@ function reRangeSelectKey(event) {
         }
     }
 }
+function adjustPosition(event) {
+    var selection = window.getSelection().baseNode.nextElementSibling;
+    if (!selection) {
+        if (event.keyCode == 37) {
+            $(window.getSelection().baseNode.parentNode).before("&nbsp;");
+        } else if (event.keyCode == 39) {
+            $(window.getSelection().baseNode.parentNode).after("&nbsp;");
+        }
+    }
+}
 function reRangeSelect(event, dx, dy) {
     var r = range.create();
     if (!r || r.isCollapsed()) return;
@@ -778,6 +788,7 @@ eventHandler.attach = function (oLayoutInfo, options) {
         }
     });
     $(document).on("keyup", reRangeSelectKey);
+    $(document).on("keydown", adjustPosition);
 
     var clone_data = false;
     var $node = oLayoutInfo.editor();
@@ -868,6 +879,7 @@ eventHandler.detach = function (oLayoutInfo, options) {
     $(document).off('mouseup', summernote_mouseup);
     oLayoutInfo.editor().off("dblclick");
     $(document).off("keyup", reRangeSelectKey);
+    $(document).off("keydown", adjustPosition);
 };
 
 // Translation for odoo
