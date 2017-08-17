@@ -367,7 +367,7 @@ var LineRenderer = Widget.extend(FieldManagerMixin, {
 
         // mv_lines
         var $mv_lines = this.$('.match table tbody').empty();
-        _.each(state.mv_lines.slice(0,5), function (line) {
+        _.each(state.mv_lines.slice(0,40), function (line) {
             var $line = $(qweb.render("reconciliation.line.mv_line", {'line': line, 'state': state}));
             if (!isNaN(line.id)) {
                 $('<span class="line_info_button fa fa-info-circle"/>')
@@ -376,9 +376,6 @@ var LineRenderer = Widget.extend(FieldManagerMixin, {
             }
             $mv_lines.append($line);
         });
-        this.$('.match .fa-chevron-right').toggleClass('disabled', state.mv_lines.length <= 5);
-        this.$('.match .fa-chevron-left').toggleClass('disabled', !state.offset);
-        this.$('.match').css('max-height', !state.mv_lines.length && !state.filter.length ? '0px' : '');
 
         // balance
         this.$('table tfoot').html(qweb.render("reconciliation.line.balance", {'state': state}));
