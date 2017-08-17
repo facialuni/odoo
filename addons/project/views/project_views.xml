@@ -222,6 +222,11 @@
                             <group>
                                 <field name="name" class="o_project_name oe_inline"
                                     string="Project Name" placeholder="e.g. Office Party"/>
+                                <label for="label_tasks" string="Task Label"/>
+                                <div>
+                                    <field name="label_tasks" class="oe_inline oe_input_align" attrs="{'invisible': [('use_tasks', '=', False)]}" placeholder="e.g.Issues, Bookings, etc."/>
+                                </div>
+                                <field name="project_type" widget="radio"/>
                                 <label for="alias_name" string="Choose a Project Email" attrs="{'invisible': [('alias_domain', '=', False)]}"/>
                                 <div name="alias_def" attrs="{'invisible': [('alias_domain', '=', False)]}">
                                     <field name="alias_name" class="oe_inline"/>@<field name="alias_domain" class="oe_inline" readonly="1"/>
@@ -229,7 +234,7 @@
                                 <field name="user_id" invisible="1"/>
                             </group>
                             <group name='options' invisible="1">
-                                <field name="use_tasks"/>
+                                <field name="use_tasks" invisible="1"/>
                             </group>
                         </group>
                         <footer>
