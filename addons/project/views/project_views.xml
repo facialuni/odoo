@@ -126,9 +126,7 @@
                         </h1>
                         <div name="options_active" class="oe_edit_only">
                             <div>
-                                <field name="use_tasks" class="oe_inline"/>
-                                <label for="use_tasks" class="oe_inline" string="Name of the tasks :"/>
-                                <field name="label_tasks" class="oe_inline oe_input_align" attrs="{'invisible': [('use_tasks', '=', False)]}"/>
+                                <field name="use_tasks" class="oe_inline" invisible="1"/>
                             </div>
                         </div>
                     </div>
@@ -137,6 +135,10 @@
                             <group>
                                 <field name="user_id" string="Project Manager"
                                         attrs="{'readonly':[('active','=',False)]}"/>
+                                <label for="label_tasks" class="oe_edit_only" string="Task Label"/>
+                                <div class="oe_edit_only">
+                                    <field name="label_tasks" class="oe_inline oe_input_align" attrs="{'invisible': [('use_tasks', '=', False)]}" placeholder="e.g.Issues, Bookings, etc."/>
+                                </div>
                                 <field name="project_type" widget="radio"/>
                                 <field name="subtask_project_id" groups="project.group_subtask_project"/>
                                 <field name="partner_id" string="Customer" attrs="{'invisible': [('project_type', '!=', 'portal')]}" placeholder="Leave empty if each task is for a specific customer"/>
