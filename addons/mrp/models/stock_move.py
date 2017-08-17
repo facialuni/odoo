@@ -177,7 +177,6 @@ class StockMove(models.Model):
                 'product_uom_qty': quantity,
                 'state': 'draft',  # will be confirmed below
                 'name': self.name,
-                'procurement_id': self.procurement_id.id,
             })
         return self.env['stock.move']
 

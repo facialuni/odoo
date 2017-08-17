@@ -108,5 +108,3 @@
   !python {model: sale.order, id: sale_order_so0}: |
     mo = self.env['mrp.production'].search([('origin','like',self.name)], limit=1)
     assert mo, 'Manufacturing order has not been generated'
-    assert mo.sale_name == self.name, 'Wrong Name for the Manufacturing Order. Expected %s, Got %s' % (self.name, mo.sale_name)
-    assert mo.sale_ref == self.client_order_ref, 'Wrong Sale Reference for the Manufacturing Order'

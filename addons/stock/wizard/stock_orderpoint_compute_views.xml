@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_procurement_compute_wizard" model="ir.ui.view">
+        <field name="name">Run Reordering Rules</field>
+        <field name="model">stock.orderpoint.compute</field>
+        <field name="arch" type="xml">
+            <form string="Parameters">
+                <p>
+                This tool will force the computation of all reordering rules now.
+                You don't need to run it manually, as it's launched
+                automatically once per day for you.
+                </p>
+                <footer>
+                    <button name="procure_calculation" string="Process Orderpoints" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-default" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_procurement_compute" model="ir.actions.act_window">
+        <field name="name">Run Reordering Rules</field>
+        <field name="res_model">stock.orderpoint.compute</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_stock_sched" name="Schedulers" parent="stock.menu_stock_root" groups="group_stock_manager" sequence="50"/>
+    <menuitem action="action_procurement_compute" id="menu_procurement_compute" parent="menu_stock_sched"/>
+
+
+</odoo>

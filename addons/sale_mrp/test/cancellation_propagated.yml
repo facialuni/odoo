@@ -56,11 +56,6 @@
   !python {model: sale.order, id: sale_order_product_manu}: |
     self.action_confirm()
 -
-  I run scheduler.
--
-  !python {model: procurement.order, id: False}: |
-    self.run_scheduler()
-- 
   Check the propagation when we cancel the main procurement 
     * Retrieve related procurements and check that there are all running
     * Check that the purchase order has been well created

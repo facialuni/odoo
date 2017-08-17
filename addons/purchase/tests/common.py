@@ -8,7 +8,7 @@ from odoo.addons.stock.tests.common2 import TestStockCommon
 class TestPurchase(TestStockCommon):
 
     def _create_make_procurement(self, product, product_qty):
-        MakeProcurement = self.env['make.procurement']
+        ProcurementGroup = self.env['procurement.group']
         order_values = {
             'product_id': product.id,
             'qty': product_qty,
@@ -16,7 +16,7 @@ class TestPurchase(TestStockCommon):
             'warehouse_id': self.warehouse_1.id,
             'date_planned': fields.Datetime.to_string(fields.datetime.now() + timedelta(days=10))  # 10 days added to current date of procurement to get future schedule date and order date of purchase order.
         }
-        return MakeProcurement.create(order_values)
+        return ProcurementGroup.run(order_values)
 
     @classmethod
     def setUpClass(cls):

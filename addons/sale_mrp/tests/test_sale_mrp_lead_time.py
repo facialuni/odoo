@@ -63,9 +63,6 @@ class TestSaleMrpLeadTime(TestStockCommon):
         # Confirm sale order
         order.action_confirm()
 
-        # Run scheduler
-        self.env['procurement.order'].run_scheduler()
-
         # Check manufacturing order created or not
         manufacturing_order = self.env['procurement.order'].search([('product_id', '=', self.product_1.id), ('group_id', '=', order.procurement_group_id.id), ('production_id', '!=', False)]).production_id
         self.assertTrue(manufacturing_order, 'Manufacturing order should be created.')

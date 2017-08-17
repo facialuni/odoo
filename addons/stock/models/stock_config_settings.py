@@ -11,11 +11,6 @@ class StockConfigSettings(models.TransientModel):
     company_id = fields.Many2one(
         'res.company', 'Company',
         default=lambda self: self.env.user.company_id, required=True)
-    module_procurement_jit = fields.Selection([
-        (1, 'Immediately after sales order confirmation'),
-        (0, 'Manually or based on automatic scheduler')
-        ], "Reservation",
-        help="Reserving products manually in delivery orders or by running the scheduler is advised to better manage priorities in case of long customer lead times or/and frequent stock-outs.")
     module_product_expiry = fields.Boolean("Expiration Dates",
         help="Track following dates on lots & serial numbers: best before, removal, end of life, alert. \n Such dates are set automatically at lot/serial number creation based on values set on the product (in days).")
     group_stock_packaging = fields.Boolean('Product Packages',

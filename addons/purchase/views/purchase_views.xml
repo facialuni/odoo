@@ -223,6 +223,7 @@
                                     <field name="price_unit"/>
                                     <field name="taxes_id" widget="many2many_tags" domain="[('type_tax_use','=','purchase')]" context="{'default_type_tax_use': 'purchase'}" options="{'no_create': True}"/>
                                     <field name="price_subtotal" widget="monetary"/>
+                                    <field name="move_dest_id" invisible="1"/>
                                 </tree>
                                 <form string="Purchase Order Line">
                                     <sheet>
@@ -251,6 +252,7 @@
                                         </page><page string="Invoices and Incoming Shipments">
                                             <field name="invoice_lines"/>
                                             <field name="move_ids"/>
+                                            <field name="move_dest_id" invisible="1"/>
                                         </page>
                                         </notebook>
                                     </sheet>
@@ -535,19 +537,6 @@
             </field>
         </record>
 
-        <!-- Procurements -->
-
-        <record id="view_procurement_form_inherit" model="ir.ui.view">
-            <field name="name">procurement.order.form.inherit</field>
-            <field name="model">procurement.order</field>
-            <field name="inherit_id" ref="procurement.procurement_form_view"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='origin']" position="after">
-                    <field name="purchase_id"/>
-                </xpath>
-            </field>
-        </record>
-        
         <!-- Product Suppliers-->
         
         <record id="view_product_supplier_inherit" model="ir.ui.view">

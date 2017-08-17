@@ -8,11 +8,11 @@ from operator import itemgetter
 
 from odoo import api, fields, models, _
 from odoo.addons import decimal_precision as dp
-from odoo.addons.procurement.models import procurement
 from odoo.exceptions import UserError
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, pycompat
 from odoo.tools.float_utils import float_compare, float_round, float_is_zero
 
+PROCUREMENT_PRIORITIES = [('0', 'Not urgent'), ('1', 'Normal'), ('2', 'Urgent'), ('3', 'Very Urgent')]
 
 class StockMove(models.Model):
     _name = "stock.move"
@@ -26,7 +26,7 @@ class StockMove(models.Model):
 
     name = fields.Char('Description', index=True, required=True)
     sequence = fields.Integer('Sequence', default=10)
-    priority = fields.Selection(procurement.PROCUREMENT_PRIORITIES, 'Priority', default='1')
+    priority = fields.Selection(PROCUREMENT_PRIORITIES, 'Priority', default='1')
     create_date = fields.Datetime('Creation Date', index=True, readonly=True)
     date = fields.Datetime(
         'Date', default=fields.Datetime.now, index=True, required=True,
@@ -122,7 +122,6 @@ class StockMove(models.Model):
              "this second option should be chosen.")
     scrapped = fields.Boolean('Scrapped', related='location_dest_id.scrap_location', readonly=True, store=True)
     scrap_ids = fields.One2many('stock.scrap', 'move_id')
-    procurement_id = fields.Many2one('procurement.order', 'Procurement')
     group_id = fields.Many2one('procurement.group', 'Procurement Group', default=_default_group_id)
     rule_id = fields.Many2one('procurement.rule', 'Procurement Rule', ondelete='restrict', help='The procurement rule that created this stock move')
     push_rule_id = fields.Many2one('stock.location.path', 'Push Rule', ondelete='restrict', help='The push rule that created this stock move')
@@ -146,7 +145,7 @@ class StockMove(models.Model):
         'Availability', compute='_compute_string_qty_information',
         readonly=True, help='Show various information on stock availability for this move')
     restrict_partner_id = fields.Many2one('res.partner', 'Owner ', help="Technical field used to depict a restriction on the ownership of quants to consider when marking this move as 'done'")
-    route_ids = fields.Many2many('stock.location.route', 'stock_location_route_move', 'move_id', 'route_id', 'Destination route', help="Preferred route to be followed by the procurement order")
+    route_ids = fields.Many2many('stock.location.route', 'stock_location_route_move', 'move_id', 'route_id', 'Destination route', help="Preferred route")
     warehouse_id = fields.Many2one('stock.warehouse', 'Warehouse', help="Technical field depicting the warehouse to consider for the route selection on the next procurement (if any).")
     has_tracking = fields.Selection(related='product_id.tracking', string='Product with Tracking')
     quantity_done = fields.Float('Quantity Done', compute='_quantity_done_compute', digits=dp.get_precision('Product Unit of Measure'), inverse='_quantity_done_set',
@@ -530,7 +529,7 @@ class StockMove(models.Model):
                 ('location_dest_id', '=', move.location_dest_id.id),
                 ('picking_type_id', '=', move.picking_type_id.id),
                 ('printed', '=', False),
-                ('state', 'in', ['draft', 'confirmed', 'waiting', 'partially_available', 'assigned'])], limit=1)
+                ('state', 'in', ['confirmed', 'waiting', 'partially_available', 'assigned'])], limit=1)
             if not picking:
                 recompute = True
                 picking = Picking.create(move._get_new_picking_values())
@@ -543,6 +542,7 @@ class StockMove(models.Model):
             # record won't be found.
             if recompute:
                 move.recompute()
+            picking.action_confirm()
         return True
     _picking_assign = assign_picking
 
@@ -584,11 +584,8 @@ class StockMove(models.Model):
                 to_assign[key] |= move
 
         # create procurements for make to order moves
-        procurements = self.env['procurement.order']
         for move in move_create_proc:
-            procurements |= procurements.create(move._prepare_procurement_from_move())
-        if procurements:
-            procurements.run()
+            self.env['procurement.group'].run(move._prepare_procurement_from_move())
 
         move_to_confirm.write({'state': 'confirmed'})
         (move_waiting | move_create_proc).write({'state': 'waiting'})
@@ -602,25 +599,25 @@ class StockMove(models.Model):
     def _prepare_procurement_from_move(self):
         self.ensure_one()
         origin = (self.group_id and (self.group_id.name + ":") or "") + (self.rule_id and self.rule_id.name or self.origin or self.picking_id.name or "/")
-        group_id = self.group_id and self.group_id.id or False
+        group_id = self.group_id or False
         if self.rule_id:
             if self.rule_id.group_propagation_option == 'fixed' and self.rule_id.group_id:
-                group_id = self.rule_id.group_id.id
+                group_id = self.rule_id.group_id
             elif self.rule_id.group_propagation_option == 'none':
                 group_id = False
         return {
             'name': self.rule_id and self.rule_id.name or "/",
             'origin': origin,
-            'company_id': self.company_id.id,
+            'company_id': self.company_id,
             'date_planned': self.date,
-            'product_id': self.product_id.id,
+            'product_id': self.product_id,
             'product_qty': self.product_uom_qty,
-            'product_uom': self.product_uom.id,
-            'location_id': self.location_id.id,
-            'move_dest_id': self.id,
+            'product_uom': self.product_uom,
+            'location_id': self.location_id,
+            'move_dest_id': self,
             'group_id': group_id,
-            'route_ids': [(4, x.id) for x in self.route_ids],
-            'warehouse_id': self.warehouse_id.id or (self.picking_type_id and self.picking_type_id.warehouse_id.id or False),
+            'route_ids': self.route_ids,
+            'warehouse_id': self.warehouse_id or (self.picking_type_id and self.picking_type_id.warehouse_id or False),
             'priority': self.priority,
         }
 
@@ -800,7 +797,6 @@ class StockMove(models.Model):
                     move.move_dest_ids.write({'procure_method': 'make_to_stock'})
                     move.move_dest_ids.write({'move_orig_ids': [(3, move.id, 0)]})
         self.write({'state': 'cancel', 'move_orig_ids': [(5, 0, 0)]})
-        self.mapped('procurement_id').check()
         return True
 
     def _prepare_extra_move_vals(self, qty):
@@ -819,7 +815,6 @@ class StockMove(models.Model):
         The rationale for the creation of an extra move is the application of a potential push
         rule that will handle the extra quantities.
         """
-        self.ensure_one()
         extra_move = self.env['stock.move']
         rounding = self.product_uom.rounding
         # moves created after the picking is assigned do not have `product_uom_qty`, but we shouldn't create extra moves for them
@@ -947,6 +942,7 @@ class StockMove(models.Model):
         # HALF-UP rounding as only rounding errors will be because of propagation of error from default UoM
         uom_qty = self.product_id.uom_id._compute_quantity(qty, self.product_uom, rounding_method='HALF-UP')
         defaults = self._prepare_move_split_vals(uom_qty)
+
         if restrict_partner_id:
             defaults['restrict_partner_id'] = restrict_partner_id
 
@@ -982,17 +978,3 @@ class StockMove(models.Model):
                 else:
                     move.state = 'confirmed'
 
-    @api.multi
-    def action_show_picking(self):
-        view = self.env.ref('stock.view_picking_form')
-        return {
-            'name': _('Transfer'),
-            'type': 'ir.actions.act_window',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'stock.picking',
-            'views': [(view.id, 'form')],
-            'view_id': view.id,
-            'target': 'new',
-            'res_id': self.id}
-    show_picking = action_show_picking
