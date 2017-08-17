@@ -501,6 +501,15 @@ var LineRenderer = Widget.extend(FieldManagerMixin, {
                 .then(addRequiredStyle.bind(self, self.fields.amount));
             self.$('.create').append($create);
 
+            $create.on('input', function (event) {
+                for (var fieldName in self.fields) {
+                    if (self.fields[fieldName].$el.is(event.target)) {
+                        self.fields[fieldName]._setValue($(event.target).val());
+                        break;
+                    }
+                }
+            });
+
             function addRequiredStyle(widget) {
                 widget.$el.addClass('o_required_modifier');
             }
