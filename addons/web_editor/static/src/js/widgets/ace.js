@@ -224,7 +224,8 @@ var ViewEditor = Widget.extend({
                 initType = 'less';
             }
             if (!this.options.doNotLoadViews) {
-                initResID = (typeof this.viewKey === 'number' ? this.viewKey : _.findWhere(this.views, {xml_id: this.viewKey}).id);
+                var viewKey =  _.findWhere(this.views, {xml_id: this.viewKey});
+                initResID = (typeof this.viewKey === 'number' ? this.viewKey : (viewKey ? viewKey.id : $('#wrap').data('oeId')));
                 initType = 'xml';
             }
         }
