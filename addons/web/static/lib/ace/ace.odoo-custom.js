@@ -74,7 +74,9 @@
             return s
         };
     o(ACE_NAMESPACE)
-})(), ace.define("ace/lib/regexp", ["require", "exports", "module"], function(e, t, n) {
+})();
+(function() {var define = ace.define, require = ace.require;
+define("ace/lib/regexp", ["require", "exports", "module"], function(e, t, n) {
     "use strict";
 
     function o(e) {
@@ -116,7 +118,7 @@
         var t = r.exec.call(this, e);
         return t && this.global && !t[0].length && this.lastIndex > t.index && this.lastIndex--, !!t
     })
-}), ace.define("ace/lib/es5-shim", ["require", "exports", "module"], function(e, t, n) {
+}), define("ace/lib/es5-shim", ["require", "exports", "module"], function(e, t, n) {
     function r() {}
 
     function w(e) {
@@ -459,10 +461,10 @@
         if (e == null) throw new TypeError("can't convert " + e + " to object");
         return Object(e)
     }
-}), ace.define("ace/lib/fixoldbrowsers", ["require", "exports", "module", "ace/lib/regexp", "ace/lib/es5-shim"], function(e, t, n) {
+}), define("ace/lib/fixoldbrowsers", ["require", "exports", "module", "ace/lib/regexp", "ace/lib/es5-shim"], function(e, t, n) {
     "use strict";
     e("./regexp"), e("./es5-shim")
-}), ace.define("ace/lib/dom", ["require", "exports", "module"], function(e, t, n) {
+}), define("ace/lib/dom", ["require", "exports", "module"], function(e, t, n) {
     "use strict";
     var r = "http://www.w3.org/1999/xhtml";
     t.getDocumentHead = function(e) {
@@ -562,7 +564,7 @@
     }), t.getParentWindow = function(e) {
         return e.defaultView || e.parentWindow
     }
-}), ace.define("ace/lib/oop", ["require", "exports", "module"], function(e, t, n) {
+}), define("ace/lib/oop", ["require", "exports", "module"], function(e, t, n) {
     "use strict";
     t.inherits = function(e, t) {
         e.super_ = t, e.prototype = Object.create(t.prototype, {
@@ -579,7 +581,7 @@
     }, t.implement = function(e, n) {
         t.mixin(e, n)
     }
-}), ace.define("ace/lib/keys", ["require", "exports", "module", "ace/lib/fixoldbrowsers", "ace/lib/oop"], function(e, t, n) {
+}), define("ace/lib/keys", ["require", "exports", "module", "ace/lib/fixoldbrowsers", "ace/lib/oop"], function(e, t, n) {
     "use strict";
     e("./fixoldbrowsers");
     var r = e("./oop"),
@@ -716,7 +718,7 @@
         var t = i[e];
         return typeof t != "string" && (t = String.fromCharCode(e)), t.toLowerCase()
     }
-}), ace.define("ace/lib/useragent", ["require", "exports", "module"], function(e, t, n) {
+}), define("ace/lib/useragent", ["require", "exports", "module"], function(e, t, n) {
     "use strict";
     t.OS = {
         LINUX: "LINUX",
@@ -729,7 +731,7 @@
     var r = (navigator.platform.match(/mac|win|linux/i) || ["other"])[0].toLowerCase(),
         i = navigator.userAgent;
     t.isWin = r == "win", t.isMac = r == "mac", t.isLinux = r == "linux", t.isIE = navigator.appName == "Microsoft Internet Explorer" || navigator.appName.indexOf("MSAppHost") >= 0 ? parseFloat((i.match(/(?:MSIE |Trident\/[0-9]+[\.0-9]+;.*rv:)([0-9]+[\.0-9]+)/) || [])[1]) : parseFloat((i.match(/(?:Trident\/[0-9]+[\.0-9]+;.*rv:)([0-9]+[\.0-9]+)/) || [])[1]), t.isOldIE = t.isIE && t.isIE < 9, t.isGecko = t.isMozilla = (window.Controllers || window.controllers) && window.navigator.product === "Gecko", t.isOldGecko = t.isGecko && parseInt((i.match(/rv\:(\d+)/) || [])[1], 10) < 4, t.isOpera = window.opera && Object.prototype.toString.call(window.opera) == "[object Opera]", t.isWebKit = parseFloat(i.split("WebKit/")[1]) || undefined, t.isChrome = parseFloat(i.split(" Chrome/")[1]) || undefined, t.isAIR = i.indexOf("AdobeAIR") >= 0, t.isIPad = i.indexOf("iPad") >= 0, t.isTouchPad = i.indexOf("TouchPad") >= 0, t.isChromeOS = i.indexOf(" CrOS ") >= 0
-}), ace.define("ace/lib/event", ["require", "exports", "module", "ace/lib/keys", "ace/lib/useragent"], function(e, t, n) {
+}), define("ace/lib/event", ["require", "exports", "module", "ace/lib/keys", "ace/lib/useragent"], function(e, t, n) {
     "use strict";
 
     function o(e, t, n) {
@@ -898,7 +900,7 @@
     t.nextFrame = typeof window == "object" && (window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame || window.oRequestAnimationFrame), t.nextFrame ? t.nextFrame = t.nextFrame.bind(window) : t.nextFrame = function(e) {
         setTimeout(e, 17)
     }
-}), ace.define("ace/lib/lang", ["require", "exports", "module"], function(e, t, n) {
+}), define("ace/lib/lang", ["require", "exports", "module"], function(e, t, n) {
     "use strict";
     t.last = function(e) {
         return e[e.length - 1]
@@ -994,7 +996,7 @@
             return n
         }, i
     }
-}), ace.define("ace/keyboard/textinput", ["require", "exports", "module", "ace/lib/event", "ace/lib/useragent", "ace/lib/dom", "ace/lib/lang"], function(e, t, n) {
+}), define("ace/keyboard/textinput", ["require", "exports", "module", "ace/lib/event", "ace/lib/useragent", "ace/lib/dom", "ace/lib/lang"], function(e, t, n) {
     "use strict";
     var r = e("../lib/event"),
         i = e("../lib/useragent"),
@@ -1218,7 +1220,7 @@
             r.addListener(t.renderer.scroller, "contextmenu", U), r.addListener(n, "contextmenu", U)
         };
     t.TextInput = f
-}), ace.define("ace/mouse/default_handlers", ["require", "exports", "module", "ace/lib/dom", "ace/lib/event", "ace/lib/useragent"], function(e, t, n) {
+}), define("ace/mouse/default_handlers", ["require", "exports", "module", "ace/lib/dom", "ace/lib/event", "ace/lib/useragent"], function(e, t, n) {
     "use strict";
 
     function u(e) {
@@ -1351,7 +1353,7 @@
             if (i || n < 200) return this.$lastScrollTime = t, r.renderer.scrollBy(e.wheelX * e.speed, e.wheelY * e.speed), e.stop()
         }
     }).call(u.prototype), t.DefaultHandlers = u
-}), ace.define("ace/tooltip", ["require", "exports", "module", "ace/lib/oop", "ace/lib/dom"], function(e, t, n) {
+}), define("ace/tooltip", ["require", "exports", "module", "ace/lib/oop", "ace/lib/dom"], function(e, t, n) {
     "use strict";
 
     function s(e) {
@@ -1382,7 +1384,7 @@
             return this.getElement().offsetWidth
         }
     }).call(s.prototype), t.Tooltip = s
-}), ace.define("ace/mouse/default_gutter_handler", ["require", "exports", "module", "ace/lib/dom", "ace/lib/oop", "ace/lib/event", "ace/tooltip"], function(e, t, n) {
+}), define("ace/mouse/default_gutter_handler", ["require", "exports", "module", "ace/lib/dom", "ace/lib/oop", "ace/lib/event", "ace/tooltip"], function(e, t, n) {
     "use strict";
 
     function u(e) {
@@ -1465,7 +1467,7 @@
                 e += 15, t += 15, e + i > n && (e -= e + i - n), t + s > r && (t -= 20 + s), o.prototype.setPosition.call(this, e, t)
             }
         }.call(a.prototype), t.GutterHandler = u
-}), ace.define("ace/mouse/mouse_event", ["require", "exports", "module", "ace/lib/event", "ace/lib/useragent"], function(e, t, n) {
+}), define("ace/mouse/mouse_event", ["require", "exports", "module", "ace/lib/event", "ace/lib/useragent"], function(e, t, n) {
     "use strict";
     var r = e("../lib/event"),
         i = e("../lib/useragent"),
@@ -1501,7 +1503,7 @@
             return this.domEvent.ctrlKey
         }
     }).call(s.prototype)
-}), ace.define("ace/mouse/dragdrop_handler", ["require", "exports", "module", "ace/lib/dom", "ace/lib/event", "ace/lib/useragent"], function(e, t, n) {
+}), define("ace/mouse/dragdrop_handler", ["require", "exports", "module", "ace/lib/dom", "ace/lib/event", "ace/lib/useragent"], function(e, t, n) {
     "use strict";
 
     function f(e) {
@@ -1703,7 +1705,7 @@
             }
         }
     }).call(f.prototype), t.DragdropHandler = f
-}), ace.define("ace/lib/net", ["require", "exports", "module", "ace/lib/dom"], function(e, t, n) {
+}), define("ace/lib/net", ["require", "exports", "module", "ace/lib/dom"], function(e, t, n) {
     "use strict";
     var r = e("./dom");
     t.get = function(e, t) {
@@ -1721,7 +1723,7 @@
         var t = document.createElement("a");
         return t.href = e, t.href
     }
-}), ace.define("ace/lib/event_emitter", ["require", "exports", "module"], function(e, t, n) {
+}), define("ace/lib/event_emitter", ["require", "exports", "module"], function(e, t, n) {
     "use strict";
     var r = {},
         i = function() {
@@ -1789,7 +1791,7 @@
     }, r.removeAllListeners = function(e) {
         this._eventRegistry && (this._eventRegistry[e] = [])
     }, t.EventEmitter = r
-}), ace.define("ace/lib/app_config", ["require", "exports", "module", "ace/lib/oop", "ace/lib/event_emitter"], function(e, t, n) {
+}), define("ace/lib/app_config", ["require", "exports", "module", "ace/lib/oop", "ace/lib/event_emitter"], function(e, t, n) {
     "no use strict";
 
     function o(e) {
@@ -1853,7 +1855,7 @@
             }, this)
         }, this.warn = o, this.reportError = u
     }).call(a.prototype), t.AppConfig = a
-}), ace.define("ace/config", ["require", "exports", "module", "ace/lib/lang", "ace/lib/oop", "ace/lib/net", "ace/lib/app_config"], function(e, t, n) {
+}), define("ace/config", ["require", "exports", "module", "ace/lib/lang", "ace/lib/oop", "ace/lib/net", "ace/lib/app_config"], function(e, t, n) {
     "no use strict";
 
     function f(r) {
@@ -1948,7 +1950,7 @@
         if (!t.get("packaged")) return a();
         s.loadScript(t.moduleUrl(n, o), a)
     }, t.init = f
-}), ace.define("ace/mouse/mouse_handler", ["require", "exports", "module", "ace/lib/event", "ace/lib/useragent", "ace/mouse/default_handlers", "ace/mouse/default_gutter_handler", "ace/mouse/mouse_event", "ace/mouse/dragdrop_handler", "ace/config"], function(e, t, n) {
+}), define("ace/mouse/mouse_handler", ["require", "exports", "module", "ace/lib/event", "ace/lib/useragent", "ace/mouse/default_handlers", "ace/mouse/default_gutter_handler", "ace/mouse/mouse_event", "ace/mouse/dragdrop_handler", "ace/config"], function(e, t, n) {
     "use strict";
     var r = e("../lib/event"),
         i = e("../lib/useragent"),
@@ -2036,7 +2038,7 @@
             initialValue: !0
         }
     }), t.MouseHandler = l
-}), ace.define("ace/mouse/fold_handler", ["require", "exports", "module"], function(e, t, n) {
+}), define("ace/mouse/fold_handler", ["require", "exports", "module"], function(e, t, n) {
     "use strict";
 
     function r(e) {
@@ -2072,7 +2074,7 @@
         })
     }
     t.FoldHandler = r
-}), ace.define("ace/keyboard/keybinding", ["require", "exports", "module", "ace/lib/keys", "ace/lib/event"], function(e, t, n) {
+}), define("ace/keyboard/keybinding", ["require", "exports", "module", "ace/lib/keys", "ace/lib/event"], function(e, t, n) {
     "use strict";
     var r = e("../lib/keys"),
         i = e("../lib/event"),
@@ -2123,7 +2125,7 @@
             t || this.$editor.commands.exec("insertstring", this.$editor, e)
         }
     }).call(s.prototype), t.KeyBinding = s
-}), ace.define("ace/range", ["require", "exports", "module"], function(e, t, n) {
+}), define("ace/range", ["require", "exports", "module"], function(e, t, n) {
     "use strict";
     var r = function(e, t) {
             return e.row - t.row || e.column - t.column
@@ -2227,7 +2229,7 @@
     }, i.comparePoints = r, i.comparePoints = function(e, t) {
         return e.row - t.row || e.column - t.column
     }, t.Range = i
-}), ace.define("ace/selection", ["require", "exports", "module", "ace/lib/oop", "ace/lib/lang", "ace/lib/event_emitter", "ace/range"], function(e, t, n) {
+}), define("ace/selection", ["require", "exports", "module", "ace/lib/oop", "ace/lib/lang", "ace/lib/event_emitter", "ace/range"], function(e, t, n) {
     "use strict";
     var r = e("./lib/oop"),
         i = e("./lib/lang"),
@@ -2538,7 +2540,7 @@
             return !0
         }
     }).call(u.prototype), t.Selection = u
-}), ace.define("ace/tokenizer", ["require", "exports", "module", "ace/config"], function(e, t, n) {
+}), define("ace/tokenizer", ["require", "exports", "module", "ace/config"], function(e, t, n) {
     "use strict";
     var r = e("./config"),
         i = 2e3,
@@ -2682,7 +2684,7 @@
             }
         }, this.reportError = r.reportError
     }).call(s.prototype), t.Tokenizer = s
-}), ace.define("ace/mode/text_highlight_rules", ["require", "exports", "module", "ace/lib/lang"], function(e, t, n) {
+}), define("ace/mode/text_highlight_rules", ["require", "exports", "module", "ace/lib/lang"], function(e, t, n) {
     "use strict";
     var r = e("../lib/lang"),
         i = function() {
@@ -2786,7 +2788,7 @@
             return this.$keywords
         }
     }).call(i.prototype), t.TextHighlightRules = i
-}), ace.define("ace/mode/behaviour", ["require", "exports", "module"], function(e, t, n) {
+}), define("ace/mode/behaviour", ["require", "exports", "module"], function(e, t, n) {
     "use strict";
     var r = function() {
         this.$behaviours = {}
@@ -2816,7 +2818,7 @@
             return t
         }
     }).call(r.prototype), t.Behaviour = r
-}), ace.define("ace/unicode", ["require", "exports", "module"], function(e, t, n) {
+}), define("ace/unicode", ["require", "exports", "module"], function(e, t, n) {
     "use strict";
 
     function r(e) {
@@ -2862,7 +2864,7 @@
         Cs: "D800-DFFF",
         Cn: "03780379037F-0383038B038D03A20526-05300557055805600588058B-059005C8-05CF05EB-05EF05F5-05FF06040605061C061D0620065F070E074B074C07B2-07BF07FB-07FF082E082F083F-08FF093A093B094F095609570973-097809800984098D098E0991099209A909B109B3-09B509BA09BB09C509C609C909CA09CF-09D609D8-09DB09DE09E409E509FC-0A000A040A0B-0A0E0A110A120A290A310A340A370A3A0A3B0A3D0A43-0A460A490A4A0A4E-0A500A52-0A580A5D0A5F-0A650A76-0A800A840A8E0A920AA90AB10AB40ABA0ABB0AC60ACA0ACE0ACF0AD1-0ADF0AE40AE50AF00AF2-0B000B040B0D0B0E0B110B120B290B310B340B3A0B3B0B450B460B490B4A0B4E-0B550B58-0B5B0B5E0B640B650B72-0B810B840B8B-0B8D0B910B96-0B980B9B0B9D0BA0-0BA20BA5-0BA70BAB-0BAD0BBA-0BBD0BC3-0BC50BC90BCE0BCF0BD1-0BD60BD8-0BE50BFB-0C000C040C0D0C110C290C340C3A-0C3C0C450C490C4E-0C540C570C5A-0C5F0C640C650C70-0C770C800C810C840C8D0C910CA90CB40CBA0CBB0CC50CC90CCE-0CD40CD7-0CDD0CDF0CE40CE50CF00CF3-0D010D040D0D0D110D290D3A-0D3C0D450D490D4E-0D560D58-0D5F0D640D650D76-0D780D800D810D840D97-0D990DB20DBC0DBE0DBF0DC7-0DC90DCB-0DCE0DD50DD70DE0-0DF10DF5-0E000E3B-0E3E0E5C-0E800E830E850E860E890E8B0E8C0E8E-0E930E980EA00EA40EA60EA80EA90EAC0EBA0EBE0EBF0EC50EC70ECE0ECF0EDA0EDB0EDE-0EFF0F480F6D-0F700F8C-0F8F0F980FBD0FCD0FD9-0FFF10C6-10CF10FD-10FF1249124E124F12571259125E125F1289128E128F12B112B612B712BF12C112C612C712D7131113161317135B-135E137D-137F139A-139F13F5-13FF169D-169F16F1-16FF170D1715-171F1737-173F1754-175F176D17711774-177F17DE17DF17EA-17EF17FA-17FF180F181A-181F1878-187F18AB-18AF18F6-18FF191D-191F192C-192F193C-193F1941-1943196E196F1975-197F19AC-19AF19CA-19CF19DB-19DD1A1C1A1D1A5F1A7D1A7E1A8A-1A8F1A9A-1A9F1AAE-1AFF1B4C-1B4F1B7D-1B7F1BAB-1BAD1BBA-1BFF1C38-1C3A1C4A-1C4C1C80-1CCF1CF3-1CFF1DE7-1DFC1F161F171F1E1F1F1F461F471F4E1F4F1F581F5A1F5C1F5E1F7E1F7F1FB51FC51FD41FD51FDC1FF01FF11FF51FFF2065-206920722073208F2095-209F20B9-20CF20F1-20FF218A-218F23E9-23FF2427-243F244B-245F26CE26E226E4-26E727002705270A270B2728274C274E2753-2755275F27602795-279727B027BF27CB27CD-27CF2B4D-2B4F2B5A-2BFF2C2F2C5F2CF2-2CF82D26-2D2F2D66-2D6E2D70-2D7F2D97-2D9F2DA72DAF2DB72DBF2DC72DCF2DD72DDF2E32-2E7F2E9A2EF4-2EFF2FD6-2FEF2FFC-2FFF3040309730983100-3104312E-3130318F31B8-31BF31E4-31EF321F32FF4DB6-4DBF9FCC-9FFFA48D-A48FA4C7-A4CFA62C-A63FA660A661A674-A67BA698-A69FA6F8-A6FFA78D-A7FAA82C-A82FA83A-A83FA878-A87FA8C5-A8CDA8DA-A8DFA8FC-A8FFA954-A95EA97D-A97FA9CEA9DA-A9DDA9E0-A9FFAA37-AA3FAA4EAA4FAA5AAA5BAA7C-AA7FAAC3-AADAAAE0-ABBFABEEABEFABFA-ABFFD7A4-D7AFD7C7-D7CAD7FC-D7FFFA2EFA2FFA6EFA6FFADA-FAFFFB07-FB12FB18-FB1CFB37FB3DFB3FFB42FB45FBB2-FBD2FD40-FD4FFD90FD91FDC8-FDEFFDFEFDFFFE1A-FE1FFE27-FE2FFE53FE67FE6C-FE6FFE75FEFDFEFEFF00FFBF-FFC1FFC8FFC9FFD0FFD1FFD8FFD9FFDD-FFDFFFE7FFEF-FFF8FFFEFFFF"
     })
-}), ace.define("ace/token_iterator", ["require", "exports", "module"], function(e, t, n) {
+}), define("ace/token_iterator", ["require", "exports", "module"], function(e, t, n) {
     "use strict";
     var r = function(e, t, n) {
         this.$session = e, this.$row = t, this.$rowTokens = e.getTokens(t);
@@ -2906,7 +2908,7 @@
             }
         }
     }).call(r.prototype), t.TokenIterator = r
-}), ace.define("ace/mode/text", ["require", "exports", "module", "ace/tokenizer", "ace/mode/text_highlight_rules", "ace/mode/behaviour", "ace/unicode", "ace/lib/lang", "ace/token_iterator", "ace/range"], function(e, t, n) {
+}), define("ace/mode/text", ["require", "exports", "module", "ace/tokenizer", "ace/mode/text_highlight_rules", "ace/mode/behaviour", "ace/unicode", "ace/lib/lang", "ace/token_iterator", "ace/range"], function(e, t, n) {
     "use strict";
     var r = e("../tokenizer").Tokenizer,
         i = e("./text_highlight_rules").TextHighlightRules,
@@ -3107,7 +3109,7 @@
             })
         }, this.$id = "ace/mode/text"
     }).call(l.prototype), t.Mode = l
-}), ace.define("ace/apply_delta", ["require", "exports", "module"], function(e, t, n) {
+}), define("ace/apply_delta", ["require", "exports", "module"], function(e, t, n) {
     "use strict";
 
     function r(e, t) {
@@ -3147,7 +3149,7 @@
                 r === f ? e[r] = s.substring(0, i) + s.substring(a) : e.splice(r, f - r + 1, s.substring(0, i) + e[f].substring(a))
         }
     }
-}), ace.define("ace/anchor", ["require", "exports", "module", "ace/lib/oop", "ace/lib/event_emitter"], function(e, t, n) {
+}), define("ace/anchor", ["require", "exports", "module", "ace/lib/oop", "ace/lib/event_emitter"], function(e, t, n) {
     "use strict";
     var r = e("./lib/oop"),
         i = e("./lib/event_emitter").EventEmitter,
@@ -3213,7 +3215,7 @@
             return e >= this.document.getLength() ? (n.row = Math.max(0, this.document.getLength() - 1), n.column = this.document.getLine(n.row).length) : e < 0 ? (n.row = 0, n.column = 0) : (n.row = e, n.column = Math.min(this.document.getLine(n.row).length, Math.max(0, t))), t < 0 && (n.column = 0), n
         }
     }).call(s.prototype)
-}), ace.define("ace/document", ["require", "exports", "module", "ace/lib/oop", "ace/apply_delta", "ace/lib/event_emitter", "ace/range", "ace/anchor"], function(e, t, n) {
+}), define("ace/document", ["require", "exports", "module", "ace/lib/oop", "ace/apply_delta", "ace/lib/event_emitter", "ace/range", "ace/anchor"], function(e, t, n) {
     "use strict";
     var r = e("./lib/oop"),
         i = e("./apply_delta").applyDelta,
@@ -3452,7 +3454,7 @@
             return i + e.column
         }
     }).call(a.prototype), t.Document = a
-}), ace.define("ace/background_tokenizer", ["require", "exports", "module", "ace/lib/oop", "ace/lib/event_emitter"], function(e, t, n) {
+}), define("ace/background_tokenizer", ["require", "exports", "module", "ace/lib/oop", "ace/lib/event_emitter"], function(e, t, n) {
     "use strict";
     var r = e("./lib/oop"),
         i = e("./lib/event_emitter").EventEmitter,
@@ -3522,7 +3524,7 @@
             return this.states[e] + "" != r.state + "" ? (this.states[e] = r.state, this.lines[e + 1] = null, this.currentLine > e + 1 && (this.currentLine = e + 1)) : this.currentLine == e && (this.currentLine = e + 1), this.lines[e] = r.tokens
         }
     }).call(s.prototype), t.BackgroundTokenizer = s
-}), ace.define("ace/search_highlight", ["require", "exports", "module", "ace/lib/lang", "ace/lib/oop", "ace/range"], function(e, t, n) {
+}), define("ace/search_highlight", ["require", "exports", "module", "ace/lib/lang", "ace/lib/oop", "ace/range"], function(e, t, n) {
     "use strict";
     var r = e("./lib/lang"),
         i = e("./lib/oop"),
@@ -3547,7 +3549,7 @@
             }
         }
     }).call(o.prototype), t.SearchHighlight = o
-}), ace.define("ace/edit_session/fold_line", ["require", "exports", "module", "ace/range"], function(e, t, n) {
+}), define("ace/edit_session/fold_line", ["require", "exports", "module", "ace/range"], function(e, t, n) {
     "use strict";
 
     function i(e, t) {
@@ -3665,7 +3667,7 @@
             }
         }
     }).call(i.prototype), t.FoldLine = i
-}), ace.define("ace/range_list", ["require", "exports", "module", "ace/range"], function(e, t, n) {
+}), define("ace/range_list", ["require", "exports", "module", "ace/range"], function(e, t, n) {
     "use strict";
     var r = e("./range").Range,
         i = r.comparePoints,
@@ -3772,7 +3774,7 @@
                 }
         }
     }).call(s.prototype), t.RangeList = s
-}), ace.define("ace/edit_session/fold", ["require", "exports", "module", "ace/range", "ace/range_list", "ace/lib/oop"], function(e, t, n) {
+}), define("ace/edit_session/fold", ["require", "exports", "module", "ace/range", "ace/range_list", "ace/lib/oop"], function(e, t, n) {
     "use strict";
 
     function u(e, t) {
@@ -3836,7 +3838,7 @@
                 return l(e, this.start)
             }
         }.call(o.prototype)
-}), ace.define("ace/edit_session/folding", ["require", "exports", "module", "ace/range", "ace/edit_session/fold_line", "ace/edit_session/fold", "ace/token_iterator"], function(e, t, n) {
+}), define("ace/edit_session/folding", ["require", "exports", "module", "ace/range", "ace/edit_session/fold_line", "ace/edit_session/fold", "ace/token_iterator"], function(e, t, n) {
     "use strict";
 
     function u() {
@@ -4240,7 +4242,7 @@
         s = e("./fold").Fold,
         o = e("../token_iterator").TokenIterator;
     t.Folding = u
-}), ace.define("ace/edit_session/bracket_match", ["require", "exports", "module", "ace/token_iterator", "ace/range"], function(e, t, n) {
+}), define("ace/edit_session/bracket_match", ["require", "exports", "module", "ace/token_iterator", "ace/range"], function(e, t, n) {
     "use strict";
 
     function s() {
@@ -4337,7 +4339,7 @@
     var r = e("../token_iterator").TokenIterator,
         i = e("../range").Range;
     t.BracketMatch = s
-}), ace.define("ace/edit_session", ["require", "exports", "module", "ace/lib/oop", "ace/lib/lang", "ace/config", "ace/lib/event_emitter", "ace/selection", "ace/mode/text", "ace/range", "ace/document", "ace/background_tokenizer", "ace/search_highlight", "ace/edit_session/folding", "ace/edit_session/bracket_match"], function(e, t, n) {
+}), define("ace/edit_session", ["require", "exports", "module", "ace/lib/oop", "ace/lib/lang", "ace/config", "ace/lib/event_emitter", "ace/selection", "ace/mode/text", "ace/range", "ace/document", "ace/background_tokenizer", "ace/search_highlight", "ace/edit_session/folding", "ace/edit_session/bracket_match"], function(e, t, n) {
     "use strict";
     var r = e("./lib/oop"),
         i = e("./lib/lang"),
@@ -5184,7 +5186,7 @@
             }
         }
     }), t.EditSession = p
-}), ace.define("ace/search", ["require", "exports", "module", "ace/lib/lang", "ace/lib/oop", "ace/range"], function(e, t, n) {
+}), define("ace/search", ["require", "exports", "module", "ace/lib/lang", "ace/lib/oop", "ace/range"], function(e, t, n) {
     "use strict";
     var r = e("./lib/lang"),
         i = e("./lib/oop"),
@@ -5358,7 +5360,7 @@
             }
         }
     }).call(o.prototype), t.Search = o
-}), ace.define("ace/keyboard/hash_handler", ["require", "exports", "module", "ace/lib/keys", "ace/lib/useragent"], function(e, t, n) {
+}), define("ace/keyboard/hash_handler", ["require", "exports", "module", "ace/lib/keys", "ace/lib/useragent"], function(e, t, n) {
     "use strict";
 
     function o(e, t) {
@@ -5497,7 +5499,7 @@
                 return t.$keyChain || ""
             }
         }.call(o.prototype), t.HashHandler = o, t.MultiHashHandler = u
-}), ace.define("ace/commands/command_manager", ["require", "exports", "module", "ace/lib/oop", "ace/keyboard/hash_handler", "ace/lib/event_emitter"], function(e, t, n) {
+}), define("ace/commands/command_manager", ["require", "exports", "module", "ace/lib/oop", "ace/keyboard/hash_handler", "ace/lib/event_emitter"], function(e, t, n) {
     "use strict";
     var r = e("../lib/oop"),
         i = e("../keyboard/hash_handler").MultiHashHandler,
@@ -5545,7 +5547,7 @@
                 })
             }
         }.call(o.prototype), t.CommandManager = o
-}), ace.define("ace/commands/default_commands", ["require", "exports", "module", "ace/lib/lang", "ace/config", "ace/range"], function(e, t, n) {
+}), define("ace/commands/default_commands", ["require", "exports", "module", "ace/lib/lang", "ace/config", "ace/range"], function(e, t, n) {
     "use strict";
 
     function o(e, t) {
@@ -6325,7 +6327,7 @@
         readOnly: !0,
         scrollIntoView: "none"
     }]
-}), ace.define("ace/editor", ["require", "exports", "module", "ace/lib/fixoldbrowsers", "ace/lib/oop", "ace/lib/dom", "ace/lib/lang", "ace/lib/useragent", "ace/keyboard/textinput", "ace/mouse/mouse_handler", "ace/mouse/fold_handler", "ace/keyboard/keybinding", "ace/edit_session", "ace/search", "ace/range", "ace/lib/event_emitter", "ace/commands/command_manager", "ace/commands/default_commands", "ace/config", "ace/token_iterator"], function(e, t, n) {
+}), define("ace/editor", ["require", "exports", "module", "ace/lib/fixoldbrowsers", "ace/lib/oop", "ace/lib/dom", "ace/lib/lang", "ace/lib/useragent", "ace/keyboard/textinput", "ace/mouse/mouse_handler", "ace/mouse/fold_handler", "ace/keyboard/keybinding", "ace/edit_session", "ace/search", "ace/range", "ace/lib/event_emitter", "ace/commands/command_manager", "ace/commands/default_commands", "ace/config", "ace/token_iterator"], function(e, t, n) {
     "use strict";
     e("./lib/fixoldbrowsers");
     var r = e("./lib/oop"),
@@ -7276,7 +7278,7 @@
         foldStyle: "session",
         mode: "session"
     }), t.Editor = b
-}), ace.define("ace/undomanager", ["require", "exports", "module"], function(e, t, n) {
+}), define("ace/undomanager", ["require", "exports", "module"], function(e, t, n) {
     "use strict";
     var r = function() {
         this.reset()
@@ -7344,7 +7346,7 @@
             return n(e, t)
         }
     }).call(r.prototype), t.UndoManager = r
-}), ace.define("ace/layer/gutter", ["require", "exports", "module", "ace/lib/dom", "ace/lib/oop", "ace/lib/lang", "ace/lib/event_emitter"], function(e, t, n) {
+}), define("ace/layer/gutter", ["require", "exports", "module", "ace/lib/dom", "ace/lib/oop", "ace/lib/lang", "ace/lib/event_emitter"], function(e, t, n) {
     "use strict";
     var r = e("../lib/dom"),
         i = e("../lib/oop"),
@@ -7462,7 +7464,7 @@
             if (this.$showFoldWidgets && e.x > n.right - t.right) return "foldWidgets"
         }
     }).call(u.prototype), t.Gutter = u
-}), ace.define("ace/layer/marker", ["require", "exports", "module", "ace/range", "ace/lib/dom"], function(e, t, n) {
+}), define("ace/layer/marker", ["require", "exports", "module", "ace/range", "ace/lib/dom"], function(e, t, n) {
     "use strict";
     var r = e("../range").Range,
         i = e("../lib/dom"),
@@ -7540,7 +7542,7 @@
             e.push("<div class='", n, "' style='", "height:", o, "px;", "top:", s, "px;", "left:0;right:0;", i || "", "'></div>")
         }
     }).call(s.prototype), t.Marker = s
-}), ace.define("ace/layer/text", ["require", "exports", "module", "ace/lib/oop", "ace/lib/dom", "ace/lib/lang", "ace/lib/useragent", "ace/lib/event_emitter"], function(e, t, n) {
+}), define("ace/layer/text", ["require", "exports", "module", "ace/lib/oop", "ace/lib/dom", "ace/lib/lang", "ace/lib/useragent", "ace/lib/event_emitter"], function(e, t, n) {
     "use strict";
     var r = e("../lib/oop"),
         i = e("../lib/dom"),
@@ -7777,7 +7779,7 @@
             clearInterval(this.$pollSizeChangesTimer), this.$measureNode && this.$measureNode.parentNode.removeChild(this.$measureNode), delete this.$measureNode
         }
     }).call(a.prototype), t.Text = a
-}), ace.define("ace/layer/cursor", ["require", "exports", "module", "ace/lib/dom"], function(e, t, n) {
+}), define("ace/layer/cursor", ["require", "exports", "module", "ace/lib/dom"], function(e, t, n) {
     "use strict";
     var r = e("../lib/dom"),
         i, s = function(e) {
@@ -7863,7 +7865,7 @@
             clearInterval(this.intervalId), clearTimeout(this.timeoutId)
         }
     }).call(s.prototype), t.Cursor = s
-}), ace.define("ace/scrollbar", ["require", "exports", "module", "ace/lib/oop", "ace/lib/dom", "ace/lib/event", "ace/lib/event_emitter"], function(e, t, n) {
+}), define("ace/scrollbar", ["require", "exports", "module", "ace/lib/oop", "ace/lib/dom", "ace/lib/event", "ace/lib/event_emitter"], function(e, t, n) {
     "use strict";
     var r = e("./lib/oop"),
         i = e("./lib/dom"),
@@ -7919,7 +7921,7 @@
                 this.scrollLeft != e && (this.skipEvent = !0, this.scrollLeft = this.element.scrollLeft = e)
             }
         }.call(f.prototype), t.ScrollBar = a, t.ScrollBarV = a, t.ScrollBarH = f, t.VScrollBar = a, t.HScrollBar = f
-}), ace.define("ace/renderloop", ["require", "exports", "module", "ace/lib/event"], function(e, t, n) {
+}), define("ace/renderloop", ["require", "exports", "module", "ace/lib/event"], function(e, t, n) {
     "use strict";
     var r = e("./lib/event"),
         i = function(e, t) {
@@ -7939,7 +7941,7 @@
             }
         }
     }).call(i.prototype), t.RenderLoop = i
-}), ace.define("ace/layer/font_metrics", ["require", "exports", "module", "ace/lib/oop", "ace/lib/dom", "ace/lib/lang", "ace/lib/useragent", "ace/lib/event_emitter"], function(e, t, n) {
+}), define("ace/layer/font_metrics", ["require", "exports", "module", "ace/lib/oop", "ace/lib/dom", "ace/lib/lang", "ace/lib/useragent", "ace/lib/event_emitter"], function(e, t, n) {
     var r = e("../lib/oop"),
         i = e("../lib/dom"),
         s = e("../lib/lang"),
@@ -8011,7 +8013,7 @@
             clearInterval(this.$pollSizeChangesTimer), this.el && this.el.parentNode && this.el.parentNode.removeChild(this.el)
         }
     }).call(f.prototype)
-}), ace.define("ace/virtual_renderer", ["require", "exports", "module", "ace/lib/oop", "ace/lib/dom", "ace/config", "ace/lib/useragent", "ace/layer/gutter", "ace/layer/marker", "ace/layer/text", "ace/layer/cursor", "ace/scrollbar", "ace/scrollbar", "ace/renderloop", "ace/layer/font_metrics", "ace/lib/event_emitter"], function(e, t, n) {
+}), define("ace/virtual_renderer", ["require", "exports", "module", "ace/lib/oop", "ace/lib/dom", "ace/config", "ace/lib/useragent", "ace/layer/gutter", "ace/layer/marker", "ace/layer/text", "ace/layer/cursor", "ace/scrollbar", "ace/scrollbar", "ace/renderloop", "ace/layer/font_metrics", "ace/lib/event_emitter"], function(e, t, n) {
     "use strict";
     var r = e("./lib/oop"),
         i = e("./lib/dom"),
@@ -8666,7 +8668,7 @@
             handlesSet: !0
         }
     }), t.VirtualRenderer = g
-}), ace.define("ace/worker/worker_client", ["require", "exports", "module", "ace/lib/oop", "ace/lib/net", "ace/lib/event_emitter", "ace/config"], function(e, t, n) {
+}), define("ace/worker/worker_client", ["require", "exports", "module", "ace/lib/oop", "ace/lib/net", "ace/lib/event_emitter", "ace/config"], function(e, t, n) {
     "use strict";
     var r = e("../lib/oop"),
         i = e("../lib/net"),
@@ -8806,7 +8808,7 @@
         })
     };
     a.prototype = u.prototype, t.UIWorkerClient = a, t.WorkerClient = u
-}), ace.define("ace/placeholder", ["require", "exports", "module", "ace/range", "ace/lib/event_emitter", "ace/lib/oop"], function(e, t, n) {
+}), define("ace/placeholder", ["require", "exports", "module", "ace/range", "ace/lib/event_emitter", "ace/lib/oop"], function(e, t, n) {
     "use strict";
     var r = e("./range").Range,
         i = e("./lib/event_emitter").EventEmitter,
@@ -8917,7 +8919,7 @@
             this.selectionBefore && this.session.selection.fromJSON(this.selectionBefore)
         }
     }).call(o.prototype), t.PlaceHolder = o
-}), ace.define("ace/mouse/multi_select_handler", ["require", "exports", "module", "ace/lib/event", "ace/lib/useragent"], function(e, t, n) {
+}), define("ace/mouse/multi_select_handler", ["require", "exports", "module", "ace/lib/event", "ace/lib/useragent"], function(e, t, n) {
     function s(e, t) {
         return e.row == t.row && e.column == t.column
     }
@@ -9000,7 +9002,7 @@
     var r = e("../lib/event"),
         i = e("../lib/useragent");
     t.onMouseDown = o
-}), ace.define("ace/commands/multi_select_commands", ["require", "exports", "module", "ace/keyboard/hash_handler"], function(e, t, n) {
+}), define("ace/commands/multi_select_commands", ["require", "exports", "module", "ace/keyboard/hash_handler"], function(e, t, n) {
     t.defaultCommands = [{
         name: "addCursorAbove",
         exec: function(e) {
@@ -9134,7 +9136,7 @@
     }];
     var r = e("../keyboard/hash_handler").HashHandler;
     t.keyboardHandler = new r(t.multiSelectCommands)
-}), ace.define("ace/multi_select", ["require", "exports", "module", "ace/range_list", "ace/range", "ace/selection", "ace/mouse/multi_select_handler", "ace/lib/event", "ace/lib/lang", "ace/commands/multi_select_commands", "ace/search", "ace/edit_session", "ace/editor", "ace/config"], function(e, t, n) {
+}), define("ace/multi_select", ["require", "exports", "module", "ace/range_list", "ace/range", "ace/selection", "ace/mouse/multi_select_handler", "ace/lib/event", "ace/lib/lang", "ace/commands/multi_select_commands", "ace/search", "ace/edit_session", "ace/editor", "ace/config"], function(e, t, n) {
     function h(e, t, n) {
         return c.$options.wrap = !0, c.$options.needle = t, c.$options.backwards = n == -1, c.find(e)
     }
@@ -9532,7 +9534,7 @@
             value: !0
         }
     })
-}), ace.define("ace/mode/folding/fold_mode", ["require", "exports", "module", "ace/range"], function(e, t, n) {
+}), define("ace/mode/folding/fold_mode", ["require", "exports", "module", "ace/range"], function(e, t, n) {
     "use strict";
     var r = e("../../range").Range,
         i = t.FoldMode = function() {};
@@ -9580,12 +9582,12 @@
             return u.column++, o.column--, r.fromPoints(u, o)
         }
     }).call(i.prototype)
-}), ace.define("ace/theme/textmate", ["require", "exports", "module", "ace/lib/dom"], function(e, t, n) {
+}), define("ace/theme/textmate", ["require", "exports", "module", "ace/lib/dom"], function(e, t, n) {
     "use strict";
     t.isDark = !1, t.cssClass = "ace-tm", t.cssText = '.ace-tm .ace_gutter {background: #f0f0f0;color: #333;}.ace-tm .ace_print-margin {width: 1px;background: #e8e8e8;}.ace-tm .ace_fold {background-color: #6B72E6;}.ace-tm {background-color: #FFFFFF;color: black;}.ace-tm .ace_cursor {color: black;}.ace-tm .ace_invisible {color: rgb(191, 191, 191);}.ace-tm .ace_storage,.ace-tm .ace_keyword {color: blue;}.ace-tm .ace_constant {color: rgb(197, 6, 11);}.ace-tm .ace_constant.ace_buildin {color: rgb(88, 72, 246);}.ace-tm .ace_constant.ace_language {color: rgb(88, 92, 246);}.ace-tm .ace_constant.ace_library {color: rgb(6, 150, 14);}.ace-tm .ace_invalid {background-color: rgba(255, 0, 0, 0.1);color: red;}.ace-tm .ace_support.ace_function {color: rgb(60, 76, 114);}.ace-tm .ace_support.ace_constant {color: rgb(6, 150, 14);}.ace-tm .ace_support.ace_type,.ace-tm .ace_support.ace_class {color: rgb(109, 121, 222);}.ace-tm .ace_keyword.ace_operator {color: rgb(104, 118, 135);}.ace-tm .ace_string {color: rgb(3, 106, 7);}.ace-tm .ace_comment {color: rgb(76, 136, 107);}.ace-tm .ace_comment.ace_doc {color: rgb(0, 102, 255);}.ace-tm .ace_comment.ace_doc.ace_tag {color: rgb(128, 159, 191);}.ace-tm .ace_constant.ace_numeric {color: rgb(0, 0, 205);}.ace-tm .ace_variable {color: rgb(49, 132, 149);}.ace-tm .ace_xml-pe {color: rgb(104, 104, 91);}.ace-tm .ace_entity.ace_name.ace_function {color: #0000A2;}.ace-tm .ace_heading {color: rgb(12, 7, 255);}.ace-tm .ace_list {color:rgb(185, 6, 144);}.ace-tm .ace_meta.ace_tag {color:rgb(0, 22, 142);}.ace-tm .ace_string.ace_regex {color: rgb(255, 0, 0)}.ace-tm .ace_marker-layer .ace_selection {background: rgb(181, 213, 255);}.ace-tm.ace_multiselect .ace_selection.ace_start {box-shadow: 0 0 3px 0px white;}.ace-tm .ace_marker-layer .ace_step {background: rgb(252, 255, 0);}.ace-tm .ace_marker-layer .ace_stack {background: rgb(164, 229, 101);}.ace-tm .ace_marker-layer .ace_bracket {margin: -1px 0 0 -1px;border: 1px solid rgb(192, 192, 192);}.ace-tm .ace_marker-layer .ace_active-line {background: rgba(0, 0, 0, 0.07);}.ace-tm .ace_gutter-active-line {background-color : #dcdcdc;}.ace-tm .ace_marker-layer .ace_selected-word {background: rgb(250, 250, 255);border: 1px solid rgb(200, 200, 250);}.ace-tm .ace_indent-guide {background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bLly//BwAmVgd1/w11/gAAAABJRU5ErkJggg==") right repeat-y;}';
     var r = e("../lib/dom");
     r.importCssString(t.cssText, t.cssClass)
-}), ace.define("ace/line_widgets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/dom", "ace/range"], function(e, t, n) {
+}), define("ace/line_widgets", ["require", "exports", "module", "ace/lib/oop", "ace/lib/dom", "ace/range"], function(e, t, n) {
     "use strict";
 
     function o(e) {
@@ -9703,7 +9705,7 @@
             }
         }
     }).call(o.prototype), t.LineWidgets = o
-}), ace.define("ace/ext/error_marker", ["require", "exports", "module", "ace/line_widgets", "ace/lib/dom", "ace/range"], function(e, t, n) {
+}), define("ace/ext/error_marker", ["require", "exports", "module", "ace/line_widgets", "ace/lib/dom", "ace/range"], function(e, t, n) {
     "use strict";
 
     function o(e, t, n) {
@@ -9786,7 +9788,7 @@
             bottom: h.el.offsetHeight
         })
     }, i.importCssString("    .error_widget_wrapper {        background: inherit;        color: inherit;        border:none    }    .error_widget {        border-top: solid 2px;        border-bottom: solid 2px;        margin: 5px 0;        padding: 10px 40px;        white-space: pre-wrap;    }    .error_widget.ace_error, .error_widget_arrow.ace_error{        border-color: #ff5a5a    }    .error_widget.ace_warning, .error_widget_arrow.ace_warning{        border-color: #F1D817    }    .error_widget.ace_info, .error_widget_arrow.ace_info{        border-color: #5a5a5a    }    .error_widget.ace_ok, .error_widget_arrow.ace_ok{        border-color: #5aaa5a    }    .error_widget_arrow {        position: absolute;        border: solid 5px;        border-top-color: transparent!important;        border-right-color: transparent!important;        border-left-color: transparent!important;        top: -5px;    }", "")
-}), ace.define("ace/ace", ["require", "exports", "module", "ace/lib/fixoldbrowsers", "ace/lib/dom", "ace/lib/event", "ace/editor", "ace/edit_session", "ace/undomanager", "ace/virtual_renderer", "ace/worker/worker_client", "ace/keyboard/hash_handler", "ace/placeholder", "ace/multi_select", "ace/mode/folding/fold_mode", "ace/theme/textmate", "ace/ext/error_marker", "ace/config"], function(e, t, n) {
+}), define("ace/ace", ["require", "exports", "module", "ace/lib/fixoldbrowsers", "ace/lib/dom", "ace/lib/event", "ace/editor", "ace/edit_session", "ace/undomanager", "ace/virtual_renderer", "ace/worker/worker_client", "ace/keyboard/hash_handler", "ace/placeholder", "ace/multi_select", "ace/mode/folding/fold_mode", "ace/theme/textmate", "ace/ext/error_marker", "ace/config"], function(e, t, n) {
     "use strict";
     e("./lib/fixoldbrowsers");
     var r = e("./lib/dom"),
@@ -9824,7 +9826,7 @@
     }, t.EditSession = o, t.UndoManager = u
 });
 (function() {
-    ace.require(["ace/ace"], function(a) {
+    require(["ace/ace"], function(a) {
         a && a.config.init(true);
         if (!window.ace)
             window.ace = a;
@@ -9832,4 +9834,5 @@
             if (a.hasOwnProperty(key))
                 window.ace[key] = a[key];
     });
+})();
 })();

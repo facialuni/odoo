@@ -1,4 +1,5 @@
-ace.define("ace/mode/python_highlight_rules", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text_highlight_rules"], function(e, t, n) {
+(function() {var define = ace.define, require = ace.require;
+define("ace/mode/python_highlight_rules", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text_highlight_rules"], function(e, t, n) {
     "use strict";
     var r = e("../lib/oop"),
         i = e("./text_highlight_rules").TextHighlightRules,
@@ -124,7 +125,7 @@ ace.define("ace/mode/python_highlight_rules", ["require", "exports", "module", "
             }
         };
     r.inherits(s, i), t.PythonHighlightRules = s
-}), ace.define("ace/mode/folding/pythonic", ["require", "exports", "module", "ace/lib/oop", "ace/mode/folding/fold_mode"], function(e, t, n) {
+}), define("ace/mode/folding/pythonic", ["require", "exports", "module", "ace/lib/oop", "ace/mode/folding/fold_mode"], function(e, t, n) {
     "use strict";
     var r = e("../../lib/oop"),
         i = e("./fold_mode").FoldMode,
@@ -139,7 +140,7 @@ ace.define("ace/mode/python_highlight_rules", ["require", "exports", "module", "
                 if (i) return i[1] ? this.openingBracketBlock(e, i[1], n, i.index) : i[2] ? this.indentationBlock(e, n, i.index + i[2].length) : this.indentationBlock(e, n)
             }
         }.call(s.prototype)
-}), ace.define("ace/mode/python", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text", "ace/mode/python_highlight_rules", "ace/mode/folding/pythonic", "ace/range"], function(e, t, n) {
+}), define("ace/mode/python", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text", "ace/mode/python_highlight_rules", "ace/mode/folding/pythonic", "ace/range"], function(e, t, n) {
     "use strict";
     var r = e("../lib/oop"),
         i = e("./text").Mode,
@@ -183,3 +184,4 @@ ace.define("ace/mode/python_highlight_rules", ["require", "exports", "module", "
             }, this.$id = "ace/mode/python"
         }.call(a.prototype), t.Mode = a
 });
+})();

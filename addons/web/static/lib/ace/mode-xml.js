@@ -1,4 +1,5 @@
-ace.define("ace/mode/xml_highlight_rules", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text_highlight_rules"], function(e, t, n) {
+(function() {var define = ace.define, require = ace.require;
+define("ace/mode/xml_highlight_rules", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text_highlight_rules"], function(e, t, n) {
     "use strict";
     var r = e("../lib/oop"),
         i = e("./text_highlight_rules").TextHighlightRules,
@@ -237,7 +238,7 @@ ace.define("ace/mode/xml_highlight_rules", ["require", "exports", "module", "ace
             }])
         }
     }).call(i.prototype), r.inherits(s, i), t.XmlHighlightRules = s
-}), ace.define("ace/mode/behaviour/xml", ["require", "exports", "module", "ace/lib/oop", "ace/mode/behaviour", "ace/token_iterator", "ace/lib/lang"], function(e, t, n) {
+}), define("ace/mode/behaviour/xml", ["require", "exports", "module", "ace/lib/oop", "ace/mode/behaviour", "ace/token_iterator", "ace/lib/lang"], function(e, t, n) {
     "use strict";
 
     function u(e, t) {
@@ -339,7 +340,7 @@ ace.define("ace/mode/xml_highlight_rules", ["require", "exports", "module", "ace
             })
         };
     r.inherits(a, i), t.XmlBehaviour = a
-}), ace.define("ace/mode/folding/xml", ["require", "exports", "module", "ace/lib/oop", "ace/lib/lang", "ace/range", "ace/mode/folding/fold_mode", "ace/token_iterator"], function(e, t, n) {
+}), define("ace/mode/folding/xml", ["require", "exports", "module", "ace/lib/oop", "ace/lib/lang", "ace/range", "ace/mode/folding/fold_mode", "ace/token_iterator"], function(e, t, n) {
     "use strict";
 
     function l(e, t) {
@@ -473,7 +474,7 @@ ace.define("ace/mode/xml_highlight_rules", ["require", "exports", "module", "ace
             }
         }
     }).call(a.prototype)
-}), ace.define("ace/mode/xml", ["require", "exports", "module", "ace/lib/oop", "ace/lib/lang", "ace/mode/text", "ace/mode/xml_highlight_rules", "ace/mode/behaviour/xml", "ace/mode/folding/xml", "ace/worker/worker_client"], function(e, t, n) {
+}), define("ace/mode/xml", ["require", "exports", "module", "ace/lib/oop", "ace/lib/lang", "ace/mode/text", "ace/mode/xml_highlight_rules", "ace/mode/behaviour/xml", "ace/mode/folding/xml", "ace/worker/worker_client"], function(e, t, n) {
     "use strict";
     var r = e("../lib/oop"),
         i = e("../lib/lang"),
@@ -500,3 +501,4 @@ ace.define("ace/mode/xml_highlight_rules", ["require", "exports", "module", "ace
             }, this.$id = "ace/mode/xml"
         }.call(l.prototype), t.Mode = l
 });
+})();
