@@ -1366,7 +1366,6 @@ class AccountMoveLine(models.Model):
     def _query_get(self, domain=None):
         context = dict(self._context or {})
         domain = domain and safe_eval(str(domain)) or []
-
         date_field = 'date'
         if context.get('aged_balance'):
             date_field = 'date_maturity'

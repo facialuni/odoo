@@ -29,39 +29,30 @@
                         <strong>Tax</strong>
                     </div>
                 </div>
-                <div class="row col-xs-12">
-                    <t t-if="sale_line == 'sale'"> Sale </t>
-                    <t t-if="all_sale_tax">
+                <div class="row">
+                    <div class="col-xs-12">
+                        Sale
                         <p style="border: 1px inset"></p>
                         <div class="row">
-                            <div class="col-xs-2">
-                                <span class="ml16" t-esc="purchase_tax"/>
-                            </div>
-                            <div class="col-xs-offset-6 col-xs-2">
-                                <span t-esc="all_sale_price"/>
-                            </div>
-                            <div class="col-xs-2">
-                                <span t-esc="all_sale_tax"/>
-                            </div>
+                            <t t-foreach="lines" t-as="lines">
+                                <t t-if="lines['id'] == 1">
+                                    <div class="col-xs-2">
+                                        <span t-esc="lines.get('name')"/>
+                                    </div>
+                                    <div class="col-xs-offset-6 col-xs-2">
+                                        <t t-foreach="lines['columns']" t-as="sale">
+                                            <span t-esc="sale.get('net')"/>
+                                       </t>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <t t-foreach="lines['columns']" t-as="sale">
+                                            <span t-esc="sale.get('tax')"/>
+                                        </t>
+                                    </div>
+                                </t>
+                            </t>
                         </div>
-                    </t>
-                </div>
-                <div class="row col-xs-12">
-                    <t t-if="purchase_line == 'purchase'"> Purchase </t>
-                    <t t-if="all_purchase_tax">
-                        <p style="border: 1px inset"></p>
-                         <div class="row">
-                            <div class="col-xs-2">
-                                <span class="ml16" t-esc="purchase_tax"/>
-                            </div>
-                            <div class="col-xs-offset-6 col-xs-2">
-                                <span t-esc="all_purchase_price"/>
-                            </div>
-                             <div class="col-xs-2">
-                                <span t-esc="all_purchase_tax"/>
-                            </div>
-                        </div>
-                    </t>
+                    </div>
                 </div>
             </div>
         </t>
