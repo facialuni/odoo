@@ -370,10 +370,10 @@
                             </group>
                         </group>
                         <group>
-                            <group string="Receivables">
+                            <group name="receivables" string="Receivables">
                                 <field name="inbound_payment_method_ids" widget="many2many_checkboxes"/>
                             </group>
-                            <group string="Payables">
+                            <group name="payables" string="Payables">
                                 <field name="outbound_payment_method_ids" widget="many2many_checkboxes"/>
                             </group>
                             <group name="bank_statement" string="Bank Statements" groups="account.group_account_user">
@@ -2106,7 +2106,7 @@
         <menuitem id="product_product_menu_purchasable" name="Purchasable Products" action="product_product_action_purchasable" parent="account.menu_finance_payables" sequence="101"/>
 
         <menuitem id="product_configuration_menu" name="Products" parent="account.menu_finance_configuration" sequence="1"/>
-        
+
         <menuitem id="menu_account_supplier" name="Vendors"
             parent="menu_finance_payables"
             action="base.action_partner_supplier_form" sequence="100"/>
