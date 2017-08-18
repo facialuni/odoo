@@ -70,6 +70,7 @@ Core mechanisms for the accounting modules. To display the menuitems, install th
         "static/src/xml/account_reconciliation.xml",
         "static/src/xml/account_payment.xml",
         "static/src/xml/account_report_backend.xml",
+        "static/src/xml/account_button_view.xml",
     ],
     'installable': True,
     'application': False,

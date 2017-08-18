@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates xml:space="preserve">
+
+    <t t-extend="ListView.buttons">
+        <t t-jquery="button.o_list_button_add" t-operation="replace">
+            <t t-if="widget.is_action_enabled('create')">
+                <button type="button" class="btn btn-primary btn-sm o_list_button_add" accesskey="c">
+                    New Invoice
+                </button>
+                <button type="button" class="btn btn-sm btn-default o_button_credit_note" accesskey="n">
+                    New Credit Note
+                </button>
+            </t>
+            <button type="button" class="btn btn-primary btn-sm o_list_button_save" accesskey="s">
+                Save
+            </button>
+            <button type="button" class="btn btn-default btn-sm o_list_button_discard" accesskey="j">
+                Discard
+            </button>
+        </t>
+    </t>
+
+    <t t-name="FormView.buttons">
+        <div class="o_form_buttons_view">
+            <button t-if="widget.is_action_enabled('edit')" type="button"
+                    class="btn btn-primary btn-sm o_form_button_edit" accesskey="a">
+                Edit
+            </button>
+            <button t-if="widget.is_action_enabled('create')" type="button"
+                    class="btn btn-default btn-sm o_form_button_create" accesskey="c">
+                Create
+            </button>
+        </div>
+        <div class="o_form_buttons_edit">
+            <button type="button"
+                    class="btn btn-primary btn-sm o_form_button_save" accesskey="s">
+                Save
+            </button>
+            <button type="button"
+                    class="btn btn-default btn-sm o_form_button_cancel" accesskey="j">
+                Discard
+            </button>
+        </div>
+    </t>
+
+
+</templates>
