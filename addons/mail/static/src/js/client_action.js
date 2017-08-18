@@ -250,7 +250,9 @@ var ChatAction = Widget.extend(ControlPanelMixin, {
         var def2 = this.basic_composer.appendTo(this.$('.o_mail_chat_content'));
         var def3 = this.extended_composer.appendTo(this.$('.o_mail_chat_content'));
         var def4 = this.searchview.appendTo($("<div>")).then(function () {
-            self.$searchview_buttons = self.searchview.$buttons.contents();
+            if (!config.isMobile) {
+                self.$searchview_buttons = self.searchview.$buttons.contents();
+            }
         });
 
         this.renderSidebar();
