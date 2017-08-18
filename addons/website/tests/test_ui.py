@@ -13,10 +13,7 @@ class TestUi(odoo.tests.HttpCase):
     at_install = False
 
     def test_01_public_homepage(self):
-        self.chrome_headless("/", "console.log('ok')", "'website.snippets.animation' in odoo.__DEBUG__.services")
+        self.chrome_headless("/", "console.log('ok')", "'website.content.snippets.animation' in odoo.__DEBUG__.services")
 
-    def test_02_admin_homepage(self):
-        self.chrome_headless("/", "console.log('ok')", "'website.snippets.editor' in odoo.__DEBUG__.services", login='admin')
-
-    def test_03_admin_tour_banner(self):
+    def test_02_admin_tour_banner(self):
         self.chrome_headless("/", "odoo.__DEBUG__.services['web_tour.tour'].run('banner')", "odoo.__DEBUG__.services['web_tour.tour'].tours.banner.ready", login='admin')
