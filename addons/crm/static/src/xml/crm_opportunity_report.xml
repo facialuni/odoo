@@ -13,8 +13,12 @@
                         <div class="o_pipeline_side_box">
                             <t t-set="opportunity_value" t-value="widget.data.opportunity" />
                             <b><t t-esc="opportunity_value.open_opp" /></b> Open Opportunity <br />
-                            <a class="o_click_action"><b><t t-esc="opportunity_value.opp_to_close.length" /></b> opportunities to close by the end of <t t-esc="widget.options.date.end_date" />.</a><br />
-                            <a class="o_click_action" ><b><t t-esc="opportunity_value.opp_overpassed.length"/></b> opportunities with expected closing date overpassed; amount is <b><t t-esc="opportunity_value.opp_overpassed_amount" />.</b></a>
+                            <t t-if="opportunity_value.opp_to_close.length !== 0">
+                                <a class="o_click_action" name="Pipeline to close"><b><t t-esc="opportunity_value.opp_to_close.length" /></b> opportunities to close by the end of <t t-esc="widget.options.date.end_date" />.</a><br />
+                            </t>
+                            <t t-if="opportunity_value.opp_overpassed.length !== 0">
+                                <a class="o_click_action" name="Overdue Opportunity" ><b><t t-esc="opportunity_value.opp_overpassed.length"/></b> opportunities with expected closing date overpassed with amount <b><t t-esc="opportunity_value.opp_overpassed_amount" />.</b></a>
+                            </t>
                         </div>
                         <div class="o_pipeline_side_box">
                             <strong><t t-esc="widget.data.average_days"/> Days</strong>
@@ -63,7 +67,7 @@
             </t>
             <t t-else="">
                 <div class="o_pipeline_stage_moves">
-                    <a class="o_click_action">
+                    <a class="o_click_action" name="Pipeline">
                         <t t-esc="stage.data"/> Opportunity <br />
                         <t t-esc="stage.percentage" /> % Conversion
                     </a>

@@ -78,7 +78,10 @@ class History(models.Model):
         stage_moves = []
         for stage in stages:
             result = self.env['crm.stage.history'].search_count([('res_id', 'in', records.ids), ('stage_name', '=', stage.name)])
-            percentage = (result * 100) / total_opp
+            if total_opp != 0:
+                percentage = (result * 100) / total_opp
+            else:
+                percentage = 0
             stage_moves.append({'name': stage.name,
                                 'sequence': stage.sequence,
                                 'data': result,

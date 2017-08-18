@@ -146,13 +146,18 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
      * @private
      */
     _renderFunnelchart: function () {
-        var funnelchart = new FunnelChart({
-                        data: this.data.expected_revenues,
-                        height: 350,
-                        width: 300,
-                        bottomPct: 1/8
-                    });
-        funnelchart.draw('.o_funnelchart');
+        var funnelchart = new D3Funnel('.o_funnelchart');
+        var options = {
+            chart: {
+                height: 350,
+                width: 300,
+            },
+            block: {
+                dynamicHeight: true,
+                minHeight: 25,
+            },
+        };
+        funnelchart.draw(this.data.expected_revenues, options);
     },
     /**
      * @private
@@ -281,12 +286,17 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
         var $action = $(event.currentTarget);
         var domain = this.data.domain;
 
+        if ($action.attr('name') == 'Overdue Opportunity') {
+            domain = [['id', 'in', this.data.opportunity.opp_overpassed]];
+        } else if ($action.attr('name') == 'Pipeline to close') {
+            domain = [['id', 'in', this.data.opportunity.opp_to_close]];
+        }
+
         return this.do_action({
-            name: 'Pipeline',
+            name: $action.attr('name'),
             type: 'ir.actions.act_window',
             res_model: 'crm.lead',
             views: [[false, 'kanban'], [false, 'form'], [false, 'list']],
-            view_type: "kanban",
             view_mode: "kanban",
             domain: domain,
         });
