@@ -32,8 +32,14 @@ class TemplatePreview(models.TransientModel):
             result['model_id'] = self.env['mail.template'].browse(self._context['template_id']).model_id.id
         return result
 
+    def _default_language(self):
+        lang_code = self.env['ir.values'].get_default('res.partner', 'lang')
+        def_lang = self.env['res.lang'].search([('code', '=', lang_code)], limit=1)
+        return def_lang.id if def_lang else self.env['res.lang'].search([], limit=1)
+
     res_id = fields.Selection(_get_records, 'Sample Document')
     partner_ids = fields.Many2many('res.partner', string='Recipients')
+    language_id = fields.Many2one('res.lang', string='Default Language', default=_default_language)
 
     @api.onchange('res_id')
     @api.multi
@@ -45,3 +51,7 @@ class TemplatePreview(models.TransientModel):
             mail_values = template.generate_email(self.res_id)
         for field in ['email_from', 'email_to', 'email_cc', 'reply_to', 'subject', 'body_html', 'partner_to', 'partner_ids', 'attachment_ids']:
             setattr(self, field, mail_values.get(field, False))
+
+    @api.onchange('language_id')
+    def _onchange_language_id(self):
+        pass
