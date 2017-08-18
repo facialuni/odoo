@@ -102,6 +102,7 @@ class MailComposer(models.TransientModel):
                 ('mass_mail', 'Email Mass Mailing'),
                 ('mass_post', 'Post on Multiple Documents')]
 
+    followers_name = fields.Text(readonly=True)
     composition_mode = fields.Selection(selection=_get_composition_mode_selection, string='Composition mode', default='comment')
     partner_ids = fields.Many2many(
         'res.partner', 'mail_compose_message_res_partner_rel',
@@ -172,7 +173,9 @@ class MailComposer(models.TransientModel):
                 partner_ids += [(4, parent.author_id.id)]
             result['partner_ids'] = partner_ids
         elif values.get('model') and values.get('res_id'):
-            doc_name_get = self.env[values.get('model')].browse(values.get('res_id')).name_get()
+            record = self.env[values.get('model')].browse(values.get('res_id'))
+            doc_name_get = record.name_get()
+            result['followers_name'] = ', '.join(record.message_follower_ids.mapped('partner_id.name'))
             result['record_name'] = doc_name_get and doc_name_get[0][1] or ''
             subject = tools.ustr(result['record_name'])
 
