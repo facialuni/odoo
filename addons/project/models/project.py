@@ -236,6 +236,11 @@ class Project(models.Model):
         for project in self:
             project.portal_url = '/my/project/%s' % project.id
 
+    @api.onchange('project_type')
+    def _onchange_project_type(self):
+        if self.project_type == "internal":
+            self.partner_id = False
+
     @api.multi
     def map_tasks(self, new_project_id):
         """ copy and map tasks from old to new project """
