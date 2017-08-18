@@ -61,23 +61,23 @@
         <div class="o_pipeline_box">
             <div class="o_pipeline_stage_name">
                 <b><t t-esc="stage.name" /></b>
-                <span class="chevron"/>
             </div>
-            <t t-if="stage === _.first(widget.data.stage_moves)">
-                <div class="o_new_deals">
-                    <strong><t t-esc="widget.data.new_opp" /></strong>
-                    <br/> New Opportunity
-                </div>
-            </t>
-            <t t-else="">
-                <div class="o_pipeline_stage_moves">
-                    <a class="o_click_action" name="Pipeline">
-                        <t t-esc="stage.data"/> Opportunity <br />
-                        <t t-esc="stage.percentage" /> % Conversion
-                    </a>
-                    <i class="chevron"></i>
-                </div>
-            </t>
+            <div class="o_pipeline_border_box">
+                <t t-if="stage === _.first(widget.data.stage_moves)">
+                    <div class="o_new_deals">
+                        <strong><t t-esc="widget.data.new_opp" /></strong>
+                        <br/> New Opportunity
+                    </div>
+                </t>
+                <t t-else="">
+                    <div class="o_pipeline_stage_moves">
+                        <a class="o_click_action" name="Pipeline">
+                            <t t-esc="stage.data"/> Opportunity <br />
+                            <t t-esc="stage.percentage" /> % Conversion
+                        </a>
+                    </div>
+                </t>
+            </div>
         </div>
     </t>
 
