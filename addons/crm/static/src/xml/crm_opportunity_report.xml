@@ -32,7 +32,10 @@
                         <br />Won Opportunity<br />
                         <strong><t t-esc="widget.won_opp_amount" /></strong>
                     </div>
-                    <div class="o_piechart" />
+                        <div class="o_piechart_img">
+                            <img src="crm/static/src/img/pie_chart.png" alt="There isn't any won/lost opportunity" class="image-responsive mt8"/>
+                        </div>
+                        <div class="o_piechart_graph" />
                     <div class="o_deals">
                         <strong class="o_lost_deals">
                             <t t-esc="widget.data.opportunity.lost_opp.length"/>
@@ -40,14 +43,15 @@
                         <br />Lost Opportunity<br />
                         <strong><t t-esc="widget.lost_opp_amount"/></strong>
                     </div>
-                    <t t-if="widget.data.expected_revenues.length > 0">
-                        <div class="o_funnel">
-                            <b>Probable Turnover</b>
-                            <a name="crm.crm_opportunity_report_view_pivot">
-                                <div class="o_funnelchart"/>
-                            </a>
+                    <div class="o_funnel">
+                        <b>Probable Turnover</b>
+                        <div class="o_funnelchart_img">
+                            <img src="crm/static/src/img/funnel_chart.png" alt="There isn't any expected revenue for any stage" class="image-responsive mt8"/>
                         </div>
-                    </t>
+                        <a name="crm.crm_opportunity_report_view_pivot">
+                            <div class="o_funnelchart_graph" />
+                        </a>
+                    </div>
                 </div>
             </t>
         </div>

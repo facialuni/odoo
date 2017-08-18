@@ -134,65 +134,75 @@ var OpportunityReport = Widget.extend(ControlPanelMixin, {
             self.won_opp_amount = _.reduce(self.data.opportunity.won_opp, function(sum, x) {return sum + x;});
             self.lost_opp_amount = _.reduce(self.data.opportunity.lost_opp, function(sum, x) {return sum + x;});
             self.renderElement();
-            if (self.data.opportunity.lost_opp.length !== 0 || self.data.opportunity.won_opp.length !== 0) {
-                self._renderGraph();
-            };
-            if (self.data.expected_revenues.length > 0) {
-                self._renderFunnelchart();
-            };
+            self._renderGraph();
+            self._renderFunnelchart();
         });
     },
     /**
      * @private
      */
     _renderFunnelchart: function () {
-        var funnelchart = new D3Funnel('.o_funnelchart');
-        var options = {
-            chart: {
-                height: 350,
-                width: 300,
-            },
-            block: {
-                dynamicHeight: true,
-                minHeight: 25,
-            },
+        if (this.data.expected_revenues.length > 0) {
+            this.$(".o_funnelchart_img").hide();
+            this.$(".o_funnelchart_graph").show();
+            var funnelchart = new D3Funnel('.o_funnelchart_graph');
+            var options = {
+                chart: {
+                    height: 350,
+                    width: 300,
+                },
+                block: {
+                    dynamicHeight: true,
+                    minHeight: 25,
+                },
+            };
+            funnelchart.draw(this.data.expected_revenues, options);
+        } else {
+            this.$(".o_funnelchart_graph").hide();
+            this.$(".o_funnelchart_img").show();
         };
-        funnelchart.draw(this.data.expected_revenues, options);
     },
     /**
      * @private
      */
     _renderGraph: function () {
-        var totalOpp = this.data.opportunity.lost_opp.length + this.data.opportunity.won_opp.length;
-        var wonPercent = this.data.opportunity.won_opp.length * 100 / totalOpp;
-        var lostPercent = 100 - wonPercent;
-        var graphData = [{
-                'label': '$ ' + this.won_opp_amount,
-                'value': wonPercent,
-            },
-            {
-                'label': '$ ' + this.lost_opp_amount,
-                'value': lostPercent,
-            }
-        ];
-        nv.addGraph(function() {
-            var pieChart = nv.models.pieChart()
-                .x(function(d) { return d.label; })
-                .y(function(d) { return d.value; })
-                .labelType("percent")
-                .showLegend(false)
-                .margin({ "left": 0, "right": 0, "top": 0, "bottom": 0 })
-                .color(['#00ff00', '#ff0000']);
-        var svg = d3.select(".o_piechart").append("svg");
+        if (this.data.opportunity.lost_opp.length === 0 && this.data.opportunity.won_opp.length === 0) {
+            this.$(".o_piechart_img").show();
+            this.$(".o_piechart_graph").hide();
+        } else {
+            this.$(".o_piechart_img").hide();
+            this.$(".o_piechart_graph").show();
+            var totalOpp = this.data.opportunity.lost_opp.length + this.data.opportunity.won_opp.length;
+            var wonPercent = this.data.opportunity.won_opp.length * 100 / totalOpp;
+            var lostPercent = 100 - wonPercent;
+            var graphData = [{
+                    'label': '$ ' + this.won_opp_amount,
+                    'value': wonPercent,
+                },
+                {
+                    'label': '$ ' + this.lost_opp_amount,
+                    'value': lostPercent,
+                }
+            ];
+            nv.addGraph(function() {
+                var pieChart = nv.models.pieChart()
+                    .x(function(d) { return d.label; })
+                    .y(function(d) { return d.value; })
+                    .labelType("percent")
+                    .showLegend(false)
+                    .margin({ "left": 0, "right": 0, "top": 0, "bottom": 0 })
+                    .color(['#00ff00', '#ff0000']);
+            var svg = d3.select(".o_piechart_graph").append("svg");
 
-        svg
-            .attr("height", "15em")
-            .datum(graphData)
-            .call(pieChart);
+            svg
+                .attr("height", "15em")
+                .datum(graphData)
+                .call(pieChart);
 
-        nv.utils.windowResize(pieChart.update);
-        return pieChart;
-        });
+            nv.utils.windowResize(pieChart.update);
+            return pieChart;
+            });
+        }
     },
     /**
      * @private

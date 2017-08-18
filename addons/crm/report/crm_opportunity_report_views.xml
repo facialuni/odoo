@@ -143,7 +143,7 @@
             name="Leads"
             parent="crm_menu_report"
             action="crm_opportunity_report_action_lead"
-            groups="crm.group_use_lead,sales_team.group_sale_manager"
+            groups="crm.group_use_lead"
             sequence="1"/>
 
 </odoo>
