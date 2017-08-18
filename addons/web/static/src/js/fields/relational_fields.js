@@ -21,7 +21,6 @@ var dialogs = require('web.view_dialogs');
 var core = require('web.core');
 var data = require('web.data');
 var Dialog = require('web.Dialog');
-var field_utils = require('web.field_utils');
 var KanbanRenderer = require('web.KanbanRenderer');
 var ListRenderer = require('web.ListRenderer');
 var Pager = require('web.Pager');
@@ -290,7 +289,7 @@ var FieldMany2One = AbstractField.extend({
     _reset: function () {
         this._super.apply(this, arguments);
         this.floating = false;
-        this.m2o_value = field_utils.format.many2one(this.value);
+        this.m2o_value = this._formatValue(this.value);
     },
     /**
      * @private
@@ -567,7 +566,7 @@ var KanbanFieldMany2One = AbstractField.extend({
     tagName: 'span',
     init: function () {
         this._super.apply(this, arguments);
-        this.m2o_value = field_utils.format.many2one(this.value);
+        this.m2o_value = this._formatValue(this.value);
     },
 
     //--------------------------------------------------------------------------

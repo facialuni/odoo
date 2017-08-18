@@ -7351,6 +7351,47 @@ QUnit.module('relational_fields', {
         form.destroy();
     });
 
+    QUnit.only('reference reset by onchange', function (assert) {
+        assert.expect(2);
+
+        this.data.partner.onchanges = {
+            int_field: function (obj) {
+                debugger;
+                obj.reference = 'product,' + obj.int_field;
+            },
+        };
+
+        var form = createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: '<form string="Partners">' +
+                    '<sheet>' +
+                        '<group>' +
+                            '<field name="int_field"/>' +
+                            '<field name="reference" readonly="1"/>' +
+                        '</group>' +
+                    '</sheet>' +
+                '</form>',
+            res_id: 1,
+            viewOptions: {
+                mode: 'edit',
+            },
+            debug: 1,
+        });
+
+        assert.strictEqual(form.$('a[name="reference"]').text(), "first record",
+            "reference field should be correctly set");
+
+        // trigger onchange
+        form.$('.o_field_widget[name=int_field]').val(2).trigger('input');
+
+        assert.strictEqual(form.$('a[name="reference"]').text(), "",
+            "reference field should have been updated and re-rendered as empty");
+
+        // form.destroy();
+    });
+
 });
 });
 });
