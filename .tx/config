@@ -682,9 +682,9 @@ file_filter = addons/stock_landed_costs/i18n/<lang>.po
 source_file = addons/stock_landed_costs/i18n/stock_landed_costs.pot
 source_lang = en
 
-[odoo-master.stock_picking_wave]
-file_filter = addons/stock_picking_wave/i18n/<lang>.po
-source_file = addons/stock_picking_wave/i18n/stock_picking_wave.pot
+[odoo-master.stock_batch_picking]
+file_filter = addons/stock_batch_picking/i18n/<lang>.po
+source_file = addons/stock_batch_picking/i18n/stock_batch_picking.pot
 source_lang = en
 
 [odoo-master.survey]
