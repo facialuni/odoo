@@ -30,6 +30,7 @@ var StatementAction = Widget.extend(ControlPanelMixin, {
         validate_all_balanced: '_onValidate',
         change_name: '_onChangeName',
         close_statement: '_onCloseStatement',
+        load_more: '_onLoadMore',
     },
     config: {
         // used to instanciate the model
@@ -89,12 +90,7 @@ var StatementAction = Widget.extend(ControlPanelMixin, {
         this.update_control_panel({breadcrumbs: breadcrumbs, search_view_hidden: true}, {clear: true});
 
         this.renderer.prependTo(self.$('.o_form_sheet'));
-        _.each(this.model.lines, function (line, handle) {
-            var widget = new self.config.LineRenderer(self, self.model, line);
-            widget.handle = handle;
-            self.widgets.push(widget);
-            widget.appendTo(self.$('.o_reconciliation_lines'));
-        });
+        this._renderLines();
         this._openFirstLine();
     },
 
@@ -152,6 +148,24 @@ var StatementAction = Widget.extend(ControlPanelMixin, {
             });
         }
         return handle;
+    },
+    /**
+     * render line widget and append to view
+     *
+     * @private
+     */
+    _renderLines: function (){
+        var self = this;
+        var lines_to_display = this.model.getDisplayLines();
+        _.each(lines_to_display, function (line, handle) {
+            var widget = new self.config.LineRenderer(self, self.model, line);
+            widget.handle = handle;
+            self.widgets.push(widget);
+            widget.appendTo(self.$('.o_reconciliation_lines'));
+        });
+        if (this.model.getDisplayLoadButton() === false) {
+            this.renderer.hideLoadMoreButton();
+        }
     },
 
     //--------------------------------------------------------------------------
@@ -221,6 +235,15 @@ var StatementAction = Widget.extend(ControlPanelMixin, {
                 view_type: 'form',
                 view_mode: 'form',
             });
+        });
+    },
+    /**
+     * Load more statement and render them
+     */
+    _onLoadMore: function (event, qty) {
+        var self = this;
+        return this.model.loadMore(qty).then(function () {
+            self._renderLines();
         });
     },
     /**

@@ -100,6 +100,8 @@ var StatementModel = BasicModel.extend({
         this.lines = {};
         this.valuenow = 0;
         this.valuemax = 0;
+        this.already_displayed = [];
+        this.default_display_qty = 10;
     },
 
     //--------------------------------------------------------------------------
@@ -284,6 +286,32 @@ var StatementModel = BasicModel.extend({
         return this.context;
     },
     /**
+     * Return the lines that needs to be displayed by the widget
+     * @returns {Object} lines that are loaded and not yet displayed
+     */
+    getDisplayLines: function () {
+        var self = this;
+        var lines_to_display = _.pick(this.lines, function(value, key, object) { 
+            if (value['visible'] === true && self.already_displayed.indexOf(value['id']) === -1) {
+                self.already_displayed.push(value['id']);
+                return object;
+            }
+        });
+        return lines_to_display;
+    },
+    /**
+     * Return a boolean telling if load button needs to be displayed or not
+     * @returns {Boolean} true if load more button needs to be displayed
+     */
+    getDisplayLoadButton: function () {
+        var self = this;
+        var not_displayed = _.filter(this.lines, function(line) { return line.visible === undefined; });
+        if (not_displayed.length > 0) {
+            return true;
+        }
+        return false;
+    },
+    /**
      * get the line data for this handle
      *
      * @param {OdooEvent} event
@@ -355,6 +383,8 @@ var StatementModel = BasicModel.extend({
                 line.reconcileModels = self.reconcileModels;
             });
             var ids = _.pluck(self.lines, 'id');
+            ids = ids.splice(0, self.default_display_qty);
+            self.pager_index = ids.length;
             return self._rpc({
                     model: 'account.bank.statement.line',
                     method: 'get_data_for_reconciliation_widget',
@@ -362,6 +392,22 @@ var StatementModel = BasicModel.extend({
                 })
                 .then(self._formatLine.bind(self));
         });
+    },
+    loadMore: function(qty) {
+        var self = this;
+        if (qty === undefined) {
+            qty = self.default_display_qty;
+        }
+        var ids = _.pluck(self.lines, 'id');
+        ids = ids.splice(self.pager_index, qty);
+        self.pager_index += qty;
+        var excluded_ids = self._getExcludedIds();
+        return self._rpc({
+            model: 'account.bank.statement.line',
+            method: 'get_data_for_reconciliation_widget',
+            args: [ids, excluded_ids],
+        })
+        .then(self._formatLine.bind(self));
     },
     /**
      * Add lines into the propositions from the reconcile model
@@ -770,6 +816,7 @@ var StatementModel = BasicModel.extend({
             var line = _.find(self.lines, function (l) {
                 return l.id === data.st_line.id;
             });
+            line.visible = true;
             _.extend(line, data);
             self._formatLineProposition(line, line.reconciliation_proposition);
             if (!line.reconciliation_proposition.length) {
@@ -849,6 +896,25 @@ var StatementModel = BasicModel.extend({
         }
         prop.amount = prop.base_amount;
         return prop;
+    },
+    /**
+     * Return list of account_move_line that has been selected and needs to be removed
+     * from other calls.
+     *
+     * @private
+     * @returns {Array} list of excluded ids
+     */
+    _getExcludedIds: function () {
+        var excluded_ids = [];
+        _.each(this.lines, function(line) {
+            if (line.reconciliation_proposition) {
+                _.each(line.reconciliation_proposition, function(prop) {
+                    if (parseInt(prop['id'])) {
+                        excluded_ids.push(prop['id']);
+                    }
+                })
+            }
+        });
     },
     /**
      * Defined whether the line is to be displayed or not. Here, we only display
