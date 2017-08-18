@@ -424,26 +424,38 @@ action = model.activate_sample_project()
                         </page>
                         <page string="Extra Info" groups="base.group_no_one">
                             <group>
-                                <group>
+                                <field name="email_from" invisible="1"/>
+                                <field name="email_cc" invisible="1"/>
+                                <field name="parent_id" groups="project.group_subtask_project"/>
+                                <field name="child_ids" invisible="1" />
+                                <field name="subtask_project_id" invisible="1" />
+                            </group>
+                            <group>
+                                <group string="Assignation" attrs="{'invisible': [('working_hours_open', '=', 0.0)]}">
+                                    <label string="Time to Assign"/>
+                                    <div>
+                                        <field name="working_days_open" class="oe_inline mr8"/>
+                                        <strong><span class="mr8">Days</span></strong>
+                                        <field name="working_hours_open" class="oe_inline mr8"/>
+                                        <strong><span>Hours</span></strong>
+                                    </div>
+                                </group>
+                                <group string="Kanban View">
                                     <field name="sequence" groups="base.group_no_one"/>
-                                    <field name="email_from" invisible="1"/>
-                                    <field name="email_cc" invisible="1"/>
-                                    <field name="parent_id" groups="project.group_subtask_project"/>
-                                    <field name="child_ids" invisible="1" />
-                                    <field name="subtask_project_id" invisible="1" />
                                     <field name="displayed_image_id" groups="base.group_no_one"/>
+                                </group>
+                                <group string="Time to Close" attrs="{'invisible': [('working_hours_close', '=', 0.0)]}">
+                                    <label string="Time to Close"/>
+                                    <div>
+                                        <field name="working_days_close" class="oe_inline mr8"/>
+                                        <strong><span class="mr8">Days</span></strong>
+                                        <field name="working_hours_close" class="oe_inline mr8"/>
+                                        <strong><span>Hours</span></strong>
+                                    </div>
                                 </group>
                                 <group>
                                     <field name="date_assign" groups="base.group_no_one"/>
                                     <field name="date_last_stage_update" groups="base.group_no_one"/>
-                                </group>
-                                <group string="Working Time to Assign" attrs="{'invisible': [('working_hours_open', '=', 0.0)]}">
-                                    <field name="working_hours_open" string="Hours"/>
-                                    <field name="working_days_open" string="Days"/>
-                                </group>
-                                <group string="Working Time to Close" attrs="{'invisible': [('working_hours_close', '=', 0.0)]}">
-                                    <field name="working_hours_close" string="Hours"/>
-                                    <field name="working_days_close" string="Days"/>
                                 </group>
                             </group>
                         </page>
