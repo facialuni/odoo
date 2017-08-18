@@ -54,4 +54,12 @@ class TemplatePreview(models.TransientModel):
 
     @api.onchange('language_id')
     def _onchange_language_id(self):
-        pass
+        # self.body_html = self.env['mail.template'].browse(self._context['template_id']).with_context(lang=self.language_id.code).body_html
+        mail_values = {}
+        if self.res_id and self._context.get('template_id'):
+            template = self.env['mail.template'].browse(self._context['template_id'])
+            template.lang = self.language_id.code
+            mail_values = template.with_context(lang=self.language_id.code).generate_email(self.res_id)
+            # print "\n\n\n\n\n mail_values -> ", mail_values
+        for field in ['email_from', 'email_to', 'email_cc', 'reply_to', 'subject', 'body_html', 'partner_to', 'partner_ids', 'attachment_ids']:
+            setattr(self, field, mail_values.get(field, False))
