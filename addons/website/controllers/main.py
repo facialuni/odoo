@@ -128,6 +128,7 @@ class Website(Home):
             else:
                 return request.env['ir.http']._handle_exception(e, 404)
 
+
         return request.render(page, values)
 
     @http.route(['/website/country_infos/<model("res.country"):country>'], type='json', auth="public", methods=['POST'], website=True)

@@ -8,6 +8,7 @@
     'description': """ This is product configurator module""",
     'data': [
         'views/product_config_views.xml',
+        'views/templates.xml',
     ],
     'demo': [
     ],

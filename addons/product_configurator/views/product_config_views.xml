@@ -36,7 +36,7 @@
     	<field name="arch" type="xml">
 	    	<xpath expr="//field[@name='attribute_line_ids']" position="before">
 	    		<group>
-	    		<field name="variant_mode"/>
+	    		<field name="variant_mode" widget="radio"/>
 	    		</group>
 	    	</xpath>	
     	</field>

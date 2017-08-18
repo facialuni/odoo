@@ -663,7 +663,7 @@
                   </t>
               </ul>
             </t>
-
+                                                                                                                                                                                                
             <t t-if="variant_id.attribute_id.type == 'color'">
               <ul class="list-inline">
                   <t t-set="inc" t-value="0"/>
