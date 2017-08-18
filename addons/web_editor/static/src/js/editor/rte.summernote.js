@@ -598,11 +598,17 @@ function reRangeSelectKey(event) {
 }
 function adjustPosition(event) {
     var selection = window.getSelection().baseNode.nextElementSibling;
-    if (!selection) {
-        if (event.keyCode == 37) {
-            $(window.getSelection().baseNode.parentNode).before("&nbsp;");
-        } else if (event.keyCode == 39) {
-            $(window.getSelection().baseNode.parentNode).after("&nbsp;");
+    var parentSelectedNode = window.getSelection().baseNode.parentNode;
+
+    if (!selection && $(parentSelectedNode).hasClass('fa')) {
+        var element = parentSelectedNode.outerHTML;
+        var regex = new RegExp('([^>]?)' +element+ '([^<]?)');
+        var groups = regex.exec(parentSelectedNode.parentNode.innerHTML);
+
+        if (event.keyCode == 37 && groups[1] != ' ') {
+            $(parentSelectedNode).before(" ");
+        } else if (event.keyCode == 39 && groups[2] != ' ') {
+            $(parentSelectedNode).after(" ");
         }
     }
 }

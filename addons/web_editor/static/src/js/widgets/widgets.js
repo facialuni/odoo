@@ -538,8 +538,8 @@ var fontIconsDialog = Widget.extend({
             $(media).data($(this.media).data());
             $(this.media).replaceWith(media);
             this.media = media;
-            $(media).after("&nbsp;");
-            $(media).before("&nbsp;");
+            $(media).after(" ");
+            $(media).before(" ");
             style = style.replace(/\s*width:[^;]+/, '');
         }
         $(this.media).attr("class", _.compact(final_classes).join(' ')).attr("style", style);
